@@ -375,10 +375,7 @@
         templates of the body's child elements (which consists entirely of dri:div tags).
     -->
     <xsl:template match="dri:body">
-        <xsl:if test="/dri:document/dri:meta/dri:userMeta[@authenticated = 'yes']">
-            <xsl:call-template name="userbox" />
-        </xsl:if>
-        <xsl:call-template name="languageSelection"/>
+        <xsl:call-template name="navbar"/>
         <div class="container-fluid">
             
             <div class="container">

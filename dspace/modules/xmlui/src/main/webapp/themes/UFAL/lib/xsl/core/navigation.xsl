@@ -339,8 +339,26 @@
                 </ul>
     </xsl:template>
 
+	<xsl:template name="navbar">
+		<nav class="navbar-fixed-top">
+			<div class="container-fluid">
+		        <xsl:if test="/dri:document/dri:meta/dri:userMeta[@authenticated = 'yes']">
+				<ul class="nav navbar-nav navbar-right">
+				<li>
+					<xsl:call-template name="userbox"/>
+				</li>
+				</ul>
+        		</xsl:if>
+			<ul class="nav navbar-nav navbar-left">
+			<li>
+				<xsl:call-template name="languageSelection"/>
+			</li>
+			</ul>
+			</div>
+                </nav>
+	</xsl:template>
 	<xsl:template name="userbox">
-		<div id="userbox" class="navbar-fixed-top text-right">
+		<div id="userbox">
 			<div class="badge" style="margin: 2px;">
 				<a style="color: #FFF;">
 					<xsl:attribute name="href">
@@ -378,7 +396,17 @@
                             <xsl:call-template name="getLanguageURL"/>
                             <xsl:value-of select="$locale"/>
                         </xsl:attribute>
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='supportedLocale'][@qualifier=$locale]"/>
+			<img>
+			    <xsl:attribute name="src">
+				<xsl:value-of select="concat($context-path,'/themes/UFAL/lib/lindat/public/img/flags/',$locale,'.png')"/>
+			    </xsl:attribute>
+			    <xsl:attribute name="alt">
+	                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='supportedLocale'][@qualifier=$locale]"/>
+			    </xsl:attribute>
+			    <xsl:attribute name="title">
+	                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='supportedLocale'][@qualifier=$locale]"/>
+			    </xsl:attribute>
+			</img>
                     </a>
                 </xsl:for-each>
             </div>
