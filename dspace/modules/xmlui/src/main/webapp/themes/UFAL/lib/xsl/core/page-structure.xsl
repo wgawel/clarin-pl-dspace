@@ -378,6 +378,7 @@
         <xsl:if test="/dri:document/dri:meta/dri:userMeta[@authenticated = 'yes']">
             <xsl:call-template name="userbox" />
         </xsl:if>
+        <xsl:call-template name="languageSelection"/>
         <div class="container-fluid">
             
             <div class="container">
@@ -418,7 +419,6 @@
             </div>
         </div>
     </xsl:template>
-
 
     <!-- Currently the dri:meta element is not parsed directly. Instead, parts of it are referenced from inside
         other elements (like reference). The blank template below ends the execution of the meta branch -->

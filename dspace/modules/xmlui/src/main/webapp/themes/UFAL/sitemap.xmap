@@ -128,6 +128,7 @@
                     <map:parameter name="javascript#1" value="lib/js/aai_config.js"/>
                     <map:parameter name="theme.path" value="{global:theme-path}"/>
                     <map:parameter name="theme.name" value="{global:theme-name}"/>
+                    <map:parameter name="curRequestURI" value="{1}"/>
                 </map:transform>
 
 				<!-- Debuging output -->
