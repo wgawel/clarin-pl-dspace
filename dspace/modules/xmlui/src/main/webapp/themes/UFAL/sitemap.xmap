@@ -130,6 +130,10 @@
                     <map:parameter name="theme.name" value="{global:theme-name}"/>
                     <map:parameter name="curRequestURI" value="{1}"/>
                 </map:transform>
+                
+                <map:act type="locale">
+                	<map:parameter name="locale" value="{locale}"/>
+                </map:act>
 
 				<!-- Debuging output -->
 				<map:match type="request" pattern="XML">
