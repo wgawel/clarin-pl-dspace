@@ -2777,4 +2777,21 @@
     <message key="xmlui.swordclient.SwordResponse.title">Odpověď SWORD</message>
     <message key="xmlui.swordclient.SwordResponse.trail">Odpověď SWORD</message>
 
+    <!-- Homepage -->
+    <message key="homepage.carousel.quote">&#x201E;Na světě by mělo být jen jedno velké úložiště umění, které by umělec obohatil svými díly a při prezentaci získal přesně, co žádal... &#x201D;</message>
+    <message key="homepage.carousel.data_tools">Lingvistická data a nástroje</message>
+    <message key="homepage.carousel.find">Vyhledávání</message>
+    <message key="homepage.carousel.citation_support">Podpora citací (persistentní identifikátory)</message>
+    <message key="homepage.carousel.deposit">Úschova zdarma a bezpečně</message>
+    <message key="homepage.carousel.license">Volitelné licence (avšak preferujeme otevřené)</message>
+    <message key="homepage.carousel.easy_find">Snadné hledání</message>
+    <message key="homepage.carousel.easy_cite">Snadná citace</message>
+    
+    <message key="homepage.item.description">Popis:</message>
+    <message key="homepage.item.authors">Autoři</message>
+
+    <message key="homepage.whatsnew">Nově přidané</message>
+    <message key="homepage.norecent">Žádné nové položky</message>
+    <message key="homepage.show_hide_menu">Zobrazit/Skrýt menu</message>
+
 </catalogue>
