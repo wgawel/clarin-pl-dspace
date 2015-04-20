@@ -62,7 +62,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
     private static final String T_head_visits_cities = "xmlui.statistics.visits.cities";
     private static final String T_head_visits_bitstream = "xmlui.statistics.visits.bitstreams";
     
-    private static final String T_most_viewed = "homepage.most_viewed_items";
+    private static final Message T_most_viewed = message("homepage.most_viewed_items");
     private static final String T_top_week = "homepage.top_week";
 
     private Date dateStart = null;
