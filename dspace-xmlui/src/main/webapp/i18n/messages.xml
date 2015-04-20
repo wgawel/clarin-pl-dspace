@@ -2842,4 +2842,8 @@
   <!-- UFAL/lib/xsl/aspect/artifactbrowser/item-view.xsl -->
   <message key="xmlui.UFAL.artifactbrowser.item-download-all-files">Download all files in item ({0})</message>
   <message key="xmlui.UFAL.artifactbrowser.item-download-file">Download file</message>
+  
+  <!-- homepage -->
+  <message key="homepage.most_viewed_items">Most Viewed Items</message>
+  <message key="homepage.top_week">Top Last Week</message>
 </catalogue>

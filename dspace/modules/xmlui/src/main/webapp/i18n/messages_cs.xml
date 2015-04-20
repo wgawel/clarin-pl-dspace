@@ -2794,4 +2794,7 @@
     <message key="homepage.norecent">Žádné nové položky</message>
     <message key="homepage.show_hide_menu">Zobrazit/Skrýt menu</message>
 
+    <message key="homepage.most_viewed_items">Nejnavštěvovanější záznamy</message>
+    <message key="homepage.top_week">Za poslední týden</message>
+
 </catalogue>
