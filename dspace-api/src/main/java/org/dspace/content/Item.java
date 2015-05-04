@@ -30,6 +30,8 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.discovery.IndexingService;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.event.Event;
 import org.dspace.embargo.EmbargoManager;
 import org.dspace.eperson.EPerson;
@@ -798,9 +800,9 @@ public class Item extends DSpaceObject
         mappingRow.setColumn("bundle_id", b.getID());
         DatabaseManager.insert(ourContext, mappingRow);
 
-        ourContext.addEvent(new Event(Event.ADD, Constants.ITEM, getID(), 
-                Constants.BUNDLE, b.getID(), b.getName(), 
-                getIdentifiers(ourContext)));
+        ourContext.addEvent(new Event(Event.ADD, Constants.ITEM, getID(),
+            Constants.BUNDLE, b.getID(), b.getName(),
+            getIdentifiers(ourContext)));
     }
 
     /**
@@ -837,12 +839,12 @@ public class Item extends DSpaceObject
 
         // Remove mapping from DB
         DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM item2bundle WHERE item_id= ? " +
+            "DELETE FROM item2bundle WHERE item_id= ? " +
                 "AND bundle_id= ? ",
-                getID(), b.getID());
+            getID(), b.getID());
 
-        ourContext.addEvent(new Event(Event.REMOVE, Constants.ITEM, getID(), 
-                Constants.BUNDLE, b.getID(), b.getName(), getIdentifiers(ourContext)));
+        ourContext.addEvent(new Event(Event.REMOVE, Constants.ITEM, getID(),
+            Constants.BUNDLE, b.getID(), b.getName(), getIdentifiers(ourContext)));
 
         // If the bundle is orphaned, it's removed
         TableRowIterator tri = DatabaseManager.query(ourContext,
@@ -1273,6 +1275,22 @@ public class Item extends DSpaceObject
         // Write log
         log.info(LogManager.getHeader(ourContext, "reinstate_item", "user="
                 + e.getEmail() + ",item_id=" + getID()));
+    }
+
+    public void reindex()
+    {
+        DSpace dspace = new DSpace();
+        IndexingService indexer = dspace.getServiceManager().getServiceByName(
+            IndexingService.class.getName(),IndexingService.class);
+        try {
+            indexer.indexContent( ourContext, this, true );
+            decache();
+            indexer.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (SearchServiceException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

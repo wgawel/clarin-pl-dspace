@@ -66,6 +66,7 @@ public class FlowItemUtils
     private static final Message T_item_public = new Message("default","The item is now public.");
     private static final Message T_item_private = new Message("default","The item is now private.");
 	private static final Message T_item_reinstated = new Message("default","The item has been reinstated.");
+	private static final Message T_item_reindexed = new Message("default","The item has been reindexed.");
 	private static final Message T_item_moved = new Message("default","The item has been moved.");
 	private static final Message T_item_move_destination_not_found = new Message("default","The selected destination collection could not be found.");
 	private static final Message T_bitstream_added = new Message("default","The new bitstream was successfully uploaded.");
@@ -421,20 +422,36 @@ public class FlowItemUtils
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
-		
+
 		Item item = Item.find(context, itemID);
 		item.reinstate();
 		context.commit();
 
 		result.setContinue(true);
-        result.setOutcome(true);
-        result.setMessage(T_item_reinstated);
-        
+		result.setOutcome(true);
+		result.setMessage(T_item_reinstated);
+
+		return result;
+	}
+
+	public static FlowResult processReindex(Context context, int itemID) throws SQLException, AuthorizeException, IOException
+	{
+		FlowResult result = new FlowResult();
+		result.setContinue(false);
+
+		Item item = Item.find(context, itemID);
+		item.reindex();
+		context.commit();
+
+		result.setContinue(true);
+		result.setOutcome(true);
+		result.setMessage(T_item_reindexed);
+
 		return result;
 	}
 
 
-    /**
+	/**
      * Make the specified item Private, this method assumes that the action has been confirmed.
      *
      * @param context The DSpace context

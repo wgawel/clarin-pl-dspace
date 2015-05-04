@@ -7,9 +7,13 @@
  */
 package org.dspace.discovery;
 
+import cz.cuni.mff.ufal.DSpaceApi;
 import org.apache.log4j.Logger;
 import org.apache.commons.cli.*;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernelInit;
 import org.dspace.utils.DSpace;
 
 import java.io.IOException;
@@ -101,10 +105,17 @@ public class IndexClient {
         /**
          * new DSpace.getServiceManager().getServiceByName("org.dspace.discovery.SolrIndexer");
          */
+        DSpaceApi.load_dspace();
+        DSpaceKernelImpl kernelImpl = DSpaceKernelInit.getKernel(null);
+        if (!kernelImpl.isRunning())
+        {
+            kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+        }
+
 
         DSpace dspace = new DSpace();
 
-        IndexingService indexer = dspace.getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
+        IndexingService indexer = kernelImpl.getServiceManager().getServiceByName(IndexingService.class.getName(),IndexingService.class);
 
         if (line.hasOption("r")) {
             log.info("Removing " + line.getOptionValue("r") + " from Index");

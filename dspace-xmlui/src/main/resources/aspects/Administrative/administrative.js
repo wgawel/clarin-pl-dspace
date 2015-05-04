@@ -1627,6 +1627,11 @@ function doEditItemStatus(itemID)
 			// Confirm the withdrawal of the item
 			result = doWithdrawItem(itemID);
 		}
+		else if (cocoon.request.get("submit_reindex"))
+		{
+			// Confirm the reinstatiation of the item
+			result = doReindexItem(itemID);
+		}
 		else if (cocoon.request.get("submit_reinstate"))
 		{
 			// Confirm the reinstatiation of the item
@@ -1865,6 +1870,20 @@ function doReinstateItem(itemID)
 	}
 	return null;
 }
+
+function doReindexItem(itemID)
+{
+	// authorization check performed directly by the dspace-api
+	// assertAdministrator();
+
+	// Actually reinstate the item
+	// authorization check performed directly by the dspace-api
+	// assertAdministrator();
+
+	var result = FlowItemUtils.processReindex(getDSContext(),itemID);
+	return result;
+}
+
 
 
 function doPrivateItem(itemID)

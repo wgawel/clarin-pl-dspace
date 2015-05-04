@@ -405,7 +405,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 for (items = Item.findAllUnfiltered(context); items.hasNext();)
                 {
                     Item item = items.next();
-                    indexContent(context, item, force);
+                    if (item.getHandle().contains("11372/LRT-1409")) {
+                        indexContent(context, item, force);
+                    }
                     item.decache();
                 }
             } finally {

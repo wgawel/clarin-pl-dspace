@@ -1737,6 +1737,7 @@
 	<message key="xmlui.administrative.item.ConfirmItemForm.column3">Language</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.submit_withdraw">Withdraw</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.submit_reinstate">Reinstate</message>
+	<message key="xmlui.administrative.item.ConfirmItemForm.submit_reindex">Reindex</message>
     <message key="xmlui.administrative.item.ConfirmItemForm.submit_private">Make it Private</message>
     <message key="xmlui.administrative.item.ConfirmItemForm.submit_public">Make it Public</message>
 
@@ -1823,6 +1824,7 @@
 	<message key="xmlui.administrative.item.EditItemStatusForm.label_reinstate">Reinstate item into the repository</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.label_move">Move item to another collection</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.label_delete">Completely expunge item</message>
+	<message key="xmlui.administrative.item.EditItemStatusForm.label_reindex">Reindex item (debug)</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.submit_authorizations">Authorizations...</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.submit_withdraw">Withdraw...</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.submit_reinstate">Reinstate...</message>

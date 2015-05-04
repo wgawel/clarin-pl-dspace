@@ -57,6 +57,7 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 	private static final Message T_label_reinstate = message("xmlui.administrative.item.EditItemStatusForm.label_reinstate");
 	private static final Message T_label_move = message("xmlui.administrative.item.EditItemStatusForm.label_move");
 	private static final Message T_label_delete = message("xmlui.administrative.item.EditItemStatusForm.label_delete");
+	private static final Message T_label_reindex = message("xmlui.administrative.item.EditItemStatusForm.label_reindex");
 	private static final Message T_submit_authorizations = message("xmlui.administrative.item.EditItemStatusForm.submit_authorizations");
 	private static final Message T_submit_withdraw = message("xmlui.administrative.item.EditItemStatusForm.submit_withdraw");
 	private static final Message T_submit_reinstate = message("xmlui.administrative.item.EditItemStatusForm.submit_reinstate");
@@ -209,8 +210,17 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		{
 			addNotAllowedButton(itemInfo.addItem(), "submit_delete", T_submit_delete);
 		}
-		
-		
+
+		itemInfo.addLabel(T_label_reindex);
+		if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.DELETE))
+		{
+			itemInfo.addItem().addButton("submit_reindex").setValue(T_label_reindex);
+		}
+		else
+		{
+			addNotAllowedButton(itemInfo.addItem(), "submit_reindex", T_label_reindex);
+		}
+
 		
 		
 		// PARA: main actions

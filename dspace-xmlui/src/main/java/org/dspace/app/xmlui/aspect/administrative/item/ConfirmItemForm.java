@@ -57,6 +57,7 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 	private static final Message T_submit_delete = message("xmlui.general.delete");
 	private static final Message T_submit_withdraw = message("xmlui.administrative.item.ConfirmItemForm.submit_withdraw");
 	private static final Message T_submit_reinstate = message("xmlui.administrative.item.ConfirmItemForm.submit_reinstate");
+	private static final Message T_submit_reindex = message("xmlui.administrative.item.ConfirmItemForm.submit_reindex");
 
     private static final Message T_submit_private = message("xmlui.administrative.item.ConfirmItemForm.submit_private");
     private static final Message T_submit_public = message("xmlui.administrative.item.ConfirmItemForm.submit_public");
@@ -125,6 +126,10 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 		if("delete".equals(confirm))
 		{
 			confirmButton.setValue(T_submit_delete);
+		}
+		else if ("reindex".equals(confirm))
+		{
+			confirmButton.setValue(T_submit_reindex);
 		}
 		else if ("reinstate".equals(confirm))
 		{
