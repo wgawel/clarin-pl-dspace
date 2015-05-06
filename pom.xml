@@ -1328,6 +1328,19 @@
               <version>3.0.0</version>
               <scope>provided</scope>
           </dependency>
+          
+		  <dependency>
+          	 <groupId>org.aspectj</groupId>
+          	 <artifactId>aspectjrt</artifactId>
+          	 <version>1.8.5</version>
+		  </dependency>          
+          <dependency>
+          	 <groupId>org.aspectj</groupId>
+          	 <artifactId>aspectjtools</artifactId>
+          	 <version>1.8.5</version>
+          </dependency>
+          
+          
       </dependencies>
    </dependencyManagement>
 
