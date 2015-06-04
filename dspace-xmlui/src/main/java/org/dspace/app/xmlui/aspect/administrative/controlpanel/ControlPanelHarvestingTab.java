@@ -21,6 +21,11 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.harvest.HarvestedCollection;
 import org.dspace.harvest.OAIHarvester.HarvestScheduler;
 
+/**
+ * Control panel tab that controls the OAI harvester.
+ * Based on the original ControlPanel class by Jay Paz and Scott Phillips
+ * @author LINDAT/CLARIN dev team (http://lindat.cz)
+ **/
 public class ControlPanelHarvestingTab extends AbstractControlPanelTab
 {
 

@@ -17,6 +17,11 @@ import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 
+/**
+ * Control panel tab that displays info about java and system.
+ * Based on the original ControlPanel class by Jay Paz and Scott Phillips
+ * @author LINDAT/CLARIN dev team (http://lindat.cz)
+ */
 public class ControlPanelJavaTab extends AbstractControlPanelTab
 {
 

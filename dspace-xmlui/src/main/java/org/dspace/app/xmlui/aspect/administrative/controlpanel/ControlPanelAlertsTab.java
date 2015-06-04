@@ -18,6 +18,11 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.TextArea;
 
+/**
+ * Control panel tab that handles system wide alerts.
+ * Based on the original ControlPanel class by Jay Paz and Scott Phillips
+ * @author LINDAT/CLARIN dev team (http://lindat.cz)
+ */
 public class ControlPanelAlertsTab extends AbstractControlPanelTab {
 
 	private static final Message T_alerts_head = message("xmlui.administrative.ControlPanel.alerts_head");

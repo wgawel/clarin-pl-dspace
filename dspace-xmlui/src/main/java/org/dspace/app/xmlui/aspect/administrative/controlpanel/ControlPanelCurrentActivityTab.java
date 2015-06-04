@@ -24,6 +24,12 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.eperson.EPerson;
 
+/**
+ * Control panel tab that displays current activity.
+ * Based on the original ControlPanel class by Jay Paz and Scott Phillips
+ * @author LINDAT/CLARIN dev team (http://lindat.cz)
+ *
+ */
 public class ControlPanelCurrentActivityTab extends AbstractControlPanelTab {
 
 	private static final Message T_activity_head = message("xmlui.administrative.ControlPanel.activity_head");

@@ -20,6 +20,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.excalibur.store.Store;
 import org.apache.excalibur.store.StoreJanitor;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.aspect.administrative.controlpanel.AbstractControlPanelTab;
 import org.dspace.app.xmlui.aspect.administrative.controlpanel.ControlPanelTab;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -37,13 +38,15 @@ import org.dspace.core.PluginManager;
 import org.xml.sax.SAXException;
 
 /**
- * This page displays important information about running dspace.
+ * This page displays control panel tabs which provide information about running dspace and admin functionalities.
  *
- * based on class by Jay Paz and Scott Phillips
- * modified for LINDAT/CLARIN
- * @author Amir Kamran
+ * based on ControlPanel by Jay Paz and Scott Phillips
+ * @author LINDAT/CLARIN dev team (http://lindat.cz)
  */
 public class ControlPanel extends AbstractDSpaceTransformer implements Serviceable, Disposable {
+
+    /** log4j category */
+    private static final Logger log = Logger.getLogger(ControlPanel.class);
 
     /** Language Strings */
     private static final Message T_DSPACE_HOME		= message("xmlui.general.dspace_home");
@@ -111,7 +114,6 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
                     AuthorizeException 
     {
         pageMeta.addMetadata("title").addContent(T_title);
-        pageMeta.addMetadata("include-library", "controlpanel");
 
         pageMeta.addTrailLink(contextPath + "/", T_DSPACE_HOME);
         pageMeta.addTrailLink(null, T_trail);
@@ -163,9 +165,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 					((AbstractControlPanelTab) cpTab).service(serviceManager);
 					((AbstractControlPanelTab) cpTab).setWebLink(contextPath + "/admin/panel?tab=" + selected_tab);
 				} catch (ServiceException e) {
-					e.printStackTrace();
+					log.error(e);
 				} catch (ProcessingException e) {
-					e.printStackTrace();
+					log.error(e);
 				}
         	}        	
         	cpTab.addBody(objectModel, div);
@@ -194,6 +196,3 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         super.dispose();
     }
 }
-
-
-

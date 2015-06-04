@@ -1,0 +1,21 @@
+/*global jQuery */
+/*jshint globalstrict: true*/
+'use strict';
+//
+//
+//
+jQuery(document).ready(function () {
+    jQuery(".toggle-onclick-parent-next4").each(function () {
+        // toggle on click
+        var how_many = 4;
+        jQuery(this).click(function () {
+            var o = jQuery(this).parent();
+            for (var i = 0; i < how_many; ++i) {
+                o = o.next();
+                o.toggleClass('hidden');
+            }
+            return false;
+        });
+    });
+
+}); // ready

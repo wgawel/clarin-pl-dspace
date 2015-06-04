@@ -1,4 +1,3 @@
-
 /**
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
@@ -18,6 +17,12 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 
+/**
+ * Control panel tab that displays important configuration.
+ * Based on the original ControlPanel class by Jay Paz and Scott Phillips
+ * @author LINDAT/CLARIN dev team (http://lindat.cz)
+ *
+ */
 public class ControlPanelConfigurationTab extends AbstractControlPanelTab {
 
 	private static final Message T_DSPACE_HEAD = message("xmlui.administrative.ControlPanel.dspace_head");
