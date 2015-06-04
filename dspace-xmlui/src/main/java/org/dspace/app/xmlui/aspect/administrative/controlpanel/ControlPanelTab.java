@@ -1,5 +1,5 @@
 /* Created for LINDAT/CLARIN */
-package cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative;
+package org.dspace.app.xmlui.aspect.administrative.controlpanel;
 
 import java.io.IOException;
 import java.sql.SQLException;

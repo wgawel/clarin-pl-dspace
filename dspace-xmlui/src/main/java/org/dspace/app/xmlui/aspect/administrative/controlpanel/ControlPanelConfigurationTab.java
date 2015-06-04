@@ -1,5 +1,12 @@
-/* Created for LINDAT/CLARIN */
-package cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative;
+
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+package org.dspace.app.xmlui.aspect.administrative.controlpanel;
 
 import java.util.Map;
 
@@ -8,11 +15,8 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.content.Site;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.storage.rdbms.DatabaseManager;
-
-import cz.cuni.mff.ufal.DSpaceApi;
 
 public class ControlPanelConfigurationTab extends AbstractControlPanelTab {
 
@@ -41,7 +45,7 @@ public class ControlPanelConfigurationTab extends AbstractControlPanelTab {
      * @param value candidate string.
      * @return {@code value} or a constant indicating an unset value.
      */
-    private static String notnull(String value) { return null == value ? T_UNSET : value; }
+    private static String notempty(String value) { return (null == value || "".equals(value)) ? T_UNSET : value; }
 
 	@Override
 	public void addBody(Map objectModel, Division div) throws WingException {
@@ -53,81 +57,47 @@ public class ControlPanelConfigurationTab extends AbstractControlPanelTab {
 		dspace.addItem(Util.getSourceVersion());
 
 		dspace.addLabel(T_DSPACE_DIR);
-		dspace.addItem(notnull(ConfigurationManager.getProperty("dspace.dir")));
+		dspace.addItem(notempty(ConfigurationManager.getProperty("dspace.dir")));
 
 		dspace.addLabel(T_DSPACE_URL);
-		String base_url = notnull(ConfigurationManager.getProperty("dspace.url"));
+		String base_url = notempty(ConfigurationManager.getProperty("dspace.url"));
 		dspace.addItemXref(base_url, base_url);
 
 		dspace.addLabel(T_DSPACE_HOST_NAME);
-		dspace.addItem(notnull(ConfigurationManager.getProperty("dspace.hostname")));
+		dspace.addItem(notempty(ConfigurationManager.getProperty("dspace.hostname")));
 
 		dspace.addLabel(T_DSPACE_NAME);
-		dspace.addItem(notnull(ConfigurationManager.getProperty("dspace.name")));
+		dspace.addItem(notempty(ConfigurationManager.getProperty("dspace.name")));
 
 		dspace.addLabel(T_DB_NAME);
-		dspace.addItem(notnull(DatabaseManager.getDbName()));
+		dspace.addItem(notempty(DatabaseManager.getDbName()));
 
 		dspace.addLabel(T_DB_URL);
-		dspace.addItem(notnull(ConfigurationManager.getProperty("db.url")));
-
-		// ufal
-		dspace.addLabel("License database URL");
-		final String licDBurl = DSpaceApi.getFunctionalityManager().get("lr.utilities.db.url");
-		if (licDBurl != null && !licDBurl.equals("")) {
-			dspace.addItem(licDBurl);
-		} else {
-			dspace.addItem("unknown");
-		}
-		// /ufal
+		dspace.addItem(notempty(ConfigurationManager.getProperty("db.url")));
 
 		dspace.addLabel(T_DB_DRIVER);
-		dspace.addItem(notnull(ConfigurationManager.getProperty("db.driver")));
+		dspace.addItem(notempty(ConfigurationManager.getProperty("db.driver")));
 
 		dspace.addLabel(T_DB_MAX_CONN);
-		dspace.addItem(notnull(ConfigurationManager.getProperty("db.maxconnections")));
+		dspace.addItem(notempty(ConfigurationManager.getProperty("db.maxconnections")));
 
 		dspace.addLabel(T_DB_MAX_WAIT);
-		dspace.addItem(notnull(ConfigurationManager.getProperty("db.maxwait")));
+		dspace.addItem(notempty(ConfigurationManager.getProperty("db.maxwait")));
 
 		dspace.addLabel(T_DB_MAX_IDLE);
-		dspace.addItem(notnull(ConfigurationManager.getProperty("db.maxidle")));
+		dspace.addItem(notempty(ConfigurationManager.getProperty("db.maxidle")));
 
 		dspace.addLabel(T_MAIL_SERVER);
-		dspace.addItem(notnull(ConfigurationManager.getProperty("mail.server")));
+		dspace.addItem(notempty(ConfigurationManager.getProperty("mail.server")));
 
 		dspace.addLabel(T_MAIL_FROM_ADDRESS);
-		dspace.addItem(notnull(ConfigurationManager.getProperty("mail.from.address")));
+		dspace.addItem(notempty(ConfigurationManager.getProperty("mail.from.address")));
 
 		dspace.addLabel(T_FEEDBACK_RECIPIENT);
-		dspace.addItem(notnull(ConfigurationManager.getProperty("feedback.recipient")));
+		dspace.addItem(notempty(ConfigurationManager.getProperty("feedback.recipient")));
 
 		dspace.addLabel(T_MAIL_ADMIN);
-		dspace.addItem(notnull(ConfigurationManager.getProperty("mail.admin")));
-
-		// ufal
-		dspace.addLabel("Site handle (e.g., used in curation)");
-		dspace.addItem(Site.getSiteHandle());
-
-		dspace.addLabel("OAI url");
-		String oai_url = notnull(ConfigurationManager.getProperty("lr", "lr.dspace.oai.url"));
-		dspace.addItemXref(oai_url, oai_url);
-
-		dspace.addLabel("Solr log url");
-		String oai_solr = notnull(ConfigurationManager.getProperty("solr.log.server"));
-		dspace.addItemXref(oai_solr, oai_solr);
-
-		List ufaladd = div.addList("LINDAT_Utilities");
-		ufaladd.setHead("LINDAT Utilities");
-
-		ufaladd.addLabel("Help mail");
-		ufaladd.addItem(notnull(ConfigurationManager.getProperty("lr.help.mail")));
-
-		ufaladd.addLabel("Assetstore");
-		ufaladd.addItem(notnull(ConfigurationManager.getProperty("assetstore.dir")));
-
-		ufaladd.addLabel("Postgresql logging dir (default)");
-		ufaladd.addItem("/var/log/postgresql");
+		dspace.addItem(notempty(ConfigurationManager.getProperty("mail.admin")));
 	}
 
 }
