@@ -5,6 +5,8 @@
 //
 //
 jQuery(document).ready(function () {
+    jQuery("#aspect_administrative_ControlPanel_table_users").css(
+        "word-break", "break-all");
     jQuery(".toggle-onclick-parent-next4").each(function () {
         // toggle on click
         var how_many = 4;
