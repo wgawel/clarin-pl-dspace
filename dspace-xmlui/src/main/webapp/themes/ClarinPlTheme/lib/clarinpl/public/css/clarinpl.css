@@ -1,0 +1,210 @@
+/* Project specific imports must be here */
+
+/* bootstrap */
+@import url("../bootstrap/css/bootstrap.min.css");
+@import url("../bootstrap/css/font-awesome.min.css");
+@import url("../bootstrap/css/ufal-theme.css");
+
+/* PMLTQ */
+@import url("lindat-pmltq.css");
+/* Repository */
+@import url("lindat-repository.css");
+/* Services */
+@import url("lindat-services.css");
+
+
+/* The only global thing we have to set */
+body#clarinpl-repository {
+    margin: 0; 
+    padding: 0;
+    background-color: #f1f1f1;
+}
+
+/* Header */
+
+.clarinpl-header {
+    margin: 0px auto;
+    background-color: #000;  
+    color: #fff;
+    text-align: right;
+    padding: 0px 90px;
+    display: block;
+    max-width: 1170px;
+}
+
+/* Footer */
+.clarinpl-footer {
+    color: #606060;
+    margin: 0px;
+}
+
+.clarinpl-footer h1 {
+	border-bottom: thin solid #C0C0C0;
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 25px;
+	margin-bottom: 5px;
+}
+
+.clarinpl-footer a {
+    color: #606060;
+	text-decoration: none;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.clarinpl-footer a:hover {
+	text-decoration: underline;
+}
+
+.clarinpl-footer-main {
+	display: block;
+	text-align: center;
+    margin: 0px auto;
+    max-width: 1170px;
+}
+
+.clarinpl-copyright {
+	text-align: center;
+	background-color: transparent;
+	padding: 5px;
+	font-size: 80%;
+}
+
+.dsa-logo {
+	background: url('../img/dsa.png') no-repeat center center;
+	background-size: 75px;
+	width: 170px;
+	height: 60px;
+	display: block;
+	margin-top: 5px;
+	background-size: 60px;
+	background-position: 30px;
+}
+
+.clarinb-logo {
+	background: url('../img/clarinb.png') no-repeat center center;
+		background-size: 160px;
+	width: 160px;
+	height: 35px;
+	display: block;
+	margin-top: 28px;	
+}
+
+.clarinpl-logo-mono {
+	background: url('../img/clarinpl-logo-mono.png') no-repeat center center;
+	width: 125px;
+	height: 59px;	
+	display: block;
+	margin: 10px 0px;
+	background-size: 95px; 
+}
+
+.clarinpl-logo {
+	background: url('../img/clarinpl-logo.png') no-repeat center center;
+	width: 80px;
+	display: block;
+	height: 80px;
+	background-size: 80px;
+	margin: 0px 10px;
+	text-decoration: none;
+}
+
+.clarinpl-logo:hover, .clarin-logo:hover {
+	text-decoration: none;
+} 
+
+.clarin-logo {
+        background: url('../img/clarin-logo.png') no-repeat center center;
+        width: 80px;
+        display: block;
+        height: 80px;
+        background-size: 50px;
+        margin: 0px 10px;
+	text-decoration: none;
+}
+
+.msmt-logo-mono {
+	background: url('../img/msmt-mono.png') no-repeat center center;
+	width: 130px;
+	height: 60px;	
+	display: block;
+	margin: 10px 0px;
+	background-size: 120px; 
+}
+
+.clarinpl-header .navbar-innder {
+	text-align: center !important;
+}
+
+.clarinpl-header .nav {
+	margin: 1px 0px 0px 0px !important;
+	display: inline-block !important;
+}
+
+.clarinpl-header .collapse.in li a{
+}
+
+.clarinpl-header .nav a {
+	font-size: 96%;
+	font-weight: normal;
+	color: #fff !important;
+	padding: 2px 6px 2px 6px;
+    border-radius: 0px;
+	text-shadow: none !important;
+}
+
+.clarinpl-header .nav li a:hover,
+.clarinpl-header .nav li a:active,
+.clarinpl-header .nav li a:focus,
+.clarinpl-header .nav li.active a {
+	background-color: #363636 !important;
+	text-shadow: none !important;
+}
+
+.clarinpl-header .nav li {
+	margin: 5px 5px !important;
+	font-size: 14px;
+}
+
+.clarinpl-header .nav li.clarinpl-current-item a {
+    background-color: #303030;
+}
+
+#clarinpl-header-logo {
+    background-color: #fff;
+}
+
+.repository-only {
+	display: none;
+}
+
+
+/* Project Specific
+ *
+ * Please keep identificators naming convention #clarinpl-*project or page*
+ */
+ 
+ 
+/* temporary for clarinpl home */
+
+#site-container {
+	width: 970px;
+	margin: auto;
+}
+
+.carousel-indicators li {
+        background-color: #A0A0A0 !important;
+}
+
+.selected img {
+	border: 2px solid rgb(102, 175, 233) !important;
+}
+
+.flag {
+        text-decoration: none !important;
+}
+
+.flag img {
+	border: 1px solid #A0A0A0;
+}

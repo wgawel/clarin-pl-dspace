@@ -1,11 +1,15 @@
 # Makefile for this project
 # by LINDAT/CLARIN dev team
+# modified by CLARIN-PL dev team
 #
 # Note: If you want to change this file, copy it to project/config
 # 
 
-# lindat settings
-LINDAT_COMMON_THEME_FETCH=git checkout -f bootstrap3 && git pull
+# template settings
+THEME_TEMPLATE=ClarinPlTheme
+HOME_THEME_TEMPLATE=ClarinPlHomeTheme
+LINDAT_COMMON_THEME_BRANCH=bootstrap3
+#LINDAT_COMMON_THEME_FETCH=git checkout -f bootstrap3 && git pull
 
 # tomcat
 TOMCAT_VERSION=6
@@ -14,7 +18,7 @@ TOMCAT_GROUP:=tomcat$(TOMCAT_VERSION)
 TOMCAT_CONF:=/etc/$(TOMCAT_USER)
 
 # dspace
-DSPACE_USER:=dspace
+DSPACE_DATABASE_USER:=dspace
 
 # tool directories
 DIRECTORY_POSTGRESQL:=/var/lib/postgresql

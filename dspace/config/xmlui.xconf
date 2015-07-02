@@ -197,10 +197,19 @@
              For information on configuring the mobile theme, see:
              dspace-xmlui/src/main/webapp/themes/mobile/readme.txt
         -->
+
     	<!-- UFAL Homepage -->
-    	<theme name="UFAL Homepage" regex="^$" path="UFALHome/" />
+    	<!-- <theme name="UFAL Homepage" regex="^$" path="UFALHome/" /> -->
     	
     	<!-- UFAL theme -->
-        <theme name="UFAL Theme" regex=".*" path="UFAL/" />
+        <!-- <theme name="UFAL Theme" regex=".*" path="UFAL/" /> -->
+        
+
+    	<!-- CLARIN-PL Homepage -->
+    	<theme name="ClarinPl HomeTheme" regex="^$" path="ClarinPlHomeTheme/" />
+    	
+    	<!-- CLARIN-PL theme -->
+        <theme name="ClarinPl Theme" regex=".*" path="ClarinPlTheme/" />
+
     </themes>
 </xmlui>

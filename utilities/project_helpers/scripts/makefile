@@ -1,6 +1,7 @@
 #
 # Makefile for this project
 # by LINDAT/CLARIN dev team
+# modified by CLARIN-PL dev team
 #
 # Note: if you want to update this makefile, create a copy e.g., makefile.project and
 # invoke make with "-f makefile.project" parameter
@@ -190,7 +191,7 @@ install_guru:   print_message \
                 install_dspace
 
 install_dspace: 
-	@echo "DEPLOYING LINDAT/CLARIN DSpace ..."
+	@echo "DEPLOYING CLARIN-PL DSpace ..."
 	@cd $(DIR_BUILD) &&  $(ANT_WITH_CONF) update 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log 
 	@$(MAKE) clean_installation
 	@echo "INSTALLATION SUCCESSFUL ..."
@@ -202,7 +203,7 @@ postinstall: update_lindat_common
 	@echo "DEPLOYMENT (INSTALL + POSTINSTALL) SUCCESSFUL"
 
 fresh_install: update_lindat_common
-	@echo "INSTALLING FRESH LINDAT/CLARIN DSpace ..."
+	@echo "INSTALLING FRESH CLARIN-PL DSpace ..."
 	@cd $(DIR_BUILD) && $(ANT_WITH_CONF) fresh_install 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log 
 
 # Grant rights to installation
@@ -237,10 +238,15 @@ test_databases: test_utilities_database test_dspace_database
 
 create_databases:
 	@echo "CREATING DSpace DATABASE .."
-	sudo -u postgres createdb -p $(DB_PORT) "$(DATABASE_NAME)" --owner $(DSPACE_USER) --encoding "UTF-8" --template=template0
+	sudo -u postgres createdb -p $(DB_PORT) "$(DATABASE_NAME)" --owner $(DSPACE_DATABASE_USER) --encoding "UTF-8" --template=template0
 	@echo "CREATING UTILITIES DATABASE ..."
-	sudo -u postgres createdb -p $(DB_PORT) "$(UTILITIES_DATABASE_NAME)" --owner $(DSPACE_USER) --encoding "UTF-8" --template=template0
-	sudo -u postgres psql -p $(DB_PORT) $(UTILITIES_DATABASE_NAME) < $(DIR_UTILITIES)/utilities.sql
+	sudo -u postgres createdb -p $(DB_PORT) "$(UTILITIES_DATABASE_NAME)" --owner $(DSPACE_DATABASE_USER) --encoding "UTF-8" --template=template0
+	@echo "CREATING CUSTOM SQL FILE (with proper database user) ..."
+	@sed -e s/dspace\;/$(DSPACE_DATABASE_USER)\;/ $(DIR_UTILITIES)/utilities.sql > $(DIR_UTILITIES)/utilities.sql.temp
+	@echo "RUN SQL ..."
+	sudo -u postgres psql -p $(DB_PORT) $(UTILITIES_DATABASE_NAME) < $(DIR_UTILITIES)/utilities.sql.temp
+	@echo "REMOVE CUSTOM SQL FILE ..."
+	@rm $(DIR_UTILITIES)/licenses.sql.temp
 	@echo "DONE"
 
 #update utilities database
@@ -273,6 +279,13 @@ update_config:
 	@echo "UPDATING CONFIG ..."
 	@cd $(DIR_BUILD) &&  $(ANT_WITH_CONF) update_configs 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log 
 	@echo "SUCCESSFUL"
+
+update_themes: 
+	@echo "Remove old themes files... "
+	@rm -Rf $(DIR_INSTALLATION)/webapps/xmlui/themes
+	@echo "Copy new themes files..."
+	@cp -Rf $(DIR_SOURCE)/dspace-xmlui/src/main/webapp/themes $(DIR_INSTALLATION)/webapps/xmlui/
+	@$(MAKE) grant_rights
 
 
 #======================================================
@@ -356,7 +369,7 @@ update_discovery:
 	$(DSPACE_BIN) index-discovery
 
 generate_handle_list:
-	@sudo -u $(DSPACE_USER) psql -p $(DB_PORT) $(DATABASE_NAME) -c "select handle from handle where resource_id in (select item_id from item where in_archive = 't' and withdrawn = 'f');" | tail -n +3 | head -n -2
+	@sudo -u $(DSPACE_DATABASE_USER) psql -p $(DB_PORT) $(DATABASE_NAME) -c "select handle from handle where resource_id in (select item_id from item where in_archive = 't' and withdrawn = 'f');" | tail -n +3 | head -n -2
 
 #TODO make this cron friendly
 update_openaire_cache:

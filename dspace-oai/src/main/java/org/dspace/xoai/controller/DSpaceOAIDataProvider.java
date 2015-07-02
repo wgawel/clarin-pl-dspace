@@ -185,7 +185,7 @@ public class DSpaceOAIDataProvider
 
         if(ConfigurationManager.getBooleanProperty("lr", "lr.tracker.enabled")) {
             // Track the OAI request for analytics platform
-            TrackerFactory.createInstance(TrackingSite.OAI).trackPage(request, "LINDAT/CLARIN OAI-PMH Data Provider Endpoint");
+            TrackerFactory.createInstance(TrackingSite.OAI).trackPage(request, "CLARIN-PL OAI-PMH Data Provider Endpoint");
         }
 
         Context context = null;

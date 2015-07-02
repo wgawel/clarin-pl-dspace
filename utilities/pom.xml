@@ -2,7 +2,7 @@
    <modelVersion>4.0.0</modelVersion>   
    <groupId>cz.cuni.mff.ufal.lindat</groupId>
    <artifactId>utilities</artifactId>
-   <name>UFAL Utilities</name>
+   <name>UFAL Utilities (github)</name>
    <url>https://svn.ms.mff.cuni.cz/redmine/projects/dspace-modifications</url>
  
    <parent>

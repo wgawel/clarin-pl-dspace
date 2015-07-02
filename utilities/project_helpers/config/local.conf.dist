@@ -81,9 +81,13 @@ lr.dspace.version = dspace-1.8.2
 lr.dspace.dir = /installations/dspace/dspace-1.8.2
 
 # A description of your dspace instance. It will be used as a description of your dspace instance for other services
-lr.dspace.name = LINDAT/CLARIN digital library at Institute of Formal and Applied Linguistics, Charles University in Prague
+#lr.dspace.name = LINDAT/CLARIN digital library at Institute of Formal and Applied Linguistics, Charles University in Prague
+#lr.dspace.name = CLARIN-PL digital repository
+lr.dspace.name = 
 # Used in email templates
-lr.dspace.name.short = LINDAT/CLARIN
+#lr.dspace.name.short = LINDAT/CLARIN
+#lr.dspace.name.short = CLARIN-PL
+lr.dspace.name.short = 
 
 ############################################
 
@@ -95,16 +99,23 @@ lr.mail.server = 127.0.0.1
 # Mail server disabled?
 lr.mail.server.disabled = true
 
-# UFAL: Contact information
-lr.help.mail = dspace-help@ufal.mff.cuni.cz
-lr.help.phone = +420-22191-4366
-lr.mail.from.address = dspace-noreply@ufal.mff.cuni.cz
-lr.feedback.recipient = dspace-help@ufal.mff.cuni.cz
-lr.info.recipient = lindat-technical@ufal.mff.cuni.cz
+# Contact information
+# type: e-mail
+lr.help.mail = 
+# type: phone number
+lr.help.phone = 
+# type: e-mail
+lr.mail.from.address = 
+# type: e-mail
+lr.feedback.recipient = 
+# type: e-mail
+lr.info.recipient = 
 
 
 # solr server address that your instance is using.
-lr.solr.log.server = http://ufal-point-dev.ms.mff.cuni.cz:8080/repository/solr
+#lr.solr.log.server = http://ufal-point-dev.ms.mff.cuni.cz:8080/repository/solr
+#lr.solr.log.server = http://localhost:9081/solr
+lr.solr.log.server = 
 
 # Google Analytics
 # NOTE: Copy appropriate Google Analytics API key file to the location specified
@@ -112,8 +123,8 @@ lr.solr.log.server = http://ufal-point-dev.ms.mff.cuni.cz:8080/repository/solr
 #       Be sure to choose location that is not deleted/overwritten upon deployment
 #       (the default value is safe)
 lr.ga.analytics.key.file = ${dspace.dir}/config/ga.api.key.p12 
-lr.ga.analytics.profile.id = 52779327
-lr.ga.analytics.account.email = 144418224547@developer.gserviceaccount.com
+lr.ga.analytics.profile.id = 0
+lr.ga.analytics.account.email = 0@developer.gserviceaccount.com
 
 # Path of the sources folder that is used for the compilation of this dspace instance.
 lr.dspace.source.dir = /sources/dspace-1.8.2
@@ -327,6 +338,16 @@ lr.curation.metadata.checkrequired.ignore = metashare.*
 lr.link.checker.user.agent = "DSpace Link Validator"
 lr.link.checker.connect.timeout = 2000
 lr.link.checker.read.timeout = 3000
+
+############################################
+#
+# Templates
+#
+# Default template
+lr.template.default = ClarinPlTheme
+
+# Home page template
+lr.template.home = ClarinPlHomeTheme
 
 mail.server.username = 
 mail.server.password = 
