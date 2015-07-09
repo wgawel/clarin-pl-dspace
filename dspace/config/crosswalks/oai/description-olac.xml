@@ -1,16 +1,16 @@
-<olac-archive type="institutional" currentAsOf="2014-11-20"
+<olac-archive type="institutional" currentAsOf="2008-04-19"
          xmlns="http://www.language-archives.org/OLAC/1.1/olac-archive"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://www.language-archives.org/OLAC/1.1/olac-archive
          http://www.language-archives.org/OLAC/1.1/olac-archive.xsd">
-      <archiveURL>http://lindat.cz/</archiveURL>
-      <participant name="Jozef Misutka" 
-         email="${lr.help.mail}" role="repository manager"/>
+      <archiveURL>http://dspace-pl.eu/</archiveURL>
+      <participant name="Marcin Pol" 
+         email="dspace@clarin-pl.eu" role="repository manager"/>
       <institution>Institute of Formal and Applied Linguistics</institution>
-      <institutionURL>http://ufal.mff.cuni.cz</institutionURL>
-      <shortLocation>Prague, Czech Republic</shortLocation>
-      <location>Malostranské náměstí 25,118 00 Prague, Czech Republic</location>
-      <synopsis>http://lindat.cz</synopsis>
-      <access>https://lindat.mff.cuni.cz/repository/xmlui/page/about</access>
-      <archivalSubmissionPolicy>https://lindat.mff.cuni.cz/repository/xmlui/page/about</archivalSubmissionPolicy>
+      <institutionURL>http://clarin-pl.eu</institutionURL>
+      <shortLocation>Wroclaw, Poland</shortLocation>
+      <location>Wybrzeze Wyspianskiego 27 ,50-370 Wroclaw, Poland</location>
+      <synopsis>http://dspace-pl.eu</synopsis>
+      <access>https://dspace-pl.eu/dspace/page/about</access>
+      <archivalSubmissionPolicy>http://clarin-pl.eu/en/contact/</archivalSubmissionPolicy>
 </olac-archive>
