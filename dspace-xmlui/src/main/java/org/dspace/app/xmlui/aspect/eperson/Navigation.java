@@ -252,9 +252,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         about.setHead( T_about_head );
         about.addItemXref( contextPath + "/page/deposit", T_deposit );
         about.addItemXref( contextPath + "/page/cite", T_cite);
-        about.addItemXref( contextPath + "/page/item-lifecycle", T_lifecycle );
+        //about.addItemXref( contextPath + "/page/item-lifecycle", T_lifecycle );
         about.addItemXref( contextPath + "/page/faq", T_faq);
-        about.addItemXref( contextPath + "/page/about", T_about );
+        //about.addItemXref( contextPath + "/page/about", T_about );
         about.addItem().addXref("mailto:" + ConfigurationManager.getProperty("lr.help.mail"),T_helpdesk, "helpdesk");
         
         //context
