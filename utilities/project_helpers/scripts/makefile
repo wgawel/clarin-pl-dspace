@@ -73,7 +73,6 @@ DB_PORT			:=$(shell cd $(BASE) && python setup.lindat.py --get="lr.database.port
 DIR_INSTALLATION        :=$(shell cd $(BASE) && python setup.lindat.py --get="lr.dspace.dir" --from="$(LOCAL_CONF)")
 DIR_LINDAT_COMMON_THEME :=$(shell cd $(BASE) && python setup.lindat.py --get="lr.common.theme" --from="$(LOCAL_CONF)")
 
-DIR_LINDAT_THEME_IN_WEBAPPS :=$(DIR_INSTALLATION)/webapps/xmlui/themes/UFAL/lib/lindat
 DIR_DATABASE_BACKUP         :=$(DIR_INSTALLATION)/../database_backup
 
 
@@ -197,8 +196,6 @@ install_dspace:
 	@echo "INSTALLATION SUCCESSFUL ..."
 
 postinstall: update_lindat_common
-	rm -rf $(DIR_LINDAT_THEME_IN_WEBAPPS)
-	ln -s $(DIR_LINDAT_COMMON_THEME) $(DIR_LINDAT_THEME_IN_WEBAPPS)
 	@$(MAKE) grant_rights
 	@echo "DEPLOYMENT (INSTALL + POSTINSTALL) SUCCESSFUL"
 
