@@ -629,7 +629,7 @@
                         </xsl:attribute>
                 <div class="row">
 					<div class="input-group input-group-lg col-md-6 col-md-offset-3">
-						<span class="input-group-addon"><i class="fa fa-search fa-lg" style="color: #7479B8;">&#160;</i></span>
+						<span class="input-group-addon"><i class="fa fa-search fa-lg" style="color: #7d6ba9;">&#160;</i></span>
 						<input class="form-control" type="text">
 							<xsl:attribute name="name">
 								<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='queryField']" />

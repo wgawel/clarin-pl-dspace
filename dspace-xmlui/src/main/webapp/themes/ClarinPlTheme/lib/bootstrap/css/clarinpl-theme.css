@@ -329,7 +329,7 @@ li [class^="fa-"],li [class*=" fa-"],.nav-list li [class^="fa-"],.nav-list li [c
 
 .nav-list>li .submenu>li>a:hover {
 	text-decoration: none;
-	color: #7479b8;
+	color: #7d6ba9;
 }
 
 .nav-list>li .submenu>li.active>a {
@@ -549,7 +549,7 @@ li [class^="fa-"],li [class*=" fa-"],.nav-list li [class^="fa-"],.nav-list li [c
 }
 
 .nav-list>li>.submenu li>.submenu>li a:hover {
-	color: #7479b8;
+	color: #7d6ba9;
 	text-decoration: underline
 }
 
@@ -622,8 +622,8 @@ li [class^="fa-"],li [class*=" fa-"],.nav-list li [class^="fa-"],.nav-list li [c
 	text-overflow: ellipsis;
 }
 
-.hr-lindat {
-	background: url('../../../images/lindat_color_line.png');
+.hr-clarinpl {
+	background: url('../../../images/clarinpl_color_line.png');
 	height: 8px;
 }
 

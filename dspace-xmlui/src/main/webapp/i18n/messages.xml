@@ -2913,5 +2913,9 @@
   <!-- UFAL/lib/xsl/aspect/artifactbrowser/item-view.xsl -->
   <message key="xmlui.UFAL.artifactbrowser.item-download-all-files">Download all files in item ({0})</message>
   <message key="xmlui.UFAL.artifactbrowser.item-download-file">Download file</message>
+  <message key="xmlui.UFAL.artifactbrowser.item-process-doc">Process files to CCL</message>
+  <message key="xmlui.UFAL.artifactbrowser.item-export-to-inforex">Export to Inforex</message>
+  <message key="xmlui.UFAL.artifactbrowser.item-export-to-wielowyr">Export to MeWeX</message>
+  <message key="xmlui.UFAL.artifactbrowser.item-goto-freq-lists">Make sense frequency list</message>
 </catalogue>
 
