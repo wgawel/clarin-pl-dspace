@@ -15,4 +15,3 @@ _____________________________________
 ${dspace.name},
 WWW: ${dspace.url}
 Email: ${lr.help.mail}
-Tel.: ${lr.help.phone}
