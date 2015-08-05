@@ -168,6 +168,7 @@
 				</link>
 			</xsl:if>
 
+			<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js">&#160;</script>
 			<!-- The following javascript removes the default text of empty text areas when they are focused on or submitted -->
 			<!-- There is also javascript to disable submitting a form when the 'enter' key is pressed. -->
 			<script type="text/javascript">
@@ -260,6 +261,7 @@
     		<xsl:call-template name="userbox" />
     	</xsl:if>	
 		<div class="container-fluid">
+
 			<div class="container">
 			
 				<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']">
@@ -291,8 +293,7 @@
 
 				<!-- Rest of the Body -->
 				<div class="row contents">
-				
-					<div id="main-contents" class="col-sm-9">																								
+					<div id="main-contents" class="col-sm-9">
 						<xsl:choose>
 							<xsl:when test="dri:div[@n='site-home']/dri:div[@n='site-recent-submission']/dri:referenceSet/dri:reference">
 								<xsl:call-template name="recent-submission" />
@@ -833,7 +834,12 @@
 	
 	<xsl:template name="top-banner">
 	    <div id="clarinpl-header-logo" class="row">
-		    <div style="float: left; margin: 14px 60px 14px 154px;">
+
+
+			<div style="float: left; margin: 40px 10px 10px 25px;">
+				 <img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/typeB_middle.png" class="logo" width="200" height="50" alt="CLARIN-PL logo" />
+			</div>
+			<div style="float: left; margin: 14px 60px 14px 120px;">
 		        <a href="/dspace">
 	                <img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/clarinpl-logo_2.png" class="logo" alt="CLARIN-PL logo" />
                 </a>

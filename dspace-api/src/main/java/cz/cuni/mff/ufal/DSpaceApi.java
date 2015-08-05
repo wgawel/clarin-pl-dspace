@@ -183,7 +183,7 @@ public class DSpaceApi {
 	 * user_metadata table under eperson_id.
 	 * 
 	 * @param eperson
-	 * @param metadata
+	 * @param value
 	 * @return
 	 */
 	public static boolean addUserMetadata( EPerson eperson, String key, String value ) 

@@ -38,6 +38,7 @@
     exclude-result-prefixes="xalan encoder i18n dri mets dim xlink xsl util jstring rights confman">
 
     <xsl:output indent="yes"/>
+    <xsl:variable name="AUTH" select="/dri:document/dri:meta/dri:userMeta/@authenticated"/>
 
     <xsl:template name="itemSummaryView-DIM">
         <!-- Generate the info about the item from the metadata section -->

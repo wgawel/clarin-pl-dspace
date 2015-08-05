@@ -7,6 +7,8 @@
  */
 package org.dspace.eperson;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -80,6 +82,7 @@ public class EPerson extends DSpaceObject
     /** Flag set when data is modified, for events */
     private boolean modified;
 
+    private String password;
     /**
      * Construct an EPerson
      * 
@@ -702,7 +705,7 @@ public class EPerson extends DSpaceObject
         if ( info == null ) {
             info = Calendar.getInstance(TimeZone.getDefault()).getTime().toString();
         }
-        myRow.setColumn("welcome_info", info );
+        myRow.setColumn("welcome_info", info);
     }
     
     /** Returns non empty or null. */
@@ -1011,6 +1014,7 @@ public class EPerson extends DSpaceObject
      */
     public void setPassword(String s)
     {
+        password = s;
         PasswordHash hash = new PasswordHash(s);
         myRow.setColumn("password", Utils.toHex(hash.getHash()));
         myRow.setColumn("salt", Utils.toHex(hash.getSalt()));
@@ -1139,6 +1143,9 @@ public class EPerson extends DSpaceObject
 
         DatabaseManager.update(ourContext, myRow);
 
+        //Executing script to replicate user to other applications
+        runExternalScript();
+
         log.info(LogManager.getHeader(ourContext, "update_eperson",
                 "eperson_id=" + getID()));
 
@@ -1152,6 +1159,47 @@ public class EPerson extends DSpaceObject
         {
             updateMetadata();
             clearDetails();
+        }
+    }
+
+    /**
+     * runs external scripts
+     */
+    private void runExternalScript() {
+        try {
+
+            if (null != getEmail() && null != password) {
+                String cmd = String.format("%s %s %s %s",
+                        ConfigurationManager.getProperty("dspace.ext.script"), getEmail(), password, getFullName());
+                ProcessBuilder pb = new ProcessBuilder("bash", "-c", cmd);
+
+                // use this to capture messages sent to stderr
+                pb.redirectErrorStream(true);
+
+                Process shell = pb.start();
+
+                InputStream shellIn = shell.getInputStream();
+                int shellExitStatus = shell.waitFor();
+
+                // at this point you can process the output issued by the command
+                // for instance, this reads the output and writes it to log:
+                int c;
+                StringBuilder sb = new StringBuilder();
+                while ((c = shellIn.read()) != -1) {
+                    sb.append(Character.toChars(c));
+                }
+                try {
+                    shellIn.close();
+                } catch (IOException ignoreMe) {
+                    log.info(ignoreMe);
+                }
+                log.info(sb.toString());
+                log.info("Replication script executed");
+            }
+        } catch (IOException e) {
+            log.error("Preblem executing replication scrpit", e);
+        } catch (InterruptedException e) {
+            log.error("Preblem executing replication scrpit", e);
         }
     }
 

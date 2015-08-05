@@ -98,8 +98,7 @@
                             </div>
 
                             <div id="main-container" class="container">
-
-                                <div class="row row-offcanvas row-offcanvas-right">
+                               <div class="row row-offcanvas row-offcanvas-right">
                                     <div class="horizontal-slider clearfix">
                                         <div class="col-xs-12 col-sm-12 col-md-9 main-content">
                                             <xsl:apply-templates select="*[not(self::dri:options)]"/>
@@ -226,7 +225,7 @@
                     </xsl:attribute>
                 </link>
             </xsl:if>
-
+            <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js">&#160;</script>
             <!-- The following javascript removes the default text of empty text areas when they are focused on or submitted -->
             <!-- There is also javascript to disable submitting a form when the 'enter' key is pressed. -->
             <script>

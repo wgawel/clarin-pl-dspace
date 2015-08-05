@@ -204,14 +204,15 @@
                     <map:reader name="PiwikStatisticsReader" src="cz.cuni.mff.ufal.PiwikStatisticsReader"/>
                                         
                     <map:reader name="HandleResolverReader" src="org.dspace.app.xmlui.aspect.handle.HandleResolverReader"/>
-
                     <map:reader name="ProcessStatusReader" src="org.dspace.app.xmlui.aspect.artifactbrowser.ProcessStatusReader" />
                     <map:reader name="ExportToInforexAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.ExportToInforexAction" />
                     <map:reader name="ExportToWielowyrAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.ExportToWielowyrAction" />
                     <map:reader name="ResourceStreamFileListReader" src="org.dspace.app.xmlui.aspect.artifactbrowser.ResourceStreamFileListReader" />
                     <map:reader name="ItemListReader" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemListReader" />
-                    <map:reader name="APIHandleReader" src="pl.edu.wroc.dspace.api.APIHandleReader"/>
-                    <map:reader name="APIAddFileReader" src="pl.edu.wroc.dspace.api.APIAddFileReader"/>
+                     <!-- Move to rest api
+                        <map:reader name="APIHandleReader" src="pl.edu.wroc.dspace.api.APIHandleReader"/>
+                        <map:reader name="APIAddFileReader" src="pl.edu.wroc.dspace.api.APIAddFileReader"/>
+                    -->
                 </map:readers>
                 <map:actions>
                         <map:action name="locale" src="org.dspace.app.xmlui.cocoon.DSpaceLocaleAction"/>
@@ -349,7 +350,8 @@
 	                 </map:read>
                 </map:match>
                 </map:pipeline>
-                
+
+
                 <map:pipeline type="noncaching">
                 <map:match pattern="handle/*/*/jsonFileList">
 	                 <map:read type="ResourceStreamFileListReader">
@@ -371,6 +373,7 @@
 	                 </map:read>
                 </map:match>
                 </map:pipeline>
+
 
                 <!-- Bitstream pipeline -->
                 <map:pipeline type="noncaching">
@@ -603,7 +606,7 @@
                             <map:read type="JSONControlledVocabularyReader"/>
                         </map:match>
 
-                        <!-- DSpace API -->
+                        <!-- DSpace API
                         <map:match pattern="api/handle">
                             <map:read type="APIHandleReader"/>
                         </map:match>
@@ -611,7 +614,8 @@
                         <map:match pattern="api/addFileFromPostToItem">
                             <map:read type="APIAddFileReader"/>
                         </map:match>
-                        
+                         -->
+
                         <!-- END DSpace API -->
                 </map:pipeline>
 

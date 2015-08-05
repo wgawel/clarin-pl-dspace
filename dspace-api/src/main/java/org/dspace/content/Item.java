@@ -380,6 +380,32 @@ public class Item extends DSpaceObject
         return itemRow.getBooleanColumn("withdrawn");
     }
 
+    public String getNLPEngineToken(){
+        return itemRow.getStringColumn("nlpengine_token");
+    }
+
+    public void setNLPEngineToken(String token){
+        itemRow.setColumn("nlpengine_token", token);
+        try {
+            DatabaseManager.update(ourContext, itemRow);
+        } catch (SQLException e) {
+            log.error("Unable to update nlptoken", e);
+        }
+    }
+
+    public String getProcessStatus(){
+        return itemRow.getStringColumn("process_status");
+    }
+
+    public void setProcessStatus(String status){
+        itemRow.setColumn("process_status", status);
+        try {
+            DatabaseManager.update(ourContext, itemRow);
+        } catch (SQLException e) {
+            log.error("Unable to update process status", e);
+        }
+    }
+
     /**
      * Find out if the item is discoverable
      *
@@ -1128,6 +1154,11 @@ public class Item extends DSpaceObject
             if (itemRow.isColumnNull("discoverable"))
             {
                 itemRow.setColumn("discoverable", false);
+            }
+
+            if (itemRow.isColumnNull("process_status"))
+            {
+                itemRow.setColumn("process_status", "READY");
             }
 
 
