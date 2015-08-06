@@ -82,7 +82,7 @@ DSPACE_BIN              :=${DIR_INSTALLATION}/bin/dspace
 DSPACE_CFG_BASENAME     :=dspace.cfg
 DSPACE_CFG              :=$(DIR_SOURCE)/dspace/config/$(DSPACE_CFG_BASENAME)
 DSPACE_CFG_EXISTS       :=$(shell (if [ -e $(DSPACE_CFG) ]; then echo 1; else echo 0; fi ))
-DSPACE_MVN_PROJECTS     :=-P 'xpdf-mediafilter-support,!dspace-jspui,!dspace-sword-client,!dspace-swordv2,!dspace-sword,!dspace-lni,!dspace-rdf,!dspace-rest,!dspace-xmlui-mirage2'
+DSPACE_MVN_PROJECTS     :=-P 'xpdf-mediafilter-support,!dspace-jspui,!dspace-sword-client,!dspace-swordv2,!dspace-sword,!dspace-lni,!dspace-rdf,!dspace-xmlui-mirage2'
 
 MVN_ENV			:=local
 
