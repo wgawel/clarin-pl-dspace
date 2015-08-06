@@ -43,6 +43,7 @@
     </servlet-mapping>
     
     <!-- Security settings and mapping -->
+    <!-- Disable redirection to https in tomcat. See: https://wiki.duraspace.org/display/DSDOC5x/REST+API#RESTAPI-InstallingtheRESTAPI
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>DSpace REST API</web-resource-name>
@@ -51,7 +52,7 @@
         <user-data-constraint>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
-    </security-constraint>
+    </security-constraint>  -->
     
     <!-- DSpace Configuration Information -->
     <context-param>
