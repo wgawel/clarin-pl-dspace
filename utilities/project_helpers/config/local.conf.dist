@@ -17,6 +17,8 @@ lr.pid.service.testPid =
 # subprefix is only used for local handles
 lr.pid.community.configurations = community=*,prefix=99999,type=local,canonical_prefix=http://hdl.handle.net/
 
+handle.canonical.prefix = http://hdl.handle.net/
+handle.prefix = 123456789
 
 # UFAL mounted assetstore for restricted item harvesting. Please mind the traling slash
 lr.harvestable.assetstore =
@@ -60,6 +62,13 @@ lr.db.driver = org.postgresql.Driver
 lr.db.username = dspace
 lr.db.password =
 
+lr.db.maxidle = -1
+lr.db.schema = 
+lr.db.maxwait = 5000
+lr.db.maxconnections = 30
+lr.db.statementpool = true
+lr.db.poolname = dspacepool
+
 # UFAL Utilities database name.
 lr.utilities.database = XXX-UTILS-DATABASE
 
@@ -95,6 +104,9 @@ lr.dspace.name.short =
 
 # Mail server address. you can use 127.0.0.1, if configured on localhost.
 lr.mail.server = 127.0.0.1
+lr.mail.server.username = 
+lr.mail.server.password = 
+lr.mail.server.port = 25
 
 # Mail server disabled?
 lr.mail.server.disabled = true
@@ -346,24 +358,17 @@ lr.link.checker.read.timeout = 3000
 # Default template
 lr.template.default = ClarinPlTheme
 
+# Determine if new users should be allowed to register
+lr.user.registration = true
+
 # Home page template
 lr.template.home = ClarinPlHomeTheme
 
-mail.server.username = 
-mail.server.password = 
-mail.server.port = 25
-default.language = en_US
-db.maxidle = -1
-db.schema = 
-db.maxwait = 5000
-db.maxconnections = 30
-db.statementpool = true
-db.poolname = dspacepool
-http.proxy.host =
-http.proxy.port =
-handle.canonical.prefix = http://hdl.handle.net/
-handle.prefix = 123456789
-loglevel.other=INFO
-loglevel.dspace=INFO
+lr.default.language = en_US
+
+lr.http.proxy.host =
+lr.http.proxy.port =
+lr.loglevel.other=INFO
+lr.loglevel.dspace=INFO
 
 lr.compile.time=
