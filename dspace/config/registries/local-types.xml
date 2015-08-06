@@ -2,7 +2,7 @@
 <dspace-dc-types>
     <dc-schema>
         <name>local</name>
-        <namespace>http://clarin-pl.eu/dspace/metadata-terms/</namespace>
+        <namespace>https://clarin-pl.eu/dspace/metadata-terms/</namespace>
     </dc-schema>
     <dc-type>
         <schema>local</schema>
@@ -35,7 +35,7 @@
     <dc-type>
         <schema>local</schema>
         <element>branding</element>
-        <scope_note>LRT/LINDAT (Name of Community)</scope_note>
+        <scope_note>CLARIN-PL (Name of Community)</scope_note>
     </dc-type>    
     <dc-type>
         <schema>local</schema>
