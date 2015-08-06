@@ -97,6 +97,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_discojuice_login =
         message("xmlui.EPerson.Navigation.discojuice.login");
 
+    private static final Message T_login =
+        message("xmlui.EPerson.Navigation.login");
+
     private static final Message T_context_head 				= message("xmlui.administrative.Navigation.context_head");
 
 	/** Cached validity object */
@@ -220,9 +223,12 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         } 
         else 
         {
+
+            account.addItem().addXref(contextPath+"/password-login",T_login,"signon_default");
+
             // UFAL
-            account.addItem().addXref(contextPath + "/login",
-                    T_discojuice_login, "signon");
+            //account.addItem().addXref(contextPath + "/login", T_discojuice_login, "signon");
+            account.addItem().addXref(contextPath+"/login",T_discojuice_login,"signon");
 
             final javax.servlet.http.HttpServletRequest hreq = (javax.servlet.http.HttpServletRequest) this.objectModel
                     .get(org.apache.cocoon.environment.http.HttpEnvironment.HTTP_REQUEST_OBJECT);
