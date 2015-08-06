@@ -639,6 +639,7 @@ public class FlowItemUtils
 	 */
 	public static FlowResult processAddBitstream(Context context, int itemID, Request request) throws SQLException, AuthorizeException, IOException 
 	{
+         log.info("processAddBitstream:\n\titemID = '"+itemID+"'\n\tfile_local = '"+request.getParameter("file_local")+"'\n\tbundle = '"+request.getParameter("bundle")+"'");
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
 		
