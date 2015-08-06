@@ -122,8 +122,8 @@
 		<Format id="bibtex">
 		    <Prefix>bibtex</Prefix>
 		    <XSLT>metadataFormats/bibtex.xsl</XSLT>
-		    <Namespace>http://lindat.mff.cuni.cz/ns/experimental/bibtex</Namespace>
-		    <SchemaLocation>http://lindat.mff.cuni.cz/schemas/experimental/bibtex.xsd</SchemaLocation>
+		    <Namespace>http://clarin-pl.eu/ns/experimental/bibtex</Namespace>
+		    <SchemaLocation>http://clarin-pl.eu/schemas/experimental/bibtex.xsd</SchemaLocation>
         </Format>
 		<Format id="oai_metasharev2">
 		    <Prefix>oai_metasharev2</Prefix>
@@ -153,8 +153,8 @@
 		<Format id="html">
 		    <Prefix>html</Prefix>
 		    <XSLT>metadataFormats/html.xsl</XSLT>
-		    <Namespace>http://lindat.mff.cuni.cz/ns/experimental/html</Namespace>
-		    <SchemaLocation>http://lindat.mff.cuni.cz/schemas/experimental/html.xsd</SchemaLocation>
+		    <Namespace>http://clarin-pl.eu/ns/experimental/html</Namespace>
+		    <SchemaLocation>http://clarin-pl.eu/schemas/experimental/html.xsd</SchemaLocation>
 		</Format>
     </Formats>
 

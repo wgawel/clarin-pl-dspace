@@ -3,7 +3,7 @@
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:doc="http://www.lyncode.com/xoai" 
-    xmlns:bib="http://lindat.mff.cuni.cz/ns/experimental/bibtex"
+    xmlns:bib="http://clarin-pl.eu/ns/experimental/bibtex"
     xmlns:util="cz.cuni.mff.ufal.utils.BibtexUtil"
     exclude-result-prefixes="doc util"
     version="1.0">
@@ -11,7 +11,7 @@
     <xsl:output omit-xml-declaration="yes" method="xml" indent="yes" cdata-section-elements="bib:bibtex"/>
     
     <xsl:template match="/">
-        <bib:bibtex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lindat.mff.cuni.cz/ns/experimental/bibtex http://lindat.mff.cuni.cz/schemas/experimental/bibtex.xsd">
+        <bib:bibtex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://clarin-pl.eu/ns/experimental/bibtex http://clarin-pl.eu/schemas/experimental/bibtex.xsd">
         @misc{<xsl:value-of select="doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text()"/>,
             <xsl:variable name="title"><xsl:call-template name="title"/></xsl:variable>
             <xsl:variable name="author"><xsl:call-template name="author"/></xsl:variable>

@@ -2,7 +2,7 @@
 <dspace-dc-types>
     <dc-schema>
         <name>local</name>
-        <namespace>http://lindat.mff.cuni.cz/repository/metadata-terms/</namespace>
+        <namespace>http://clarin-pl.eu/dspace/metadata-terms/</namespace>
     </dc-schema>
     <dc-type>
         <schema>local</schema>
