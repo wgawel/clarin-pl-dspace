@@ -56,7 +56,8 @@ import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseResourceUserAllowance;
 import cz.cuni.mff.ufal.lindat.utilities.hibernate.UserMetadata;
 import cz.cuni.mff.ufal.lindat.utilities.hibernate.UserRegistration;
 import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
-
+import java.io.UnsupportedEncodingException;
+import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
 
 /**
  * Display a form that allows the user to edit their profile.
@@ -255,12 +256,11 @@ public class EditProfile extends AbstractDSpaceTransformer
 
 	private Text add_key_pair(String item_name, Message key, String value,
 			List identity, Message error) throws WingException {
-		return add_key_pair(item_name, key, value, null, identity, error, false);
-       }
-       
+		return add_key_pair(item_name, key, value, identity, error, false);
+	}
+
 	// key, help, error can be null
-	private Text add_key_pair(String item_name, Message key, String value,
-			Message help, List identity, Message error, boolean auto_filled)
+	private Text add_key_pair(String item_name, Message key, String value, List identity, Message error, boolean auto_filled)
 			throws WingException {
 		Text text = identity.addItem().addText(item_name);
 		text.setValue(value);
@@ -268,8 +268,8 @@ public class EditProfile extends AbstractDSpaceTransformer
 		if (null != key) {
 			text.setLabel(key);
 		}
-		if (null != help) {
-			text.setHelp(help);
+		if (auto_filled) {
+			text.setHelp(T_auto_filled_in);
 		}
 		if (null != error) {
 			text.addError(error);
@@ -440,7 +440,9 @@ public class EditProfile extends AbstractDSpaceTransformer
 
 		try {
 
-			java.util.List<LicenseResourceUserAllowance> licenses = functionalityManager.getSignedLicensesByUser(eperson.getID());
+			java.util.List<LicenseResourceUserAllowance> licenses = eperson == null 
+                                ? new ArrayList<LicenseResourceUserAllowance>(0)
+                                : functionalityManager.getSignedLicensesByUser(eperson.getID());
 
 			// hack for group by /////////
 			/*
@@ -524,7 +526,7 @@ public class EditProfile extends AbstractDSpaceTransformer
 		}catch( IllegalArgumentException e1 ) {
 			profile.addPara(null, "alert alert-error").addContent( "No items - " + e1.getMessage() );
 		}catch( Exception e2 ) {
-			profile.addPara(null, "alert alert-error").addContent( "Exception - " + e2.toString() );
+			profile.addPara(null, "alert alert-error").addContent( "Exception - " + e2.toString() + "\n" +getStackTrace(e2) ));
 		}
 		finally {
 			functionalityManager.closeSession();
@@ -559,11 +561,12 @@ public class EditProfile extends AbstractDSpaceTransformer
 		}
 
 		// local vs shibbie user?
-		String netid = eperson.getNetid();
+		String netid = eperson == null ? null : eperson.getNetid();
 		boolean has_netid = netid != null && !netid.isEmpty();
-		boolean has_password = eperson.getPasswordHash() != null
+		boolean has_password = eperson == null ? false
+                        : (eperson.getPasswordHash() != null
 				&& eperson.getPasswordHash().getHashString() != null
-				&& !eperson.getPasswordHash().getHashString().isEmpty();
+				&& !eperson.getPasswordHash().getHashString().isEmpty());
 		boolean is_probably_local_user = eperson == null ? false : has_password
 				&& !has_netid;
 
@@ -599,15 +602,15 @@ public class EditProfile extends AbstractDSpaceTransformer
 
 		// First name
 		add_key_pair("first_name", T_first_name, defaultFirstName,
-				T_auto_filled_in, identity,
+				identity,
 				get_error(errors, "first_name", T_error_required),
-				!is_probably_local_user).setRequired(true);
+				!is_probably_local_user && !registering).setRequired(true);
 
 		// Last name
 		add_key_pair("last_name", T_last_name, defaultLastName,
-				T_auto_filled_in, identity,
+				identity,
 				get_error(errors, "last_name", T_error_required),
-				!is_probably_local_user).setRequired(true);
+				!is_probably_local_user && !registering).setRequired(true);
 
 		// Phone
 		add_key_pair("phone", T_telephone, defaultPhone, identity,
@@ -658,9 +661,13 @@ public class EditProfile extends AbstractDSpaceTransformer
 			add_list_of_groups(profile);
        }
 
-		Division signed = profile.addDivision("signed-licenses", "well well-light");
-		signed.setHead("Licenses you signed");
-		add_signed_licenses(signed);
+		// Licences
+		//
+		if (!registering) {
+                    Division signed = profile.addDivision("signed-licenses", "well well-light");
+                    signed.setHead("Licenses you signed");
+                    add_signed_licenses(signed);
+                }
 
 		//
 		profile.addHidden("eperson-continue").setValue(knot.getId());
