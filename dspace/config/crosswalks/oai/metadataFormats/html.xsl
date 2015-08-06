@@ -3,7 +3,7 @@
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:doc="http://www.lyncode.com/xoai"
-    xmlns:h="http://lindat.mff.cuni.cz/ns/experimental/html"
+    xmlns:h="http://clarin-pl.eu/ns/experimental/html"
     xmlns:confman="org.dspace.core.ConfigurationManager"
     exclude-result-prefixes="doc confman"
     version="1.0">
@@ -13,7 +13,7 @@
 
     <xsl:output omit-xml-declaration="yes" method="xml" indent="yes" cdata-section-elements="h:html"/>
     <xsl:template match="/">
-        <h:html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://lindat.mff.cuni.cz/ns/experimental/html http://lindat.mff.cuni.cz/schemas/experimental/html.xsd">
+        <h:html xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://clarin-pl.eu/ns/experimental/html http://clarin-pl.eu/schemas/experimental/html.xsd">
             <xsl:variable name="title"><xsl:call-template name="title"/></xsl:variable>
             <xsl:variable name="authors"><xsl:call-template name="authors"/></xsl:variable>
             <xsl:variable name="pid"><xsl:call-template name="pid"/></xsl:variable>

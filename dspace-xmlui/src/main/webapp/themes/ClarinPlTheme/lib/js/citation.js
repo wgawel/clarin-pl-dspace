@@ -104,7 +104,7 @@ ufal.citation = {
 			try {
 				var xml = jQuery.parseXML(xml_content);
 				var metadata = jQuery(xml.getElementsByTagNameNS(
-						"http://lindat.mff.cuni.cz/ns/experimental/html",
+						"http://clarin-pl.eu/ns/experimental/html",
 						"html")[0]).html();
 				if (!metadata) {
 					throw "Not found."
