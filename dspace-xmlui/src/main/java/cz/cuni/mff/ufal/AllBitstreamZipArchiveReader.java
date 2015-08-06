@@ -305,7 +305,7 @@ public class AllBitstreamZipArchiveReader extends AbstractReader implements Recy
             {
                 name = "item_" + item.getID() + ".zip";
             }
-            response.setHeader("Content-Disposition", "attachment;filename=" + name);
+            response.setHeader("Content-Disposition", "attachment;filename=\"" + name+"\"");           
 
             byte[] buffer = new byte[BUFFER_SIZE];
             int length = -1;
