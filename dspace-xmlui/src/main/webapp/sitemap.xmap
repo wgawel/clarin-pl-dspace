@@ -209,10 +209,11 @@
                     <map:reader name="ExportToWielowyrAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.ExportToWielowyrAction" />
                     <map:reader name="ResourceStreamFileListReader" src="org.dspace.app.xmlui.aspect.artifactbrowser.ResourceStreamFileListReader" />
                     <map:reader name="ItemListReader" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemListReader" />
-                     <!-- Move to rest api
+
+                     <!-- TODO: Move to rest api -->
                         <map:reader name="APIHandleReader" src="pl.edu.wroc.dspace.api.APIHandleReader"/>
                         <map:reader name="APIAddFileReader" src="pl.edu.wroc.dspace.api.APIAddFileReader"/>
-                    -->
+
                 </map:readers>
                 <map:actions>
                         <map:action name="locale" src="org.dspace.app.xmlui.cocoon.DSpaceLocaleAction"/>
@@ -606,7 +607,7 @@
                             <map:read type="JSONControlledVocabularyReader"/>
                         </map:match>
 
-                        <!-- DSpace API
+                        <!-- DSpace API -->
                         <map:match pattern="api/handle">
                             <map:read type="APIHandleReader"/>
                         </map:match>
@@ -614,8 +615,7 @@
                         <map:match pattern="api/addFileFromPostToItem">
                             <map:read type="APIAddFileReader"/>
                         </map:match>
-                         -->
-
+                        
                         <!-- END DSpace API -->
                 </map:pipeline>
 
