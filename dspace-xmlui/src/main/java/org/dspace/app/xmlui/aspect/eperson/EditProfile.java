@@ -526,7 +526,7 @@ public class EditProfile extends AbstractDSpaceTransformer
 		}catch( IllegalArgumentException e1 ) {
 			profile.addPara(null, "alert alert-error").addContent( "No items - " + e1.getMessage() );
 		}catch( Exception e2 ) {
-			profile.addPara(null, "alert alert-error").addContent( "Exception - " + e2.toString() + "\n" +getStackTrace(e2) ));
+			profile.addPara(null, "alert alert-error").addContent( "Exception - " + e2.toString() + "\n" +getStackTrace(e2) );
 		}
 		finally {
 			functionalityManager.closeSession();
