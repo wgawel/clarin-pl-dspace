@@ -10,7 +10,7 @@ To complete registration for a ${lr.dspace.name.short} repository account at ${d
   {0}
 
 If you need assistance with your account, please email
-${lr.help.mail} or call us at ${lr.help.phone}
+${lr.help.mail} 
 
 
 ${lr.dspace.name.short} Team
