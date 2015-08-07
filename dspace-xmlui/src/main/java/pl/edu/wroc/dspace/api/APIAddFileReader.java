@@ -9,7 +9,7 @@ package pl.edu.wroc.dspace.api;
 
 import org.dspace.app.xmlui.cocoon.*;
 import com.google.gson.Gson;
-import cz.cuni.mff.ufal.dspace.content.Handle;
+import cz.cuni.mff.ufal.dspace.handle.Handle;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
