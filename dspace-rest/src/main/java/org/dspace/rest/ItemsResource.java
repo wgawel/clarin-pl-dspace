@@ -1063,7 +1063,7 @@ public class ItemsResource extends Resource
      *             Is thrown when item with passed id is not exists and if user
      *             has no permission to do passed action.
      */
-    private org.dspace.content.Item findItem(org.dspace.core.Context context, int id, int action) throws WebApplicationException
+    protected org.dspace.content.Item findItem(org.dspace.core.Context context, int id, int action) throws WebApplicationException
     {
         org.dspace.content.Item item = null;
         try

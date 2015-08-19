@@ -548,6 +548,12 @@
             </xsl:attribute>&#160;</script>
 
 
+        <script type="text/javascript">
+            <xsl:attribute name="src">
+                <xsl:value-of select="$theme-path" />
+                <xsl:text>/lib/js/process.js</xsl:text>
+            </xsl:attribute>&#160;
+        </script>
         <!-- UFAL additional libraries
         -->
         

@@ -21,7 +21,7 @@
 
 	<xsl:output indent="yes" />
 	<xsl:variable name="AUTH" select="/dri:document/dri:meta/dri:userMeta/@authenticated"/>
-	
+	<xsl:variable name="user_email" select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='email']"/>
 	<xsl:template name="itemSummaryView-DIM">
 		<!-- Generate the info about the item from the metadata section -->
 		<xsl:apply-templates
@@ -819,16 +819,16 @@
 					<xsl:variable name="download-all-url"><xsl:value-of select="concat(/mets:METS/@OBJID,'/allzip')" /></xsl:variable>
 
 					<xsl:variable name="process-doc-url">
-						<xsl:value-of select="concat(/mets:METS/@OBJID,'/startProcess')" />
+						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'),'/rest/process/items/handle/',substring-after(/mets:METS/@ID,'hdl:'),'/start')" />
 					</xsl:variable>
 					<xsl:variable name="process-status-url">
-						<xsl:value-of select="concat(/mets:METS/@OBJID,'/processStatus')" />
+						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'),'/rest/process/items/handle/',substring-after(/mets:METS/@ID,'hdl:'),'/status')" />
 					</xsl:variable>
 					<xsl:variable name="export-to-wielowyr">
-						<xsl:value-of select="concat(/mets:METS/@OBJID,'/exportWielowyr')" />
+						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'),'/rest/process/items/handle/',substring-after(/mets:METS/@ID,'hdl:'),'/export/mewex')" />
 					</xsl:variable>
 					<xsl:variable name="export-to-inforex">
-						<xsl:value-of select="concat(/mets:METS/@OBJID, '/exportInforex')" />
+						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'),'/rest/process/items/handle/',substring-after(/mets:METS/@ID,'hdl:'),'/export/inforex')" />
 					</xsl:variable>
 					<xsl:variable name="goto-freq-lists">
 						<xsl:value-of select="concat(/mets:METS/@OBJID, '/freqLists')" />
@@ -848,15 +848,19 @@
 						<dd>
 							<xsl:call-template name="process-doc">
 								<xsl:with-param name="process-doc-url" select="$process-doc-url" />
+								<xsl:with-param name="process-status-url" select="$process-status-url" />
+								<xsl:with-param name="user-email" select="$user_email" />
 							</xsl:call-template>
 							<xsl:call-template name="goto-freq-lists">
 								<xsl:with-param name="goto-freq-lists" select="$goto-freq-lists" />
 							</xsl:call-template>
 							<xsl:call-template name="export-to-wielowyr">
 								<xsl:with-param name="export-to-wielowyr" select="$export-to-wielowyr" />
+								<xsl:with-param name="user-email" select="$user_email" />
 							</xsl:call-template>
 							<xsl:call-template name="export-to-inforex">
 								<xsl:with-param name="export-to-inforex" select="$export-to-inforex" />
+								<xsl:with-param name="user-email" select="$user_email" />
 							</xsl:call-template>
 						</dd>
 					</dl>
@@ -872,47 +876,7 @@
 					<div id="process-msg" class="alert alert-danger" role="alert" style="display:none"></div>
 					<script type="text/javascript">
 						$( document ).ready(function() {
-
-						getStatus();
-
-						var handle;
-
-						function getStatus(){
-							$.getJSON('<xsl:value-of select="$baseURL" /><xsl:value-of select="$process-status-url" />', function(j) {
-								updateStatus(j);
-							});
-						}
-
-						function updateStatus(s){
-							if(s.status === 'READY'){
-								$( "#process-doc-button").show();
-							}
-
-							if(s.status === 'PROCESSING'){
-								$( "#process-doc-button").hide();
-								$( "#export-to-inforex").hide();
-								$( "#export-to-wielowyr").hide();
-								$( "#process-progres" ).show();
-								var progres = s.progress*100;
-								$( "#p-progress" ).css('width', progres+'%').attr('aria-valuenow',progres);
-								setTimeout(function () { getStatus(); }, 1000);
-								}
-
-							if(s.status === 'DONE'){
-								$( "#export-to-inforex").show();
-								$( "#export-to-wielowyr").show();
-								$( "#goto-freq-lists").show();
-								$( "#process-progres" ).hide();
-								$( "#freq_token").attr("value","/public-dspace/"+s.handle+"/wlw_ccl.zip")
-							}
-
-							if(s.status === 'ERROR'){
-								$( "#process-doc-button").show();
-								$( "#process-msg" ).show();
-								$( "#process-msg" ).text(s.error);
-							}
-						}
-
+							getProcessStatus('<xsl:value-of select="$process-status-url" />');
 						});
 					</script>
 					</xsl:if>
@@ -1093,8 +1057,15 @@
 
 	<xsl:template name="process-doc">
 		<xsl:param name="process-doc-url" />
+		<xsl:param name="process-status-url" />
+		<xsl:param name="user-email" />
 		<a id="process-doc-button" class="label label-info pull-right" style="display:none;">
-			<xsl:attribute name="href"><xsl:value-of select="$process-doc-url" /></xsl:attribute>
+			<xsl:attribute name="href">javascript:{}</xsl:attribute>
+			<xsl:attribute name="onclick">javascript:
+				var link = '<xsl:value-of select="$process-doc-url" />' +"?userEmail="+ '<xsl:value-of select="$user-email" />';
+				$.get(link);
+				location.reload();
+			</xsl:attribute>
 			<i class="fa fa-cog">&#160;</i>
 			<i18n:translate>
 				<i18n:text>xmlui.UFAL.artifactbrowser.item-process-doc</i18n:text>
@@ -1104,29 +1075,14 @@
 
 	<xsl:template name="export-to-inforex">
 		<xsl:param name="export-to-inforex" />
-		<xsl:variable name="baseURL"
-			select="confman:getProperty('dspace.baseUrl')" />
+		<xsl:param name="user-email" />
 		<div id="inforex-loading" class="label label-warning" style="display:none;">
 			Loading Inforex ...
 		</div>
 		<a id="export-to-inforex" class="label label-info" style="display:none;">
 			<xsl:attribute name="href">javascript:{}</xsl:attribute>
 			<xsl:attribute name="onclick">javascript:
-									$( "#export-to-inforex" ).hide();
-									$( "#inforex-loading" ).show();
-									$.getJSON('<xsl:value-of select="$baseURL" /><xsl:value-of select="$export-to-inforex" />', function(j) {
-									if( j.error !== null){
-          								$( "#process-msg" ).text("Inforex error message: "+ j.error);
-          								$( "#inforex-loading").hide();
-										$( "#process-msg" ).show();
-          								$( "#export-to-inforex" ).show();
-          							}
-          							if(j.redirect !== null){
-          								window.open(j.redirect, '_newtab');
-          								$( "#inforex-loading").hide();
-          								$( "#export-to-inforex" ).show();
-          							}
-								});
+				exportInforex('<xsl:value-of select="$export-to-inforex" />','<xsl:value-of select="$user-email" />');
 			</xsl:attribute>
 			<i class="fa fa-exchange">&#160;</i>
 			<i18n:translate>
@@ -1156,28 +1112,14 @@
 
 	<xsl:template name="export-to-wielowyr">
 		<xsl:param name="export-to-wielowyr" />
-		<xsl:variable name="baseURL" select="confman:getProperty('dspace.baseUrl')" />
+		<xsl:param name="user-email" />
 		<div id="wielowyr-loading" class="label label-warning" style="display:none;">
 			Loading Mewex ...
 		</div>
 		<a id="export-to-wielowyr" class="label label-info" style="display:none;">
 			<xsl:attribute name="href">javascript:{}</xsl:attribute>
 			<xsl:attribute name="onclick">javascript:
-									$( "#export-to-wielowyr" ).hide();
-									$( "#wielowyr-loading" ).show();
-									$.getJSON('<xsl:value-of select="$baseURL" /><xsl:value-of select="$export-to-wielowyr" />', function(j) {
-									if( j.error !== null){
-										$( "#process-msg" ).show();
-          								$( "#process-msg" ).text("MaWeX error message: "+ j.error);
-          								$( "#export-to-wielowyr" ).show();
-										$( "#wielowyr-loading" ).hide();
-          							}
-          							if(j.redirect !== null){
-          								window.open(j.redirect, '_newtab');
-          								$( "#wielowyr-loading" ).hide();
-          								$( "#export-to-wielowyr" ).show();
-          							}
-								});
+				exportMewex('<xsl:value-of select="$export-to-wielowyr" />','<xsl:value-of select="$user-email" />');
 			</xsl:attribute>
 
 			<i class="fa fa-exchange">&#160;</i>

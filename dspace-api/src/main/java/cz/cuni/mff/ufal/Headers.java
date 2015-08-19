@@ -16,8 +16,6 @@ public class Headers
 {
 	
 	// variables
-	//
-	
 	private HashMap<String, List<String>> headers_ = new HashMap<String, List<String>>();
     private String header_separator_ = null;
 	

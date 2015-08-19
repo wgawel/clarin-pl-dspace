@@ -27,6 +27,7 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
@@ -37,7 +38,9 @@ import com.google.gson.reflect.TypeToken;
 public class ResourceStreamFileListReader extends AbstractReader{
 
 	private static final Logger log = Logger.getLogger(ResourceStreamFileListReader.class);
-	
+	public static final String host = ConfigurationManager.getProperty("dspace.baseUrl");
+	public static final String ALLOWED_FILES = String.format("(?i).*\\.(%s)$", ConfigurationManager.getProperty("dspace.file.extension.to.ccl"));
+
 	private Item item = null;
 	private HttpClient client = new DefaultHttpClient();
 	private Context context;
@@ -51,7 +54,7 @@ public class ResourceStreamFileListReader extends AbstractReader{
 				.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
 
 		String handle = parameters.getParameter("handle", null);
-		String bitstreamUrl = String.format("%s%s/bitstream/handle/%s/", ProcessDocumentsAction.host, httpRequest.getContextPath(), handle);
+		String bitstreamUrl = String.format("%s%s/bitstream/handle/%s/", host, httpRequest.getContextPath(), handle);
 		List<ResourceFileElement> elements = new ArrayList<ResourceFileElement>();
 		try {
 			this.handle = parameters.getParameter("handle", null);
@@ -129,7 +132,7 @@ public class ResourceStreamFileListReader extends AbstractReader{
 			for (Bitstream bitstream : bss) {
 				String filename = bitstream.getName();
 
-				if (bitstream.getName().matches(ProcessDocumentsAction.ALLOWED_FILES)) {
+				if (bitstream.getName().matches(ALLOWED_FILES)) {
 					files.add(bitstream);
 				}
 			}

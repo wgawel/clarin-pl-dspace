@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.xml.sax.SAXException;
 
@@ -27,6 +28,7 @@ import com.google.gson.reflect.TypeToken;
 public class ItemListReader extends AbstractReader{
 
 	private static final Logger log = Logger.getLogger(ItemListReader.class);
+	public static final String host = ConfigurationManager.getProperty("dspace.baseUrl");
 	private String search;
 
 	@Override
@@ -49,7 +51,7 @@ public class ItemListReader extends AbstractReader{
 		while( item.hasNext() ) {
 			Item i = item.next();
 			String handle = i.getHandle();
-			String bitstreamUrl = String.format("%s%s/handle/%s/", ProcessDocumentsAction.host, request.getContextPath(), handle);
+			String bitstreamUrl = String.format("%s%s/handle/%s/", host, request.getContextPath(), handle);
 			if(search !=null && !search.equals("")){
 				if(containsSearchFrase(i, search)){
 					list.add(new JsonItem(

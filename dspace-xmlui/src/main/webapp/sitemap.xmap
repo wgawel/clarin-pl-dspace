@@ -202,17 +202,13 @@
                     <map:reader name="JQueryLoaderReader" src="org.dspace.app.xmlui.utils.JQueryLoaderReader"/>
                     <map:reader name="JSONControlledVocabularyReader" src="org.dspace.app.xmlui.cocoon.JSONControlledVocabularyReader"/>
                     <map:reader name="PiwikStatisticsReader" src="cz.cuni.mff.ufal.PiwikStatisticsReader"/>
-                                        
                     <map:reader name="HandleResolverReader" src="org.dspace.app.xmlui.aspect.handle.HandleResolverReader"/>
-                    <map:reader name="ProcessStatusReader" src="org.dspace.app.xmlui.aspect.artifactbrowser.ProcessStatusReader" />
-                    <map:reader name="ExportToInforexAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.ExportToInforexAction" />
-                    <map:reader name="ExportToWielowyrAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.ExportToWielowyrAction" />
-                    <map:reader name="ResourceStreamFileListReader" src="org.dspace.app.xmlui.aspect.artifactbrowser.ResourceStreamFileListReader" />
-                    <map:reader name="ItemListReader" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemListReader" />
 
                      <!-- TODO: Move to rest api -->
-                        <map:reader name="APIHandleReader" src="pl.edu.wroc.dspace.api.APIHandleReader"/>
-                        <map:reader name="APIAddFileReader" src="pl.edu.wroc.dspace.api.APIAddFileReader"/>
+                    <map:reader name="ResourceStreamFileListReader" src="org.dspace.app.xmlui.aspect.artifactbrowser.ResourceStreamFileListReader" />
+                    <map:reader name="ItemListReader" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemListReader" />
+                    <map:reader name="APIHandleReader" src="pl.edu.wroc.dspace.api.APIHandleReader"/>
+                    <map:reader name="APIAddFileReader" src="pl.edu.wroc.dspace.api.APIAddFileReader"/>
 
                 </map:readers>
                 <map:actions>
@@ -222,8 +218,6 @@
                         <map:action name="PropertyFileReader" src="org.dspace.app.xmlui.cocoon.PropertyFileReader" />
                         <map:action name="CurrentActivityAction" src="org.dspace.app.xmlui.aspect.administrative.CurrentActivityAction" />
                         <map:action name="DiscoJuiceFeeds" src="cz.cuni.mff.ufal.DiscoJuiceFeeds" />
-                        <map:action name="ProcessDocumentAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.ProcessDocumentsAction" />    
-                        <map:action name="ResetProcessAction" src="org.dspace.app.xmlui.aspect.artifactbrowser.ResetProcessAction" />                
                 </map:actions>
                 <map:pipes default="caching">
                         <map:pipe name="noncaching" src="org.apache.cocoon.components.pipeline.impl.NonCachingProcessingPipeline">
@@ -282,76 +276,6 @@
                     </map:match>
                 </map:pipeline>
                 <!-- end feeds -->
-                
-                <map:pipeline type="noncaching">
-                <map:match pattern="handle/*/*/startProcess">
-				  <map:select type="AuthenticatedSelector">
-                     <map:when test="eperson">
-	                     <map:act type="ProcessDocumentAction">
-	                     	<map:parameter name="handle" value="{1}/{2}"/>
-	                     </map:act>
-                       </map:when>
-                          <map:otherwise>
-                       <map:act type="StartAuthentication"/>
-                    </map:otherwise>
-                  </map:select>                        
-                </map:match>
-                </map:pipeline>
-                
-                <map:pipeline type="noncaching">
-                <map:match pattern="handle/*/*/resetProcess">
-				  <map:select type="AuthenticatedSelector">
-                     <map:when test="eperson">
-	                     <map:act type="ResetProcessAction">
-	                     	<map:parameter name="handle" value="{1}/{2}"/>
-	                     </map:act>
-                       </map:when>
-                          <map:otherwise>
-                       <map:act type="StartAuthentication"/>
-                    </map:otherwise>
-                  </map:select>                        
-                </map:match>
-                </map:pipeline> 
-                
-                <map:pipeline type="noncaching">
-                <map:match pattern="handle/*/*/exportInforex">
-				  <map:select type="AuthenticatedSelector">
-                     <map:when test="eperson">
-                         <map:read type="ExportToInforexAction">
-	                  		<map:parameter name="handle" value="{1}/{2}"/>
-	                 	 </map:read>
-                       </map:when>
-                          <map:otherwise>
-                       <map:act type="StartAuthentication"/>
-                    </map:otherwise>
-                  </map:select>                        
-                </map:match>
-                </map:pipeline>
-          
-   
-                 <map:pipeline type="noncaching">
-                <map:match pattern="handle/*/*/exportWielowyr">
-				  <map:select type="AuthenticatedSelector">
-                     <map:when test="eperson">
-	                     <map:read type="ExportToWielowyrAction">
-	                     	<map:parameter name="handle" value="{1}/{2}"/>
-	                     </map:read>
-                       </map:when>
-                          <map:otherwise>
-                       <map:act type="StartAuthentication"/>
-                    </map:otherwise>
-                  </map:select>                        
-                </map:match>
-                </map:pipeline>
-                
-                <map:pipeline type="noncaching">
-                <map:match pattern="handle/*/*/processStatus">
-	                 <map:read type="ProcessStatusReader">
-	                  	<map:parameter name="handle" value="{1}/{2}"/>
-	                 </map:read>
-                </map:match>
-                </map:pipeline>
-
 
                 <map:pipeline type="noncaching">
                 <map:match pattern="handle/*/*/jsonFileList">
