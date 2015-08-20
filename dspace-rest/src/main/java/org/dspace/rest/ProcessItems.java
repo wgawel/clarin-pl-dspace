@@ -75,7 +75,6 @@ public class ProcessItems extends ItemsResource {
 
         org.dspace.core.Context context = null;
 
-        HttpClient client = new DefaultHttpClient();
         try {
             context = createContext(getUser(headers));
             org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
@@ -94,8 +93,8 @@ public class ProcessItems extends ItemsResource {
                         || "ERROR".equals(dspaceItem.getProcessStatus())) {
 
                     if (bitstreams.size() > 0) {
-                        saveMetaFile(handle, client);
-                        String nlpengineToken = callEngineService(xml, client);
+                        saveMetaFile(handle);
+                        String nlpengineToken = callEngineService(xml);
                         log.info(nlpengineToken);
                         if (nlpengineToken != null && !nlpengineToken.isEmpty()) {
                             dspaceItem.setNLPEngineToken(nlpengineToken);
@@ -111,10 +110,7 @@ public class ProcessItems extends ItemsResource {
             processException("Could not read item(handle=" + prefix + "/" + suffix + "), ContextException. Message: " + e.getMessage(), context);
         } catch (SQLException e) {
             processException("Could not read item(handle=" + prefix + "/" + suffix + "), ContextException. Message: " + e.getMessage(), context);
-        } finally {
-            client.getConnectionManager().shutdown();
         }
-
         return "Fail to start process";
     }
 
@@ -263,7 +259,7 @@ public class ProcessItems extends ItemsResource {
             @QueryParam("userEmail") String user_email, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) {
 
-        log.info("Reading item(handle=" + prefix + "/" + suffix+").");
+        log.info("Reading item(handle=" + prefix + "/" + suffix + ").");
         org.dspace.core.Context context = null;
         Map<String, String> m = new HashMap<String, String>();
         m.put("redirect", null);
@@ -355,11 +351,10 @@ public class ProcessItems extends ItemsResource {
         return json;
     }
 
-    private void saveMetaFile(String handle, HttpClient client){
-
+    private void saveMetaFile(String handle){
+        HttpClient client = new DefaultHttpClient();
         String metaURL =
-                String.format(ConfigurationManager.getProperty("oai.baseUrl")+"stripped?verb=GetRecord&metadataPrefix=cmdi&identifier=oai:%s:%s",
-                        dspace_hostname,dspace_hostname,handle);
+                String.format(ConfigurationManager.getProperty("oai.baseUrl")+"stripped?verb=GetRecord&metadataPrefix=cmdi&identifier=oai:%s:%s", dspace_hostname,handle);
 
         HttpGet request = new HttpGet(metaURL);
 
@@ -389,6 +384,8 @@ public class ProcessItems extends ItemsResource {
 
         } catch (IOException e) {
             log.error("Saving metadata file error:", e);
+        } finally {
+            client.getConnectionManager().shutdown();
         }
     }
 
@@ -504,8 +501,9 @@ public class ProcessItems extends ItemsResource {
 
     }
 
-    public String callEngineService(String xml, HttpClient client) {
+    public String callEngineService(String xml) {
 
+        HttpClient client = new DefaultHttpClient();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(nlengineTaskStartURL);
         try {
 
@@ -527,6 +525,8 @@ public class ProcessItems extends ItemsResource {
             log.error(e);
         } catch (IOException e) {
             log.error(e);
+        } finally {
+            client.getConnectionManager().shutdown();
         }
         return null;
     }
