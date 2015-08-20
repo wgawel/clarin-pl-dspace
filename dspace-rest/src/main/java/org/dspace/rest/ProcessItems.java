@@ -61,7 +61,7 @@ public class ProcessItems extends ItemsResource {
     public static final String nfs = ConfigurationManager.getProperty("dspace.nfs.path");
     public static final String mewexURL = ConfigurationManager.getProperty("dspace.wielowyr.export.url");
     public static final String inforexURL = ConfigurationManager.getProperty("dspace.inforex.export.url");
-    public static final String oaiUrl = ConfigurationManager.getProperty("oai.baseUrl")+"cite?metadataPrefix=cmdi&handle=";
+    public static final String oaiUrl = ConfigurationManager.getProperty("oai.context")+"cite?metadataPrefix=cmdi&handle=";
 
     @javax.ws.rs.core.Context public static ServletContext servletContext;
 
@@ -355,7 +355,7 @@ public class ProcessItems extends ItemsResource {
         HttpClient client = new DefaultHttpClient();
 
         String metaURL = oaiUrl+handle;
-
+        log.info(metaURL);
         HttpGet request = new HttpGet(metaURL);
 
         // add request header
