@@ -290,11 +290,14 @@ update_themes:
 #
 
 check_lindat_common:
-	@echo "Checking lindat common theme into $(DIR_LINDAT_COMMON_THEME)... "
-	@test -d $(DIR_LINDAT_COMMON_THEME)/.git || git clone $(URL_LINDAT_COMMON_GIT) $(DIR_LINDAT_COMMON_THEME)
+	@echo "[CLARIN-PL] Skip 'check_lindat_common'"
+#	@echo "Checking lindat common theme into $(DIR_LINDAT_COMMON_THEME)... "
+#	@test -d $(DIR_LINDAT_COMMON_THEME)/.git || git clone $(URL_LINDAT_COMMON_GIT) $(DIR_LINDAT_COMMON_THEME)
 
-update_lindat_common: check_lindat_common
-	cd $(DIR_LINDAT_COMMON_THEME) && $(LINDAT_COMMON_THEME_FETCH)
+update_lindat_common: 
+	@echo "[CLARIN-PL] Skip 'update_lindat_common'"
+#	check_lindat_common
+#	cd $(DIR_LINDAT_COMMON_THEME) && $(LINDAT_COMMON_THEME_FETCH)
 
 
 #======================================================
