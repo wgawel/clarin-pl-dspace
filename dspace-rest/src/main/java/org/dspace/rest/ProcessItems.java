@@ -358,7 +358,7 @@ public class ProcessItems extends ItemsResource {
     private void saveMetaFile(String handle, HttpClient client){
 
         String metaURL =
-                String.format("https://%s/oai/requeststripped?verb=GetRecord&metadataPrefix=cmdi&identifier=oai:%s:%s",
+                String.format(ConfigurationManager.getProperty("oai.baseUrl")+"stripped?verb=GetRecord&metadataPrefix=cmdi&identifier=oai:%s:%s",
                         dspace_hostname,dspace_hostname,handle);
 
         HttpGet request = new HttpGet(metaURL);
