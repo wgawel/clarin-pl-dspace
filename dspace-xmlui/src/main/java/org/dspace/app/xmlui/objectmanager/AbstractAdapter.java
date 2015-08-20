@@ -24,6 +24,7 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.PluginManager;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -462,6 +463,8 @@ public abstract class AbstractAdapter
         	attributes.put("CHECKSUMTYPE", checksumType);
         }
         attributes.put("SIZE", String.valueOf(size));
+        attributes.put("HAS_CMDI", bitstream.getCmdiBitstreamId() > 0 ? true : false );
+        attributes.put("CMDI_LINK", ConfigurationManager.getProperty("dspace.url")+"/bitstream/id/" + bitstream.getCmdiBitstreamId()+ "/" );
         startElement(METS,"file",attributes);
         
         

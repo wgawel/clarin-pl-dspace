@@ -619,9 +619,21 @@ public abstract class RichTextContainer extends TextContainer
     {
         return addTextArea(name, null);
     }
-    
-    
-    
+
+
+    public SingleFile addSingleFile(String name, String handle, String id) throws WingException
+    {
+        SingleFile file = new SingleFile(context, handle, id);
+        contents.add(file);
+        return file;
+    }
+
+    public CustomButton addCustomButton(String handle, String id) throws WingException
+    {
+        CustomButton btn = new CustomButton(context, id, handle);
+        contents.add(btn);
+        return btn;
+    }
     
     
 }

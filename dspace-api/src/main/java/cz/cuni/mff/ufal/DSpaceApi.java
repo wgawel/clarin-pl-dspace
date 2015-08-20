@@ -13,6 +13,7 @@ import javax.mail.MessagingException;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 
+import cz.cuni.mff.ufal.lindat.utilities.hibernate.CmdiProfile;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.authorize.AuthorizeException;
@@ -261,6 +262,21 @@ public class DSpaceApi {
 
 	}
 
+	public static CmdiProfile getCmdiProfileById(int id )
+	{
+				CmdiProfile profile;
+		       IFunctionalities manager = DSpaceApi.getFunctionalityManager();
+			try{
+					manager.openSession();
+					profile = (CmdiProfile) manager.findById(CmdiProfile.class, id);
+					manager.close();
+			}catch(Exception e){
+					log.error("Error while querying for cmdiProfile", e);
+				manager.close();
+				return null;
+		}
+		return profile;
+	}
 	public static void main(String[] t) {
 		try {
 			load_dspace();

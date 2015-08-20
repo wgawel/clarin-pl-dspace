@@ -209,6 +209,7 @@
                     <map:reader name="ItemListReader" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemListReader" />
                     <map:reader name="APIHandleReader" src="pl.edu.wroc.dspace.api.APIHandleReader"/>
                     <map:reader name="APIAddFileReader" src="pl.edu.wroc.dspace.api.APIAddFileReader"/>
+                    <map:reader name="APIUploadCmdFileReader" src="pl.edu.wroc.dspace.api.APIUploadCmdFileReader"/>
 
                 </map:readers>
                 <map:actions>
@@ -299,6 +300,9 @@
                 </map:match>
                 </map:pipeline>
 
+                <map:match pattern="api/cmdi/upload">
++                    <map:read type="APIUploadCmdFileReader"/>
++               </map:match>
 
                 <!-- Bitstream pipeline -->
                 <map:pipeline type="noncaching">

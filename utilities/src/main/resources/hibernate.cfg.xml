@@ -39,6 +39,7 @@
   <!-- eperson additional abstracted metadata -->
   <mapping resource="cz/cuni/mff/ufal/lindat/utilities/hibernate/UserMetadata.hbm.xml"/>
   <mapping resource="cz/cuni/mff/ufal/lindat/utilities/hibernate/PiwikReport.hbm.xml"/>
+  <mapping resource="cz/cuni/mff/ufal/lindat/utilities/hibernate/CmdiProfileMapping.hbm.xml"/>
  </session-factory>
 </hibernate-configuration>
 

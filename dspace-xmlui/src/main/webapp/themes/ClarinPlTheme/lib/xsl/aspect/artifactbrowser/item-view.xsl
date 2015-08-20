@@ -986,6 +986,14 @@
                         <i18n:param><xsl:copy-of select="$formatted-file-size"/></i18n:param>
                     </i18n:translate>
 				</a>
+				<xsl:if test="@HAS_CMDI='yes'">
+					<a data-toggle="modal" data-target="#exporter_model_div" class="label label-default pull-right">
+						<xsl:attribute name="href">
+							<xsl:value-of select="@CMDI_LINK" />
+						</xsl:attribute>
+						<i18n:text>CMDI</i18n:text>
+					</a>
+				</xsl:if>
 			</div>			
 	</xsl:template>
 

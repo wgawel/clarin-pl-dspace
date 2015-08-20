@@ -854,6 +854,13 @@ GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
+CREATE TABLE cmdi_profiles(
+  clarin_id character varying(255),
+  name character varying(255),
+  form_file character varying(255),
+  id serial NOT NULL,
+  CONSTRAINT id PRIMARY KEY (id)
+);
 --
 -- PostgreSQL database dump complete
 --

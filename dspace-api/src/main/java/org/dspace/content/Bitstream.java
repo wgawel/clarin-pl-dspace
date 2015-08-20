@@ -52,6 +52,8 @@ public class Bitstream extends DSpaceObject
     /** The bitstream format corresponding to this bitstream */
     private BitstreamFormat bitstreamFormat;
 
+    private int cmdiBitstreamId;
+
     /** Flag set when data is modified, for events */
     private boolean modified;
 
@@ -201,7 +203,7 @@ public class Bitstream extends DSpaceObject
      * @throws IOException
      * @throws SQLException
      */
-    static Bitstream create(Context context, InputStream is)
+    public static Bitstream create(Context context, InputStream is)
             throws IOException, SQLException
     {
         // Store the bits
@@ -213,6 +215,7 @@ public class Bitstream extends DSpaceObject
         // Set the format to "unknown"
         Bitstream bitstream = find(context, bitstreamID);
         bitstream.setFormat(null);
+        bitstream.setCmdiBitstreamId(0);
 
         context.addEvent(new Event(Event.CREATE, Constants.BITSTREAM, 
                 bitstreamID, null, bitstream.getIdentifiers(context)));
@@ -514,7 +517,7 @@ public class Bitstream extends DSpaceObject
      * 
      * @throws SQLException
      */
-    void delete() throws SQLException
+    public void delete() throws SQLException
     {
         boolean oracle = DatabaseManager.isOracle();
 
@@ -743,5 +746,15 @@ public class Bitstream extends DSpaceObject
     //UFAL okosarko we need this for harvesting
     public String get_internal_id(){
     	return bRow.getStringColumn("internal_id");
+    }
+
+    public int getCmdiBitstreamId() {
+      	return bRow.getIntColumn("cmdi_id");
+    }
+
+    public void setCmdiBitstreamId(int cmdiBitstreamId) {
+    	this.cmdiBitstreamId = cmdiBitstreamId;
+    	bRow.setColumn("cmdi_id", cmdiBitstreamId);
+        modifiedMetadata = true;
     }
 }

@@ -821,6 +821,12 @@
     <message key="xmlui.Submission.submit.progressbar.license">License</message>
 	<message key="xmlui.Submission.submit.progressbar.complete">Complete</message>
 
+	<!-- CmdiStep -->
+	<message key="xmlui.Submission.submit.CmdiStep.head">Cmdi</message>
+	<message key="xmlui.Submission.submit.CmdiStep.column1">Cmdi File</message>
+	<message key="xmlui.Submission.submit.CmdiStep.column2">Action</message>
+	<message key="xmlui.Submission.submit.progressbar.cmdi">Cmdi upload</message>
+
 	<!-- org.dspace.app.xmlui.Submission.submit.ResumeStep -->
 	<message key="xmlui.Submission.submit.ResumeStep.submit_resume">Resume</message>
 

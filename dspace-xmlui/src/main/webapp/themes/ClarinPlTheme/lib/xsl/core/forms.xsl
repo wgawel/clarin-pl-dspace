@@ -1190,6 +1190,24 @@
 		</xsl:if>
 	</xsl:template>
 
+	<xsl:template match="dri:single">
+		<input type="file" name="file" accept=".cmdi, .xml">
+			<xsl:attribute name="id">file_<xsl:value-of	select="@id" /></xsl:attribute>
+			<xsl:attribute name="onchange">
+				return upload('file_<xsl:value-of select="@id" />','<xsl:value-of select="@handle" />','<xsl:value-of select="@id" />')
+			</xsl:attribute>
+		</input>
+	</xsl:template>
+
+	<xsl:template match="dri:customButton">
+		<button type="button" class="btn btn-xs btn-info">
+			<xsl:attribute name="onclick">
+				return createCmdi('<xsl:value-of select="@handle" />','<xsl:value-of select="@id" />')
+			</xsl:attribute>
+			Create
+		</button>
+	</xsl:template>
+
 	<!-- UFAL If page metadata specify that they want to use drag and drop then 
 		include it as a button. This relies on js/css added in buildHeader. jmisutka 
 		2011/04/07 -->

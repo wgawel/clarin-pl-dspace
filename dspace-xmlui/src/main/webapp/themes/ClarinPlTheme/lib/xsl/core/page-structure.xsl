@@ -143,7 +143,15 @@
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='dragNdrop']">
                 <link rel="stylesheet" href="{$theme-path}/lib/css/jquery.fileupload-ui.css"> </link>
 	    </xsl:if>
-	    
+            <xsl:if
+                    test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='uploadFile']">
+                <link rel="stylesheet" href="{$theme-path}/lib/css/jquery.fileupload-ui.css">
+                </link>
+                <link rel="stylesheet" href="{$theme-path}/lib/css/ui-lightness/jquery-ui.css">
+                </link>
+                <link rel="stylesheet" href="{$theme-path}/lib/css/upload.css">
+                </link>
+            </xsl:if>
 	    <!-- license selector -->
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='licenseselect']">
             <link rel="stylesheet" href="{$theme-path}/lib/lindat-license-selector/license-selector.min.css"> </link>
@@ -207,6 +215,12 @@
             <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js">&#160;</script>
             <!-- The following javascript removes the default text of empty text areas when they are focused on or submitted -->
             <!-- There is also javascript to disable submitting a form when the 'enter' key is pressed. -->
+            <script type="text/javascript" src="{$theme-path}/lib/js/jquery-ui.js">&#160;</script>
+            <xsl:if
+                    test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='uploadFile']">
+                <script type="text/javascript" src="{$theme-path}/lib/js/upload.js">&#160;</script>
+                <script type="text/javascript" src="{$theme-path}/lib/js/jquery.form.min.js">&#160;</script>
+            </xsl:if>
             <script type="text/javascript">
                 
                 // Clear default text of emty text areas on focus
@@ -419,6 +433,10 @@
                 </div>
                                    
             </div>
+            <xsl:if
+                    test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='uploadFile']">
+                <xsl:call-template name="cmdiDialogBox" />
+            </xsl:if>
         </div>
     </xsl:template>
 
@@ -637,6 +655,13 @@
         </xsl:if>
     </xsl:template>
 
+    <xsl:template name="cmdiDialogBox">
+        <!-- Modal -->
+        <div id="dialog" title="Create cmdi file">
+            <span style="width='100%'"> Profile: <select id="selectProfiles"><option value="0">None</option></select></span>
+            <iframe id="cmdiFrame" src="" width="100%" height="92%" frameborder="0"></iframe>
+        </div>
+    </xsl:template>
 </xsl:stylesheet>
 
 

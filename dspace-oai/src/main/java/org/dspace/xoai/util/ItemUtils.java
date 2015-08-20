@@ -211,6 +211,7 @@ public class ItemUtils
                     String cka = bit.getChecksumAlgorithm();
                     String oname = bit.getSource();
                     String name = bit.getName();
+                    int cmdi_id = bit.getCmdiBitstreamId();
                     String description = bit.getDescription();
 
                     if (name != null)
@@ -237,6 +238,7 @@ public class ItemUtils
                                     + ""));
                     bitstream.getField().add(
                     		createValue("id", bit.getID()+""));
+                    bitstream.getField().add(createValue("cmdi_id", cmdi_id+""));
 
                     if(!restricted){
                         List<LicenseDefinition> lds = functionalityManager.getLicenses(bit.getID());

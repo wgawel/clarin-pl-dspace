@@ -154,6 +154,13 @@
 			<workflow-editable>true</workflow-editable>
 		</step>
 
+        <step id="cmdi">
+             <heading>submit.progressbar.cmdi</heading>
+             <processing-class>pl.edu.pwr.dspace.submit.step.CmdiStep</processing-class>
+             <xmlui-binding>pl.edu.pwr.dspace.app.xmlui.aspect.submission.submit.CmdiStep</xmlui-binding>
+             <workflow-editable>true</workflow-editable>
+        </setp>
+
 		<step id="moredetails">
 			<heading>submit.progressbar.additional</heading>
 			<processing-class>cz.cuni.mff.ufal.dspace.submit.step.UFALExtraMetadataStep</processing-class>
@@ -251,12 +258,14 @@
 
 			<!--Step 2 will be to Upload the item -->
 			<step id="upload" />
-      
-			<!--Step 3 will be to Sign off on the License -->
-			<step id="license" />
+
+            <setp id="cmdi" />
+
+            <!--Step 3 will be to Sign off on the License -->
+            <step id="license" />
 
 			<!-- jmisutka/UFAL Step 4 will be to add additional metdata for moredetails e.g., metashare -->
-			<step id="moredetails" />
+			<!-- <step id="moredetails" /> -->
 
  	  <!--Step 5 will be to Verify/Review everything -->
 			<step id="review" />
