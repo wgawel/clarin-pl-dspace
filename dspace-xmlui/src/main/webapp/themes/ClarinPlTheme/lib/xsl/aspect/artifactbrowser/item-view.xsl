@@ -819,16 +819,16 @@
 					<xsl:variable name="download-all-url"><xsl:value-of select="concat(/mets:METS/@OBJID,'/allzip')" /></xsl:variable>
 
 					<xsl:variable name="process-doc-url">
-						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'),'/rest/process/items/handle/',substring-after(/mets:METS/@ID,'hdl:'),'/start')" />
+						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'), confman:getProperty('dspace.rest.process'), substring-after(/mets:METS/@ID,'hdl:'),'/start')" />
 					</xsl:variable>
 					<xsl:variable name="process-status-url">
-						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'),'/rest/process/items/handle/',substring-after(/mets:METS/@ID,'hdl:'),'/status')" />
+						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'), confman:getProperty('dspace.rest.process'), substring-after(/mets:METS/@ID,'hdl:'),'/status')" />
 					</xsl:variable>
 					<xsl:variable name="export-to-wielowyr">
-						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'),'/rest/process/items/handle/',substring-after(/mets:METS/@ID,'hdl:'),'/export/mewex')" />
+						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'), confman:getProperty('dspace.rest.process'), substring-after(/mets:METS/@ID,'hdl:'),'/export/mewex')" />
 					</xsl:variable>
 					<xsl:variable name="export-to-inforex">
-						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'),'/rest/process/items/handle/',substring-after(/mets:METS/@ID,'hdl:'),'/export/inforex')" />
+						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'), confman:getProperty('dspace.rest.process'), substring-after(/mets:METS/@ID,'hdl:'),'/export/inforex')" />
 					</xsl:variable>
 					<xsl:variable name="goto-freq-lists">
 						<xsl:value-of select="concat(/mets:METS/@OBJID, '/freqLists')" />
