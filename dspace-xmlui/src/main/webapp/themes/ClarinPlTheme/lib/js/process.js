@@ -1,3 +1,7 @@
+function startProcess(link){
+	$.get(link, function(){}, "json");
+}
+
 function getProcessStatus(link){
   $.getJSON(link, function(j) {
     updateProcessStatus(j,link);
