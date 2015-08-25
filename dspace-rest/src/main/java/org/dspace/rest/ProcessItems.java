@@ -415,7 +415,7 @@ public class ProcessItems extends ItemsResource {
             }
         }
         xml.setSource(src);
-        xml.getActivities().add(new ActivityElement("2", "any2text", "1", null));
+        xml.getActivities().add(new ActivityElement("2", "any2txt", "1", null));
         xml.getActivities().add(new ActivityElement("3", "wcrft2large", "2", null));
         xml.getActivities().add(new ActivityElement("4", "liner2_large", "3", "'{\"model\":\"all\"}'"));
         xml.getActivities().add(new ActivityElement("5", "wsd2", "4", null));
