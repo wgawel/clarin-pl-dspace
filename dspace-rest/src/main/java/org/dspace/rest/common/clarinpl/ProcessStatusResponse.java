@@ -7,8 +7,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
  */
 public class ProcessStatusResponse {
 
-    @JsonProperty("itemId")
-    private String itemId;
+    @JsonProperty("handle")
+    private String handle;
 
     @JsonProperty("nlpEngineToken")
     private String nlpEngineToken;
@@ -23,12 +23,12 @@ public class ProcessStatusResponse {
     private String progress = "0";
 
 
-    public String getItemId() {
-        return itemId;
+    public String getHandle() {
+        return handle;
     }
 
-    public void setItemId(String itemId) {
-        this.itemId = itemId;
+    public void setHandle(String handle) {
+        this.handle = handle;
     }
 
     public String getNlpEngineToken() {

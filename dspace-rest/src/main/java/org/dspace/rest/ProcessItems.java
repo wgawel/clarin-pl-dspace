@@ -305,7 +305,7 @@ public class ProcessItems extends ItemsResource {
 
     private ProcessStatusResponse checkStatus( org.dspace.content.Item item) {
         ProcessStatusResponse status = new ProcessStatusResponse();
-        status.setItemId(Integer.toString(item.getID()));
+        status.setHandle(item.getHandle());
         String token = item.getNLPEngineToken();
         String currentItemStatus = item.getProcessStatus();
         Map<String, Object> engineStatus = new HashMap<String, Object>();
