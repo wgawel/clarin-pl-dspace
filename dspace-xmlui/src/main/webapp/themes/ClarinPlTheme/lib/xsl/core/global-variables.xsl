@@ -55,7 +55,7 @@
 	
 	<xsl:variable name="query-string" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='queryString']" />
 
-	<xsl:variable name="oai-url" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='OAIURL']" />
+	<xsl:variable name="oai-url" select="confman:getProperty('lr', 'lr.dspace.oai.url')" />
 	<xsl:variable name="oai-handle"	select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='OAIHANDLE']" />
 
 	<!-- dynamically select the static html file based on requested page name -->
