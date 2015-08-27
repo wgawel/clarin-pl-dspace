@@ -1059,6 +1059,9 @@
 		<xsl:param name="process-doc-url" />
 		<xsl:param name="process-status-url" />
 		<xsl:param name="user-email" />
+		<div id="process-loading" class="label label-warning" style="display:none;">
+			Please wait ...
+		</div>
 		<a id="process-doc-button" class="label label-info pull-right" style="display:none;">
 			<xsl:attribute name="href">javascript:{}</xsl:attribute>
 			<xsl:attribute name="onclick">javascript:
