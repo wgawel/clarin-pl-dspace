@@ -4,7 +4,7 @@ function startProcess(link, status){
 	$.ajax({
           url: link ,
           async: false
-     });
+    });
     $( "#process-loading").hide();
 	getProcessStatus(status);
 }
