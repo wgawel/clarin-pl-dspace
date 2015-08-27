@@ -314,7 +314,6 @@ public class ProcessItems extends ItemsResource {
             try {
                 if(!currentItemStatus.equals("DONE")){
                     engineStatus = getNLPEngineStatus(token);
-                    log.info(engineStatus.get("value"));
                     if (!currentItemStatus.equals(engineStatus.get("status"))) {
                         item.setProcessStatus((String) engineStatus.get("status"));
                     }
@@ -355,7 +354,6 @@ public class ProcessItems extends ItemsResource {
         HttpClient client = new DefaultHttpClient();
 
         String metaURL = oaiUrl+handle;
-        log.info(metaURL);
         HttpGet request = new HttpGet(metaURL);
 
         // add request header
@@ -392,7 +390,6 @@ public class ProcessItems extends ItemsResource {
     public String getEngineXml(List<Bitstream> files, String bitstreamUrl, String prefix, String suffix,  String username){
 
         ClarinPlEngine xml = new ClarinPlEngine();
-
 
         SourceElement src = new SourceElement("1", username);
         Set<String> names = new HashSet<String>();
