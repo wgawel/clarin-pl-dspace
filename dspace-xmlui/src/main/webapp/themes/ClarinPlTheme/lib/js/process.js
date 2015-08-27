@@ -1,5 +1,9 @@
-function startProcess(link){
-	$.get(link, function(){}, "json");
+function startProcess(link, status){
+	$.ajax({
+          url: link ,
+          async: false
+     });
+	getProcessStatus(status);
 }
 
 function getProcessStatus(link){

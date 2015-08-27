@@ -1062,8 +1062,8 @@
 		<a id="process-doc-button" class="label label-info pull-right" style="display:none;">
 			<xsl:attribute name="href">javascript:{}</xsl:attribute>
 			<xsl:attribute name="onclick">javascript:
-				startProcess('<xsl:value-of select="$process-doc-url" />' +"?userEmail="+ '<xsl:value-of select="$user-email" />');
-				location.reload();
+				startProcess('<xsl:value-of select="$process-doc-url" />' +"?userEmail="+ '<xsl:value-of select="$user-email" />',
+							 '<xsl:value-of select="$process-status-url" />');
 			</xsl:attribute>
 			<i class="fa fa-cog">&#160;</i>
 			<i18n:translate>
