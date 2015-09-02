@@ -197,7 +197,7 @@ function processFiles(files) {
 	// console.log("processing files");
 
     var accept = function(f) {
-		return f.size > 0 && f.size <= lindat_upload_file_alert_max_file_size;
+		return f.size > 0 && f.size <= clarinpl_upload_file_alert_max_file_size;
 	};
 	var filesToUpload = [];
 	var filesToReject = [];
