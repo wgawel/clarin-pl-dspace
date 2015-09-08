@@ -85,7 +85,7 @@ ufal.citation = {
             try {
                     var xml = jQuery.parseXML(xml_content);
                     var metadata = jQuery(xml.getElementsByTagNameNS(
-                                    "http://lindat.mff.cuni.cz/ns/experimental/bibtex",
+                                    "http://clarin-pl.eu/ns/experimental/bibtex",
                                     "bibtex")[0]);
                     if (!metadata) {
                             throw "Not found."
