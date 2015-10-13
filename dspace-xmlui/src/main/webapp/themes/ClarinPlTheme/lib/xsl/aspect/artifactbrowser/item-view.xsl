@@ -722,7 +722,6 @@
 						&#160;
 					</dd>
 				</dl>
-
 			</xsl:when>						
 
 			<!-- recurse without changing phase if we didn't output anything -->
@@ -999,14 +998,16 @@
                         <i18n:param><xsl:copy-of select="$formatted-file-size"/></i18n:param>
                     </i18n:translate>
 				</a>
+                <xsl:if test="$AUTH = 'yes'">
 				<xsl:if test="@HAS_CMDI='yes'">
-					<a data-toggle="modal" data-target="#exporter_model_div" class="label label-default pull-right">
+					<a data-toggle="modal" data-target="#cmdi_model_div" class="label label-default pull-right cmdi">
 						<xsl:attribute name="href">
 							<xsl:value-of select="@CMDI_LINK" />
 						</xsl:attribute>
 						<i18n:text>CMDI</i18n:text>
 					</a>
 				</xsl:if>
+                </xsl:if>
 			</div>			
 	</xsl:template>
 
@@ -1028,51 +1029,6 @@
 					<xsl:apply-templates select="labels" />
 				</div>
 			</xsl:if>
-		</div>
-	</xsl:template>
-
-	<xsl:template name="exporters">
-		<dl class="dl-horizontal">
-			<dt style="text-align: left">
-				<a class="btn btn-link" style="padding-left:0">
-					<xsl:attribute name="href"><xsl:value-of select="$ds_item_view_toggle_url" /></xsl:attribute>
-					<i18n:text>xmlui.ArtifactBrowser.ItemViewer.show_full</i18n:text>
-				</a>
-			</dt>
-			<dd class="text-right">
-				<span class="bold">
-					<i class="fa fa-magic">&#160;</i>
-					Export to
-				</span>
-				<a data-toggle="modal" data-target="#exporter_model_div" class="label label-default">
-					<xsl:attribute name="href">
-	                	<xsl:value-of select="concat($oai-url, '/requeststripped?verb=GetRecord&amp;metadataPrefix=bibtex&amp;identifier=', $oai-handle)" />
-	                </xsl:attribute>
-					<i18n:text>BibTeX</i18n:text>
-				</a>
-				<a data-toggle="modal" data-target="#exporter_model_div" class="label label-default">
-					<xsl:attribute name="href">
-	                	<xsl:value-of select="concat($oai-url, '/requeststripped?verb=GetRecord&amp;metadataPrefix=cmdi&amp;identifier=', $oai-handle)" />
-	                </xsl:attribute>
-					<i18n:text>CMDI</i18n:text>
-				</a>
-			</dd>
-		</dl>
-		<div id="exporter_model_div" class="modal fade">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal">
-							<span aria-hidden="true">&#215;</span>
-							<span class="sr-only">Close</span>
-						</button>
-						<h3 class="modal-title">Exported Item</h3>
-					</div>
-					<div class="modal-body">
-						<i class="fa fa-spinner fa-spin" style="margin: auto;">&#160;</i>
-					</div>
-				</div>
-			</div>
 		</div>
 	</xsl:template>
 

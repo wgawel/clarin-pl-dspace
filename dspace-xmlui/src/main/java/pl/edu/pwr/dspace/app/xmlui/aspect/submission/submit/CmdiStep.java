@@ -31,7 +31,7 @@ public class CmdiStep extends AbstractSubmissionStep {
 	 private static Logger log = Logger.getLogger(CmdiStep.class);
 	 
 	protected static final Message T_head = message("xmlui.Submission.submit.CmdiStep.head");
-	protected static final Message T_head2 = message("xmlui.Submission.submit.UploadStep.head2");
+	protected static final Message T_head2 = message("xmlui.Submission.submit.CMDIUploadStep.head2");
 	
 	protected static final Message T_column1 = message("xmlui.Submission.submit.UploadStep.column2");
 	protected static final Message T_column2 = message("xmlui.Submission.submit.UploadStep.column3");

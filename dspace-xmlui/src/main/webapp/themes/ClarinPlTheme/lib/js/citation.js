@@ -191,6 +191,42 @@ ufal.citation = {
 
 };
 
+$( ".cmdi" ).click(function(e) {
+	e.preventDefault();
+    var url = jQuery(this).attr("href");
+   	var name = "extract_metadata_" + jQuery(this).html().toLowerCase();
+   	var targ = jQuery(this).attr("data-target");
+   	var title = "Item cmdi file"
+   			jQuery(targ + " .modal-body").html("<i class='fa fa-spinner fa-spin' style='margin: auto;'>&#160;</i>");
+   			jQuery(targ + " .modal-title").html(title + " (" + jQuery(this).html().toUpperCase() + ")");
+   			jQuery(targ).modal('show');
+   			jQuery.ajax({
+   						url : url,
+   						context : document.body,
+   						dataType : 'text'
+   					})
+   					.done(
+   							function(data) {
+   								var jdata_html = data;
+   								jdata_html = ufal.citation[name](jdata_html);
+   								jQuery(targ + " .modal-body").html(ufal.citation.convert_metadata_to_html(jdata_html, name));
+   							})
+   					.fail(
+   							function(data) {
+   								var jdata_html = data;
+   								jdata_html = ufal.citation.extract_metadata(jdata_html.responseText);
+   								if (jdata_html != null) {
+   									jQuery(targ + " .modal-body")
+   											.html('<samp class="wordbreak linebreak">'
+   													+ jdata_html
+   													+ '</samp>');
+   								} else {
+   									jQuery(
+   											targ + " .modal-body")
+   											.html('Failed to load requested data.');
+   								}
+   							});
+});
 
 jQuery(document).ready(function (){
 	
@@ -206,7 +242,20 @@ jQuery(document).ready(function (){
 							"</div>" +
 						"</div>" +
 					"</div>").appendTo("body");
-	
+
+	jQuery("<div id='cmdi_model_div' class='modal fade'>" +
+    					"<div class='modal-dialog'>" +
+    						"<div class='modal-content'>" +
+    							"<div class='modal-header'>" +
+    								"<button type='button' class='close' data-dismiss='modal'><span aria-hidden='true'>&#215;</span>" +
+    								"<span class='sr-only'>Close</span></button>" +
+    								"<h4 class='modal-title'>&#160;</h4>" +
+    							"</div>" +
+    							"<div class='modal-body'><i class='fa fa-spinner fa-spin' style='margin: auto;'>&#160;</i></div>" +
+    						"</div>" +
+    					"</div>" +
+    				"</div>").appendTo("body");
+
 	jQuery("<div class='modal fade' id='exporter_copy_div'>" +
 			 "<div class='modal-dialog modal-sm'>" +
 			 	"<div class='modal-content'>" +
@@ -224,5 +273,6 @@ jQuery(document).ready(function (){
 	jQuery(".citationbox").each(function(){
 		ufal.citation.citationBox(jQuery(this));
 	});
+
 });
 

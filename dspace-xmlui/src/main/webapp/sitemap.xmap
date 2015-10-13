@@ -300,9 +300,11 @@
                 </map:match>
                 </map:pipeline>
 
+                <map:pipeline type="noncaching">
                 <map:match pattern="api/cmdi/upload">
-+                    <map:read type="APIUploadCmdFileReader"/>
-+               </map:match>
+                    <map:read type="APIUploadCmdFileReader"/>
+                </map:match>
+                </map:pipeline>
 
                 <!-- Bitstream pipeline -->
                 <map:pipeline type="noncaching">

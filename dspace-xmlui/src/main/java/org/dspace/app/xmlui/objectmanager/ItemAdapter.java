@@ -1041,6 +1041,8 @@ public class ItemAdapter extends AbstractAdapter
         	attributes.put("CHECKSUMTYPE", checksumType);
         }
         attributes.put("SIZE", String.valueOf(size));
+        attributes.put("HAS_CMDI", bitstream.getCmdiBitstreamId() > 0 ? true : false );
+        attributes.put("CMDI_LINK", ConfigurationManager.getProperty("dspace.url")+"/bitstream/id/" + bitstream.getCmdiBitstreamId()+ "/" );
         startElement(METS,"file",attributes);
         
         

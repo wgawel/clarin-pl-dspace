@@ -1018,6 +1018,7 @@
 	<message key="xmlui.Submission.submit.UploadStep.description_help">Optionally, provide a brief description of the file, for example "<i>Main article</i>", or "<i>Experiment data readings</i>".</message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_upload">Upload file &amp; add another</message>
 	<message key="xmlui.Submission.submit.UploadStep.head2">Files Uploaded</message>
+	<message key="xmlui.Submission.submit.CMDIUploadStep.head2">Please attach cmdi files to uploaded files</message>
 	<message key="xmlui.Submission.submit.UploadStep.column0">Primary</message>
     <message key="xmlui.Submission.submit.UploadStep.column1">Delete</message>
 	<message key="xmlui.Submission.submit.UploadStep.column2">File</message>

@@ -101,6 +101,7 @@
 				</cmd:ResourceProxy>
 				<xsl:call-template name="ProcessSourceURI"/>
 				<xsl:call-template name="ProcessBitstreams"/>
+				<xsl:call-template name="ProcessBitstreamsMetadata"/>
 			</cmd:ResourceProxyList>
 			<cmd:JournalFileProxyList/>
 			<cmd:ResourceRelationList/>
@@ -110,12 +111,27 @@
 	<!-- Omit the special "ORE" bitstream and also the consent to publish the data -->
 	<xsl:template name="ProcessBitstreams">
 	   <xsl:for-each select="/doc:metadata/doc:element[@name='bundles']/doc:element[@name='bundle']/doc:field[@name='name' and text()!='ORE' and text()!='LICENSE']/../doc:element[@name='bitstreams']/doc:element[@name='bitstream']">
-	       <cmd:ResourceProxy>
+		   <xsl:if test="./doc:field[@name='cmdi_id'] = 0">
+		   <cmd:ResourceProxy>
 	                   <xsl:attribute name="id">_<xsl:value-of select="./doc:field[@name='id']/text()"/></xsl:attribute>
                        <cmd:ResourceType><xsl:attribute name="mimetype"><xsl:value-of select="./doc:field[@name='format']/text()"/></xsl:attribute>Resource</cmd:ResourceType>
                        <cmd:ResourceRef><xsl:value-of select="concat($dsURL,'/bitstream/handle/',$handle,'/',./doc:field[@name='name']/text(),'?sequence=',./doc:field[@name='sid']/text())"/></cmd:ResourceRef>
            </cmd:ResourceProxy>
+		   </xsl:if>
 	   </xsl:for-each>
+	</xsl:template>
+
+	<!-- Omit the special "ORE" bitstream and also the consent to publish the data -->
+	<xsl:template name="ProcessBitstreamsMetadata">
+		<xsl:for-each select="/doc:metadata/doc:element[@name='bundles']/doc:element[@name='bundle']/doc:field[@name='name' and text()!='ORE' and text()!='LICENSE']/../doc:element[@name='bitstreams']/doc:element[@name='bitstream']">
+			<xsl:if test="./doc:field[@name='cmdi_id'] &gt; 0">
+				<cmd:ResourceProxy>
+					<xsl:attribute name="id">_<xsl:value-of select="./doc:field[@name='id']/text()"/></xsl:attribute>
+					<cmd:ResourceType><xsl:attribute name="mimetype">text/xml</xsl:attribute>Metadata</cmd:ResourceType>
+					<cmd:ResourceRef><xsl:value-of select="concat($dsURL,'/bitstream/id/',./doc:field[@name='cmdi_id']/text(),'/')"/></cmd:ResourceRef>
+				</cmd:ResourceProxy>
+			</xsl:if>
+		</xsl:for-each>
 	</xsl:template>
 	
 	<xsl:template name="ProcessSourceURI">

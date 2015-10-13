@@ -159,7 +159,7 @@
              <processing-class>pl.edu.pwr.dspace.submit.step.CmdiStep</processing-class>
              <xmlui-binding>pl.edu.pwr.dspace.app.xmlui.aspect.submission.submit.CmdiStep</xmlui-binding>
              <workflow-editable>true</workflow-editable>
-        </setp>
+        </step>
 
 		<step id="moredetails">
 			<heading>submit.progressbar.additional</heading>
@@ -259,7 +259,7 @@
 			<!--Step 2 will be to Upload the item -->
 			<step id="upload" />
 
-            <setp id="cmdi" />
+            <step id="cmdi" />
 
             <!--Step 3 will be to Sign off on the License -->
             <step id="license" />
