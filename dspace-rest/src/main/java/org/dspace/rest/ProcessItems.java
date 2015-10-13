@@ -6,6 +6,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 import org.dspace.content.Bitstream;
@@ -60,8 +61,7 @@ public class ProcessItems extends ItemsResource {
     public static final String nfs = ConfigurationManager.getProperty("dspace.nfs.path");
     public static final String mewexURL = ConfigurationManager.getProperty("dspace.wielowyr.export.url");
     public static final String inforexURL = ConfigurationManager.getProperty("dspace.inforex.export.url");
-
-    private HttpClient client = new DefaultHttpClient();
+    public static final String oaiUrl = ConfigurationManager.getProperty("oai.context")+"cite?metadataPrefix=cmdi&handle=";
 
     @javax.ws.rs.core.Context public static ServletContext servletContext;
 
@@ -74,6 +74,7 @@ public class ProcessItems extends ItemsResource {
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request){
 
         org.dspace.core.Context context = null;
+
         try {
             context = createContext(getUser(headers));
             org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
@@ -102,7 +103,6 @@ public class ProcessItems extends ItemsResource {
                     }
                     context.complete();
                 }
-                client.getConnectionManager().shutdown();
 
                 return "Process started";
             }
@@ -111,7 +111,6 @@ public class ProcessItems extends ItemsResource {
         } catch (SQLException e) {
             processException("Could not read item(handle=" + prefix + "/" + suffix + "), ContextException. Message: " + e.getMessage(), context);
         }
-
         return "Fail to start process";
     }
 
@@ -260,7 +259,7 @@ public class ProcessItems extends ItemsResource {
             @QueryParam("userEmail") String user_email, @QueryParam("xforwardedfor") String xforwardedfor,
             @Context HttpHeaders headers, @Context HttpServletRequest request) {
 
-        log.info("Reading item(handle=" + prefix + "/" + suffix+").");
+        log.info("Reading item(handle=" + prefix + "/" + suffix + ").");
         org.dspace.core.Context context = null;
         Map<String, String> m = new HashMap<String, String>();
         m.put("redirect", null);
@@ -306,7 +305,7 @@ public class ProcessItems extends ItemsResource {
 
     private ProcessStatusResponse checkStatus( org.dspace.content.Item item) {
         ProcessStatusResponse status = new ProcessStatusResponse();
-        status.setItemId(Integer.toString(item.getID()));
+        status.setHandle(item.getHandle());
         String token = item.getNLPEngineToken();
         String currentItemStatus = item.getProcessStatus();
         Map<String, Object> engineStatus = new HashMap<String, Object>();
@@ -315,7 +314,6 @@ public class ProcessItems extends ItemsResource {
             try {
                 if(!currentItemStatus.equals("DONE")){
                     engineStatus = getNLPEngineStatus(token);
-                    log.info(engineStatus.get("value"));
                     if (!currentItemStatus.equals(engineStatus.get("status"))) {
                         item.setProcessStatus((String) engineStatus.get("status"));
                     }
@@ -353,11 +351,9 @@ public class ProcessItems extends ItemsResource {
     }
 
     private void saveMetaFile(String handle){
+        HttpClient client = new DefaultHttpClient();
 
-        String metaURL =
-                String.format("https://%s/oai/requeststripped?verb=GetRecord&metadataPrefix=cmdi&identifier=oai:%s:%s",
-                        dspace_hostname,dspace_hostname,handle);
-
+        String metaURL = oaiUrl+handle;
         HttpGet request = new HttpGet(metaURL);
 
         // add request header
@@ -386,13 +382,14 @@ public class ProcessItems extends ItemsResource {
 
         } catch (IOException e) {
             log.error("Saving metadata file error:", e);
+        } finally {
+            client.getConnectionManager().shutdown();
         }
     }
 
     public String getEngineXml(List<Bitstream> files, String bitstreamUrl, String prefix, String suffix,  String username){
 
         ClarinPlEngine xml = new ClarinPlEngine();
-
 
         SourceElement src = new SourceElement("1", username);
         Set<String> names = new HashSet<String>();
@@ -415,9 +412,9 @@ public class ProcessItems extends ItemsResource {
             }
         }
         xml.setSource(src);
-        xml.getActivities().add(new ActivityElement("2", "any2text", "1", null));
+        xml.getActivities().add(new ActivityElement("2", "any2txt", "1", null));
         xml.getActivities().add(new ActivityElement("3", "wcrft2large", "2", null));
-        xml.getActivities().add(new ActivityElement("4", "liner2_large", "3", "'{\"model\":\"all\"}'"));
+        xml.getActivities().add(new ActivityElement("4", "liner2_large", "3", "{\"model\":\"all\"}"));
         xml.getActivities().add(new ActivityElement("5", "wsd2", "4", null));
         xml.setAgregate(new AgregateElement("6", zip_name, "zip", "5"));
         xml.setOutput(new OutputElement("7", "6", new DspaceElement("nfs", suffix, prefix, "Plik CCL")));
@@ -503,6 +500,7 @@ public class ProcessItems extends ItemsResource {
 
     public String callEngineService(String xml) {
 
+        HttpClient client = new DefaultHttpClient();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(nlengineTaskStartURL);
         try {
 
@@ -524,6 +522,8 @@ public class ProcessItems extends ItemsResource {
             log.error(e);
         } catch (IOException e) {
             log.error(e);
+        } finally {
+            client.getConnectionManager().shutdown();
         }
         return null;
     }

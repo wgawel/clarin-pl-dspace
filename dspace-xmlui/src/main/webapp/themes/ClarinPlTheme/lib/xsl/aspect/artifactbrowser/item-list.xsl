@@ -160,14 +160,14 @@
             </xsl:choose>
             <div class="label label-info" style="margin-bottom: 20px;">
                 <xsl:variable name="file-size"
-                    select="sum(mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file/@SIZE)" />
+                    select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='local' and @element='files' and @qualifier='size']/node()" />
                 <xsl:variable name="formatted-file-size">
                     <xsl:call-template name="format-size">                   
                         <xsl:with-param name="size" select="$file-size" />
                     </xsl:call-template>
                 </xsl:variable>
                 <xsl:variable name="file-count"
-                    select="count(mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file)" />
+                    select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='local' and @element='files' and @qualifier='count']/node()" />
                 <i class="fa fa-paperclip">&#160;</i>
                 <i18n:translate>
                     <xsl:choose>

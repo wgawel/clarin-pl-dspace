@@ -682,21 +682,34 @@
 
 			<xsl:when test="$clause = 15 and $ds_item_view_toggle_url != ''">
 
-				<!-- replacedby info -->
-				<xsl:if test="count(dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']) = 1">
-					<div class="alert" id="replaced_by_alert">											
-						<span><i class="fa fa-info-circle fa-3x pull-left">&#160;</i>						
-							<xsl:text>This item is replaced by a newer submission:</xsl:text><br/>						
-							<a>
-								<xsl:attribute name="href">
-			                            <xsl:value-of select="dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']" />
-			                    </xsl:attribute>
-			                    <xsl:value-of select="dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']" />
-							</a>									
-						</span>																													
-				   </div>				   
-				</xsl:if>				
-				
+                <!-- replacedby info -->
+                <xsl:if test="count(dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']) &gt;= 1">
+	                <div class="alert" id="replaced_by_alert">
+                        <span style="dispaly: table-cell">
+	                        <i class="fa fa-info-circle fa-3x pull-left">&#160;</i>
+                        </span>
+                        <span style="display: table-cell">
+	                         <xsl:choose>
+                                 <xsl:when test="count(dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']) = 1">
+                                         <xsl:text>This item is replaced by a newer submission:</xsl:text><br/>
+                                 </xsl:when>
+                                 <xsl:otherwise>
+                                         <xsl:text>This item is replaced by newer submissions:</xsl:text><br/>
+                                 </xsl:otherwise>
+	                         </xsl:choose>
+	                         <xsl:for-each select="dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']">
+                                 <div>
+	                                 <a>
+	                                     <xsl:attribute name="href">
+	                                             <xsl:value-of select="." />
+	                                     </xsl:attribute>
+	                                     <xsl:value-of select="." />
+	                                 </a>
+                                 </div>
+	                         </xsl:for-each>
+	                     </span>
+	                </div>
+                </xsl:if>				
 				<dl class="dl-horizontal">
 					<dt style="text-align: left">
 						<a class="btn btn-link" style="padding-left:0">
@@ -819,16 +832,16 @@
 					<xsl:variable name="download-all-url"><xsl:value-of select="concat(/mets:METS/@OBJID,'/allzip')" /></xsl:variable>
 
 					<xsl:variable name="process-doc-url">
-						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'),'/rest/process/items/handle/',substring-after(/mets:METS/@ID,'hdl:'),'/start')" />
+						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'), confman:getProperty('dspace.rest.process'), substring-after(/mets:METS/@ID,'hdl:'),'/start')" />
 					</xsl:variable>
 					<xsl:variable name="process-status-url">
-						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'),'/rest/process/items/handle/',substring-after(/mets:METS/@ID,'hdl:'),'/status')" />
+						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'), confman:getProperty('dspace.rest.process'), substring-after(/mets:METS/@ID,'hdl:'),'/status')" />
 					</xsl:variable>
 					<xsl:variable name="export-to-wielowyr">
-						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'),'/rest/process/items/handle/',substring-after(/mets:METS/@ID,'hdl:'),'/export/mewex')" />
+						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'), confman:getProperty('dspace.rest.process'), substring-after(/mets:METS/@ID,'hdl:'),'/export/mewex')" />
 					</xsl:variable>
 					<xsl:variable name="export-to-inforex">
-						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'),'/rest/process/items/handle/',substring-after(/mets:METS/@ID,'hdl:'),'/export/inforex')" />
+						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'), confman:getProperty('dspace.rest.process'), substring-after(/mets:METS/@ID,'hdl:'),'/export/inforex')" />
 					</xsl:variable>
 					<xsl:variable name="goto-freq-lists">
 						<xsl:value-of select="concat(/mets:METS/@OBJID, '/freqLists')" />
@@ -1067,12 +1080,14 @@
 		<xsl:param name="process-doc-url" />
 		<xsl:param name="process-status-url" />
 		<xsl:param name="user-email" />
+		<div id="process-loading" class="pull-right" style="display:none; font-size: 14px; width: 30%;">
+			Loading please wait ...
+		</div>
 		<a id="process-doc-button" class="label label-info pull-right" style="display:none;">
 			<xsl:attribute name="href">javascript:{}</xsl:attribute>
 			<xsl:attribute name="onclick">javascript:
-				var link = '<xsl:value-of select="$process-doc-url" />' +"?userEmail="+ '<xsl:value-of select="$user-email" />';
-				$.get(link);
-				location.reload();
+				startProcess('<xsl:value-of select="$process-doc-url" />' +"?userEmail="+ '<xsl:value-of select="$user-email" />',
+							 '<xsl:value-of select="$process-status-url" />');
 			</xsl:attribute>
 			<i class="fa fa-cog">&#160;</i>
 			<i18n:translate>

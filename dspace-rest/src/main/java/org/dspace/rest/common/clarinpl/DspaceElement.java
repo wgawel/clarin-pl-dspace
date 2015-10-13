@@ -12,10 +12,10 @@ public class DspaceElement {
     @XmlAttribute
     private String type;
 
-    @XmlAttribute
+    @XmlAttribute(name = "item_id")
     private String item_id;
 
-    @XmlAttribute
+    @XmlAttribute(name = "repo_id")
     private String repo_id;
 
     @XmlValue

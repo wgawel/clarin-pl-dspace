@@ -1,3 +1,14 @@
+function startProcess(link, status){
+	$( "#process-doc-button").hide();
+	$( "#process-loading").show();
+	$.ajax({
+          url: link ,
+          async: false
+    });
+    $( "#process-loading").hide();
+	getProcessStatus(status);
+}
+
 function getProcessStatus(link){
   $.getJSON(link, function(j) {
     updateProcessStatus(j,link);
