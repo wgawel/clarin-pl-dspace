@@ -207,8 +207,8 @@ public class Handle extends DSpaceObject implements Identifier
             throws SQLException, AuthorizeException
     {
     	Handle h = null;
-    	
-    	if(canCreate(context)) {
+        // TODO Check Why Only Admin can create new items?
+    	//if(canCreate(context)) {
     		
     		if(dso == null) {
     			h = new Handle(context, DatabaseManager.create(context, "handle"));    			
@@ -221,7 +221,7 @@ public class Handle extends DSpaceObject implements Identifier
 	        log.info(LogManager.getHeader(context, "create_handle",
 	                "handle_id=" + h.getID())
 	                + ",handle=" + h.getHandle());
-    	}
+    	//}
 	
         return h;
     }
@@ -239,27 +239,24 @@ public class Handle extends DSpaceObject implements Identifier
      * @return the newly created handle
      */
     public static Handle create(Context context, DSpaceObject dso, String handle)
-            throws SQLException, AuthorizeException
-    {    
-    	Handle h = null;
-    	
-    	if(canCreate(context)) {
-    		
-    		if(dso == null) {
-    			h = new Handle(context, DatabaseManager.create(context, "handle"));
-    			h.setHandle(handle);
-    		}
-    		else {
-    			String returnedHandle = HandleManager.createHandle(context, dso, handle);    			        
-    			h = Handle.findByHandle(context, returnedHandle);
-    		}
-	        
-	        log.info(LogManager.getHeader(context, "create_handle",
-	                "handle_id=" + h.getID())
-	                + ",handle=" + h.getHandle());	        	        
-	        
-    	}
-	
+            throws SQLException, AuthorizeException {
+        Handle h = null;
+
+
+         if(canCreate(context)) {
+             if (dso == null) {
+                 h = new Handle(context, DatabaseManager.create(context, "handle"));
+                 h.setHandle(handle);
+             } else {
+                 String returnedHandle = HandleManager.createHandle(context, dso, handle);
+                 h = Handle.findByHandle(context, returnedHandle);
+             }
+
+             log.info(LogManager.getHeader(context, "create_handle",
+                     "handle_id=" + h.getID())
+                     + ",handle=" + h.getHandle());
+         }
+
         return h;
     }
     
@@ -390,8 +387,7 @@ public class Handle extends DSpaceObject implements Identifier
     }        
     
     public static boolean canCreate(Context context) throws AuthorizeException, SQLException
-    {        
-    	
+    {
         return AuthorizeManager.isAdmin(context);
     }
 
@@ -421,8 +417,6 @@ public class Handle extends DSpaceObject implements Identifier
 
 	@Override
 	public void updateLastModified() {
-		// TODO Auto-generated method stub
-		
 	}
 			
 }

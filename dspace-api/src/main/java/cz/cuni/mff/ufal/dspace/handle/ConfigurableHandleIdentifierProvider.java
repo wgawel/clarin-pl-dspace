@@ -556,8 +556,7 @@ public class ConfigurableHandleIdentifierProvider extends IdentifierProvider {
             handle = Handle.create(context, dso);
             // if user did not supply a handle
             if ( null == handle_str ) {
-                PIDCommunityConfiguration pidCommunityConfiguration = PIDConfiguration
-                    .getPIDCommunityConfiguration(dso);
+                PIDCommunityConfiguration pidCommunityConfiguration = PIDConfiguration.getPIDCommunityConfiguration(dso);
                 try{
                     handle_str = createHandleId(handle.getID(), pidCommunityConfiguration);
                 }catch(IllegalStateException e){
