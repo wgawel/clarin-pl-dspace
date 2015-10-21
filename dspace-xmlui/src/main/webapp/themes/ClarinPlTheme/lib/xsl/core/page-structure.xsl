@@ -440,10 +440,6 @@
                 </div>
                                    
             </div>
-            <xsl:if
-                    test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='uploadFile']">
-                <xsl:call-template name="cmdiDialogBox" />
-            </xsl:if>
         </div>
     </xsl:template>
 
@@ -658,14 +654,6 @@
                    })();
            </xsl:text></script>
         </xsl:if>
-    </xsl:template>
-
-    <xsl:template name="cmdiDialogBox">
-        <!-- Modal -->
-        <div id="dialog" title="Create cmdi file">
-            <span style="width='100%'"> Profile: <select id="selectProfiles"><option value="0">None</option></select></span>
-            <iframe id="cmdiFrame" src="" width="100%" height="92%" frameborder="0"></iframe>
-        </div>
     </xsl:template>
 </xsl:stylesheet>
 

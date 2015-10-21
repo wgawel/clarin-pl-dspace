@@ -109,6 +109,7 @@ public class RestIndex {
                   		"<li>GET /bitstreams/{bitstream id} - Return the specified bitstream.</li>" +
                   		"<li>GET /bitstreams/{bitstream id}/policy - Return policies of the specified bitstream.</li>" +
                   		"<li>GET /bitstreams/{bitstream id}/retrieve - Return the contents of the specified bitstream.</li>" +
+                        "<li>GET /bitstreams/{bitstream id}/cmdi - Return the cmdi file attached to bitstream.</li>" +
                   		"<li>POST /bitstreams/{bitstream id}/policy - Add a policy to the specified bitstream.</li>" +
                   		"<li>PUT /bitstreams/{bitstream id}/data - Update the contents of the specified bitstream.</li>" +
                   		"<li>PUT /bitstreams/{bitstream id} - Update metadata of the specified bitstream.</li>" +

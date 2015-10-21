@@ -243,7 +243,7 @@ public class Bitstream extends DSpaceObject
     {
         // Store the bits
         int bitstreamID = BitstreamStorageManager.register(
-        		context, assetstore, bitstreamPath);
+                context, assetstore, bitstreamPath);
 
         log.info(LogManager.getHeader(context,
             "create_bitstream",
@@ -475,7 +475,7 @@ public class Bitstream extends DSpaceObject
         }
 
         // Remove user type description
-        clearMetadata(MetadataSchema.DC_SCHEMA,"format",null, Item.ANY);
+        clearMetadata(MetadataSchema.DC_SCHEMA, "format", null, Item.ANY);
 
         // Update the ID in the table row
         bRow.setColumn("bitstream_format_id", bitstreamFormat.getID());
@@ -494,6 +494,30 @@ public class Bitstream extends DSpaceObject
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
 
+        log.info(LogManager.getHeader(ourContext, "update_bitstream",
+                "bitstream_id=" + getID()));
+
+        DatabaseManager.update(ourContext, bRow);
+
+        if (modified)
+        {
+            ourContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null, getIdentifiers(ourContext)));
+            modified = false;
+        }
+        if (modifiedMetadata)
+        {
+            updateMetadata();
+            clearDetails();
+        }
+
+    }
+
+    public void update(boolean auth) throws SQLException, AuthorizeException
+    {
+        if(auth) {
+            // Check authorisation
+            AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        }
         log.info(LogManager.getHeader(ourContext, "update_bitstream",
                 "bitstream_id=" + getID()));
 
@@ -601,6 +625,12 @@ public class Bitstream extends DSpaceObject
                 .getIntColumn("bitstream_id"));
     }
 
+    public InputStream retrieveCmdi() throws IOException, SQLException,
+            AuthorizeException
+    {
+        return BitstreamStorageManager.retrieve(ourContext, bRow
+               .getIntColumn("bitstream_id"));
+    }
     /**
      * Get the bundles this bitstream appears in
      * 

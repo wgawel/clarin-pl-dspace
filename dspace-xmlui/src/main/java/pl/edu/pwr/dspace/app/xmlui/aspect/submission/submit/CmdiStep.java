@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
+import org.dspace.app.xmlui.aspect.submission.submit.ReviewStep;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -17,10 +18,7 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.SingleFile;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Item;
+import org.dspace.content.*;
 import org.dspace.workflow.WorkflowItem;
 import org.xml.sax.SAXException;
 
@@ -117,7 +115,44 @@ public class CmdiStep extends AbstractSubmissionStep {
 	public List addReviewSection(List reviewList) throws SAXException,
 			WingException, UIException, SQLException, IOException,
 			AuthorizeException {
-      return null;
+		// Create a new list section for this step (and set its heading)
+		List cmdiSection = reviewList.addList("submit-review-" + this.stepAndPage, List.TYPE_FORM);
+		cmdiSection.setHead(T_head);
+
+		// Review all uploaded files
+		Item item = submission.getItem();
+		Bundle[] bundles = item.getBundles("ORIGINAL");
+
+		Bitstream[] bitstreams = new Bitstream[0];
+		if (bundles.length > 0)
+		{
+			bitstreams = bundles[0].getBitstreams();
+		}
+
+		for (Bitstream bitstream : bitstreams)
+		{
+
+			String name = bitstream.getName();
+			String url = "";
+			String cmdiFile="";
+
+			if(bitstream.getCmdiBitstreamId() > 0) {
+				Bitstream cmdi = Bitstream.find(context, bitstream.getCmdiBitstreamId());
+				cmdiFile += cmdi.getName();
+			}
+
+			org.dspace.app.xmlui.wing.element.Item file = cmdiSection.addItem();
+			file.addXref(url,name);
+			file.addContent(" -> "+ cmdiFile);
+
+		}
+
+		if(bitstreams.length==0){
+			cmdiSection.addItem("You didn't upload any cmdi files.");
+		}
+
+		// return this new "upload" section
+		return cmdiSection;
 	}
 	
 }

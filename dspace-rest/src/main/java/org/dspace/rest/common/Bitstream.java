@@ -12,9 +12,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.dspace.content.Bundle;
 import org.dspace.core.Constants;
 
@@ -37,6 +39,7 @@ public class Bitstream extends DSpaceObject {
     private DSpaceObject parentObject;
     private String retrieveLink;
     private CheckSum checkSum;
+    private boolean cmdiFile;
     private Integer sequenceId;
     
     private ResourcePolicy[] policies = null;
@@ -69,6 +72,8 @@ public class Bitstream extends DSpaceObject {
         retrieveLink = "/bitstreams/" + bitstream.getID() + "/retrieve";
         mimeType = bitstream.getFormat().getMIMEType();
         sequenceId = bitstream.getSequenceID();
+        cmdiFile = bitstream.getCmdiBitstreamId() > 0;
+
         CheckSum checkSum = new CheckSum();
         checkSum.setCheckSumAlgorith(bitstream.getChecksumAlgorithm());
         checkSum.setValue(bitstream.getChecksum());
@@ -155,9 +160,14 @@ public class Bitstream extends DSpaceObject {
         return mimeType;
     }
 
-    public Long getSizeBytes() {
-        return sizeBytes;
-    }
+    public Long getSizeBytes() { return sizeBytes; }
+
+    @JsonProperty("hasCmdiFile")
+    public boolean getCmdiFile() { return cmdiFile; }
+
+    @JsonProperty("hasCmdiFile")
+    @XmlElement(name = "hasCmdiFile")
+    public void setCmdiFile(boolean hasCmdiFile) { this.cmdiFile = hasCmdiFile; }
 
     public String getRetrieveLink() {
         return retrieveLink;

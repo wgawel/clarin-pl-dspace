@@ -117,7 +117,7 @@ public class APIUploadCmdFileReader extends AbstractReader {
 				oldCmdiRef.delete();
 			}
 			refBitstream.setCmdiBitstreamId(cmdiId);
-			refBitstream.update();
+			refBitstream.update(false);
 		} catch (NumberFormatException e) {
 			log.error(e);
 		} catch (SQLException e) {
@@ -165,7 +165,6 @@ public class APIUploadCmdFileReader extends AbstractReader {
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty("indent", "yes");
 			transformer.transform(source, outputTarget);
-			log.info(outputStream);
 			InputStream is = new ByteArrayInputStream(outputStream.toByteArray());
 			return is;
 		} catch (ParserConfigurationException pce) {
@@ -226,7 +225,7 @@ public class APIUploadCmdFileReader extends AbstractReader {
 			bitstream.setFormat(format);
 
 			// Update to DB
-			bitstream.update();
+			bitstream.update(false);
 			item.store_provenance_info("DSpace API: Item was added a bitstream",context.getCurrentUser());
 			item.update();
 

@@ -335,6 +335,90 @@ public class BitstreamResource extends Resource
     }
 
     /**
+     * Reads  bitstream data for cmdi. May throw WebApplicationException with the
+     * INTERNAL_SERVER_ERROR(500) code. Caused by three exceptions: IOException if
+     * there was a problem with reading bitstream file. SQLException if there was
+     * a problem while reading from database. And AuthorizeException if there was
+     * a problem with authorization of user logged to DSpace context.
+     *
+     * @param bitstreamId
+     *            Id of the bitstream, whose cmdi data will be read.
+     * @param headers
+     *            If you want to access the item as the user logged into the context.
+     *            The header "rest-dspace-token" with the token passed
+     *            from the login method must be set.
+     * @return Returns response with data with file content type. It can
+     *         return the NOT_FOUND(404) response code in case of wrong bitstream
+     *         id. Or response code UNAUTHORIZED(401) if user is not
+     *         allowed to read bitstream.
+     * @throws WebApplicationException
+     *             Thrown if there was a problem: reading the file data; or reading
+     *             the database; or creating the context; or with authorization.
+     */
+    @GET
+    @Path("/{bitstream_id}/cmdi")
+    public javax.ws.rs.core.Response getBitstreamCMDI(@PathParam("bitstream_id") Integer bitstreamId,
+                                                      @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+                                                      @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            throws WebApplicationException
+    {
+
+        log.info("Reading data of bitstream(id=" + bitstreamId + ").");
+        org.dspace.core.Context context = null;
+        InputStream inputStream = null;
+        String type = null;
+
+        try
+        {
+            context = createContext(getUser(headers));
+            org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.READ);
+            if(dspaceBitstream.getCmdiBitstreamId() > 0) {
+                org.dspace.content.Bitstream cmdiBitstream = findBitstream(context, dspaceBitstream.getCmdiBitstreamId());
+
+                writeStats(dspaceBitstream, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
+                        request, context);
+
+                log.trace("Bitsream(id=" + bitstreamId + ") data was successfully read.");
+                inputStream = cmdiBitstream.retrieveCmdi();
+                type = "application/XML";
+                context.complete();
+            } else {
+                context.abort();
+                return Response.status(Status.NOT_FOUND).build();
+            }
+        }
+        catch (IOException e)
+        {
+            processException("Could not read cmdi file of bitstream(id=" + bitstreamId + ")! Message: " + e, context);
+        }
+        catch (SQLException e)
+        {
+            processException("Something went wrong while reading bitstream(id=" + bitstreamId + ") from database! Message: " + e,
+                    context);
+        }
+        catch (AuthorizeException e)
+        {
+            processException("Could not retrieve file of bitstream(id=" + bitstreamId + "), AuthorizeException! Message: " + e,
+                    context);
+        }
+        catch (ContextException e)
+        {
+            processException(
+                    "Could not retrieve file of bitstream(id=" + bitstreamId + "), ContextException! Message: " + e.getMessage(),
+                    context);
+        }
+        finally
+        {
+            processFinally(context);
+        }
+
+        return Response.ok(inputStream).type(type).build();
+    }
+
+
+
+
+    /**
      * Add bitstream policy to all bundles containing the bitstream.
      * 
      * @param bitstreamId
@@ -822,6 +906,28 @@ public class BitstreamResource extends Resource
                 throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 
+        }
+        catch (SQLException e)
+        {
+            processException("Something went wrong while finding bitstream. SQLException, Message:" + e, context);
+        }
+        return bitstream;
+    }
+
+    private org.dspace.content.Bitstream findBitstream(org.dspace.core.Context context, int id)
+            throws WebApplicationException
+    {
+        org.dspace.content.Bitstream bitstream = null;
+        try
+        {
+            bitstream = org.dspace.content.Bitstream.find(context, id);
+
+            if ((bitstream == null))
+            {
+                context.abort();
+                log.warn("Bitstream(id=" + id + ") was not found!");
+                throw new WebApplicationException(Response.Status.NOT_FOUND);
+            }
         }
         catch (SQLException e)
         {
