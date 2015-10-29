@@ -823,8 +823,9 @@
 
 	<!-- CmdiStep -->
 	<message key="xmlui.Submission.submit.CmdiStep.head">Cmdi</message>
-	<message key="xmlui.Submission.submit.CmdiStep.column1">Cmdi File</message>
-	<message key="xmlui.Submission.submit.CmdiStep.column2">Action</message>
+	<message key="xmlui.Submission.submit.CmdiStep.column1">Uploaded Cmdi File</message>
+	<message key="xmlui.Submission.submit.CmdiStep.column2">Upload cmdi</message>
+	<message key="xmlui.Submission.submit.CmdiStep.column3">Action</message>
 	<message key="xmlui.Submission.submit.progressbar.cmdi">Cmdi upload</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.ResumeStep -->

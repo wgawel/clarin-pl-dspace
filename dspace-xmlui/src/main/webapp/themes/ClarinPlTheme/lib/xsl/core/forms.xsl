@@ -702,15 +702,6 @@
 		<span class="ds-interpreted-field">Checkbox</span>
 	</xsl:template>
 
-
-
-
-
-
-
-
-
-
 	<xsl:template match="dri:field[@type='select']/dri:instance"
 		mode="interpreted">
 		<span class="ds-interpreted-field">
@@ -1191,16 +1182,19 @@
 	</xsl:template>
 
 	<xsl:template match="dri:single">
-		<input type="file" name="file" accept=".cmdi, .xml">
+		<span class="btn btn-default btn-file">
+		Upload <input type="file" name="file" accept=".cmdi, .xml">
 			<xsl:attribute name="id">file_<xsl:value-of	select="@id" /></xsl:attribute>
 			<xsl:attribute name="onchange">
 				return upload('file_<xsl:value-of select="@id" />','<xsl:value-of select="@handle" />','<xsl:value-of select="@id" />')
 			</xsl:attribute>
 		</input>
+		</span>
 	</xsl:template>
 
 	<xsl:template match="dri:customButton">
 		<button type="button" class="btn btn-xs btn-info">
+			<xsl:attribute name="id">btn_<xsl:value-of	select="@handle" /></xsl:attribute>
 			<xsl:attribute name="onclick">
 				return createCmdi('<xsl:value-of select="@handle" />','<xsl:value-of select="@id" />')
 			</xsl:attribute>

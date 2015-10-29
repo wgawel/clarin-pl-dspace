@@ -36,6 +36,7 @@ public class CmdiStep extends AbstractSubmissionStep {
 	protected static final Message T_column3 = message("xmlui.Submission.submit.UploadStep.column4");
 	protected static final Message T_column4 = message("xmlui.Submission.submit.CmdiStep.column1");
 	protected static final Message T_column5 = message("xmlui.Submission.submit.CmdiStep.column2");
+	protected static final Message T_column6 = message("xmlui.Submission.submit.CmdiStep.column3");
     protected static final Message T_submit_edit = message("xmlui.Submission.submit.UploadStep.submit_edit");
 
     protected static final Message T_description = message("xmlui.Submission.submit.UploadStep.description");
@@ -84,8 +85,9 @@ public class CmdiStep extends AbstractSubmissionStep {
 	        header.addCellContent(T_column1); // file name
 	        header.addCellContent(T_column2); // size
 	        header.addCellContent(T_column3); // description
-	        header.addCellContent(T_column4); // upload cmdi file
-	        header.addCellContent(T_column5); // create cmdi file
+	        header.addCellContent(T_column4); // current cmdi file name
+			header.addCellContent(T_column5); // upload cmdi file name
+	        header.addCellContent(T_column6); // create cmdi file
 
 	        for (Bitstream bitstream : bitstreams)
 	        {
@@ -99,7 +101,14 @@ public class CmdiStep extends AbstractSubmissionStep {
 
 	            row.addCellContent(DSpaceApi.convertBytesToHumanReadableForm(bytes));
 	            row.addCellContent(desc);
-	            
+
+				String cmdiFile ="";
+				if(bitstream.getCmdiBitstreamId()>0){
+					Bitstream bs = Bitstream.find(context, bitstream.getCmdiBitstreamId());
+					cmdiFile = bs.getName();
+				}
+				row.addCellContent(cmdiFile);
+
 	            SingleFile file = row.addCell().addSingleFile("file", collection.getHandle(), Integer.toString(id));
 	            CustomButton btn = row.addCell().addCustomButton(Integer.toString(id),collection.getHandle());
 	        }

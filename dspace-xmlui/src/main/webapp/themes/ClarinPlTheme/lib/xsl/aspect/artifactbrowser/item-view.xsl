@@ -998,7 +998,6 @@
                         <i18n:param><xsl:copy-of select="$formatted-file-size"/></i18n:param>
                     </i18n:translate>
 				</a>
-                <xsl:if test="$AUTH = 'yes'">
 				<xsl:if test="@HAS_CMDI='yes'">
 					<a data-toggle="modal" data-target="#cmdi_model_div" class="label label-default pull-right cmdi">
 						<xsl:attribute name="href">
@@ -1007,7 +1006,6 @@
 						<i18n:text>CMDI</i18n:text>
 					</a>
 				</xsl:if>
-                </xsl:if>
 			</div>			
 	</xsl:template>
 

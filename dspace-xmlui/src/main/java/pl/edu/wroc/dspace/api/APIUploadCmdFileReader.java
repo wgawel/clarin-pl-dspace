@@ -1,11 +1,8 @@
 package pl.edu.wroc.dspace.api;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -28,6 +25,7 @@ import org.apache.cocoon.reading.AbstractReader;
 import org.apache.cocoon.servlet.multipart.Part;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.solr.common.util.FastInputStream;
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -80,23 +78,53 @@ public class APIUploadCmdFileReader extends AbstractReader {
 		this.contextPath = ConfigurationManager.getProperty("dspace.url");
 		try {
 			Part filePart = (Part) request.get("file");
-			if (filePart == null) {
-				throw new IllegalArgumentException("No file found.");
-			}
 			String handle = request.get("handle").toString();
-			String refBitstreamId = request.get("bitstreamId").toString();
-			Bitstream refBitstream = Bitstream.find(context, new Integer(refBitstreamId));
-			String fileName = filePart.getFileName();
-			Bitstream newBitstream = addFileFromPostToItem(handle, filePart,fileName, refBitstream);
-			updateReferenceItemCmdiId(refBitstream, newBitstream.getID());
-			String jsonString = createJsonResultAddBitstreamSuccess(newBitstream);
+			String refBitstreamId = (String) request.get("bitstreamId");
 
-			inputStream = new ByteArrayInputStream(jsonString.getBytes("UTF-8"));
-			IOUtils.copy(inputStream, out);
-			out.flush();
+			if (filePart != null) {
+				createFromFile(filePart, handle, refBitstreamId);
+			}
+
+			if(request.get("xml") != null){
+				String xml = request.get("xml").toString();
+				createFromXML(xml, handle, refBitstreamId);
+			}
 		} catch (Exception e) {
 			log.error("Error in generate block",e);
 		}
+	}
+
+	private void createFromXML(String xml, String handle, String refBitstreamId) throws Exception {
+		ByteArrayInputStream inputStream;
+		Bitstream refBitstream = Bitstream.find(context, new Integer(refBitstreamId));
+
+		File temp = File.createTempFile(refBitstream.getName(), ".cmdi");
+		BufferedWriter out = new BufferedWriter(new FileWriter(temp));
+		out.write(createXML(context.getCurrentUser().getFullName(), Integer.toString(refBitstream.getID()), "test", xml));
+		out.close();
+		InputStream is = new FileInputStream(temp);
+
+		String upload_name = refBitstream.getName()+".cmdi";
+		Bitstream newBitstream = addFileFromPostToItem(handle, is, upload_name, upload_name, refBitstream);
+		updateReferenceItemCmdiId(refBitstream, newBitstream.getID());
+	}
+
+	private void createFromFile(Part filePart, String handle, String refBitstreamId) throws Exception {
+		ByteArrayInputStream inputStream;
+		Bitstream refBitstream = Bitstream.find(context, new Integer(refBitstreamId));
+		String fileName = filePart.getFileName();
+		Bitstream newBitstream= null;
+		if (filePart != null && filePart.getSize() > 0) {
+			InputStream is = filePart.getInputStream();
+			String upload_name = filePart.getUploadName();
+			newBitstream = addFileFromPostToItem(handle, is, upload_name, fileName, refBitstream);
+		}
+		updateReferenceItemCmdiId(refBitstream, newBitstream.getID());
+		String jsonString = createJsonResultAddBitstreamSuccess(newBitstream);
+
+		inputStream = new ByteArrayInputStream(jsonString.getBytes("UTF-8"));
+		IOUtils.copy(inputStream, out);
+		out.flush();
 	}
 
 	private String createJsonResultAddBitstreamSuccess(Bitstream bitstream) {
@@ -180,7 +208,7 @@ public class APIUploadCmdFileReader extends AbstractReader {
 	}
 
 	public Bitstream addFileFromPostToItem(String collectionHandle,
-			Part filePart, String fileName, Bitstream refBitstream)
+			InputStream is,String upload_name, String fileName, Bitstream refBitstream)
 			throws SQLException, Exception {
 
 		Handle handle = Handle.findByHandle(context, collectionHandle);
@@ -189,13 +217,6 @@ public class APIUploadCmdFileReader extends AbstractReader {
 		}
 
 		Item item = (Item) refBitstream.getParentObject();
-
-		InputStream is = null;
-		String upload_name = null;
-		if (filePart != null && filePart.getSize() > 0) {
-			is = filePart.getInputStream();
-			upload_name = filePart.getUploadName();
-		}
 
 		if (is != null) {
 
@@ -263,5 +284,32 @@ public class APIUploadCmdFileReader extends AbstractReader {
 		result.append("?sequence=").append(
 				String.valueOf(bitstream.getSequenceID()));
 		return result.toString();
+	}
+
+	private String createXML(String user, String id, String link, String component){
+		StringBuilder sb = new StringBuilder();
+		sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+		sb.append("<CMD xmlns=\"http://www.clarin.eu/cmd/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ");
+		sb.append("CMDVersion=\"1.1\" xsi:schemaLocation=\"http://www.clarin.eu/cmd/ http://catalog.clarin.eu/ds/ComponentRegistry/rest/registry/profiles/clarin.eu:cr1:p_1396012485161/xsd\">\n");
+		sb.append("<Header>\n");
+		sb.append("\t<MdCreator>"+user+"</MdCreator>\n");
+		sb.append("\t<MdCreationDate>" +new Date() + "</MdCreationDate>\n");
+		sb.append("\t<MdProfile>clarin.eu:cr1:p_1396012485161</MdProfile>\n");
+		sb.append("</Header>\n");
+		sb.append("<Resources>\n");
+			sb.append("\t<ResourceProxyList>\n");
+				sb.append("\t<ResourceProxy id=\"_"+id+"\">\n");
+					sb.append("\t\t<ResourceType mimetype=\"text/xml\"/>\n");
+					sb.append("\t\t<ResourceRef>"+link+"</ResourceRef>\n");
+					sb.append("\t\t</ResourceProxy>");
+			sb.append("\t</ResourceProxyList>\n");
+			sb.append("\t<JournalFileProxyList/>\n");
+			sb.append("\t<ResourceRelationList/>\n");
+		sb.append("</Resources>\n");
+		sb.append("<Components>\n");
+				sb.append(component);
+		sb.append("</Components>\n");
+		sb.append("</CMD>\n");
+		return  sb.toString();
 	}
 }

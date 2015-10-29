@@ -62,16 +62,16 @@ public class DSpaceApi {
 			manager = constructor.newInstance();
 
 			log.debug("Class " + className + " loaded successfully");
-			
+
 		} catch (Exception e) {
 			log.error("Failed to initialize the IFunctionalities", e);
 		}
-		
-		return manager;		
+
+		return manager;
 	}
 
 	public static boolean authorizeBitstream(Context context,
-			DSpaceObject dspaceObject) throws AuthorizeException {
+											 DSpaceObject dspaceObject) throws AuthorizeException {
 
 		EPerson currentUser = context.getCurrentUser();
 		boolean userExists = currentUser != null;
@@ -86,43 +86,42 @@ public class DSpaceApi {
 		if (dspaceObject.getType() == Constants.BITSTREAM) {
 
 			int resourceID = dspaceObject.getID();
-			
-            try {
-                Item item = (Item) dspaceObject.getParentObject();
-                EPerson submitter = item.getSubmitter();
-                if (submitter != null) {
-                    // The submitter is always authorized to access his own
-                    // bitstreams
-                    if (userID != 0 && submitter.getID() == userID) {
-                        return true;
-                    }
-                }
-            } catch (SQLException sqle) {
-                log.error("Failed to get parent object for bitstream", sqle);
-            } catch (ClassCastException ex) {
-            	// parent object is not an Item
-            	// special bitstreams e.g. images of community/collection
-            }
-			
+
+			try {
+				Item item = (Item) dspaceObject.getParentObject();
+				EPerson submitter = item.getSubmitter();
+				if (submitter != null) {
+					// The submitter is always authorized to access his own
+					// bitstreams
+					if (userID != 0 && submitter.getID() == userID) {
+						return true;
+					}
+				}
+			} catch (SQLException sqle) {
+				log.error("Failed to get parent object for bitstream", sqle);
+			} catch (ClassCastException ex) {
+				// parent object is not an Item
+				// special bitstreams e.g. images of community/collection
+			}
+
 			DSpace dspace = new DSpace();
 			//HttpSession session = null;
 			ServletRequest request = null;
 			String dtoken = null;
-			try{
+			try {
 				//session = dspace.getSessionService().getCurrentSession();
 				request = dspace.getRequestService().getCurrentRequest().getHttpServletRequest();
 				dtoken = request.getParameter("dtoken");
-			}catch(IllegalStateException e){
+			} catch (IllegalStateException e) {
 				//If the dspace kernel is null (eg. when we get here from OAI)
-			}catch(Exception e){
+			} catch (Exception e) {
 			}
 
 
-			
-			IFunctionalities manager = DSpaceApi.getFunctionalityManager();			
+			IFunctionalities manager = DSpaceApi.getFunctionalityManager();
 
 			// if the bitstream is already authorized for current session
-			
+
 			// We are not using this at the moment
             /*
 
@@ -139,37 +138,37 @@ public class DSpaceApi {
 				}
 			} */
 
-			if (dtoken != null && !dtoken.isEmpty()) {		
+			if (dtoken != null && !dtoken.isEmpty()) {
 				manager.openSession();
-				boolean tokenFound = manager.verifyToken(resourceID, dtoken);				
+				boolean tokenFound = manager.verifyToken(resourceID, dtoken);
 				manager.close();
-	            // Check token				
-			    if(tokenFound) { // database token match with url token 
-			        return true;
-			    } else {
-			    	throw new AuthorizeException("The download token is invalid or expires.");
-			    }
-			    
-			}			
+				// Check token
+				if (tokenFound) { // database token match with url token
+					return true;
+				} else {
+					throw new AuthorizeException("The download token is invalid or expires.");
+				}
+
+			}
 
 			// Check licenses
 			manager.openSession();
 			boolean allowed = manager.isUserAllowedToAccessTheResource(userID, resourceID);
-			manager.close();					
-		    if (!allowed) {
-		        throw new MissingLicenseAgreementException("Missing license agreement!");
-		    }
- 
+			manager.close();
+			if (!allowed) {
+				throw new MissingLicenseAgreementException("Missing license agreement!");
+			}
+
 		}
 		return true;
 	}
-	
-	public static void updateFileDownloadStatistics(int userID, int resourceID) {	   
-	    IFunctionalities manager = DSpaceApi.getFunctionalityManager();	    
-        manager.openSession();                
-        manager.updateFileDownloadStatistics(userID, resourceID);                                  
-        manager.close();
-	}	    		
+
+	public static void updateFileDownloadStatistics(int userID, int resourceID) {
+		IFunctionalities manager = DSpaceApi.getFunctionalityManager();
+		manager.openSession();
+		manager.updateFileDownloadStatistics(userID, resourceID);
+		manager.close();
+	}
 
 	public static boolean registerUser(String organization, EPerson eperson) {
 		IFunctionalities manager = DSpaceApi.getFunctionalityManager();
@@ -178,58 +177,54 @@ public class DSpaceApi {
 		manager.close();
 		return user != null;
 	}
-	
+
 	/**
-	 * Add information to a user, this will be stored in utilities 
+	 * Add information to a user, this will be stored in utilities
 	 * user_metadata table under eperson_id.
-	 * 
+	 *
 	 * @param eperson
 	 * @param value
 	 * @return
 	 */
-	public static boolean addUserMetadata( EPerson eperson, String key, String value ) 
-	{
+	public static boolean addUserMetadata(EPerson eperson, String key, String value) {
 		IFunctionalities metadataUtil = DSpaceApi.getFunctionalityManager();
 		metadataUtil.openSession();
 		boolean result = metadataUtil.addUserMetadata(eperson.getID(), key, value);
 		metadataUtil.close();
-		return result;				
+		return result;
 	}
-	
-	public static boolean addUserMetadata(EPerson eperson, Map<String, String> metadata ) 
-	{		
-        IFunctionalities metadataUtil = DSpaceApi.getFunctionalityManager();
-		try{
+
+	public static boolean addUserMetadata(EPerson eperson, Map<String, String> metadata) {
+		IFunctionalities metadataUtil = DSpaceApi.getFunctionalityManager();
+		try {
 			metadataUtil.openSession();
-			for ( Map.Entry<String, String> m : metadata.entrySet() ) 
-			{
+			for (Map.Entry<String, String> m : metadata.entrySet()) {
 				metadataUtil.addUserMetadata(eperson.getID(), m.getKey(), m.getValue());
 			}
 			metadataUtil.close();
-            return true;
-		}catch(Exception e){
+			return true;
+		} catch (Exception e) {
 			log.error("Error while adding user metadata", e);
 			metadataUtil.close();
 			return false;
 		}
 	}
 
-	public static Map<String, String> getUserMetadata( EPerson eperson ) 
-	{
-		Map<String, String> metadata_map = new HashMap<String, String> ();		
-        IFunctionalities metadataUtil = DSpaceApi.getFunctionalityManager();
-		try{
+	public static Map<String, String> getUserMetadata(EPerson eperson) {
+		Map<String, String> metadata_map = new HashMap<String, String>();
+		IFunctionalities metadataUtil = DSpaceApi.getFunctionalityManager();
+		try {
 			metadataUtil.openSession();
-			List<UserMetadata> metadatas = metadataUtil.getUserMetadata(eperson.getID());			
-			for ( UserMetadata me : metadatas ) {
-				metadata_map.put( me.getMetadataKey(), me.getMetadataValue() );
+			List<UserMetadata> metadatas = metadataUtil.getUserMetadata(eperson.getID());
+			for (UserMetadata me : metadatas) {
+				metadata_map.put(me.getMetadataKey(), me.getMetadataValue());
 			}
 			metadataUtil.close();
-		}catch(Exception e){
+		} catch (Exception e) {
 			log.error("Error while querying for user metadata from utilities MetadataEperson", e);
 			metadataUtil.close();
 			return null;
-		}		
+		}
 		return metadata_map;
 	}
 
@@ -239,7 +234,7 @@ public class DSpaceApi {
 	 * not used anymore!
 	 */
 	public static void submit_step_CompleteStep(Logger log, Context context,
-			SubmissionInfo subInfo) throws ServletException {
+												SubmissionInfo subInfo) throws ServletException {
 		// added for UFAL purposes: finally, the item URL should be working and
 		// we are able
 		// to re-register the PID (handle) to point to the actual item URL in
@@ -262,21 +257,48 @@ public class DSpaceApi {
 
 	}
 
-	public static CmdiProfile getCmdiProfileById(int id )
-	{
-				CmdiProfile profile;
-		       IFunctionalities manager = DSpaceApi.getFunctionalityManager();
-			try{
-					manager.openSession();
-					profile = (CmdiProfile) manager.findById(CmdiProfile.class, id);
-					manager.close();
-			}catch(Exception e){
-					log.error("Error while querying for cmdiProfile", e);
-				manager.close();
-				return null;
+	public static CmdiProfile getCmdiProfileById(int id) {
+		CmdiProfile profile;
+		IFunctionalities manager = DSpaceApi.getFunctionalityManager();
+		try {
+			manager.openSession();
+			profile = (CmdiProfile) manager.findById(CmdiProfile.class, id);
+			manager.close();
+		} catch (Exception e) {
+			log.error("Error while querying for cmdiProfile", e);
+			manager.close();
+			return null;
 		}
 		return profile;
 	}
+
+	public static List<CmdiProfile> getCmdiProfiles() {
+		IFunctionalities manager = DSpaceApi.getFunctionalityManager();
+		List<CmdiProfile> profiles;
+		try {
+			manager.openSession();
+			profiles = manager.getAll(CmdiProfile.class);
+			manager.close();
+		} catch (Exception e) {
+			log.error("Error while querying for cmdiProfile", e);
+			manager.close();
+			return null;
+		}
+		return profiles;
+	}
+
+	public static void saveCmdiProfile(CmdiProfile profile){
+		IFunctionalities manager = DSpaceApi.getFunctionalityManager();
+		try {
+			manager.openSession();
+			manager.persist(CmdiProfile.class, profile);
+			manager.close();
+		} catch (Exception e) {
+			log.error("Error while saving for cmdiProfile", e);
+			manager.close();
+		}
+	}
+
 	public static void main(String[] t) {
 		try {
 			load_dspace();

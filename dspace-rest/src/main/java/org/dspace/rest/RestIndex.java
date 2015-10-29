@@ -85,7 +85,7 @@ public class RestIndex {
                   		"<li>GET /collections/{collectionId}/items - Return all items of the specified collection.</li>" +
                   		"<li>POST /collections/{collectionId}/items - Create an item in the specified collection. You must post an item.</li>" +
                   		"<li>POST /collections/find-collection - Find a collection by name.</li>" +
-                  		"<li>PUT /collections/{collectionId} </li> - Update the specified collection. You must post a collection." +
+                  		"<li>PUT /collections/{collectionId} - Update the specified collection. You must post a collection. </li>" +
                   		"<li>DELETE /collections/{collectionId} - Delete the specified collection from DSpace.</li>" +
                   		"<li>DELETE /collections/{collectionId}/items/{itemId} - Delete the specified item (itemId) in the specified collection (collectionId). </li>" +
                   	"</ul>" +
@@ -116,6 +116,11 @@ public class RestIndex {
                   		"<li>DELETE /bitstreams/{bitstream id} - Delete the specified bitstream from DSpace.</li>" +
                   		"<li>DELETE /bitstreams/{bitstream id}/policy/{policy_id} - Delete the specified bitstream policy.</li>" +
                   	"</ul>" +
+                    "<h2>Cmdi profiles</h2>" +
+                    "<ul>" +
+                        "<li>GET /cmdi/profiles - Return list of aviable profiles.</li>" +
+                        "<li>GET /cmdi/profiles/{profile_id}/form - Return specified profile partial html form.</li>" +
+                    "</ul>" +
                 "</body></html> ";
     }
     

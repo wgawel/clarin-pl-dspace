@@ -1,4 +1,4 @@
-package pl.edu.pwr.cmdi.html;
+package org.dspace.rest.cmdi.html;
 
 public class Form extends Tag{
 
@@ -16,6 +16,6 @@ public class Form extends Tag{
 	}
 	@Override
 	public String getClosingTag() {
-		return "<input type=\"submit\"></input>\n</form>";
+		return "\n</form>";
 	}
 }

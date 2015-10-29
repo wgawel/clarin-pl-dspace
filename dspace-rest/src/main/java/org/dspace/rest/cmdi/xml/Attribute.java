@@ -1,4 +1,4 @@
-package pl.edu.pwr.cmdi.xml;
+package org.dspace.rest.cmdi.xml;
 
 
 public class Attribute {

@@ -1,4 +1,4 @@
-package pl.edu.pwr.cmdi.html;
+package org.dspace.rest.cmdi.html;
 
 public class Span extends Tag{
 

@@ -1,7 +1,7 @@
-package pl.edu.pwr.cmdi.html;
+package org.dspace.rest.cmdi.html;
 
 
-import pl.edu.pwr.cmdi.xml.CmdElement;
+import org.dspace.rest.cmdi.xml.CmdElement;
 
 public class Component extends Tag{
 

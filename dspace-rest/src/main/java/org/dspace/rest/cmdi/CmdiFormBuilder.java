@@ -1,17 +1,17 @@
-package pl.edu.pwr.cmdi;
+package org.dspace.rest.cmdi;
 
 
-import pl.edu.pwr.cmdi.html.Component;
-import pl.edu.pwr.cmdi.html.Element;
-import pl.edu.pwr.cmdi.html.Form;
-import pl.edu.pwr.cmdi.xml.CmdComponent;
-import pl.edu.pwr.cmdi.xml.CmdElement;
+import org.dspace.rest.cmdi.html.Component;
+import org.dspace.rest.cmdi.html.Element;
+import org.dspace.rest.cmdi.html.Form;
+import org.dspace.rest.cmdi.xml.CmdComponent;
+import org.dspace.rest.cmdi.xml.CmdElement;
 
 public class CmdiFormBuilder {
 
 	public String build(CmdComponent cmd){
 	
-		Form form = buildForm("test.php", "POST");
+		Form form = buildForm("###", "POST");
 		form.addContent(buildRootComponent(cmd));
 		return form.getHtml();
 	}

@@ -3,16 +3,13 @@ var client = new XMLHttpRequest();
 function upload(id,handle,bitstreamId) {
 	
 	var file = document.getElementById(id);
-	var icon = "loading-icon-"+id;
 	var idTag = "#"+id;
-	var tagOk = "ok-"+id;
-	$("#"+tagOk).remove();
-	
-	$("<i id='"+ icon+"' class='fa fa-spinner fa-spin'></i>").insertAfter( idTag );
+
 	var uploadForm = new FormData();
 	uploadForm.append("file", file.files[0]);
 	uploadForm.append("handle", handle);
 	uploadForm.append("bitstreamId", bitstreamId);
+
 
 	$.ajax({
 		url : '/dspace/api/cmdi/upload',
@@ -22,8 +19,7 @@ function upload(id,handle,bitstreamId) {
 		contentType : false,
 		type : 'POST',
 		success : function(data) {
-			$("#"+icon).remove();
-			$("<i id='"+tagOk+"' style='color:green' class='fa fa-check-circle'></i>").insertAfter( idTag );
+			$(idTag).closest("td").prev().html(file.files[0].name);
 		},
 		error: function(data) {
 			alert("Error");
@@ -146,19 +142,6 @@ function cloneComponent(element){
 	node.parentNode.insertBefore(cln, node.nextSibling);
 }
 
-$.createElement = function(name){
-    return $('<'+name+' />');
-};
-
-$.fn.appendNewElement = function(name)
-{
-    this.each(function(i)
-    {
-        $(this).append('<'+name+' />');
-    });
-    return this;
-};
-
 function test(){
     try{
     	var $form = $('#xmlForm');
@@ -195,7 +178,7 @@ function rootElement(){
 };
 
 function buildXml(){
-	alert( $('#selectProfiles',top.document).find(":selected").val());
+	//alert( $('#selectProfiles',top.document).find(":selected").val());
 	var $root = $('<XMLDocument />');
 	var $form = $('#xmlForm');
 	var $first = $(":first-child", $form);
@@ -226,33 +209,45 @@ function buildXml(){
 			$ref.append($newComponent);
 		});
 	} 
-	console.log($root.html());
+	uploadXml($root.html());
 }
 
-function createCmdi(handle,bitstreamId){
-	$("#dialog").dialog({
-		autoOpen: false,
-		modal: true,
-		width: 900,
-		height: 600,
-		beforeClose: function( event, ui ) {
-			clearDialog();
-		 },
-		open: function( event, ui ) {
-			loadProfiles();
-			refreshSelected();
+var currentHandle;
+var currenBitstreamId;
+var currentTagId;
+
+function uploadXml(xml) {
+
+	var uploadForm = new FormData();
+	uploadForm.append("xml", xml);
+	uploadForm.append("handle", currentHandle);
+	uploadForm.append("bitstreamId", currenBitstreamId);
+
+	$.ajax({
+		url : '/dspace/api/cmdi/upload',
+		data : uploadForm,
+		dataType : 'text',
+		processData : false,
+		contentType : false,
+		type : 'POST',
+		success : function(data) {
 		},
-		buttons: {
-		       "Send": function() {
-		    	   buildXml();
-		    	   $( this ).dialog( "close" );
-		        },
-		        Cancel: function() {
-		          $( this ).dialog( "close" );
-		        }
-		      }
+		error: function(data) {
+		}
 	});
-	$("#dialog").dialog("open");
+	var $tag = $(currentTagId).closest("td").prev().prev().prev().prev().prev();
+	var filename = $tag.text() + ".cmdi";
+	$(currentTagId).closest("td").prev().prev().html(filename);
+}
+
+function createCmdi(bitstreamId, handle){
+	currenBitstreamId = bitstreamId;
+	currentHandle = handle;
+	currentTagId = "#btn_"+ bitstreamId;
+	clearDialog();
+	loadProfiles();
+	$('#cmdi_model_div').modal('show');
+    refreshSelected();
 }
 
 function clearDialog(){
@@ -261,7 +256,8 @@ function clearDialog(){
 }
 
 function loadProfiles(){
-	$.getJSON( "http://localhost:9081/dspace/api/cmdi/profiles", function( data ) {
+	RefreshEventListener()
+	$.getJSON( "http://localhost:9081/rest/cmdi/profiles", function( data ) {
 		 var options = "";
 		  $.each( data, function( key, val ) {
 			  options += "<option value=" + key  + ">" + val + "</option>";
@@ -273,14 +269,62 @@ function loadProfiles(){
 function refreshSelected(){
 	  var id = $('#selectProfiles').find(":selected").val();
 	  if(id === "undefined" || id === 0){
-		  $("#cmdiFrame").attr("src", "");
 	  } else {
-		  $("#cmdiFrame").attr("src", "http://localhost:9081/dspace/api/cmdi/profiles/" +id);
+	    var link = "http://localhost:9081/rest/cmdi/profiles/" + id + "/form";
+	     $.ajax({
+                type: "GET",
+                url: link
+            }).done(function(data){
+        		$("#cmdiFrame").html(data);
+            });
 	  }
 }
 
-$("#selectProfiles").on("change", function(e) {
-	refreshSelected();
+function RefreshEventListener() {
+    // Remove handler from existing elements
+    $("#selectProfiles").off();
+
+    // Re-add event handler for all matching elements
+    $("#selectProfiles").on("change", function() {
+       	refreshSelected();
+    });
+    $("#processCmdi").on("click", function() {
+		buildXml();
+    });
+}
+
+
+jQuery(document).ready(function (){
+
+$.createElement = function(name){
+    return $('<'+name+' />');
+};
+
+$.fn.appendNewElement = function(name)
+{
+    this.each(function(i)
+    {
+        $(this).append('<'+name+' />');
+    });
+    return this;
+};
+
+	jQuery("<div class='modal fade' id='cmdi_model_div' role='dialog'>" +
+			 "<div class='modal-dialog modal-lg'>" +
+			 	"<div class='modal-content'>" +
+		        "<div class='modal-header'>" +
+		          "<button type='button' class='close' data-dismiss='modal'><span aria-hidden='true'>&#215;</span><span class='sr-only'>Close</span></button>" +
+		          "<h4 class='modal-title'>Create cmdi file from profile</h4>" +
+		        "</div>" +
+		        "<div class='modal-body'>" +
+		          "<span> Profile: <select id='selectProfiles' class='form-control'><option value='0'>None</option></select></span>"+
+		          "<div id='cmdiFrame' width='100%' height='550px'></div>" +
+		        "</div>" +
+		        "<div class='modal-footer'>"+
+                         "<button id='processCmdi' type='button' class='btn btn-default' data-dismiss='modal'>Create</button>"+
+                "</div>"+
+		      "</div>" +
+			 "</div>" +
+			"</div>").appendTo("body");
+	RefreshEventListener();
 });
-
-

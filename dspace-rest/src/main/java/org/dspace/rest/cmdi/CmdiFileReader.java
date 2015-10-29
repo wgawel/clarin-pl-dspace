@@ -1,4 +1,4 @@
-package pl.edu.pwr.cmdi;
+package org.dspace.rest.cmdi;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
-import pl.edu.pwr.cmdi.xml.*;
+import org.dspace.rest.cmdi.xml.*;
 
 
 public class CmdiFileReader {
@@ -190,7 +190,7 @@ public class CmdiFileReader {
 		AttributeList result = new AttributeList();
 		for (Node n : list) {
 			if (isCMD(n, CMD.ATTRIBUTELIST)) {
-				Class<Attribute> aClass = pl.edu.pwr.cmdi.xml.Attribute.class;
+				Class<Attribute> aClass = org.dspace.rest.cmdi.xml.Attribute.class;
 				List<Node> attributes = getListForElement(n.getChildNodes());
 				
 				for (Node a : attributes) {
