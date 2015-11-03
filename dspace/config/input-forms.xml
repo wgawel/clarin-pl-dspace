@@ -133,9 +133,10 @@
             <input-type value-pairs-name="metashare_languageDependent">list</input-type> <!-- true/false value -->
             <hint>Indicate whether you will upload cmdi file in the next step. Combine with "hide" for weblicht submissions.</hint>
          <required></required>
-            <acl>          	          	        	
+       <!--  <acl>
               	policy=deny,action=read,grantee-type=user,grantee-id=*
-            </acl>                    
+            </acl>
+       -->
        </field>
 
       </page>

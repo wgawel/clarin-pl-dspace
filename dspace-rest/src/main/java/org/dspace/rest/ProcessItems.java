@@ -57,7 +57,6 @@ public class ProcessItems extends ItemsResource {
     public static final String ALLOWED_FILES = String.format("(?i).*\\.(%s)$", ConfigurationManager.getProperty("dspace.file.extension.to.ccl"));
     public static final String meta_file = ConfigurationManager.getProperty("dspace.metafile.xml");
     public static final String zip_name = ConfigurationManager.getProperty("dspace.ccl.zip");
-    public static final String dspace_hostname = ConfigurationManager.getProperty("dspace.hostname");
     public static final String nfs = ConfigurationManager.getProperty("dspace.nfs.path");
     public static final String mewexURL = ConfigurationManager.getProperty("dspace.wielowyr.export.url");
     public static final String inforexURL = ConfigurationManager.getProperty("dspace.inforex.export.url");
