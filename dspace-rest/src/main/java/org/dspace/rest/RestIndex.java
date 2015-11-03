@@ -121,6 +121,14 @@ public class RestIndex {
                         "<li>GET /cmdi/profiles - Return list of aviable profiles.</li>" +
                         "<li>GET /cmdi/profiles/{profile_id}/form - Return specified profile partial html form.</li>" +
                     "</ul>" +
+                    "<h2>External services - processing </h2>" +
+                    "<ul>" +
+                        "<li>GET /process/items/handle/{prefix}/{sufix}/start - Start item processing by Engine service.</li>" +
+                        "<li>GET /process/items/handle/{prefix}/{sufix}/status - Returns current status of engine service processing </li>" +
+                        "<li>GET /process/items/handle/{prefix}/{sufix}/restart - Resets item status </li>" +
+                        "<li>GET /process/items/handle/{prefix}/{sufix}/export/mewex - Exports processed item files to mewex service </li>" +
+                        "<li>GET /process/items/handle/{prefix}/{sufix}/export/inforex - Exports processed item files to inforex service </li>" +
+                        "</ul>" +
                 "</body></html> ";
     }
     
