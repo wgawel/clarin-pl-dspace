@@ -38,8 +38,13 @@ public class ItemUtil {
 			DSpaceObject dso = HandleManager.resolveToObject(context, handle);
 
 			if (dso != null && dso.getType() == Constants.ITEM && ((Item)dso).hasOwnMetadata()) {
-				Bitstream bitstream = ((Item) dso).getBundles("METADATA")[0]
-						.getBitstreams()[0];
+				Bitstream[] bitstreams = ((Item) dso).getBundles("METADATA")[0].getBitstreams();
+				Bitstream bitstream = null;
+				for(int i=0; i< bitstreams.length; i++){
+					if(!bitstreams[i].isDeleted())
+						bitstream = bitstreams[i];
+				}
+
 				context.turnOffAuthorisationSystem();
 				Reader reader = new InputStreamReader(bitstream.retrieve());
 				context.restoreAuthSystemState();

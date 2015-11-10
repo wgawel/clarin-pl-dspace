@@ -107,8 +107,10 @@ public class Item extends DSpaceObject {
             for(Bundle bundle : bundles) {
                 org.dspace.content.Bitstream[] itemBitstreams = bundle.getBitstreams();
                 for(org.dspace.content.Bitstream itemBitstream : itemBitstreams) {
-                    if(AuthorizeManager.authorizeActionBoolean(context, itemBitstream, org.dspace.core.Constants.READ)) {
-                        bitstreams.add(new Bitstream(itemBitstream, null));
+                    if(AuthorizeManager.authorizeActionBoolean(context, itemBitstream, org.dspace.core.Constants.READ))
+                    {
+                        if(!itemBitstream.isDeleted())
+                            bitstreams.add(new Bitstream(itemBitstream, null));
                     }
                 }
             }

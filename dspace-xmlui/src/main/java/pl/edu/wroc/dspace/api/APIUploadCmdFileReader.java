@@ -53,6 +53,8 @@ public class APIUploadCmdFileReader extends AbstractReader {
 
 	private String contextPath;
 
+	private static final String OAI_BASE_URL = ConfigurationManager.getProperty("oai.baseURL");
+
 	private static Logger log = Logger.getLogger(APIUploadCmdFileReader.class);
 
 	@Override
@@ -100,7 +102,8 @@ public class APIUploadCmdFileReader extends AbstractReader {
 
 		File temp = File.createTempFile(refBitstream.getName(), ".cmdi");
 		BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-		out.write(createXML(context.getCurrentUser().getFullName(), Integer.toString(refBitstream.getID()), "test", xml));
+		String oaiLink = OAI_BASE_URL + "cite?metadataPrefix=cmdi&handle=" + handle;
+		out.write(createXML(context.getCurrentUser().getFullName(), Integer.toString(refBitstream.getID()), "test", xml,oaiLink));
 		out.close();
 		InputStream is = new FileInputStream(temp);
 
@@ -171,14 +174,23 @@ public class APIUploadCmdFileReader extends AbstractReader {
 		return root;
 	}
 
+	private Element createIsPartOf(Document doc, String ownerLink){
+		Element root = doc.createElement("IsPartOfList");
+		Element child = doc.createElement("IsPartOf");
+		child.setTextContent(ownerLink);
+		root.appendChild(child);
+		return root;
+	}
+
 	public void removeChilds(Node node) {
 	    while (node.hasChildNodes())
 	        node.removeChild(node.getFirstChild());
 	}
 	
-	public InputStream parseCmdiFile(InputStream inputFile, String handle,
-			String bstramId) {
+	public InputStream parseCmdiFile(InputStream inputFile, String handle, String bstramId) {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+		String oaiLink = OAI_BASE_URL + "cite?metadataPrefix=cmdi&handle=" + handle;
 		try {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -187,6 +199,7 @@ public class APIUploadCmdFileReader extends AbstractReader {
 			NodeList nodes = doc.getElementsByTagName("ResourceProxyList");
 			removeChilds(nodes.item(0));
 			nodes.item(0).appendChild(createResourceProxyElement(doc, handle, bstramId));
+			nodes.item(0).appendChild(createIsPartOf(doc, oaiLink));
 
 			DOMSource source = new DOMSource(doc);
 			Result outputTarget = new StreamResult(outputStream);
@@ -286,7 +299,7 @@ public class APIUploadCmdFileReader extends AbstractReader {
 		return result.toString();
 	}
 
-	private String createXML(String user, String id, String link, String component){
+	private String createXML(String user, String id, String link, String component,String isPartOf){
 		StringBuilder sb = new StringBuilder();
 		sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 		sb.append("<CMD xmlns=\"http://www.clarin.eu/cmd/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ");
@@ -305,6 +318,7 @@ public class APIUploadCmdFileReader extends AbstractReader {
 			sb.append("\t</ResourceProxyList>\n");
 			sb.append("\t<JournalFileProxyList/>\n");
 			sb.append("\t<ResourceRelationList/>\n");
+			sb.append("\t<IsPartOfList><IsParOf>"+isPartOf+"</IsParOf></IsPartOfList>\n");
 		sb.append("</Resources>\n");
 		sb.append("<Components>\n");
 				sb.append(component);

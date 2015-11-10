@@ -614,6 +614,7 @@ public class UploadStep extends AbstractProcessingStep
                 //If we indicated upload of cmdi file and this file has cmdi suffix, change the target bundle
                 if(item.hasOwnMetadata() && filePath.toLowerCase().endsWith("cmdi")){
                 	bundleName = "METADATA";
+
                 }
 
                 // do we already have a bundle?
