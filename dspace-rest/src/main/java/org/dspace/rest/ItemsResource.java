@@ -9,6 +9,8 @@ package org.dspace.rest;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -40,6 +42,7 @@ import org.dspace.content.Bundle;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.Metadatum;
 import org.dspace.content.service.ItemService;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.Group;
 import org.dspace.rest.common.Bitstream;
 import org.dspace.rest.common.Item;
@@ -330,6 +333,30 @@ public class ItemsResource extends Resource
 
         log.trace("Item(id=" + itemId + ") bitstreams were successfully read.");
         return bitstreams.toArray(new Bitstream[0]);
+    }
+
+    @GET
+    @Path("/{item_id}/cmdi")
+    public Response getItemCmdi(@PathParam("item_id") Integer itemId,
+                                         @QueryParam("limit") @DefaultValue("20") Integer limit, @QueryParam("offset") @DefaultValue("0") Integer offset,
+                                         @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+                                         @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            throws WebApplicationException
+    {
+
+        org.dspace.core.Context  context = null;
+        URI uri = null;
+        try {
+            context = createContext(getUser(headers));
+            org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
+            String OAI_BASE_URL = ConfigurationManager.getProperty("oai.context");
+            uri = new URI(OAI_BASE_URL + "cite?metadataPrefix=cmdi&handle=" + dspaceItem.getHandle());
+        } catch (ContextException ce) {
+            log.error(ce);
+        } catch (URISyntaxException use) {
+            log.error(use);
+        }
+        return Response.temporaryRedirect(uri).build();
     }
 
     /**

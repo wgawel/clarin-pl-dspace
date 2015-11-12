@@ -26,6 +26,8 @@
 .btn-file {
     position: relative;
     overflow: hidden;
+    padding: 2px 5px;
+    font-size: 12px;
 }
 .btn-file input[type=file] {
     position: absolute;

@@ -631,6 +631,7 @@ public class Bitstream extends DSpaceObject
         return BitstreamStorageManager.retrieve(ourContext, bRow
                .getIntColumn("bitstream_id"));
     }
+
     /**
      * Get the bundles this bitstream appears in
      * 

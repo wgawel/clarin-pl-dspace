@@ -7,9 +7,12 @@
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
-import java.io.IOException;
+import java.io.*;
 import java.sql.SQLException;
+import java.util.Date;
 
+import org.apache.log4j.Logger;
+import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.wing.Message;
@@ -18,7 +21,25 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 /**
  * This is a confirmation page informing the user that they have 
@@ -32,6 +53,7 @@ import org.xml.sax.SAXException;
 public class CompletedStep extends AbstractSubmissionStep
 {
 
+	private static Logger log = Logger.getLogger(CompletedStep.class);
 	/** Language Strings **/ 
 	protected static final Message T_head = 
         message("xmlui.Submission.submit.CompletedStep.head"); 
@@ -40,7 +62,23 @@ public class CompletedStep extends AbstractSubmissionStep
     protected static final Message T_go_submission = 
         message("xmlui.Submission.submit.CompletedStep.go_submission");
 	protected static final Message T_submit_again = 
-        message("xmlui.Submission.submit.CompletedStep.submit_again"); 
+        message("xmlui.Submission.submit.CompletedStep.submit_again");
+
+	public void addBody(Body body) throws SAXException, WingException,
+			UIException, SQLException, IOException, AuthorizeException
+	{
+
+		Division div = body.addInteractiveDivision("submit-complete",contextPath+"/handle/"+handle+"/submit", Division.METHOD_POST,"primary submission");
+		div.setHead(T_head);
+
+		div.addPara(T_info1);
+
+		div.addPara().addXref(contextPath+"/submissions", T_go_submission);
+
+		div.addHidden("handle").setValue(handle);
+
+		div.addPara().addButton("submit_again").setValue(T_submit_again);
+	}
 
 	/**
 	 * Establish our required parameters, abstractStep will enforce these.
@@ -49,22 +87,7 @@ public class CompletedStep extends AbstractSubmissionStep
 	{
 		this.requireHandle = true;
 	}
-
-	public void addBody(Body body) throws SAXException, WingException,
-	UIException, SQLException, IOException, AuthorizeException
-	{	
-		Division div = body.addInteractiveDivision("submit-complete",contextPath+"/handle/"+handle+"/submit", Division.METHOD_POST,"primary submission");
-		div.setHead(T_head);
-		
-		div.addPara(T_info1);
-		
-		div.addPara().addXref(contextPath+"/submissions",T_go_submission);
-	     
-	    div.addPara().addButton("submit_again").setValue(T_submit_again);
-	    div.addHidden("handle").setValue(handle);
-	}
-    
-    /** 
+    /**
      * Each submission step must define its own information to be reviewed
      * during the final Review/Verify Step in the submission process.
      * <P>
@@ -90,4 +113,5 @@ public class CompletedStep extends AbstractSubmissionStep
         //nothing to review, since submission is now Completed!
         return null;
     }
+
 }

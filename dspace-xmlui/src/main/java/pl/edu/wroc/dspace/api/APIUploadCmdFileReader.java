@@ -53,7 +53,8 @@ public class APIUploadCmdFileReader extends AbstractReader {
 
 	private String contextPath;
 
-	private static final String OAI_BASE_URL = ConfigurationManager.getProperty("oai.baseURL");
+	private static final String REST_URL = ConfigurationManager.getProperty("dspace.rest");
+	private static final String REST_ITEMS = REST_URL + "/items/";
 
 	private static Logger log = Logger.getLogger(APIUploadCmdFileReader.class);
 
@@ -80,47 +81,48 @@ public class APIUploadCmdFileReader extends AbstractReader {
 		this.contextPath = ConfigurationManager.getProperty("dspace.url");
 		try {
 			Part filePart = (Part) request.get("file");
-			String handle = request.get("handle").toString();
+			String itemId =  request.get("handle").toString();
 			String refBitstreamId = (String) request.get("bitstreamId");
 
 			if (filePart != null) {
-				createFromFile(filePart, handle, refBitstreamId);
+				createFromFile(filePart, itemId, refBitstreamId);
 			}
 
 			if(request.get("xml") != null){
 				String xml = request.get("xml").toString();
-				createFromXML(xml, handle, refBitstreamId);
+				createFromXML(xml, itemId, refBitstreamId);
 			}
 		} catch (Exception e) {
 			log.error("Error in generate block",e);
 		}
 	}
 
-	private void createFromXML(String xml, String handle, String refBitstreamId) throws Exception {
+	private void createFromXML(String xml, String itemId, String refBitstreamId) throws Exception {
 		ByteArrayInputStream inputStream;
 		Bitstream refBitstream = Bitstream.find(context, new Integer(refBitstreamId));
 
 		File temp = File.createTempFile(refBitstream.getName(), ".cmdi");
 		BufferedWriter out = new BufferedWriter(new FileWriter(temp));
-		String oaiLink = OAI_BASE_URL + "cite?metadataPrefix=cmdi&handle=" + handle;
-		out.write(createXML(context.getCurrentUser().getFullName(), Integer.toString(refBitstream.getID()), "test", xml,oaiLink));
+		String oaiLink = REST_ITEMS + itemId + "/cmdi";
+		String id = Integer.toString(refBitstream.getID());
+		String link = REST_URL + "/bitstreams/" + id + "/retrieve";
+		out.write(createXML(context.getCurrentUser().getFullName(), id , link, xml,oaiLink));
 		out.close();
 		InputStream is = new FileInputStream(temp);
 
 		String upload_name = refBitstream.getName()+".cmdi";
-		Bitstream newBitstream = addFileFromPostToItem(handle, is, upload_name, upload_name, refBitstream);
+		Bitstream newBitstream = addFileFromPostToItem(itemId, is, upload_name, refBitstream);
 		updateReferenceItemCmdiId(refBitstream, newBitstream.getID());
 	}
 
-	private void createFromFile(Part filePart, String handle, String refBitstreamId) throws Exception {
+	private void createFromFile(Part filePart, String itemId, String refBitstreamId) throws Exception {
 		ByteArrayInputStream inputStream;
 		Bitstream refBitstream = Bitstream.find(context, new Integer(refBitstreamId));
-		String fileName = filePart.getFileName();
 		Bitstream newBitstream= null;
 		if (filePart != null && filePart.getSize() > 0) {
 			InputStream is = filePart.getInputStream();
 			String upload_name = filePart.getUploadName();
-			newBitstream = addFileFromPostToItem(handle, is, upload_name, fileName, refBitstream);
+			newBitstream = addFileFromPostToItem(itemId, is, upload_name, refBitstream);
 		}
 		updateReferenceItemCmdiId(refBitstream, newBitstream.getID());
 		String jsonString = createJsonResultAddBitstreamSuccess(newBitstream);
@@ -158,14 +160,14 @@ public class APIUploadCmdFileReader extends AbstractReader {
 		}
 	}
 
-	private Element createResourceProxyElement(Document doc, String handle,
-			String bstreamId) {
+	private Element createResourceProxyElement(Document doc, String bstreamId) {
 
 		Element root = doc.createElement("ResourceProxy");
-		root.setAttribute("id", "_" + bstreamId);
-
+		root.setAttribute("id", "b_" + bstreamId);
+		String handle = REST_URL + "/bitstreams/" + bstreamId + "/retrieve";
 		Element resourceType = doc.createElement("ResourceType");
 		resourceType.setAttribute("mimetype", "text/xml");
+		resourceType.setTextContent("Resource");
 		Element resourceRef = doc.createElement("ResourceRef");
 		resourceRef.setTextContent(handle);
 		root.appendChild(resourceType);
@@ -187,10 +189,10 @@ public class APIUploadCmdFileReader extends AbstractReader {
 	        node.removeChild(node.getFirstChild());
 	}
 	
-	public InputStream parseCmdiFile(InputStream inputFile, String handle, String bstramId) {
+	public InputStream parseCmdiFile(InputStream inputFile, String itemId, String bstramId) {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-		String oaiLink = OAI_BASE_URL + "cite?metadataPrefix=cmdi&handle=" + handle;
+		String oaiLink = REST_ITEMS + itemId +"/cmdi";
 		try {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -198,7 +200,9 @@ public class APIUploadCmdFileReader extends AbstractReader {
 
 			NodeList nodes = doc.getElementsByTagName("ResourceProxyList");
 			removeChilds(nodes.item(0));
-			nodes.item(0).appendChild(createResourceProxyElement(doc, handle, bstramId));
+			nodes.item(0).appendChild(createResourceProxyElement(doc, bstramId));
+
+			nodes = doc.getElementsByTagName("Resources");
 			nodes.item(0).appendChild(createIsPartOf(doc, oaiLink));
 
 			DOMSource source = new DOMSource(doc);
@@ -220,25 +224,16 @@ public class APIUploadCmdFileReader extends AbstractReader {
 		return null;
 	}
 
-	public Bitstream addFileFromPostToItem(String collectionHandle,
-			InputStream is,String upload_name, String fileName, Bitstream refBitstream)
-			throws SQLException, Exception {
-
-		Handle handle = Handle.findByHandle(context, collectionHandle);
-		if (handle == null) {
-			throw new IllegalArgumentException("Handle \"" + collectionHandle + "\" not found.");
-		}
+	public Bitstream addFileFromPostToItem(String handle, InputStream is,String upload_name, Bitstream refBitstream)
+			throws Exception {
 
 		Item item = (Item) refBitstream.getParentObject();
 
 		if (is != null) {
 
-			is = parseCmdiFile(is, makeBitstreamLink(handle.getHandle(), refBitstream), Integer.toString(refBitstream.getID()));
-
-			String bundleName = "METADATA";
+			is = parseCmdiFile(is, handle, Integer.toString(refBitstream.getID()));
 
 			Bitstream bitstream = Bitstream.create(context, is);
-			Bundle[] bundles = item.getBundles(bundleName);
 
 			String upload_name_stripped = upload_name;
 			while (upload_name_stripped.indexOf('/') > -1) {
@@ -271,34 +266,6 @@ public class APIUploadCmdFileReader extends AbstractReader {
 		}
 	}
 
-	/**
-	 * Returns canonical link to a bitstream in the item.
-	 *
-	 * @param bitstream
-	 *            The bitstream to link to
-	 * @returns a String link to the bistream
-	 */
-	private String makeBitstreamLink(String handle, Bitstream bitstream) {
-		String name = bitstream.getName();
-		StringBuilder result = new StringBuilder(contextPath);
-		result.append("/bitstream/handle/").append(handle);
-		// append name although it isn't strictly necessary
-		try {
-			if (name != null) {
-				result.append("/").append(
-						Util.encodeBitstreamName(name, "UTF-8"));
-			}
-		} catch (UnsupportedEncodingException uee) {
-			// just ignore it, we don't have to have a pretty
-			// name on the end of the url because the sequence id will
-			// locate it. However it means that links in this file might
-			// not work....
-		}
-		result.append("?sequence=").append(
-				String.valueOf(bitstream.getSequenceID()));
-		return result.toString();
-	}
-
 	private String createXML(String user, String id, String link, String component,String isPartOf){
 		StringBuilder sb = new StringBuilder();
 		sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -311,14 +278,14 @@ public class APIUploadCmdFileReader extends AbstractReader {
 		sb.append("</Header>\n");
 		sb.append("<Resources>\n");
 			sb.append("\t<ResourceProxyList>\n");
-				sb.append("\t<ResourceProxy id=\"_"+id+"\">\n");
+				sb.append("\t<ResourceProxy id=\"b_"+id+"\">\n");
 					sb.append("\t\t<ResourceType mimetype=\"text/xml\"/>\n");
 					sb.append("\t\t<ResourceRef>"+link+"</ResourceRef>\n");
 					sb.append("\t\t</ResourceProxy>");
 			sb.append("\t</ResourceProxyList>\n");
 			sb.append("\t<JournalFileProxyList/>\n");
 			sb.append("\t<ResourceRelationList/>\n");
-			sb.append("\t<IsPartOfList><IsParOf>"+isPartOf+"</IsParOf></IsPartOfList>\n");
+			sb.append("\t<IsPartOfList>\n\t<IsParOf>"+isPartOf+"</IsParOf>\n</IsPartOfList>\n");
 		sb.append("</Resources>\n");
 		sb.append("<Components>\n");
 				sb.append(component);
