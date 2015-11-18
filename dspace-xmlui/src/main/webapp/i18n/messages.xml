@@ -822,11 +822,11 @@
 	<message key="xmlui.Submission.submit.progressbar.complete">Complete</message>
 
 	<!-- CmdiStep -->
-	<message key="xmlui.Submission.submit.CmdiStep.head">Cmdi</message>
-	<message key="xmlui.Submission.submit.CmdiStep.column1">Uploaded Cmdi File</message>
-	<message key="xmlui.Submission.submit.CmdiStep.column2">Upload cmdi</message>
+	<message key="xmlui.Submission.submit.CmdiStep.head">CMDI</message>
+	<message key="xmlui.Submission.submit.CmdiStep.column1">Uploaded CMDI File</message>
+	<message key="xmlui.Submission.submit.CmdiStep.column2">Upload CMDI</message>
 	<message key="xmlui.Submission.submit.CmdiStep.column3">Action</message>
-	<message key="xmlui.Submission.submit.progressbar.cmdi">Cmdi upload</message>
+	<message key="xmlui.Submission.submit.progressbar.cmdi">Additional CMDI</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.ResumeStep -->
 	<message key="xmlui.Submission.submit.ResumeStep.submit_resume">Resume</message>
@@ -1005,7 +1005,9 @@
 	<message key="xmlui.Submission.submit.UploadStep.head">Upload File(s)</message>
 	<message key="xmlui.Submission.submit.UploadStep.file">File</message>
     <message key="xmlui.Submission.submit.UploadStep.file_help">Please enter the full path of the file on your computer corresponding to your item. If you click "Browse...", a new window will allow you to select the file from your computer. <div class='alert'>When uploading language resources, please try to use one of the recommended formats mentioned in <a href='http://www.clarin.eu/sites/default/files/Standards%20for%20LRT-v6.pdf' target='_blank'>LRT Standards</a></div><div class='alert'>Uploading <strong>files larger than {0} </strong> requires special handling. Please contact <a class="helpdesk-tolink">Help Desk</a> about how to upload these files. Thank you for your understanding.</div></message>
-    <message key="xmlui.Submission.submit.UploadStep.file_local_head">Add files from URI</message>
+	<message key="xmlui.Submission.submit.UploadStep.file_cmdi_help">Please enter the full path of the file on your computer corresponding to your item. If you click "Browse...", a new window will allow you to select the file from your computer. <div id="cmdi-help" class='alert'>Please remember to upload main CMDI file</div> <div class='alert'>When uploading language resources, please try to use one of the recommended formats mentioned in <a href='http://www.clarin.eu/sites/default/files/Standards%20for%20LRT-v6.pdf' target='_blank'>LRT Standards</a></div><div class='alert'>Uploading <strong>files larger than {0} </strong> requires special handling. Please contact <a class="helpdesk-tolink">Help Desk</a> about how to upload these files. Thank you for your understanding.</div></message>
+	<message key="xmlui.Submission.submit.UploadStep.file_cmdi_help_uploaded">Please enter the full path of the file on your computer corresponding to your item. If you click "Browse...", a new window will allow you to select the file from your computer. <div id="cmdi-help" class='alert alert-success'>CMDI file uploaded</div> <div class='alert'>When uploading language resources, please try to use one of the recommended formats mentioned in <a href='http://www.clarin.eu/sites/default/files/Standards%20for%20LRT-v6.pdf' target='_blank'>LRT Standards</a></div><div class='alert'>Uploading <strong>files larger than {0} </strong> requires special handling. Please contact <a class="helpdesk-tolink">Help Desk</a> about how to upload these files. Thank you for your understanding.</div></message>
+	<message key="xmlui.Submission.submit.UploadStep.file_local_head">Add files from URI</message>
     <message key="xmlui.Submission.submit.UploadStep.file_local_help">Please enter the full path of the file available on local server or from a http location.</message>
 	<message key="xmlui.Submission.submit.UploadStep.file_error">The item must contain at least one file.</message>
     <message key="xmlui.Submission.submit.UploadStep.file_error.internal">The uploaded file probably exceeded max file size. Please, contact the administrator.</message>

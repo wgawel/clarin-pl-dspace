@@ -98,6 +98,10 @@ public class UploadStep extends AbstractSubmissionStep
             message("xmlui.Submission.submit.UploadStep.description");
     protected static final Message T_description_help =
             message("xmlui.Submission.submit.UploadStep.description_help");
+    protected static final Message T_cmdi_help =
+            message("xmlui.Submission.submit.UploadStep.file_cmdi_help");
+    protected static final Message T_cmdi_help_uploaded =
+            message("xmlui.Submission.submit.UploadStep.file_cmdi_help_uploaded");
     protected static final Message T_submit_upload =
             message("xmlui.Submission.submit.UploadStep.submit_upload");
     protected static final Message T_head2 =
@@ -175,7 +179,7 @@ public class UploadStep extends AbstractSubmissionStep
      * if supported by browser simply by adding info to page metadata
      * which can be accessed from xsl easily.
      *
-     * @see structural.xsl
+     * @see "structural.xsl"
      * jmisutka 2011/03/08
      */
     public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException,
@@ -249,7 +253,15 @@ public class UploadStep extends AbstractSubmissionStep
 	        
 	        long maxFileSize = Long.parseLong(ConfigurationManager.getProperty("lr", "lr.upload.file.alert.max.file.size"));
 
-	        file.setHelp(T_file_help);
+            if(item.hasOwnMetadata()){
+                if(item.getBundles("METADATA").length >= 1){
+                    file.setHelp(T_cmdi_help_uploaded);
+                } else {
+                    file.setHelp(T_cmdi_help);
+                }
+            } else {
+                file.setHelp(T_file_help);
+            }
             file.setRequired();
 
             // if no files found error was thrown by processing class, display it!
@@ -279,6 +291,7 @@ public class UploadStep extends AbstractSubmissionStep
             if(this.errorFlag == org.dspace.submit.step.UploadStep.STATUS_NO_CMDI_FILE_ERROR){
                 file.addError(T_no_cmdi);
             }
+
 
 	        Text description = upload.addItem("description-field","description-field").addText("description");
             description.setLabel(T_description);
