@@ -846,7 +846,7 @@
                 </a>
 		    </div>
 			<div style="float: right; margin: 14px 15px 14px 120px;">
-				<a href="https://assessment.datasealofapproval.org/assessment_155/seal/html/">
+				<a href="https://assessment.datasealofapproval.org/assessment_149/seal/html/">
 					<img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/DSA_2014_2015.gif" class="logo" width="100" height="100" alt="CLARIN-PL logo" />
 				</a>
 			</div>
