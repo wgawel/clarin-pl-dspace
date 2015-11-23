@@ -844,12 +844,12 @@
 		        <a href="/dspace">
 	                <img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/clarinpl-logo_2.png" class="logo" alt="CLARIN-PL logo" />
                 </a>
-		    </div><!--
-            <div style="float: left; margin: 10px 20px 10px 370px;">
-		        <a href="http://www.clarin.eu/">
-                    <img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/clarin-logo.png" class="logo" alt="CLARIN logo" />
-                </a>
-            </div> -->
+		    </div>
+			<div style="float: right; margin: 14px 15px 14px 120px;">
+				<a href="https://assessment.datasealofapproval.org/assessment_155/seal/html/">
+					<img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/DSA_2014_2015.gif" class="logo" width="100" height="100" alt="CLARIN-PL logo" />
+				</a>
+			</div>
 	    </div>	
 	</xsl:template>
 </xsl:stylesheet>
