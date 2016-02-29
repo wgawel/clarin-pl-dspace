@@ -40,6 +40,7 @@ public class ControlPanelBitstreams extends AbstractControlPanelTab {
 	final static String submit_show_unknown_id = "non-del-unknown";
 	final static String select_prefix = "format-"; 
 	final static String submit_id = "submit_update";
+	final static String submit_all_id = "submit_update_all";
 	final static String from_id = "from-value";
 
     private static final Message T_head1_none =
@@ -54,7 +55,7 @@ public class ControlPanelBitstreams extends AbstractControlPanelTab {
 		wfdivmain.setHead("BITSTREAMS");		
 
 		
-		Bitstream[] bitstreams = getBitstreams();
+		Bitstream[] bitstreams = null;
 		
 		// param from
 		Request request = ObjectModelHelper.getRequest(objectModel);
@@ -62,16 +63,16 @@ public class ControlPanelBitstreams extends AbstractControlPanelTab {
 		// show only non-deleted unkown
 		boolean show_only_non_deleted_unknown = "Show not deleted unknown".equals(request.getParameter(submit_show_unknown_id));
 
+		if(show_only_non_deleted_unknown) {
+			bitstreams = getUnknownNotDeletedBitstreams();
+		} else {
+			bitstreams = getBitstreams();
+		}
+		
 		ArrayList<Bitstream> bitstreamList = new ArrayList<Bitstream>();
 
 		for(Bitstream b : bitstreams) {
-			if(show_only_non_deleted_unknown) {
-				if(b.getFormat().getSupportLevel()==BitstreamFormat.UNKNOWN && !b.isDeleted()) {
-					bitstreamList.add(b);
-				}
-			} else {
-				bitstreamList.add(b);
-			}
+			bitstreamList.add(b);
 		}
 		
 		String sort_by = getParameterSort();
@@ -114,30 +115,87 @@ public class ControlPanelBitstreams extends AbstractControlPanelTab {
 				}
 			});			
 		}
+				
 
 		// Do the updates
-		if ( request.getParameter(submit_id) != null ) 
-		{
-			// do updates
+		ArrayList<Bitstream> toUpdateList = new ArrayList<Bitstream>();
+		if(request.getParameter(submit_id)!=null || request.getParameter(submit_all_id)!=null) {
+			for ( Object obj_key : request.getParameters().keySet() ){
+				String key = (String)obj_key;
+				if ( key.startsWith(select_prefix) ) {
+					String value = request.getParameter(key);
+					String bitstream_id = key.substring(select_prefix.length());
+					int b_id = Integer.valueOf(bitstream_id);
+					int f_id = Integer.valueOf(value);
+					Bitstream bitstream = Bitstream.find(context, b_id);
+					if ( bitstream.getFormat().getID() != f_id ) {
+						toUpdateList.add(bitstream);
+					}					
+				}
+			}
+		}
+		
+		if ( request.getParameter(submit_id) != null ){
 			int changes = 0;
 			String exc = "";
-			for ( Object obj_key : request.getParameters().keySet() ) 
+			for (Bitstream bitstream : toUpdateList) 
 			{
 				try {
-					String key = (String)obj_key;
-					if ( key.startsWith(select_prefix) ) {
-						String value = request.getParameter(key);
-						String bitstream_id = key.substring(select_prefix.length());
-						int b_id = Integer.valueOf(bitstream_id);
-						int f_id = Integer.valueOf(value);
-						Bitstream bitstream = Bitstream.find(context, b_id);
-						if ( bitstream.getFormat().getID() != f_id ) {
-								BitstreamFormat bfn = BitstreamFormat.find(context, f_id);
-								if (bfn != null) {
-									bitstream.setFormat(bfn);
-									bitstream.update();
-									changes += 1;
-								}
+					String value = request.getParameter(select_prefix + bitstream.getID());
+					int f_id = Integer.valueOf(value);
+					BitstreamFormat bfn = BitstreamFormat.find(context, f_id);
+					if (bfn != null) {
+						bitstream.setFormat(bfn);
+						bitstream.update();
+						changes += 1;
+					}
+				} catch (Exception e) {
+					exc = e.toString();
+				}
+					
+			}
+			if ( changes > 0 ) {
+				context.commit();
+				wfdivmain.addPara("message", "alert alert-success").addContent(changes + " bitstream(s) updated.");
+			}
+			if ( exc != null && exc.length() > 0 ) {
+				wfdivmain.addPara("exeption", "alert alert-error").addContent("Exception:" + exc);
+			}
+		}
+		else
+		if ( request.getParameter(submit_all_id) != null ) {
+			int changes = 0;
+			String exc = "";
+			for (Bitstream bitstream : toUpdateList) 
+			{
+				try {
+					String value = request.getParameter(select_prefix + bitstream.getID());
+					int f_id = Integer.valueOf(value);
+					BitstreamFormat bfn = BitstreamFormat.find(context, f_id);
+								
+					if (bfn != null) {						
+						String bName = bitstream.getName();
+						String ext = bName.substring(bName.lastIndexOf("."));
+						if(ext==null || ext.isEmpty()) {
+							bitstream.setFormat(bfn);
+							bitstream.update();
+							changes += 1;
+						} else {						
+							Bitstream[] tobeUpdatedBitstreams = Bitstream.findAll(context,
+								"SELECT bitstream.* FROM bitstream LEFT JOIN metadatavalue ON"
+											+ " bitstream.bitstream_id = metadatavalue.resource_id"
+											+ " WHERE resource_type_id=0"
+											+ " AND metadata_field_id=64"
+											+ " AND text_value like '%" + ext + "'"
+											+ " AND deleted='f'");
+							
+							for(Bitstream b : tobeUpdatedBitstreams) {
+								b = Bitstream.find(context, b.getID());
+								b.setFormat(bfn);
+								b.update();
+								changes += 1;
+							}										
+						
 						}
 					}
 				} catch (Exception e) {
@@ -147,10 +205,10 @@ public class ControlPanelBitstreams extends AbstractControlPanelTab {
 			}
 			if ( changes > 0 ) {
 				context.commit();
+				wfdivmain.addPara("message", "alert alert-success").addContent(changes + " bitstream(s) updated.");
 			}
-
 			if ( exc != null && exc.length() > 0 ) {
-				div.addPara("exeption", "alert alert-error").addContent("Exception:" + exc);
+				wfdivmain.addPara("exeption", "alert alert-error").addContent("Exception:" + exc);
 			}
 		}
 		
@@ -255,13 +313,21 @@ public class ControlPanelBitstreams extends AbstractControlPanelTab {
 		}		
 		
 		Para actions = wfdivtable.addPara(null,"edit-metadata-actions bottom" );
-        actions.addButton(submit_id).setValue("update");        
+        actions.addButton(submit_id).setValue("Update");
+        actions.addButton(submit_all_id).setValue("Update All");
     }
 	
 	
 	private Bitstream[] getBitstreams() throws SQLException {
 		return Bitstream.findAll(context);
 	}
+	
+	private Bitstream[] getUnknownNotDeletedBitstreams() throws SQLException {
+		return Bitstream.findAll(context, "SELECT bitstream.* FROM bitstream LEFT JOIN bitstreamformatregistry ON"
+				+ " bitstream.bitstream_format_id=bitstreamformatregistry.bitstream_format_id" 
+				+ " WHERE deleted='f'"
+				+ " AND support_level=" + BitstreamFormat.UNKNOWN);
+	}	
 	
     private void addSearchControls(Division div) throws WingException
     {
@@ -377,8 +443,3 @@ public class ControlPanelBitstreams extends AbstractControlPanelTab {
 
 	
 }
-
-
-
-
-
