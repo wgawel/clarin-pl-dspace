@@ -6,7 +6,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 import org.dspace.content.Bitstream;
@@ -28,7 +27,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -39,7 +37,6 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -484,7 +481,7 @@ public class ProcessItems extends ItemsResource {
         map.add("name", itemName);
         map.add("email", userEmail);
         map.add("url", nfs_file);
-
+        log.debug("Call MEWEX->" + map);
         String res = template.postForObject(builder.build().toUri(), map, String.class);
 
         JSONObject json = null;
@@ -493,6 +490,7 @@ public class ProcessItems extends ItemsResource {
         } catch (ParseException e) {
             log.error("Parsing MewexService:", e);
         }
+        log.debug("Response MEWEX->" + json);
         return json;
 
     }

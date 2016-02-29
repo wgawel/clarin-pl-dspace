@@ -7,35 +7,20 @@
  */
 package org.dspace.storage.rdbms;
 
-import java.io.*;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.sql.*;
+import java.sql.Date;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Executes SQL queries.
@@ -502,8 +487,7 @@ public class DatabaseManager
         String ctable = canonicalize(table);
 
         try {
-            return findByUnique(context, ctable, getPrimaryKeyColumn(ctable),
-                    Integer.valueOf(id));
+            return findByUnique(context, ctable, getPrimaryKeyColumn(ctable), Integer.valueOf(id));
         } catch (SQLException e) {
             log.error("SQL find Error - ", e);
             throw e;

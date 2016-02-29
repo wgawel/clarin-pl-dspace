@@ -1,36 +1,24 @@
 package pl.edu.pwr.dspace.app.xmlui.aspect.submission.submit;
 
-import java.io.*;
-import java.sql.SQLException;
-import java.util.Date;
-
+import cz.cuni.mff.ufal.DSpaceApi;
 import org.apache.log4j.Logger;
-import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
-import org.dspace.app.xmlui.aspect.submission.submit.ReviewStep;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.CustomButton;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.SingleFile;
-import org.dspace.app.xmlui.wing.element.Table;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.*;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Collection;
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.workflow.WorkflowItem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import cz.cuni.mff.ufal.DSpaceApi;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -41,6 +29,12 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.Date;
 
 public class CmdiStep extends AbstractSubmissionStep {
 
@@ -221,9 +215,14 @@ public class CmdiStep extends AbstractSubmissionStep {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 			Document doc = docBuilder.parse(inputFile);
-
 			NodeList user = doc.getElementsByTagName("MdCreator");
 			NodeList creationDate = doc.getElementsByTagName("MdCreationDate");
+
+			NodeList header = doc.getElementsByTagName("Header");
+			Element selfLink = doc.createElement("MDSelfLink");
+			selfLink.setTextContent(REST_URL+"/items/"+item.getID()+"/cmdi");
+			header.item(0).appendChild(selfLink);
+
 			user.item(0).setTextContent(context.getCurrentUser().getFullName());
 			Date now = new Date();
 			creationDate.item(0).setTextContent(now.toString());
