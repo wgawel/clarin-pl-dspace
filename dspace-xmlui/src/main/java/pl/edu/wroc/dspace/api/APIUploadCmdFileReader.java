@@ -1,9 +1,29 @@
 package pl.edu.wroc.dspace.api;
 
-import java.io.*;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.Map;
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.SourceResolver;
+import org.apache.cocoon.reading.AbstractReader;
+import org.apache.cocoon.servlet.multipart.Part;
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.FormatIdentifier;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import pl.edu.wroc.dspace.api.result.ResultSuccessAddFile;
+import pl.edu.wroc.dspace.api.result.elements.ApiBitstream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -14,36 +34,10 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import cz.cuni.mff.ufal.dspace.handle.Handle;
-import org.apache.avalon.framework.parameters.Parameters;
-import org.apache.cocoon.ProcessingException;
-import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.environment.SourceResolver;
-import org.apache.cocoon.reading.AbstractReader;
-import org.apache.cocoon.servlet.multipart.Part;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.apache.solr.common.util.FastInputStream;
-import org.dspace.app.util.Util;
-import org.dspace.app.xmlui.utils.ContextUtil;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.FormatIdentifier;
-import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import pl.edu.wroc.dspace.api.result.ResultSuccessAddFile;
-import pl.edu.wroc.dspace.api.result.elements.ApiBitstream;
+import java.io.*;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.Map;
 
 public class APIUploadCmdFileReader extends AbstractReader {
 
@@ -199,11 +193,11 @@ public class APIUploadCmdFileReader extends AbstractReader {
 			Document doc = docBuilder.parse(inputFile);
 
 			NodeList nodes = doc.getElementsByTagName("ResourceProxyList");
-			removeChilds(nodes.item(0));
-			nodes.item(0).appendChild(createResourceProxyElement(doc, bstramId));
+				removeChilds(nodes.item(0));
+				nodes.item(0).appendChild(createResourceProxyElement(doc, bstramId));
 
-			nodes = doc.getElementsByTagName("Resources");
-			nodes.item(0).appendChild(createIsPartOf(doc, oaiLink));
+				nodes = doc.getElementsByTagName("Resources");
+				nodes.item(0).appendChild(createIsPartOf(doc, oaiLink));
 
 			DOMSource source = new DOMSource(doc);
 			Result outputTarget = new StreamResult(outputStream);

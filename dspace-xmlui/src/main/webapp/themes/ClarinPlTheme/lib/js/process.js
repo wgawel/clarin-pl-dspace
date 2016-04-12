@@ -80,3 +80,9 @@ function exportMewex(link,email){
     	}
 	});
 }
+
+function exportArchive(link,rest,item, arch){
+	$.getJSON(link+"?url="+item);
+	$.getJSON(rest);
+	window.location.href = arch;
+}

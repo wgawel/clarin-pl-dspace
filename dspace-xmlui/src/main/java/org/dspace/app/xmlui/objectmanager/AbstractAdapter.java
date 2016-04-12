@@ -290,7 +290,8 @@ public abstract class AbstractAdapter
      */
     protected abstract String getMETSLabel() throws WingException;
 
-    
+    protected abstract boolean isInLongTermArchive() throws WingException;
+
 	/**
 	 * Render the complete METS document.
 	 */
@@ -317,6 +318,8 @@ public abstract class AbstractAdapter
     		attributes.put("ID", getMETSID());
     		attributes.put("PROFILE", getMETSProfile());
     		attributes.put("LABEL", getMETSLabel());
+            attributes.put("IN_PERMA_ARCHIVE", isInLongTermArchive());
+
     		String objid = getMETSOBJID();
     		if (objid != null)
             {

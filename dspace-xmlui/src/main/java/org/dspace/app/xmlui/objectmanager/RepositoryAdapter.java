@@ -7,8 +7,6 @@
  */
 package org.dspace.app.xmlui.objectmanager;
 
-import java.sql.SQLException;
-
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.Namespace;
 import org.dspace.app.xmlui.wing.WingException;
@@ -20,6 +18,8 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
+
+import java.sql.SQLException;
 
 /**
  * This is an an adapter which translates a DSpace repository into a METS 
@@ -123,7 +123,10 @@ public class RepositoryAdapter extends AbstractAdapter
         return "DSpace Repository";
     }
 
-    
+    protected boolean isInLongTermArchive() throws WingException {
+        return false;
+    }
+
     /**
      * 
      * 

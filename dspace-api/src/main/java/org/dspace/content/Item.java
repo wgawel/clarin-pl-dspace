@@ -7,16 +7,6 @@
  */
 package org.dspace.content;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -25,16 +15,16 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.IndexBrowse;
+import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.ChoiceAuthorityManager;
-import org.dspace.event.Event;
 import org.dspace.embargo.EmbargoManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierService;
@@ -44,6 +34,15 @@ import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.VersioningService;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Class representing an item in DSpace.
@@ -406,6 +405,16 @@ public class Item extends DSpaceObject
         }
     }
 
+    public boolean isInLongTermArchive(){return itemRow.getBooleanColumn("in_long_term_archive");}
+
+    public void setLongTermArchive(boolean value){
+        itemRow.setColumn("in_long_term_archive", value);
+        try {
+            DatabaseManager.update(ourContext, itemRow);
+        } catch (SQLException e) {
+            log.error("Unable to update long ter archive status", e);
+        }
+    }
     /**
      * Find out if the item is discoverable
      *
@@ -868,7 +877,7 @@ public class Item extends DSpaceObject
                 "AND bundle_id= ? ",
                 getID(), b.getID());
 
-        ourContext.addEvent(new Event(Event.REMOVE, Constants.ITEM, getID(), 
+        ourContext.addEvent(new Event(Event.REMOVE, Constants.ITEM, getID(),
                 Constants.BUNDLE, b.getID(), b.getName(), getIdentifiers(ourContext)));
 
         // If the bundle is orphaned, it's removed
@@ -1161,6 +1170,9 @@ public class Item extends DSpaceObject
                 itemRow.setColumn("process_status", "READY");
             }
 
+            if(itemRow.isColumnNull("in_long_term_archive")){
+                itemRow.setColumn("in_long_term_archive", false);
+            }
 
             DatabaseManager.update(ourContext, itemRow);
 

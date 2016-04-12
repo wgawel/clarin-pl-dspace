@@ -187,6 +187,45 @@ public class ProcessItems extends ItemsResource {
     }
 
     @GET
+    @Path("/{prefix}/{suffix}/add/archive")
+    public String addToArchive(
+            @PathParam("prefix") Integer prefix, @PathParam("suffix") Integer suffix, @QueryParam("expand") String expand,
+            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+    {
+        log.info("Reading item(handle=" + prefix + "/" + suffix + ").");
+        org.dspace.core.Context context = null;
+        try
+        {
+            context = createContext(getUser(headers));
+            org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
+
+            if(dso.getType() == Constants.ITEM) {
+                org.dspace.content.Item item = (Item) dso;
+                item.setLongTermArchive(true);
+                context.complete();
+                log.trace("Item(handle=" + prefix + "/" + suffix + ") was successfully read.");
+            }
+        }
+        catch (SQLException e)
+        {
+            processException("Could not read item(handle=" + prefix + "/" + suffix + "), SQLException. Message: " + e, context);
+        }
+        catch (ContextException e)
+        {
+            processException("Could not read item(handle=" + prefix + "/" + suffix + "), ContextException. Message: " + e.getMessage(), context);
+        }
+        finally
+        {
+            processFinally(context);
+        }
+
+        return "Added to Archive Item handle=" + prefix + "/" + suffix;
+    }
+
+
+
+    @GET
     @Path("/{prefix}/{suffix}/export/mewex")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String,String> exportToMewex(

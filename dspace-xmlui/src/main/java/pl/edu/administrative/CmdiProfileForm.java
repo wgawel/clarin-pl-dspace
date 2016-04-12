@@ -1,48 +1,31 @@
 /* Created for LINDAT/CLARIN */
 package pl.edu.administrative;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Vector;
-
-import org.apache.cocoon.environment.wrapper.RequestWrapper;
-import org.apache.cocoon.servlet.multipart.Part;
-import org.apache.log4j.Logger;
-import org.dspace.app.xmlui.aspect.administrative.FlowResult;
-import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
-import org.dspace.app.xmlui.wing.Message;
-import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Cell;
-import org.dspace.app.xmlui.wing.element.CheckBox;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Radio;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Text;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.core.Utils;
-import org.dspace.eperson.EPerson;
-
 import cz.cuni.mff.ufal.DSpaceApi;
 import cz.cuni.mff.ufal.ExtraLicenseField;
 import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseDefinition;
 import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseLabel;
 import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseResourceMapping;
 import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
+import org.apache.cocoon.environment.wrapper.RequestWrapper;
+import org.apache.log4j.Logger;
+import org.dspace.app.xmlui.aspect.administrative.FlowResult;
+import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.wing.Message;
+import org.dspace.app.xmlui.wing.WingException;
+import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Item;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Vector;
 
 
 /**
@@ -59,25 +42,14 @@ public class CmdiProfileForm extends AbstractDSpaceTransformer {
 	/** Language strings */
 	private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 	protected static final Message T_head_define = message("xmlui.Submission.submit.UFALLicenseStep.define.head");
-	protected static final Message T_define_add = message("xmlui.Submission.submit.UFALLicenseStep.define.add");
-	protected static final Message T_define_cancel = message("xmlui.Submission.submit.UFALLicenseStep.define.noadd");
     protected static final Message T_license_name = message("xmlui.Submission.submit.UFALLicenseStep.define.name");
     protected static final Message T_license_label = message("xmlui.administrative.item.DefineLicenseForm.license_labels");
     protected static final Message T_license_required = message("xmlui.administrative.item.DefineLicenseForm.license_required");
 	protected static final Message T_license_url = message("xmlui.Submission.submit.UFALLicenseStep.define.url");
 	protected static final Message T_license_confirmation = message("xmlui.Submission.submit.UFALLicenseStep.define.confirmation");
-	protected static final Message T_license_no_confirmation = message("xmlui.Submission.submit.UFALLicenseStep.define.no_confirmation");
-	protected static final Message T_license_once_confirmation = message("xmlui.Submission.submit.UFALLicenseStep.define.once_confirmation");
-	protected static final Message T_license_always_confirmation = message("xmlui.Submission.submit.UFALLicenseStep.define.always_confirmation");
-	protected static final Message T_delete_error_name = message("xmlui.Submission.submit.UFALLicenseStep.delete.error");
-	protected static final Message T_define_error = message("xmlui.Submission.submit.UFALLicenseStep.define.error");
-	protected static final Message T_define_error_name = message("xmlui.Submission.submit.UFALLicenseStep.define.noname");
-	protected static final Message T_define_error_url = message("xmlui.Submission.submit.UFALLicenseStep.define.nourl");
-
 
 	private static final Message T_save = message("xmlui.general.save");
 	private static final Message T_return = message("xmlui.general.return");
-
 
 	private static final Message T_title = message("xmlui.administrative.LicenseForm.title");
 	private static final Message T_trail = message("xmlui.administrative.LicenseForm.trail");
@@ -108,10 +80,10 @@ public class CmdiProfileForm extends AbstractDSpaceTransformer {
     		}
     	}
 
-		String baseURL = contextPath+"/admin/licenses?administrative-continue="+knot.getId();
+		String baseURL = contextPath+"/admin/profiles?administrative-continue="+knot.getId();
 
 		// DIVISION: main
-		Division main = body.addInteractiveDivision("edit-license", contextPath+"/admin/licenses", Division.METHOD_MULTIPART,"primary administrative licenses");
+		Division main = body.addInteractiveDivision("edit-license", contextPath+"/admin/profiles", Division.METHOD_MULTIPART,"primary administrative licenses");
 		main.setHead(T_head);
 
 		IFunctionalities functionalityManager = DSpaceApi.getFunctionalityManager();
@@ -317,13 +289,7 @@ public class CmdiProfileForm extends AbstractDSpaceTransformer {
 			options.addItem().addHighlight("bold").addXref(baseURL + "&license_define", new Message("default", "Define License"));
 			options.addItem().addXref(baseURL + "&label_define", new Message("default", "Define License Label"));
 			defineLicenseForm(main);
-		} else if(option.equals("label_define")) {
-			options.addItem().addXref(baseURL + "&license_list", new Message("default", "All Licenses"));
-			options.addItem().addXref(baseURL + "&license_define", new Message("default", "Define License"));
-			options.addItem().addHighlight("bold").addXref(baseURL + "&label_define", new Message("default", "Define License Label"));
-			defineLabel(main);
 		}
-
 		functionalityManager.closeSession();
 
 		main.addPara().addHidden("administrative-continue").setValue(knot.getId());
@@ -410,77 +376,6 @@ public class CmdiProfileForm extends AbstractDSpaceTransformer {
 			result.addError("licenseSelect");
 			result.setMessage(message("xmlui.administrative.item.EditItemLicenseForm.select_license"));
 		}
-		return result;
-	}
-
-	public static FlowResult defineLabel(Context context, RequestWrapper request) {
-		FlowResult result = new FlowResult();
-
-		String label = (String)request.get("label");
-		String title = (String)request.get("title");
-		String extended = (String)request.get("extended");
-		Object icon = request.get("icon");
-
-		EPerson currentUser = context.getCurrentUser();
-		if(currentUser == null) {
-			result.setMessage(message("xmlui.administrative.item.DefineLicenseForm.login_error"));
-			return result;
-		}
-
-		if(label==null || label.equals("")) {
-			result.setContinue(false);
-			result.setOutcome(false);
-			result.addError("Short label cannot be empty");
-		}
-
-		if(title==null || title.equals("")) {
-			result.setContinue(false);
-			result.setOutcome(false);
-			result.addError("Title cannot be empty");
-		}
-
-		Part filePart = null;
-
-		if(icon instanceof Part) {
-			filePart = (Part) icon;
-		}
-
-		if (filePart != null && filePart.getSize() > 0)
-		{
-			try {
-				InputStream is = filePart.getInputStream();
-
-				FileOutputStream fos = new FileOutputStream(ConfigurationManager.getProperty("dspace.dir") + "/webapps/xmlui/themes/UFAL/images/licenses/" + label.toLowerCase() + ".png");
-
-				Utils.bufferedCopy(is, fos);
-
-				fos.close();
-				is.close();
-
-			} catch (IOException e) {
-				result.setMessage(new Message("default", "Unable to upload icon file"));
-				return result;
-			}
-		} else {
-			result.setMessage(new Message("default", "Please specify a label icon"));
-			return result;
-		}
-
-		IFunctionalities functionalityMangager = DSpaceApi.getFunctionalityManager();
-		functionalityMangager.openSession();
-		boolean success = functionalityMangager.defineLicenseLabel(label, title, Boolean.parseBoolean(extended));
-		functionalityMangager.closeSession();
-
-		if(success) {
-			result.setContinue(true);
-			result.setOutcome(true);
-			result.setMessage(new Message("default", "Label created successfully"));
-		} else {
-			result.setContinue(false);
-			result.setOutcome(false);
-			result.setMessage(new Message("default", "Unable to create label"));
-		}
-
 		return result;
 	}
 
@@ -574,39 +469,6 @@ public class CmdiProfileForm extends AbstractDSpaceTransformer {
 		return result;
 	}
 
-	public static void defineLabel(Division main) throws WingException {
-    	Table table = main.addTable("defineLicenseLabel", 4, 2, "ds-table");
-    	table.setHead(new Message("default", "Define New Label"));
-
-    	Row r = table.addRow();
-    	Cell c = r.addCell();
-    	c.addContent(new Message("default", "Short Label"));
-    	c = r.addCell();
-		Text text = c.addText("label");
-		r = table.addRow();
-		c = r.addCell();
-		c.addContent(new Message("default", "Label Title"));
-		c = r.addCell();
-		text = c.addText("title");
-		r = table.addRow();
-		c = r.addCell();
-		c.addContent(new Message("default", "Is extended"));
-		c = r.addCell();
-		Select confirmation = c.addSelect("extended");
-		confirmation.addOption("true", new Message("default", "Yes"));
-		confirmation.addOption("false", new Message("default", "No"));
-		r = table.addRow();
-		c = r.addCell();
-		c.addContent(new Message("default", "Icon image"));
-		c = r.addCell();
-		c.addFile("icon");
-
-		r = table.addRow();
-		c = r.addCell();
-		c = r.addCell();
-		c.addButton("new_label_save").setValue(T_save);
-		c.addButton("new_label_return").setValue(T_return);
-	}
 
 	public static void defineLicenseForm(Division main) throws WingException {
     	Table table = main.addTable("defineLicense", 4, 2, "ds-table");

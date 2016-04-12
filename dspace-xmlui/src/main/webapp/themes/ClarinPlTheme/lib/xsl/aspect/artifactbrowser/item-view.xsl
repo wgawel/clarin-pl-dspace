@@ -22,10 +22,11 @@
 	<xsl:output indent="yes" />
 	<xsl:variable name="AUTH" select="/dri:document/dri:meta/dri:userMeta/@authenticated"/>
 	<xsl:variable name="user_email" select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='email']"/>
+
 	<xsl:template name="itemSummaryView-DIM">
 		<!-- Generate the info about the item from the metadata section -->
 		<xsl:apply-templates
-			select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim"
+			select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim"
 			mode="itemSummaryView-DIM" />
 
 		<!-- Generate the bitstream information from the file section -->
@@ -827,7 +828,8 @@
 			<h4>
 				<i class="fa fa-paperclip">&#160;</i>
 				<i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text>			
-				<xsl:if test="/mets:METS/@OBJID">							
+				<xsl:if test="/mets:METS/@OBJID">
+
 					<xsl:variable name="download-all-url"><xsl:value-of select="concat(/mets:METS/@OBJID,'/allzip')" /></xsl:variable>
 
 					<xsl:variable name="process-doc-url">
@@ -842,6 +844,9 @@
 					<xsl:variable name="export-to-inforex">
 						<xsl:value-of select="concat(confman:getProperty('dspace.baseUrl'), confman:getProperty('dspace.rest.process'), substring-after(/mets:METS/@ID,'hdl:'),'/export/inforex')" />
 					</xsl:variable>
+					<xsl:variable name="add-to-archive">
+						<xsl:value-of select="confman:getProperty('dspace.archive.url')" />
+					</xsl:variable>
 					<xsl:variable name="goto-freq-lists">
 						<xsl:value-of select="concat(/mets:METS/@OBJID, '/freqLists')" />
 					</xsl:variable>
@@ -852,6 +857,13 @@
 					        <xsl:call-template name="download-all">
 						        <xsl:with-param name="download-all-url" select="$download-all-url" />
 					        </xsl:call-template>
+							<!--
+							<xsl:if test="$AUTH = 'yes'">
+								<xsl:call-template name="add-to-archive">
+									<xsl:with-param name="add-to-archive" select="$add-to-archive" />
+								</xsl:call-template>
+							</xsl:if>
+							!-->
 						</dd>
 					</dl>
 
@@ -1093,6 +1105,7 @@
 		<div id="wielowyr-loading" class="label label-warning" style="display:none;">
 			Loading Mewex ...
 		</div>
+
 		<a id="export-to-wielowyr" class="label label-info" style="display:none;">
 			<xsl:attribute name="href">javascript:{}</xsl:attribute>
 			<xsl:attribute name="onclick">javascript:
@@ -1104,6 +1117,41 @@
 				<i18n:text>xmlui.UFAL.artifactbrowser.item-export-to-wielowyr</i18n:text>
 			</i18n:translate>
 		</a>
+	</xsl:template>
+
+	<xsl:template name="add-to-archive">
+		<xsl:param name="add-to-archive" />
+		<xsl:variable name="download-url" select="concat(confman:getProperty('dspace.baseUrl') ,/mets:METS/@OBJID)" />
+		<xsl:variable name="go-to-archive" select="confman:getProperty('dspace.archive-ui.url')" />
+		<xsl:variable name="rest-url" select="concat(confman:getProperty('dspace.rest'),'/process/items/handle/', substring-after(/mets:METS/@ID,'hdl:'),'/add/archive')" />
+
+		<xsl:choose>
+			<xsl:when test="/mets:METS/@IN_PERMA_ARCHIVE='no'">
+				<a id="add-to-archive" class="label label-info pull-right" style="margin-right:5px;">
+					<xsl:attribute name="href">javascript:{}</xsl:attribute>
+					<xsl:attribute name="onclick">javascript:
+						exportArchive('<xsl:value-of select="$add-to-archive" />',
+						'<xsl:value-of select="$rest-url" />',
+						'<xsl:value-of select="$download-url" />',
+						'<xsl:value-of select="$go-to-archive" />');
+					</xsl:attribute>
+
+					<i class="fa fa-exchange">&#160;</i>
+					<i18n:translate>
+						<i18n:text>xmlui.UFAL.artifactbrowser.item-add-to-archive</i18n:text>
+					</i18n:translate>
+				</a>
+			</xsl:when>
+			<xsl:otherwise>
+				<a id="go-to-archive" class="label label-info pull-right" style="margin-right:5px;">
+					<xsl:attribute name="href"><xsl:value-of select="$go-to-archive" /></xsl:attribute>
+					<i class="fa fa-exchange">&#160;</i>
+					<i18n:translate>
+						<i18n:text>xmlui.UFAL.artifactbrowser.item-go-to-archive</i18n:text>
+					</i18n:translate>
+				</a>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<xsl:template name="download-all">

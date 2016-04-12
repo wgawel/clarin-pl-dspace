@@ -13,11 +13,7 @@ import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Metadatum;
-import org.dspace.content.Item;
+import org.dspace.content.*;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
@@ -37,8 +33,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.*;
-
-import org.dspace.content.DSpaceObject;
 
 
 /**
@@ -177,7 +171,11 @@ public class ItemAdapter extends AbstractAdapter
     {
         return "DSpace Item";
     }
-    
+
+    protected boolean isInLongTermArchive() throws WingException {
+        return item.isInLongTermArchive();
+    }
+
     /**
      * Return a unique id for a bitstream.
      */
@@ -267,7 +265,8 @@ public class ItemAdapter extends AbstractAdapter
             {
                 attributes.put("withdrawn", "y");
             }
-            startElement(DIM,"dim",attributes);
+
+            startElement(DIM, "dim", attributes);
                         
                 Metadatum[] dcvs = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
                 for (Metadatum dcv : dcvs)

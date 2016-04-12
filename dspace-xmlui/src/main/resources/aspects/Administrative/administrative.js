@@ -35,6 +35,7 @@ importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowCurationUtil
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowMetadataImportUtils);
 importClass(Packages.cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.FlowHandleUtils);
 importClass(Packages.cz.cuni.mff.ufal.administrative.LicenseForm);
+importClass(Packages.pl.edu.administrative.CmdiProfileForm);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowBatchImportUtils);
 importClass(Packages.java.lang.System);
 importClass(Packages.org.dspace.core.ConfigurationManager);
@@ -667,6 +668,20 @@ function startLicenses()
         assertAdministrator();
 
         licenses();
+
+        cocoon.redirectTo(cocoon.request.getContextPath());
+        getDSContext().complete();
+        cocoon.exit();
+}
+
+/**
+ * Start (site-wide) Cmdi profiles
+ */
+function startProfiles()
+{
+        assertAdministrator();
+
+        profiles();
 
         cocoon.redirectTo(cocoon.request.getContextPath());
         getDSContext().complete();
@@ -3661,6 +3676,63 @@ function newLabel() {
         }
     } while (true);
 }
+
+function  profiles()
+{
+    listProfiles();
+
+    do {
+        if(cocoon.request.get("license_list"))
+        {
+            listProfiles();
+        }
+        else if(cocoon.request.get("license_define"))
+        {
+            //newLicense();
+        }
+        else
+        {
+            return null;
+        }
+    }
+    while (true);
+}
+function listProfiles()
+{
+    assertAdministrator();
+    var result;
+    var licenseIDs;
+    var del = false;
+    do {
+        if(del) {
+            sendPageAndWait("admin/profiles/main", {"licenseIDs":licenseIDs, "delete":true}, result);
+            del = false;
+        } else {
+            sendPageAndWait("admin/profiles/main", {"licenseIDs":licenseIDs}, result);
+        }
+
+        if(cocoon.request.get("edit")) {
+            result = null;
+            licenseIDs = cocoon.request.get("license_id");
+        } else if(cocoon.request.get("update")){
+           // result = LicenseForm.updateLicense(getDSContext(), cocoon.request);
+            licenseIDs = result.getParameter("licenseIDs");
+        } else if(cocoon.request.get("delete")) {
+            result = null;
+            licenseIDs = cocoon.request.get("license_id");
+            del = true;
+        } else if(cocoon.request.get("confirm")) {
+          //  result = LicenseForm.deleteLicense(getDSContext(), cocoon.request);
+            licenseIDs = "";
+        } else if(cocoon.request.get("cancel")) {
+            result = null;
+            licenseIDs = "";
+        } else {
+            return null;
+        }
+    } while (true)
+}
+
 
 
 function listLicenses()

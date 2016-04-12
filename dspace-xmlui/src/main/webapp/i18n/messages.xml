@@ -2926,6 +2926,8 @@
   <message key="xmlui.UFAL.artifactbrowser.item-process-doc">Process files to CCL</message>
   <message key="xmlui.UFAL.artifactbrowser.item-export-to-inforex">Export to Inforex</message>
   <message key="xmlui.UFAL.artifactbrowser.item-export-to-wielowyr">Export to MeWeX</message>
+  <message key="xmlui.UFAL.artifactbrowser.item-add-to-archive">Add to Archive</message>
+  <message key="xmlui.UFAL.artifactbrowser.item-go-to-archive">Go to Archive</message>
   <message key="xmlui.UFAL.artifactbrowser.item-goto-freq-lists">Make sense frequency list</message>
 </catalogue>
 

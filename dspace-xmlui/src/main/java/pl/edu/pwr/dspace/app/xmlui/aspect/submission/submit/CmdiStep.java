@@ -228,10 +228,13 @@ public class CmdiStep extends AbstractSubmissionStep {
 			creationDate.item(0).setTextContent(now.toString());
 			NodeList nodes = doc.getElementsByTagName("ResourceProxyList");
 			removeChilds(nodes.item(0));
+
 			try {
 				Bundle[] bundles = item.getBundles("ORIGINAL");
-				for(Bitstream b : bundles[0].getBitstreams()) {
-					nodes.item(0).appendChild(buildProxyElement(b, doc));
+				if(bundles.length > 0) {
+					for (Bitstream b : bundles[0].getBitstreams()) {
+						nodes.item(0).appendChild(buildProxyElement(b, doc));
+					}
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
