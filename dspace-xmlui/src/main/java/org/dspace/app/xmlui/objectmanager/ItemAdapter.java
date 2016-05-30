@@ -20,6 +20,7 @@ import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.eperson.Group;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.SAXOutputter;
@@ -788,18 +789,21 @@ public class ItemAdapter extends AbstractAdapter
         attributes = new AttributeMap();
         attributes.put("TYPE", "LOGICAL");
         attributes.put("LABEL", "DSpace");
+        attributes.put("ADM", Group.isMember(context, Group.ADMIN_ID));
         startElement(METS,"structMap",attributes);
 
         // ////////////////////////////////
         // Start the special first division
         attributes = new AttributeMap();
         attributes.put("TYPE", "DSpace Item");
+
         // add references to the Descriptive metadata
         if (dmdSecIDS != null)
         {
             attributes.put("DMDID", dmdSecIDS.toString());
         }
         // add references to the Administrative metadata
+
         if (amdSecIDS != null)
         {
             attributes.put("AMDID", amdSecIDS.toString());

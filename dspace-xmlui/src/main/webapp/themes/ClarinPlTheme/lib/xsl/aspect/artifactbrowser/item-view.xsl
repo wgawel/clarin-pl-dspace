@@ -851,19 +851,16 @@
 						<xsl:value-of select="concat(/mets:METS/@OBJID, '/freqLists')" />
 					</xsl:variable>
 					<xsl:variable name="baseURL" select="confman:getProperty('dspace.baseUrl')" />
-
                     <dl class="dl-horizontal">
 						<dd>
 					        <xsl:call-template name="download-all">
 						        <xsl:with-param name="download-all-url" select="$download-all-url" />
 					        </xsl:call-template>
-							<!--
-							<xsl:if test="$AUTH = 'yes'">
+							<xsl:if test="/mets:METS/mets:structMap[@ADM='yes']">
 								<xsl:call-template name="add-to-archive">
 									<xsl:with-param name="add-to-archive" select="$add-to-archive" />
 								</xsl:call-template>
 							</xsl:if>
-							!-->
 						</dd>
 					</dl>
 
