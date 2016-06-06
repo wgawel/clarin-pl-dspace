@@ -17,7 +17,7 @@ ufal.citation = {
 			//exportSpan.append("<span class='bold'><i class='fa fa-magic'>&#160;</i>Export to</span>");
 			for(var i=0;i<exportFormats.length;i++) {
 				var format = exportFormats[i];
-				var link = jQuery("<a>" + format + "</a>").appendTo(exportSpan);
+				var link = jQuery("<a>VIEW " + format + "</a>").appendTo(exportSpan);
 				link.css("margin-left", "2px");
 				link.css("text-transform", "uppercase");
 				link.css("margin-right", "2px");
@@ -144,7 +144,7 @@ ufal.citation = {
 		exporter_click : function(e) {
 			e.preventDefault();
 			var url = jQuery(this).attr("href");
-			var name = "extract_metadata_" + jQuery(this).html().toLowerCase();
+			var name = "extract_metadata_" + jQuery(this).html().toLowerCase().replace("view ","");
 			var targ = jQuery(this).attr("data-target");
 			var title = jQuery(this).attr("title");
 			jQuery(targ + " .modal-body").html("<i class='fa fa-spinner fa-spin' style='margin: auto;'>&#160;</i>");
@@ -194,7 +194,7 @@ ufal.citation = {
 $( ".cmdi" ).click(function(e) {
 	e.preventDefault();
     var url = jQuery(this).attr("href");
-   	var name = "extract_metadata_" + jQuery(this).html().toLowerCase();
+   	var name = "extract_metadata_" + jQuery(this).html().toLowerCase().replace("view ","");
    	var targ = jQuery(this).attr("data-target");
    	var title = "Item cmdi file"
    			jQuery(targ + " .modal-body").html("<i class='fa fa-spinner fa-spin' style='margin: auto;'>&#160;</i>");
