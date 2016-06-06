@@ -1012,7 +1012,7 @@
 						<xsl:attribute name="href">
 							<xsl:value-of select="@CMDI_LINK" />
 						</xsl:attribute>
-						<i18n:text>VIEW CMDI</i18n:text>
+						<i18n:text>CMDI</i18n:text>
 					</a>
 				</xsl:if>
 			</div>			
