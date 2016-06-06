@@ -17,7 +17,7 @@ ufal.citation = {
 			//exportSpan.append("<span class='bold'><i class='fa fa-magic'>&#160;</i>Export to</span>");
 			for(var i=0;i<exportFormats.length;i++) {
 				var format = exportFormats[i];
-				var link = jQuery("<a>" + format + "</a>").appendTo(exportSpan);
+				var link = jQuery("<a>VIEW " + format + "</a>").appendTo(exportSpan);
 				link.css("margin-left", "2px");
 				link.css("text-transform", "uppercase");
 				link.css("margin-right", "2px");
