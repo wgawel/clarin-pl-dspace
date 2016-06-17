@@ -262,7 +262,7 @@ public class CmdiStep extends AbstractSubmissionStep {
 	private Element buildProxyElement(Bitstream bitstream, Document doc){
 
 		String id = Integer.toString(bitstream.getID());
-		String handle = REST_URL + "/bitstreams/" + id;
+		String handle = REST_URL + "/bitstreams/" + id +"/retrieve";
 		String rType = "Resource";
 
 		if(bitstream.getCmdiBitstreamId()>0){
