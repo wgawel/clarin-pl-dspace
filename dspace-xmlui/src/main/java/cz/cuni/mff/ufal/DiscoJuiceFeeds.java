@@ -37,6 +37,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 public class DiscoJuiceFeeds extends AbstractGenerator {
     /**
@@ -173,8 +174,10 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
         System.setProperty("jsse.enableSNIExtension", old_value);
 
         Set<String> processedEntities = new HashSet<>();
+        //loop through disco cdn feeds
         for(String feed : feedsConfig.split(",")){
             Map<String, JSONObject> feedMap = toMap(DiscoJuiceFeeds.downloadJSON(discojuiceURL + feed.trim()));
+            //loop through entities in one feed
             for (Map.Entry<String, JSONObject> entry: feedMap.entrySet()){
                 String entityID = entry.getKey();
                 JSONObject cdnEntity = entry.getValue();
@@ -193,15 +196,19 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
                     if(country != null){
                             shibEntity.put("country", country);
                     }
-                    //rewrite countries
-                    if(rewriteCountries.contains(entityID)){
-                        String old_country = (String)shibEntity.remove("country");
-                        String new_country = guessCountry(shibEntity);
-                        shibEntity.put("country", new_country);
-                        log.info(String.format("For %s changed country from %s to %s", entityID, old_country, new_country));
-                    }
                     processedEntities.add(entityID);
                 }
+            }
+        }
+
+        //loop through shib entities, we show these...
+        for (JSONObject shibEntity : shibDiscoEntities.values()){
+            //rewrite or guess countries
+            if(rewriteCountries.contains(shibEntity.get("entityID")) || isBlank((String)shibEntity.get("country"))){
+                String old_country = (String)shibEntity.remove("country");
+                String new_country = guessCountry(shibEntity);
+                shibEntity.put("country", new_country);
+                log.info(String.format("For %s changed country from %s to %s", shibEntity.get("entityID"), old_country, new_country));
             }
         }
         JSONArray ret = new JSONArray();
