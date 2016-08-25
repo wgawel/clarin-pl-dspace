@@ -20,7 +20,7 @@ jQuery(document).ready(function() {
 			var div = jQuery(this);
 			var heading = jQuery(".error-heading", div);
 			var details = jQuery(".error-details", div);
-			heading.html('<i class="fa fa-warning fa-lg ">&#160;</i> Error');
+			heading.html('<i class="fa fa-warning fa-lg ">&#160;</i>' + jQuery.i18n._('Error'));
 			details.html('<div class="text-center" style="font-size: 130%;">' + jQuery.i18n._('An error has occured during authentication.') + '<br><a class="btn btn-sm btn-danger" style="margin: 10px;" href="' + jQuery('.helpdesk').attr('href') + '">' + jQuery.i18n._('Please contact our helpdesk') + '</a></div>');
 		});
 	};
