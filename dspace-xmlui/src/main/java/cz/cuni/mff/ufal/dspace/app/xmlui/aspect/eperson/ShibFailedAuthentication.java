@@ -23,6 +23,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 /**
  * modified for LINDAT/CLARIN
 */
@@ -53,6 +55,9 @@ public class ShibFailedAuthentication extends FailedAuthentication {
 		if ( o != null ) {
 			final Map<String, List<String>> headers = ((cz.cuni.mff.ufal.Headers) o).get();
 			String idpEntityId = headers.get("shib-identity-provider").get(0);
+			if(isBlank(idpEntityId)){
+				idpEntityId = find_idp(headers);
+			}
 			String cc = ConfigurationManager.getProperty("feedback.recipient");
 
 			redirectTo = String.format("%s/page/error?idpEntityId=%s&cc=%s&ourEntityId=%s",
@@ -61,4 +66,23 @@ public class ShibFailedAuthentication extends FailedAuthentication {
 		}
 		response.sendRedirect(response.encodeRedirectURL(redirectTo));
 	}
+
+	private static String find_idp( Map<String, java.util.List<String>> headers ) {
+		java.util.List<String> ret = find_shibboleth_header_value(headers, "Shib-Identity-Provider");
+		return ret == null ? "unknown" : ret.get(0);
+	}
+	private static java.util.List<String> find_shibboleth_header_value(
+			Map<String, java.util.List<String>> headers,
+			String to_find)
+	{
+		to_find = to_find.toLowerCase();
+		for ( String key : headers.keySet() )
+		{
+			if ( key.toLowerCase().equals(to_find) ) {
+				return headers.get(key);
+			}
+		}
+		return null;
+	}
+
 }
