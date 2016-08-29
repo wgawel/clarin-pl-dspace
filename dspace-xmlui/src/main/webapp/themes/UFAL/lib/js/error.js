@@ -9,20 +9,9 @@ jQuery(document).ready(function() {
 			sParameterName = sURLVariables[i].split('=');
 	
 			if (sParameterName[0] === sParam) {
-				return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+				return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]).replace(/</g, "&lt;").replace(/>/g, "&gt;");
 			}
 		}
-	};
-
-	var error = function() {
-		jQuery(".aai-error").each(function() {
-			jQuery("#loading").hide();			
-			var div = jQuery(this);
-			var heading = jQuery(".error-heading", div);
-			var details = jQuery(".error-details", div);
-			heading.html('<i class="fa fa-warning fa-lg ">&#160;</i>' + jQuery.i18n._('Error'));
-			details.html('<div class="text-center" style="font-size: 130%;">' + jQuery.i18n._('An error has occured during authentication.') + '<br><a class="btn btn-sm btn-danger" style="margin: 10px;" href="' + jQuery('.helpdesk').attr('href') + '">' + jQuery.i18n._('Please contact our helpdesk') + '</a></div>');
-		});
 	};
 
 	var aagregatorUrl = "https://clarin-aa.ms.mff.cuni.cz/aaggreg/v1/";
@@ -31,6 +20,17 @@ jQuery(document).ready(function() {
 	var idpEntityId = getUrlParameter("idpEntityId");
 	var ourEntityId = getUrlParameter("ourEntityId");
 	var cc = getUrlParameter("cc");
+
+	var error = function() {
+		jQuery(".aai-error").each(function() {
+			jQuery("#loading").hide();
+			var div = jQuery(this);
+			var heading = jQuery(".error-heading", div);
+			var details = jQuery(".error-details", div);
+			heading.html('<i class="fa fa-warning fa-lg ">&#160;</i>' + jQuery.i18n._('Error'));
+			details.html('<div class="text-center" style="font-size: 130%;">' + jQuery.i18n._("The login process can\'t continue because your home institution (%s) did not send the required information. Please click the button and send us an email. You\'ll be also helping your colleagues.", idpEntityId) + '<br><a class="btn btn-sm btn-danger" style="margin: 10px;" href="' + jQuery('.helpdesk').attr('href') + '">' + jQuery.i18n._('Please contact our helpdesk') + '</a></div>');
+		});
+	};
 	
 	
 
@@ -62,7 +62,7 @@ jQuery(document).ready(function() {
 					function(idp, attrs) {
 						var data = idp[0];
 						var attr_data = attrs[0];
-						if (data.result.length < 1 || attr_data.result.length < 1) {
+						if (!data.ok || data.result.length < 1 || attr_data.result.length < 1) {
 							error();
 							return;
 						}
