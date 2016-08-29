@@ -190,10 +190,12 @@ public class ControlPanelBitstreams extends AbstractControlPanelTab {
 											+ " AND deleted='f'");
 							
 							for(Bitstream b : tobeUpdatedBitstreams) {
-								b = Bitstream.find(context, b.getID());
-								b.setFormat(bfn);
-								b.update();
-								changes += 1;
+								if(b.getFormat().getID()!=bfn.getID()) {
+									b = Bitstream.find(context, b.getID());
+									b.setFormat(bfn);
+									b.update();
+									changes += 1;
+								}
 							}										
 						
 						}
