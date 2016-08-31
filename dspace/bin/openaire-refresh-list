@@ -55,5 +55,6 @@ done
 echo -e "\n$XML_CLOSE_ELEMENTS" >> $FILE
 
 mv $FILE $FINAL_FILE
+chmod a+r $FINAL_FILE
 
 echo "> Ended \"$0\" execution."
