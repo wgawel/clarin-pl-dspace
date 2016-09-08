@@ -73,8 +73,10 @@ public class ReplicationManager {
 	//only one replication job at a time
 	private static ExecutorService executor = Executors.newFixedThreadPool(1);	
 
-	public static boolean initialize() throws Exception {
-		boolean res = false;
+	public static boolean initialize() {
+		if(ReplicationManager.isInitialized()){
+			return true;
+		}
 		config = new Properties();
 		populateConfig(config);
 
@@ -90,8 +92,7 @@ public class ReplicationManager {
 		}
 
 		replicationService = new HackedDataSet(config);
-		res = replicationService.initB2safeConnection();
-		return res;
+		return replicationService.initB2safeConnection();
 	}
 	
 	public static Properties getConfiguration(){

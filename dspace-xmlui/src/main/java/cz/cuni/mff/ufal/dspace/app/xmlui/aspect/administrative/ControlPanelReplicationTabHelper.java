@@ -67,16 +67,12 @@ public class ControlPanelReplicationTabHelper {
 
 		if(isReplicationOn) {
 			
-			// if not initialized try initializing it
-			if (!ReplicationManager.isInitialized()) {
-				try {
-					ReplicationManager.initialize();
-				} catch (Exception e) {
+			// if not initialized try initializing it, show error if it fails
+			if (!ReplicationManager.initialize()) {
 					List info = mainDiv.addList("replication-config");
-					info.addItem().addContent(e.toString());
+					info.addItem().addContent("Failed to initialize ReplicationManager");
 					return;
-				}
-			}					
+			}
 			
 			Map<String, String> serverInfo = null;
 			try {
