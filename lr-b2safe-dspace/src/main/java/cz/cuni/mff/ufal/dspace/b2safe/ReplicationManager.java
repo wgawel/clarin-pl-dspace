@@ -92,7 +92,14 @@ public class ReplicationManager {
 		}
 
 		replicationService = new HackedDataSet(config);
-		return replicationService.initB2safeConnection();
+		if(!replicationService.initB2safeConnection()){
+			//imo DataSet should do a proper cleanup
+			replicationService.closeConnection();
+			replicationService = null;
+			return false;
+		}else {
+			return true;
+		}
 	}
 	
 	public static Properties getConfiguration(){
