@@ -459,6 +459,13 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 	}
 
 	@Override
+	public List<LicenseResourceUserAllowance> getSignedLicensesByDate(int firstRecord, int limit) {
+		return (List<LicenseResourceUserAllowance>) hibernateUtil
+				.findByCriterieWithLimits(LicenseResourceUserAllowance.class, firstRecord, limit,
+						Order.desc("createdOn"));
+	}
+
+	@Override
 	public List<LicenseResourceUserAllowance> getSignedLicensesByUser(
 			int eperson_id) {
 		return (List<LicenseResourceUserAllowance>) hibernateUtil
