@@ -21,6 +21,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
@@ -746,16 +751,20 @@ public class UploadStep extends AbstractProcessingStep
  
         String filePath = null;        
         InputStream fileInputStream = null;
-        URI file = null;
-        
+
         try {
         	filePath = (String)request.getAttribute("fileLocal");
         	if(filePath.startsWith("/")) {
         		filePath = "file://" + filePath;
-         	}
-        	file = new URI(filePath);
-        	URL url = file.toURL();
-        	fileInputStream = url.openStream();
+                fileInputStream = new URI(filePath).toURL().openStream();
+         	}else {
+                try (CloseableHttpClient client = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build()) {
+                    HttpGet httpGet = new HttpGet(filePath);
+                    try (CloseableHttpResponse getResponse = client.execute(httpGet)) {
+                        fileInputStream = getResponse.getEntity().getContent();
+                    }
+                }
+            }
         }catch(IllegalArgumentException e) {
         	return STATUS_NOT_FOUND;
         }catch(MalformedURLException e) {
@@ -806,7 +815,7 @@ public class UploadStep extends AbstractProcessingStep
             b = bundles[0].createBitstream(fileInputStream);
         }
 
-        File f = new File(file.getPath());
+        File f = new File(filePath);
         b.setName(f.getName());
         b.setSource(filePath);
         b.setDescription(fileDescription);
