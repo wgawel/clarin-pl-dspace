@@ -1037,6 +1037,7 @@
 	<message key="xmlui.Submission.submit.UploadStep.submit_remove_all">Remove All Files</message>
 	<message key="xmlui.Submission.submit.UploadStep.column_checksum">Checksum</message>
 	<message key="xmlui.Submission.submit.UploadStep.column_order">Order</message>
+	<message key="xmlui.Submission.submit.UploadStep.review.no_file">You didn't upload any file.</message>
 
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Upload File(s)</message>
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file">File</message>

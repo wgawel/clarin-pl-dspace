@@ -164,6 +164,8 @@ public class UploadStep extends AbstractSubmissionStep
     protected static final Message T_column_order =
             message("xmlui.Submission.submit.UploadStep.column_order");
 
+    protected static final Message T_review_no_file = message("xmlui.Submission.submit.UploadStep.review.no_file");
+
     /**
      * Global reference to edit file page
      * (this is used when a user requests to edit a bitstream)
@@ -586,7 +588,7 @@ public class UploadStep extends AbstractSubmissionStep
         }
 
         if(bitstreams.length==0){
-        	uploadSection.addItem("You didn't upload any file.");
+        	uploadSection.addItem(T_review_no_file);
         }
         
         // return this new "upload" section
