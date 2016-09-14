@@ -204,7 +204,7 @@ public class InstallItem
             Item replaced_item = (Item) HandleManager.resolveToObject( c, handle_of_replaced );
             if ( null != replaced_item )
             {
-                if (!item.isReplacedBy())
+                if (!replaced_item.isReplacedBy())
                 {
                     String url_of_item = String.format(
                         "%s%s", handle_prefix, item.getHandle());
