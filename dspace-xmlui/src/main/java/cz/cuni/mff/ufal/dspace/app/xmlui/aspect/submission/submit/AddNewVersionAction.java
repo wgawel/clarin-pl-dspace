@@ -141,6 +141,9 @@ public class AddNewVersionAction extends AbstractAction
         //this is a new item; discard old provenance records
         item.clearMetadata("dc", "description", "provenance", Item.ANY);
 
+        //clear featured services
+        item.clearMetadata("local", "featuredService", Item.ANY, Item.ANY);
+
         //add new PID if enabled
         try {
             FlowUtils.reservePID(context, String.valueOf(workspaceItem.getID()));
