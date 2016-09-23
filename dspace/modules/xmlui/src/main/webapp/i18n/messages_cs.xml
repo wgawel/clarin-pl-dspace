@@ -61,7 +61,7 @@
 
 	<!--  session expired  -->
 	<message key="xmlui.SessionExpired.title">Vaše relace vypršela</message>
-	<message key="xmlui.SessionExpired.head">Pro přihlášení a pokračování kliněte </message>
+	<message key="xmlui.SessionExpired.head">Pro přihlášení a pokračování klikněte </message>
 	<message key="xmlui.SessionExpired.para1">V případě problémů, prosím, kontaktujte </message>
 
 	<!--
@@ -236,11 +236,11 @@
 	<message key="xmlui.Administrative.WithdrawnItems.title.item.title">Stažené záznamy dle názvu</message>
 	<message key="xmlui.Administrative.WithdrawnItems.trail.item.title">Stažené záznamy dle názvu</message>
 
-	<message key="xmlui.Administrative.WithdrawnItems.title.item.dateissued">Stažené záznamy dle názvu data publikování</message>
-	<message key="xmlui.Administrative.WithdrawnItems.trail.item.dateissued">Stažené záznamy dle názvu data publikování</message>
+	<message key="xmlui.Administrative.WithdrawnItems.title.item.dateissued">Stažené záznamy dle data publikování</message>
+	<message key="xmlui.Administrative.WithdrawnItems.trail.item.dateissued">Stažené záznamy dle data publikování</message>
 
-	<message key="xmlui.Administrative.WithdrawnItems.title.item.dateaccessioned">Stažené záznamy dle názvu data zaslání</message>
-	<message key="xmlui.Administrative.WithdrawnItems.trail.item.dateaccessioned">Stažené záznamy dle názvu data zaslání</message>
+	<message key="xmlui.Administrative.WithdrawnItems.title.item.dateaccessioned">Stažené záznamy dle data zaslání</message>
+	<message key="xmlui.Administrative.WithdrawnItems.trail.item.dateaccessioned">Stažené záznamy dle data zaslání</message>
 
 	<!-- org.dspace.app.xmlui.administrative.PrivateItems.java -->
 	<message key="xmlui.Administrative.PrivateItems.title.item.title">Soukromé záznamy dle názvu</message>
@@ -382,14 +382,14 @@
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.unknown">neznámý</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.login">Pokračujte na přihlašovací obrazovku.</message>
 	
-        <message key="xmlui.ArtifactBrowser.RestrictedItem.head_item_withdrawn">Tento záznam byla vyřazena</message>
+        <message key="xmlui.ArtifactBrowser.RestrictedItem.head_item_withdrawn">Tento záznam byl vyřazen</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_withdrawn">Vybraný záznam byl vyřazen a není nadále dostupný.</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted_auth">Vybraný záznam je záznam s omezeným přístupem a pro jeho zobrazení musíte mít potřebná oprávnění. Prosím, pro zobrazení tohoto záznamu se přihlaste.</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted">Váš účet nemá potřebná oprávnění pro zobrazení tohoto záznamu. Jestli máte jakékoliv nejasnosti, obraťte se na <a class="helpdesk-tolink">poradnu</a>.</message>
 	
 	<!-- Authentication messages used at the top of the login page:  -->
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.auth_header">Toto je záznam s omezeným přístupem</message>	
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.auth_message">Záznam, ke kterému se pokoušíte přistupovat, je záznam s omezeným přístupem a jeho zobrazení vyžaduje oprávnění. Prosím, přihlaste se pro získání přístupu k záznamu.</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.auth_message">Záznam, ke kterému se pokoušíte přistoupit, je záznam s omezeným přístupem a jeho zobrazení vyžaduje oprávnění. Prosím, přihlaste se pro získání přístupu k záznamu.</message>
 
     <message key="xmlui.ArtifactBrowser.StatisticsViewer.choose_month">měsíční sestavy</message>
     <message key="xmlui.ArtifactBrowser.StatisticsViewer.report.title">Statistický souhrn</message>
@@ -399,13 +399,13 @@
 
     <!-- Authentication messages used for bitstream authentication -->
 	<message key="xmlui.BitstreamReader.auth_header">Toto je soubor s omezeným přístupem</message>	
-	<message key="xmlui.BitstreamReader.auth_message">Soubor, ke kterému se pokoušíte přistupovat, je soubor s omezeným přístupem a jeho zobrazení vyžaduje oprávnění. Prosím, přihlaste se pro získání přístupu k souboru.</message>
-	<message key="xmlui.BitstreamReader.auth_embargo_message">Soubor, ke kterému se pokoušíte přistupovat, je soubor s omezeným přístupem. Autor na něj umístil embargo. To znamená, že v budoucnu bude k dispozici. Můžete zkusit autora kontaktovat přímo, nebo použijte naši <a class="helpdesk-tolink">poradnu</a>.</message>
+	<message key="xmlui.BitstreamReader.auth_message">Soubor, ke kterému se pokoušíte přistoupit, je soubor s omezeným přístupem a jeho zobrazení vyžaduje oprávnění. Prosím, přihlaste se pro získání přístupu k souboru.</message>
+	<message key="xmlui.BitstreamReader.auth_embargo_message">Soubor, ke kterému se pokoušíte přistoupit, je soubor s omezeným přístupem. Autor na něj umístil embargo. To znamená, že v budoucnu bude k dispozici. Můžete zkusit autora kontaktovat přímo, nebo použijte naši <a class="helpdesk-tolink">poradnu</a>.</message>
 
 
 	<!-- Export Archive download messages -->
 	<message key="xmlui.ItemExportDownloadReader.auth_header">Toto je exportní archiv s omezeným přístupem</message>
-	<message key="xmlui.ItemExportDownloadReader.auth_message">Exportní archiv, ke kterému se pokoušíte přistupovat, je zdroj s omezeným přístupem a jeho zobrazení vyžaduje oprávnění. Prosím, přihlaste se pro získání přístupu k exportnímu archivu.</message>
+	<message key="xmlui.ItemExportDownloadReader.auth_message">Exportní archiv, ke kterému se pokoušíte přistoupit, je zdroj s omezeným přístupem a jeho zobrazení vyžaduje oprávnění. Prosím, přihlaste se pro získání přístupu k exportnímu archivu.</message>
 
 
 	<!-- REQUEST COPY -->
@@ -469,7 +469,7 @@
 	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.title">Požadavek na změnu oprávnění</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.trail">Požadavek na změnu oprávnění</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.head">Požadavek na změnu oprávnění</message>
-	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.para1">Můžete využít tuto příležitost na opětovné zvážení omezení tohoto dokumentu (aby jste nemuseli odpovídat na tyto požadavky), pokud není důvod pro zachování omezení dokumentu. Pokud tak chcete učinit, po vložení vašeho jména a emailu (pro ověření) klikněte na tlačítko „Změnit na Open Access“.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.para1">Můžete využít tuto příležitost na opětovné zvážení omezení tohoto dokumentu (abyste nemuseli odpovídat na tyto požadavky), pokud není důvod pro zachování omezení dokumentu. Pokud tak chcete učinit, po vložení vašeho jména a emailu (pro ověření) klikněte na tlačítko „Změnit na Open Access“.</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.name">Jméno</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.email">Email</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.name.error">Jméno je nutné vyplnit</message>
@@ -557,7 +557,7 @@
 	<message key="xmlui.EPerson.EditProfile.create_password_instructions">Prosím, vložte nové heslo do níže uvedeného pole a potvrďte ho opětovným zadáním do druhého pole. Mělo by mít nejméně šest znaků.</message>
 	<message key="xmlui.EPerson.EditProfile.password">Heslo</message>
 	<message key="xmlui.EPerson.EditProfile.confirm_password">Napište znovu pro potvrzení</message>
-	<message key="xmlui.EPerson.EditProfile.submit_update">Dokonči registraci</message>
+	<message key="xmlui.EPerson.EditProfile.submit_update">Dokončit registraci</message>
 	<message key="xmlui.EPerson.EditProfile.submit_create">Aktualizovat profil</message>
 	<message key="xmlui.EPerson.EditProfile.error_required">Toto pole je povinné</message>
 	<message key="xmlui.EPerson.EditProfile.error_invalid_password">Vyberte si heslo dlouhé alespoň 6 znaků</message>
@@ -771,7 +771,7 @@
 	<message key="xmlui.Submission.Submissions.workflow_submit_return">Vrátit vybrané úlohy do zásobníku</message>
 	<message key="xmlui.Submission.Submissions.workflow_info2">Nebyli vám přiděleny žádné úlohy</message>
 	<message key="xmlui.Submission.Submissions.workflow_head3">Úlohy v zásobníku</message>
-	<message key="xmlui.Submission.Submissions.workflow_submit_take">Převzít vybrané úkoly</message>
+	<message key="xmlui.Submission.Submissions.workflow_submit_take">Převzít vybrané úlohy</message>
 	<message key="xmlui.Submission.Submissions.workflow_info3">Žádné úlohy v zásobníku</message>
 	<!-- Same transformer, submissions section -->
 	<message key="xmlui.Submission.Submissions.submit_head1">Příspěvky</message>
@@ -813,7 +813,7 @@
 	<message key="xmlui.Submission.Submissions.completed.column2">Název</message>
 	<message key="xmlui.Submission.Submissions.completed.column3">Kolekce</message>
 	<message key="xmlui.Submission.Submissions.completed_submit_add_new_version">Přidat novou verzi</message>
-	<message key="xmlui.Submission.Submissions.completed.limit">Část vašich archivovaných příspěvků je zobrazen výše.</message>
+	<message key="xmlui.Submission.Submissions.completed.limit">Část vašich archivovaných příspěvků je zobrazena výše.</message>
 	<message key="xmlui.Submission.Submissions.completed.displayall">Zobrazit všechny mé archivované příspěvky</message>
 
 
@@ -855,7 +855,7 @@
 
 	<!-- org.dspace.app.xmlui.Submission.submit.SaveOrRemoveStep -->
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.head">Uložit nebo zrušit váš příspěvek?</message>
-	<message key="xmlui.Submission.submit.SaveOrRemoveStep.info1">Chcete příspěvek odstranit nebo jej chcete uložit pro pozdější dokončení? Na proces odeslání se můžete vrátit, i když jste omylem klikli na Ukončit.</message>
+	<message key="xmlui.Submission.submit.SaveOrRemoveStep.info1">Chcete příspěvek odstranit nebo jej chcete uložit pro pozdější dokončení? K procesu odeslání se můžete vrátit, i když jste omylem klikli na Ukončit.</message>
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_back">Pokračovat v odeslání</message>
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_save">Uložit pro pozdější dokončení</message>
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_remove">Odstranit záznam</message>
@@ -895,7 +895,7 @@
         <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.title">Předmětové kategorie</message>
         <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.filter.label">Filtrovat předměty</message>
         <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.filter.button">Filtrovat</message>
-        <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.loading">Prosím, čekejte na načítání řízeného slovníku.</message>
+        <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.loading">Prosím, čekejte na načtení řízeného slovníku.</message>
         <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.error">Vyskytl se problém s načtením řízeného slovníku. Zkuste to, prosím, znovu později.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.missing_field">Vyplňte prosím všechna pole.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.regexp_error">Hodnota neodpovídá danému regulárnímu výrazu (formátu) "{0}"</message>
@@ -913,7 +913,7 @@
 	<message key="xmlui.ufal.HandleRemoved.head">Tento Handle byl vymazán</message>
 	<message key="xmlui.ufal.HandleRemoved.trail_item">Záznam</message>
 	<message key="xmlui.ufal.HandleRemoved.trail_handle_removed">Smazaný Handle</message>
-	<message key="xmlui.ufal.HandleRemoved.message">Tento záznam již neexistuje. Myslíte-li si, že by existova měl, kontaktujte naši <a class="helpdesk-tolink">poradnu</a>.</message>
+	<message key="xmlui.ufal.HandleRemoved.message">Tento záznam již neexistuje. Myslíte-li si, že by existovat měl, kontaktujte naši <a class="helpdesk-tolink">poradnu</a>.</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.UFALLicenseStep -->
 	<message key="xmlui.Submission.submit.UFALLicenseStep.define.head">Definovat novou licenci</message>
@@ -931,7 +931,7 @@
 	<message key="xmlui.Submission.submit.UFALLicenseStep.define">Definovat novou licenci</message>
 	<message key="xmlui.Submission.submit.UFALLicenseStep.delete">Smazat některou z vašich licencí</message>
 	<message key="xmlui.Submission.submit.UFALLicenseStep.notselect_error">Žádná licence nebyla vybrána. Jednu prosím vyberte, nebo použijte průvodce výběrem.</message>
-	<message key="xmlui.Submission.submit.UFALLicenseStep.license_select_help">Vyberte licenci pod kterou budeme distribuovat vaši práci.</message>
+	<message key="xmlui.Submission.submit.UFALLicenseStep.license_select_help">Vyberte licenci, pod kterou budeme distribuovat vaši práci.</message>
 	<message key="xmlui.Submission.submit.UFALLicenseStep.license_select_delete_help">Vyberte licenci k vymazání.</message>
 	<message key="xmlui.Submission.submit.UFALLicenseStep.license_select">Licence</message>
 	<message key="xmlui.Submission.submit.UFALLicenseStep.define.nourl">Nevyplněno URL.</message>
@@ -952,7 +952,7 @@
 	<message key="xmlui.ufal.UFALLicenceAgreement.head">Licenční ujednání</message>
 	<message key="xmlui.ufal.UFALLicenceAgreement.trail_item">Záznam</message>
 	<message key="xmlui.ufal.UFALLicenceAgreement.trail_license_agreement">Licenční ujednání</message>
-	<message key="xmlui.ufal.UFALLicenceAgreement.agree_message">Požadovaný obsah je distribuován pod jednou (či více) licencí. Musíte odsouhlasit licence níže, dřív než bude možné k obsahu přistoupit. Text licencí zobrazíte kliknutím na tlačítka. Čtěte prosím pozorně. Data vyplněná níže mohou být sdílena s autorem záznamu a nebo k vytváření statistik.</message>
+	<message key="xmlui.ufal.UFALLicenceAgreement.agree_message">Požadovaný obsah je distribuován pod jednou (či více) licencí. Musíte odsouhlasit licence níže, dřív než bude možné k obsahu přistoupit. Text licencí zobrazíte kliknutím na tlačítka. Čtěte prosím pozorně. Data vyplněná níže mohou být sdílena s autorem záznamu a nebo použita k vytváření statistik.</message>
 	<message key="xmlui.ufal.UFALLicenceAgreement.functionality_blocked">Funkce UFALLicenceAgreement je vypnutá (v konfiguraci).</message>
 	<message key="xmlui.ufal.UFALLicenceAgreement.signer_message">Kliknutím na tlačítko níže JÁ, PODEPSANÝ s výše uvedeným ID, souhlasím s <b>LICENCEMI</b> omezujícími užití požadovaných souborů.</message>
 
@@ -968,7 +968,7 @@
 	<message key="xmlui.ufal.UFALLicenceAgreementAgreed.functionality_blocked">Funkce UFALLicenceAgreement je vypnutá (v konfiguraci).</message>
 	<message key="xmlui.ufal.UFALLicenceAgreementAgreed.signer_message">Kliknutím na tento odkaz link JÁ, PODEPSANÝ s výše uvedeným ID, souhlasím s <b>LICENCEMI</b> omezujícími užití požadovaných souborů.</message>
 	<message key="xmlui.ufal.UFALLicenceAgreementAgreed.user_login_error">Uživatel není přihlášen: UFALLicenceAgreement nemůže pokračovat!</message>
-	<message key="xmlui.ufal.UFALLicenceAgreementAgreed.successful_signed_message">{0} Licence for soubor {1} úspěšně podepsal {2}.</message>
+	<message key="xmlui.ufal.UFALLicenceAgreementAgreed.successful_signed_message">{0} Licence pro soubor {1} úspěšně podepsal {2}.</message>
 	<message key="xmlui.ufal.UFALLicenceAgreementAgreed.continue_message">Pokud stahování nezačne automaticky, prosím klikněte zde.</message>
 	<message key="xmlui.ufal.UFALLicenceAgreementAgreed.technical_problem">Vyskytl se technický problém. Kontaktujte poradnu</message>
 
@@ -979,7 +979,7 @@
         <message key="xmlui.Submission.submit.AccessStep.embargo">Embargo na přístup do určeného data</message>
         <message key="xmlui.Submission.submit.AccessStep.embargo_visible">Viditelný/embargo</message>
         <message key="xmlui.Submission.submit.AccessStep.name">Název</message>
-        <message key="xmlui.Submission.submit.AccessStep.name_help">Krátký, popisní název politiky (do 30 znaků). Může se zobrazit koncovému uživateli. Např. „Pouze pro zaměstnance“. Nepovinný, ale doporučuje se vyplnit.</message>
+        <message key="xmlui.Submission.submit.AccessStep.name_help">Krátký, popisný název politiky (do 30 znaků). Může se zobrazit koncovému uživateli. Např. „Pouze pro zaměstnance“. Nepovinný, ale doporučuje se vyplnit.</message>
         <message key="xmlui.Submission.submit.AccessStep.description">Popis</message>
         <message key="xmlui.Submission.submit.AccessStep.reason">Důvod</message>
         <message key="xmlui.Submission.submit.AccessStep.reason_help">Důvod embarga. Typicky pouze pro interní využití. Nepovinný.</message>
@@ -990,7 +990,7 @@
         <message key="xmlui.Submission.submit.AccessStep.error_duplicated_policy">Identická politika pro tuto skupinu a tuto operaci již existuje.</message>
         <message key="xmlui.Submission.submit.AccessStep.table_policies">Seznam politik</message>
         <message key="xmlui.Submission.submit.AccessStep.policies_help">Politiky uvedené v této sekci mají prioritu před jakýmikoliv výchozími politikami kolekcí, do kterých přidáváte záznam. Pokud si přejete nastavit embargo, ale cílová kolekce umožňuje přístup pro libovolného uživatele, musíte nastavit politiku, která povoluje přístup pro skupinu Anonymous pouze od určitého data dále.</message>
-        <message key="xmlui.Submission.submit.AccessStep.no_policies">Pro tento záznam nebyli nastaveny žádné skupinové politiky.</message>
+        <message key="xmlui.Submission.submit.AccessStep.no_policies">Pro tento záznam nebyly nastaveny žádné skupinové politiky.</message>
         <message key="xmlui.Submission.submit.AccessStep.new_policy_head">Embargo</message>
         <message key="xmlui.Submission.submit.AccessStep.private_settings">Soukromý záznam</message>
         <message key="xmlui.Submission.submit.AccessStep.private_settings_help">Pokud je volba vybrána, záznam se nebude prohledávat</message>
@@ -1177,9 +1177,9 @@
 	<message key="xmlui.Submission.workflow.PerformTaskStep.curate_submit">Spravovat záznam</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.commit_help">Pokud jste již záznam editovali, použijte tuto volbu pro zapsání záznamu do archivu.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.commit_submit">Uložit do archivu</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_help">Jestli jste zkontrolovali záznam a je <strong>ne</strong>vhodný na vložení do kolekce, vyberte „Zamítnout“. Do následující zprávy pak vyplňte proč je záznam nevhodný a zda by měl odesílatel něco změnit a záznam znovu odeslat.</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_help">Jestli jste zkontrolovali záznam a je <strong>ne</strong>vhodný pro vložení do kolekce, vyberte „Zamítnout“. Do následující zprávy pak vyplňte proč je záznam nevhodný a zda by měl odesílatel něco změnit a záznam znovu odeslat.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_submit">Zamítnout záznam</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_help">Vyberte tuto volbu pro změnu metadat záznamu. Bude nutno vyplnit všechna požadované pole.</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_help">Vyberte tuto volbu pro změnu metadat záznamu. Bude nutno vyplnit všechna požadovaná pole.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_submit">Editovat metadata</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.return_help">Vrátit tuto úlohu do zásobníku tak, aby ji mohl provést jiný uživatel.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.return_submit">Vrátit úlohu do zásobníku</message>
@@ -1916,7 +1916,7 @@
 	<message key="xmlui.administrative.item.EditItemLicenseForm.select_license">Prosím zvolte licenci!</message>
 	<message key="xmlui.administrative.item.DefineLicenseForm.license_labels">Licenční nálepky</message>
 	<message key="xmlui.administrative.item.DefineLicenseForm.license_required">Vyžadované doplňující informace o uživatelích.</message>
-	<message key="xmlui.administrative.item.DefineLicenseForm.login_error">Pro vykonání této akce se prosím přihlašte.</message>
+	<message key="xmlui.administrative.item.DefineLicenseForm.login_error">Pro vykonání této akce se prosím přihlaste.</message>
 	<message key="xmlui.administrative.item.DefineLicenseForm.success_message">Nová licence úspěšně přidána.</message>
 	<message key="xmlui.administrative.item.DefineLicenseForm.already_exists">Licence již existuje.</message>
 	<message key="xmlui.administrative.item.DefineLicenseForm.unknown_error">Licenci se nezdařilo přidat.</message>
