@@ -291,14 +291,14 @@
 	<message key="xmlui.ArtifactBrowser.Contact.para1">Správce {0} můžete kontaktovat na:</message>
 	<message key="xmlui.ArtifactBrowser.Contact.feedback_label">Online formulář</message>
 	<message key="xmlui.ArtifactBrowser.Contact.feedback_link">Vyjádření názoru</message>
-	<message key="xmlui.ArtifactBrowser.Contact.email">Email</message>
+	<message key="xmlui.ArtifactBrowser.Contact.email">E-mail</message>
 	
 	<!-- org.dspace.app.xmlui.artifactbrowser.FeedbackForm.java -->
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.title">Vyjádření názoru</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.trail">Vyjádření názoru</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.head">Vyjádření názoru</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Děkujeme, že jste věnovali svůj čas na sdělení názoru. Vašich připomínek si vážíme!</message>
-	<message key="xmlui.ArtifactBrowser.FeedbackForm.email">Vaše emailová adresa</message>
+	<message key="xmlui.ArtifactBrowser.FeedbackForm.email">Vaše e-mailová adresa</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.email_help">Na tuto adresu budou zaslány odpovědi na vaše komentáře.</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.comments">Komentáře</message>
 	<message key="xmlui.ArtifactBrowser.FeedbackForm.submit">Vyjádření názoru</message>
@@ -416,8 +416,8 @@
     <message key="xmlui.ArtifactBrowser.ItemRequestForm.login_para">Uživatelé tohoto systému se mohou přihlásit pro zobrazení tohoto dokumentu.</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestForm.login">Přihlásit se</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestForm.para1">Pro vyžádání kopie dokumentu od odpovědné osoby vyplňte následující informace.</message>
-	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail">Vaše emailová adresa</message>
-	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail_help">Tato emailová adresa se použije pro zaslání dokumentu</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail">Vaše e-mailová adresa</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail_help">Tato e-mailová adresa se použije pro zaslání dokumentu</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestForm.requesterEmail.error">Adresu je nutné vyplnit</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestForm.message">Zpráva</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestForm.message.error">Zprávu je nutné vyplnit</message>
@@ -469,11 +469,11 @@
 	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.title">Požadavek na změnu oprávnění</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.trail">Požadavek na změnu oprávnění</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.head">Požadavek na změnu oprávnění</message>
-	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.para1">Můžete využít tuto příležitost na opětovné zvážení omezení tohoto dokumentu (abyste nemuseli odpovídat na tyto požadavky), pokud není důvod pro zachování omezení dokumentu. Pokud tak chcete učinit, po vložení vašeho jména a emailu (pro ověření) klikněte na tlačítko „Změnit na Open Access“.</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.para1">Můžete využít tuto příležitost na opětovné zvážení omezení tohoto dokumentu (abyste nemuseli odpovídat na tyto požadavky), pokud není důvod pro zachování omezení dokumentu. Pokud tak chcete učinit, po vložení vašeho jména a e-mailu (pro ověření) klikněte na tlačítko „Změnit na Open Access“.</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.name">Jméno</message>
-	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.email">Email</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.email">E-mail</message>
     <message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.name.error">Jméno je nutné vyplnit</message>
-	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.email.error">Emailovou adresu je nutné vyplnit</message>
+	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.email.error">E-mailovou adresu je nutné vyplnit</message>
 	<message key="xmlui.ArtifactBrowser.ItemRequestChangeStatusForm.changeToOpen">Změnit na Open Access</message>
 	        
 	<!-- org.dspace.app.xmlui.artifactbrowser.ItemRequestResponseFalseForm.java -->
@@ -549,9 +549,9 @@
 	<message key="xmlui.EPerson.EditProfile.telephone">Kontaktní telefon</message>
 	<message key="xmlui.EPerson.EditProfile.language">Jazyk</message>
 	<message key="xmlui.EPerson.EditProfile.subscriptions">Odběry</message>
-	<message key="xmlui.EPerson.EditProfile.subscriptions_help">Můžete se přihlásit k odběru denních oznámení o nových záznamech v kolekcích prostřednictvím e-mailu. Tímto způsobem můžete sledovat libovolný počet kolekcí podle vašeho přání. Jinou alternativou k denním oznámením emailem je použití kanálů RSS, které jsou dostupné pro každou kolekci.</message>
+	<message key="xmlui.EPerson.EditProfile.subscriptions_help">Můžete se přihlásit k odběru denních oznámení o nových záznamech v kolekcích prostřednictvím e-mailu. Tímto způsobem můžete sledovat libovolný počet kolekcí podle vašeho přání. Jinou alternativou k denním oznámením e-mailem je použití kanálů RSS, které jsou dostupné pro každou kolekci.</message>
 	<message key="xmlui.EPerson.EditProfile.signatures">Podepsané licence</message>
-	<message key="xmlui.EPerson.EditProfile.email_subscriptions">Odběry emailem</message>
+	<message key="xmlui.EPerson.EditProfile.email_subscriptions">Odběry e-mailem</message>
 	<message key="xmlui.EPerson.EditProfile.select_collection">( Vyberte kolekci )</message>
 	<message key="xmlui.EPerson.EditProfile.update_password_instructions">Můžete vložit nové heslo do níže uvedeného pole a potvrdit ho opětovným zadáním do druhého pole. Mělo by mít nejméně šest znaků.</message>
 	<message key="xmlui.EPerson.EditProfile.create_password_instructions">Prosím, vložte nové heslo do níže uvedeného pole a potvrďte ho opětovným zadáním do druhého pole. Mělo by mít nejméně šest znaků.</message>
@@ -569,10 +569,10 @@
 	<message key="xmlui.EPerson.EditProfile.signed_licenses">Podepsané licence</message>
 
 	<!-- org.dspace.app.xmlui.eperson.EPersonUtils.java -->
-	<message key="xmlui.EPerson.EPersonUtils.register_verify_email">Ověření emailu</message>
+	<message key="xmlui.EPerson.EPersonUtils.register_verify_email">Ověření e-mailu</message>
 	<message key="xmlui.EPerson.EPersonUtils.register_create_profile">Vytvořit profil</message>
 	<message key="xmlui.EPerson.EPersonUtils.register_finished">Hotovo</message>
-	<message key="xmlui.EPerson.EPersonUtils.forgot_verify_email">Ověření emailu</message>
+	<message key="xmlui.EPerson.EPersonUtils.forgot_verify_email">Ověření e-mailu</message>
 	<message key="xmlui.EPerson.EPersonUtils.forgot_reset_password">Vygenerovat heslo</message>
 	<message key="xmlui.EPerson.EPersonUtils.forgot_finished">Hotovo</message>
 
@@ -585,7 +585,7 @@
 	<message key="xmlui.EPerson.InvalidToken.title">Neplatný token</message>
 	<message key="xmlui.EPerson.InvalidToken.trail">Neplatný token</message>
 	<message key="xmlui.EPerson.InvalidToken.head">Neplatný token</message>
-	<message key="xmlui.EPerson.InvalidToken.para1">URL, které jste poskytli, je neplatné. Váš emailový klient mohl rozdělit URL na několik řádků následovně:</message>
+	<message key="xmlui.EPerson.InvalidToken.para1">URL, které jste poskytli, je neplatné. Váš e-mailový klient mohl rozdělit URL na několik řádků následovně:</message>
 	<message key="xmlui.EPerson.InvalidToken.para2">Pokud se tak stalo, měli byste zkopírovat celé URL do adresního řádku vašeho prohlížeče místo kliknutí na něj. Adresní řádek by měl pak obsahovat něco jako:</message>
 	
 	<!-- org.dspace.app.xmlui.eperson.Navigation.java -->
@@ -610,7 +610,7 @@
 	<message key="xmlui.EPerson.PasswordLogin.trail">Přihlášení</message>
 	<message key="xmlui.EPerson.PasswordLogin.head1">Přihlášení do repozitáře</message>
 	<message key="xmlui.EPerson.PasswordLogin.email_address">E-mailová adresa</message>
-	<message key="xmlui.EPerson.PasswordLogin.error_bad_login">Emailová adresa nebo heslo, které jste zadali, nebyly správné.</message>
+	<message key="xmlui.EPerson.PasswordLogin.error_bad_login">E-mailová adresa nebo heslo, které jste zadali, nebyly správné.</message>
 	<message key="xmlui.EPerson.PasswordLogin.password">Heslo</message>
 	<message key="xmlui.EPerson.PasswordLogin.forgot_link">Zapomněli jste heslo?</message>
 	<message key="xmlui.EPerson.PasswordLogin.submit">Přihlášení</message>
@@ -686,23 +686,23 @@
 	<!-- org.dspace.app.xmlui.eperson.StartForgotPassword.java -->
 	<message key="xmlui.EPerson.StartForgotPassword.title">Zapomenuté heslo</message>
 	<message key="xmlui.EPerson.StartForgotPassword.head">Zapomenuté heslo</message>
-	<message key="xmlui.EPerson.StartForgotPassword.para1">Zadejte emailovou adresu, kterou jste uvedli při registraci. Na tuto adresu bude zaslán email s dalšími instrukcemi.</message>
+	<message key="xmlui.EPerson.StartForgotPassword.para1">Zadejte e-mailovou adresu, kterou jste uvedli při registraci. Na tuto adresu bude zaslán e-mail s dalšími instrukcemi.</message>
 	<message key="xmlui.EPerson.StartForgotPassword.email_address">E-mailová adresa</message>
-	<message key="xmlui.EPerson.StartForgotPassword.email_address_help">Zadejte stejnou emailovou adresu, kterou jste použili při registraci.</message>
+	<message key="xmlui.EPerson.StartForgotPassword.email_address_help">Zadejte stejnou e-mailovou adresu, kterou jste použili při registraci.</message>
 	<message key="xmlui.EPerson.StartForgotPassword.error_not_found">E-mailová adresa nenalezena.</message>
 	<message key="xmlui.EPerson.StartForgotPassword.submit">Odeslat informace</message>
 	
 	<!-- org.dspace.app.xmlui.eperson.StartRegistration.java -->
 	<message key="xmlui.EPerson.StartRegistration.title">Registrace nového uživatele</message>
-	<message key="xmlui.EPerson.StartRegistration.head1">Email je již v systému registrován</message>
-	<message key="xmlui.EPerson.StartRegistration.para1">Tuto emailovou adresu již používá jiný účet. Chcete-li vygenerovat heslo pro tento účet, klikněte na tlačítko dole.</message>
+	<message key="xmlui.EPerson.StartRegistration.head1">E-mail je již v systému registrován</message>
+	<message key="xmlui.EPerson.StartRegistration.para1">Tuto e-mailovou adresu již používá jiný účet. Chcete-li vygenerovat heslo pro tento účet, klikněte na tlačítko dole.</message>
 	<message key="xmlui.EPerson.StartRegistration.reset_password_for">Vygenerovat heslo pro</message>
 	<message key="xmlui.EPerson.StartRegistration.submit_reset">Vygenerovat heslo</message>
 	<message key="xmlui.EPerson.StartRegistration.head2">Registrace nového uživatele</message>
 	<message key="xmlui.EPerson.StartRegistration.para2">Zaregistrujte si účet, abyste se mohli přihlásit k odběru aktualizací kolekcí a zasílat nové záznamy.</message>
 	<message key="xmlui.EPerson.StartRegistration.email_address">E-mailová adresa</message>
 	<message key="xmlui.EPerson.StartRegistration.email_address_help">Tato adresa bude ověřena a použita jako vaše přihlašovací jméno.</message>
-	<message key="xmlui.EPerson.StartRegistration.error_bad_email">Nepodařilo se zaslat email na tuto adresu.</message>
+	<message key="xmlui.EPerson.StartRegistration.error_bad_email">Nepodařilo se zaslat e-mail na tuto adresu.</message>
 	<message key="xmlui.EPerson.StartRegistration.submit_register">Zaregistrovat se</message>
 	
 	<!-- org.dspace.app.xmlui.eperson.VerifyEmail.java -->
@@ -758,7 +758,7 @@
 	<message key="xmlui.Submission.Submissions.trail">Příspěvky</message>
 	<message key="xmlui.Submission.Submissions.head">Příspěvky a úlohy workflow</message>
 	<message key="xmlui.Submission.Submissions.untitled"><i>Nepojmenovaný</i></message>
-	<message key="xmlui.Submission.Submissions.email">email:</message>
+	<message key="xmlui.Submission.Submissions.email">e-mail:</message>
 	<!-- Same transformer, workflow section -->
 	<message key="xmlui.Submission.Submissions.workflow_head1">Úlohy workflow</message>
 	<message key="xmlui.Submission.Submissions.workflow_info1">Tyto úlohy jsou záznamy, které čekají na schválení před přidáním do repozitáře. Existují dvě fronty úloh. Jedna pro úlohy, které jste se rozhodli přijmout, a druhá pro úlohy, které zatím nikdo nepřijal.</message>
@@ -1141,7 +1141,7 @@
 	<message key="xmlui.Submission.submit.LicenseStep.morelicense_head">Žádná z daných licencí mi nevyhovuje</message>
 	<message key="xmlui.Submission.submit.LicenseStep.morelicense_line1">Pokud potřebujete licenci, kterou momentálně nepodporujeme, postupujte následovně:</message>
 	<message key="xmlui.Submission.submit.LicenseStep.morelicense_line2">Získejte odkaz na vlastní text licence.</message>
-	<message key="xmlui.Submission.submit.LicenseStep.morelicense_line3">Pošlete <a class="helpdesk-tolink">nám</a> email s detaily licence.</message>
+	<message key="xmlui.Submission.submit.LicenseStep.morelicense_line3">Pošlete <a class="helpdesk-tolink">nám</a> e-mail s detaily licence.</message>
 	<message key="xmlui.Submission.submit.LicenseStep.morelicense_line4">Uložte váš nedokončený příspěvek a vyčkejte, než vaši licenci přidáme do seznamu. Ozveme se, až se tak stane.</message>
 	<message key="xmlui.Submission.submit.LicenseStep.morelicense_line5">Poté budete moci pokračovat s vaším příspěvkem.</message>
 
@@ -1212,7 +1212,7 @@
 	<message key="xmlui.administrative.FlowCurationUtils.queue_failed_notice">Úlohu nebylo možné zařadit do fronty. Pro další informace prosím kontaktujte <a class="helpdesk-tolink">poradnu</a> nebo zkontrolujte protokol systému.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.add_eperson_success_notice">Uživatel byl úspěšně přidán.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.edit_eperson_success_notice">Uživatel byl úspěšně editován.</message>
-	<message key="xmlui.administrative.FlowEPersonUtils.reset_password_success_notice">Uživateli byla zaslána emailová zpráva obsahující token, který může využít k výběru nového hesla.</message>
+	<message key="xmlui.administrative.FlowEPersonUtils.reset_password_success_notice">Uživateli byla zaslána e-mailová zpráva obsahující token, který může využít k výběru nového hesla.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.reset_netid_success_notice">Netid bylo úspěšně resetováno.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.delete_eperson_success_notice">Uživatel byl úspěšně smazán.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.delete_eperson_failed_notice">Uvedení uživatelé nebyli smazáni, protože existují omezení zabraňující jejich smazání. Další informace na stránce podrobností e-osoby.</message>
@@ -1314,7 +1314,7 @@
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_column1"/>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_column2">ID</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_column3">Jméno</message>
-	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_column4">Email</message>
+	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_column4">E-mail</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.submit_delete">Smazat e-osobu</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.no_results">Hledání nepřineslo žádné výsledky...</message>
 		
@@ -1323,9 +1323,9 @@
 	<message key="xmlui.administrative.eperson.AddEPersonForm.title">Přidat e-osobu</message>
 	<message key="xmlui.administrative.eperson.AddEPersonForm.trail">Přidat e-osobu</message>
 	<message key="xmlui.administrative.eperson.AddEPersonForm.head1">Vytvořit nového uživatele</message>
-	<message key="xmlui.administrative.eperson.AddEPersonForm.email_taken">Tuto emailovou adresu již používá jiná e-osoba. E-maily musí být jedinečné.</message>
+	<message key="xmlui.administrative.eperson.AddEPersonForm.email_taken">Tuto e-mailovou adresu již používá jiná e-osoba. E-maily musí být jedinečné.</message>
 	<message key="xmlui.administrative.eperson.AddEPersonForm.head2">Informace nové e-osoby:</message>
-	<message key="xmlui.administrative.eperson.AddEPersonForm.error_email_unique">Emailová adresa musí být jedinečná</message>
+	<message key="xmlui.administrative.eperson.AddEPersonForm.error_email_unique">E-mailová adresa musí být jedinečná</message>
 	<message key="xmlui.administrative.eperson.AddEPersonForm.error_email">Požadována je e-mailová adresa</message>
 	<message key="xmlui.administrative.eperson.AddEPersonForm.error_fname">Křestní jméno je povinné</message>
 	<message key="xmlui.administrative.eperson.AddEPersonForm.error_lname">Příjmení je povinné</message>
@@ -1342,9 +1342,9 @@
 	<message key="xmlui.administrative.eperson.EditEPersonForm.title">Editovat e-osobu</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.trail">Editovat e-osobu</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.head1">Editovat e-osobu</message>
-	<message key="xmlui.administrative.eperson.EditEPersonForm.email_taken">Tuto emailovou adresu již používá jiná e-osoba. E-maily musí být jedinečné.</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.email_taken">Tuto e-mailovou adresu již používá jiná e-osoba. E-maily musí být jedinečné.</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.head2">Informace o uživateli {0}:</message>
-	<message key="xmlui.administrative.eperson.EditEPersonForm.error_email_unique">Emailová adresa musí být jedinečná</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.error_email_unique">E-mailová adresa musí být jedinečná</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.error_email">Požadována je e-mailová adresa</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.error_fname">Křestní jméno je povinné</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.error_lname">Příjmení je povinné</message>
@@ -1376,7 +1376,7 @@
 	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.submit_confirm">Potvrdit smazání</message>
 	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.head_id">ID</message>
 	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.head_name">Jméno</message>
-	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.head_email">Email</message>
+	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.head_email">E-mail</message>
 
 	<!-- general items for all of the group classes -->
 	<message key="xmlui.administrative.group.general.group_trail">Spravovat skupiny</message>
@@ -1423,7 +1423,7 @@
 	<message key="xmlui.administrative.group.EditGroupForm.no_results">Hledání nepřineslo žádné výsledky...</message>
 	<message key="xmlui.administrative.group.EditGroupForm.epeople_column1">ID</message>
 	<message key="xmlui.administrative.group.EditGroupForm.epeople_column2">Jméno</message>
-	<message key="xmlui.administrative.group.EditGroupForm.epeople_column3">Email</message>
+	<message key="xmlui.administrative.group.EditGroupForm.epeople_column3">E-mail</message>
 	<message key="xmlui.administrative.group.EditGroupForm.epeople_column4"/>
 	<message key="xmlui.administrative.group.EditGroupForm.groups_column1">ID</message>
 	<message key="xmlui.administrative.group.EditGroupForm.groups_column2">Jméno</message>
@@ -1434,7 +1434,7 @@
 	<message key="xmlui.administrative.group.EditGroupForm.members_head">Členové</message>
 	<message key="xmlui.administrative.group.EditGroupForm.members_column1">ID</message>
 	<message key="xmlui.administrative.group.EditGroupForm.members_column2">Jméno</message>
-	<message key="xmlui.administrative.group.EditGroupForm.members_column3">Email</message>
+	<message key="xmlui.administrative.group.EditGroupForm.members_column3">E-mail</message>
 	<message key="xmlui.administrative.group.EditGroupForm.members_column4"/>
 	<message key="xmlui.administrative.group.EditGroupForm.members_group_name">skupina: {0}</message>	
 	<message key="xmlui.administrative.group.EditGroupForm.members_none">Tato skupina nemá žádné členy.</message>
@@ -1870,7 +1870,7 @@
 	<!-- org.dspace.app.xmlui.administrative.item.EditItemStatusForm -->
 	<message key="xmlui.administrative.item.EditItemStatusForm.title">Stav záznamu</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.trail">Stav záznamu</message>
-	<message key="xmlui.administrative.item.EditItemStatusForm.para1">Vítejte na stránce správy záznamů. Odsud můžete vyřadit, znovu zařadit, přesunout nebo smazat záznam. Na dalších záložkách můžete také aktualizovat nebo přidávat nová metadata a bitové toky.</message>
+	<message key="xmlui.administrative.item.EditItemStatusForm.para1">Vítejte na stránce správy záznamů. Odsud můžete vyřadit, znovu zařadit, přesunout nebo smazat záznam. Na dalších kartách můžete také aktualizovat nebo přidávat nová metadata a bitové toky.</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.label_id">Interní ID záznamu</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.label_handle">Handle</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.label_modified">Poslední změna</message>
@@ -1931,23 +1931,23 @@
 	<message key="xmlui.administrative.LicenseForm.head1">Spravovat licence</message>
 
 	<!-- These keys will map to the labels for extra license fields in LicenseForm -->
-	<message key="xmlui.ExtraLicenseField.LicenseForm.SEND_TOKEN">Uživatel dostane email s detaily, jak záznam stáhnout.</message>
+	<message key="xmlui.ExtraLicenseField.LicenseForm.SEND_TOKEN">Uživatel dostane e-mail s detaily, jak záznam stáhnout.</message>
 	<message key="xmlui.ExtraLicenseField.LicenseForm.NAME">Jméno</message>
 	<message key="xmlui.ExtraLicenseField.LicenseForm.DOB">Datum narození</message>
 	<message key="xmlui.ExtraLicenseField.LicenseForm.ADDRESS">Adresa</message>
 	<message key="xmlui.ExtraLicenseField.LicenseForm.COUNTRY">Země</message>
-	<message key="xmlui.ExtraLicenseField.LicenseForm.EXTRA_EMAIL">Vyžádat si další emailovou adresu.</message>
+	<message key="xmlui.ExtraLicenseField.LicenseForm.EXTRA_EMAIL">Vyžádat si další e-mailovou adresu.</message>
 	<message key="xmlui.ExtraLicenseField.LicenseForm.ORGANIZATION">Vyžádat si uživatelovu organizaci (volitelně).</message>
 	<message key="xmlui.ExtraLicenseField.LicenseForm.REQUIRED_ORGANIZATION">Vyžádat si uživatelovu organizaci (povinně).</message>
 	<message key="xmlui.ExtraLicenseField.LicenseForm.INTENDED_USE">Vyžádat si plánované použití záznamu.</message>
 
 	<!-- These keys will map to the labels for extra license fields during LicenseStep in submission -->
-	<message key="xmlui.ExtraLicenseField.submission.SEND_TOKEN">Dostanete email s detaily, jak záznam stáhnout.</message>
+	<message key="xmlui.ExtraLicenseField.submission.SEND_TOKEN">Dostanete e-mail s detaily, jak záznam stáhnout.</message>
 	<message key="xmlui.ExtraLicenseField.submission.NAME">Jméno a příjmení</message>
 	<message key="xmlui.ExtraLicenseField.submission.DOB">Datum narození</message>
 	<message key="xmlui.ExtraLicenseField.submission.ADDRESS">Adresa</message>
 	<message key="xmlui.ExtraLicenseField.submission.COUNTRY">Země</message>
-	<message key="xmlui.ExtraLicenseField.submission.EXTRA_EMAIL">Email</message>
+	<message key="xmlui.ExtraLicenseField.submission.EXTRA_EMAIL">E-mail</message>
 	<message key="xmlui.ExtraLicenseField.submission.ORGANIZATION">Organizace</message>
 	<message key="xmlui.ExtraLicenseField.submission.REQUIRED_ORGANIZATION">Organizace</message>
 	<message key="xmlui.ExtraLicenseField.submission.INTENDED_USE">Zamýšlené použití</message>
@@ -2552,8 +2552,8 @@
 	<message key="xmlui.statistics.Navigation.piwik.title">Piwik Statistiky<span class='label label-important' style='font-size: 14px;'>BETA</span></message>
 	<message key="xmlui.statistics.piwik.trail">Piwik Statistiky</message>
 
-	<message key="PiwikStatisticsTransformer.already_subscribed">  Na váš email již pravidelné měsíční zprávy o tomto záznamu dostáváte</message>
-	<message key="PiwikStatisticsTransformer.get_monthly">  Dostávat pravidelně každý měsíc zprávy o tomto záznamu emailem (pouze v angličtině)</message>
+	<message key="PiwikStatisticsTransformer.already_subscribed">  Na váš e-mail již pravidelné měsíční zprávy o tomto záznamu dostáváte</message>
+	<message key="PiwikStatisticsTransformer.get_monthly">  Dostávat pravidelně každý měsíc zprávy o tomto záznamu e-mailem (pouze v angličtině)</message>
 	<message key="PiwikStatisticsTransformer.subscribe">Přihlásit</message>
 	<message key="PiwikStatisticsTransformer.unsubscribe">Zrušit</message>
 
@@ -3231,7 +3231,7 @@
 	<message key="xmlui.aspect.submission.submit.DisplayShareLink.title">Sdílet odkaz</message>
 	<message key="xmlui.aspect.submission.submit.DisplayShareLink.trail">Sdílet odkaz</message>
 	<message key="xmlui.aspect.submission.submit.DisplayShareLink.head">Sdílet odkaz</message>
-	<message key="xmlui.aspect.submission.submit.DisplayShareLink.para">Chcete-li tento záznam předat někomu jinému, předejte tento odkaz: <span class="linkify">{0}</span>. Odkaz vám také přijde emailem (v angličtině).</message>
+	<message key="xmlui.aspect.submission.submit.DisplayShareLink.para">Chcete-li tento záznam předat někomu jinému, předejte tento odkaz: <span class="linkify">{0}</span>. Odkaz vám také přijde e-mailem (v angličtině).</message>
 
 	<!-- UFAL/lib/xsl/core/navigation.xsl -->
 	<message key="xmlui.UFAL.navigation.menu_head">Kde začít?</message>
@@ -3459,7 +3459,7 @@
 	<message key="input_forms.complex_definitions.contact_person.1_givenname.label">Vlastní jméno kontaktní osoby</message>
 	<message key="input_forms.complex_definitions.contact_person.2_surname.label">Příjmení kontaktní osoby</message>
 	<message key="input_forms.complex_definitions.contact_person.2_surname.help">Rodinné jméno</message>
-	<message key="input_forms.complex_definitions.contact_person.3_email.label">Email kontaktní osoby</message>
+	<message key="input_forms.complex_definitions.contact_person.3_email.label">E-mail kontaktní osoby</message>
 	<message key="input_forms.complex_definitions.contact_person.4_affiliation.label">Organizace kontaktní osoby</message>
 	<message key="input_forms.complex_definitions.funding.4_type.label">Druh financí</message>
 	<message key="input_forms.complex_definitions.funding.2_code.placeholder">Začněte psát jméno/číslo grantu...</message>
