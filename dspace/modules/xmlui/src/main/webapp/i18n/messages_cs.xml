@@ -1664,7 +1664,7 @@
         <message key="xmlui.administrative.authorization.EditPolicyForm.label_end_date">Datum konce</message>
         <message key="xmlui.administrative.authorization.EditPolicyForm.error_date_format">Neplatné datum</message>
         <message key="xmlui.administrative.authorization.EditPolicyForm.error_duplicated_policy">Identická politika pro tuto skupinu a tuto operaci již existuje.</message>
-        <message key="xmlui.administrative.authorization.EditPolicyForm.error_start_date_greater_than_end_date">Datum začátku je vyšší než datum konce</message>
+        <message key="xmlui.administrative.authorization.EditPolicyForm.error_start_date_greater_than_end_date">Datum začátku je po datu konce</message>
         <message key="xmlui.administrative.authorization.EditPolicyForm.label_date_help">Akceptovaný formát: yyyy, yyyy-mm, yyyy-mm-dd</message>
 	
 	<!-- org.dspace.app.xmlui.administrative.authorization.AdvacedAuthorizationsForm -->
@@ -1689,7 +1689,7 @@
         <message key="xmlui.administrative.authorization.AdvancedAuthorizationsForm.actions_start_date">Datum začátku</message>
         <message key="xmlui.administrative.authorization.AdvancedAuthorizationsForm.actions_end_date">Datum konce</message>
         <message key="xmlui.administrative.authorization.AdvancedAuthorizationsForm.error_date_format">Neplatné datum</message>
-        <message key="xmlui.administrative.authorization.AdvancedAuthorizationsForm.error_start_date_greater_than_end_date">Datum začátku je vyšší než datum konce</message>
+        <message key="xmlui.administrative.authorization.AdvancedAuthorizationsForm.error_start_date_greater_than_end_date">Datum začátku je po datu konce</message>
         <message key="xmlui.administrative.authorization.AdvancedAuthorizationsForm.error_groupIds">Vyberte alespoň jednu skupinu</message>
         <message key="xmlui.administrative.authorization.AdvancedAuthorizationsForm.error_collectionIds">Vyberte alespoň jednu kolekci</message>
 
@@ -1824,9 +1824,9 @@
 	<message key="xmlui.administrative.item.EditBitstreamForm.format_default">Formát není v seznamu</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.para2">Není-li formát uveden na seznamu výše, <strong>vyberte „Formát není v seznamu“ výše</strong> popište ho v poli níže.</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.user_label">Jiný formát</message>
-	<message key="xmlui.administrative.item.EditBitstreamForm.user_help">Aplikace, kterou jste použili na vytvoření souboru a číslo verze (např. „<i>ACMESoft SuperApp verze 1.5</i>“).</message>
+	<message key="xmlui.administrative.item.EditBitstreamForm.user_help">Aplikace, kterou jste použili k vytvoření souboru a číslo verze (např. „<i>ACMESoft SuperApp verze 1.5</i>“).</message>
 	<message key="xmlui.administrative.item.EditBitstreamForm.name_label">Název souboru:</message>
-	<message key="xmlui.administrative.item.EditBitstreamForm.name_help">Změna názvu soubory tohoto bitového toku. Tímto se změní zobrazený URL bitového toku, ale staré odkazy budou pořád fungovat dokud se nezmění číslo sekvence.</message>
+	<message key="xmlui.administrative.item.EditBitstreamForm.name_help">Změna názvu souboru tohoto bitového toku. Tímto se změní zobrazený URL bitového toku, ale staré odkazy budou pořád fungovat dokud se nezmění číslo sekvence.</message>
 
 	
 	<!-- org.dspace.app.xmlui.administrative.item.EditItemBitstreamsForm -->
@@ -1966,11 +1966,11 @@
 	<message key="xmlui.administrative.metadataimport.general.changes">změny</message>
 	<message key="xmlui.administrative.metadataimport.general.no_changes">Nebyly zjištěny změny</message>
 	<message key="xmlui.administrative.metadataimport.general.new_item">Nový záznam</message>
-	<message key="xmlui.administrative.metadataimport.flow.upload_successful">Nahrání přeběhlo úspěšně</message>
+	<message key="xmlui.administrative.metadataimport.flow.upload_successful">Nahrání proběhlo úspěšně</message>
 	<message key="xmlui.administrative.metadataimport.flow.upload_failed">Nahrání selhalo</message>
 	<message key="xmlui.administrative.metadataimport.flow.upload_badschema">Neznámé schéma metadat v hlavičce</message>
 	<message key="xmlui.administrative.metadataimport.flow.upload_badelement">Neznámý element metadat v hlavičce</message>
-	<message key="xmlui.administrative.metadataimport.flow.import_successful">Import přeběhl úspěšně</message>
+	<message key="xmlui.administrative.metadataimport.flow.import_successful">Import proběhl úspěšně</message>
 	<message key="xmlui.administrative.metadataimport.flow.import_failed">Import selhal</message>
 	<message key="xmlui.administrative.metadataimport.flow.over_limit">Počet změn překročil povolené maximum. Omezte změny nebo změňte bulkedit.gui-item-limit v dspace.cfg</message>
 
@@ -1978,7 +1978,7 @@
 	<message key="xmlui.administrative.metadataimport.MetadataImportMain.submit_upload">Nahrát CSV</message>
 
 	<!-- org.dspace.app.xmlui.administrative.metadataimport.MetadataImportConfirm -->
-	<message key="xmlui.administrative.metadataimport.MetadataImportConfirm.success">=Uspěšně zpracováno</message>
+	<message key="xmlui.administrative.metadataimport.MetadataImportConfirm.success">Úspěšně zpracováno</message>
 	<message key="xmlui.administrative.metadataimport.MetadataImportConfirm.changes_committed">Změny byly aplikovány v záznamu</message>
 	<message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_added">Přidané: </message>
 	<message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_removed">Odstraněné: </message>
@@ -2136,7 +2136,7 @@
 	<message key="xmlui.administrative.collection.GeneralCollectionHarvestingForm.submit_save">Uložit</message>
 
 	<!-- org.dspace.app.xmlui.administrative.collection.SetupCollectionHarvestingForm.java -->
-	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.main_settings_head">Umístění sklízení kolekce</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.main_settings_head">Umístění sklízené kolekce</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.options_head">Možnosti sklízení kolekce</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_oai_provider">Poskytovatel OAI</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_setid">ID množiny OAI</message>
@@ -2148,11 +2148,11 @@
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_harvest_level">Sklízený obsah</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.option_md_only">Sklízet pouze metadata.</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.option_md_and_ref">Sklízet metadata a odkazy na bitové toky (vyžaduje podporu ORE).</message>
-	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.option_md_and_bs">Sklízet metadata a odkazy na bitové toky (vyžaduje podporu ORE).</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.option_md_and_bs">Sklízet metadata a bitové toky (vyžaduje podporu ORE).</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.submit_test">Otestovat nastavení</message>
 
 	<!-- org.dspace.app.xmlui.administrative.collection.EditCollectionHarvestingForm.java -->
-	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.main_settings_head">Umístění sklízení kolekce</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.main_settings_head">Umístění sklízené kolekce</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.label_oai_provider">Poskytovatel OAI</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.label_setid">ID množiny OAI</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.label_metadata_format">Formát metadat</message>
@@ -2167,7 +2167,7 @@
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_unknown_error">Během poslední sklizně se vyskytla neočekávaná chyba</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.option_md_only">Sklízet pouze metadata.</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.option_md_and_ref">Sklízet metadata a odkazy na bitové toky.</message>
-	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.option_md_and_bs">Sklízet metadata a odkazy na bitové toky (kompletní replikace).</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.option_md_and_bs">Sklízet metadata a bitové toky (kompletní replikace).</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.submit_change_settings">Změnit nastavení</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.submit_import_now">Importovat nyní</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.submit_reimport_collection">Resetovat a znovu importovat kolekci</message>
@@ -2247,7 +2247,7 @@
 	<message key="xmlui.administrative.community.DeleteCommunityRoleConfirm.title">Potvrdit smazání role</message>
 	<message key="xmlui.administrative.community.DeleteCommunityRoleConfirm.trail">Potvrdit</message>
 	<message key="xmlui.administrative.community.DeleteCommunityRoleConfirm.main_head">Potvrdit smazání role {0}</message>
-	<message key="xmlui.administrative.community.DeleteCommunityRoleConfirm.main_para">Jste si jistý, že chcete tuto roli smazat? Všechny stávající úpravy skupiny {0} budou ztraceny a bylo by je třeba vytvořit na znovu.</message>
+	<message key="xmlui.administrative.community.DeleteCommunityRoleConfirm.main_para">Jste si jistý, že chcete tuto roli smazat? Všechny stávající úpravy skupiny {0} budou ztraceny a bylo by je třeba vytvořit znovu.</message>
 
 	<!-- org.dspace.app.xmlui.administrative.community.EditCommunityMetadataForm.java -->
 	<message key="xmlui.administrative.community.EditCommunityMetadataForm.title">Editovat metadata komunity</message>
@@ -2325,7 +2325,7 @@
 	<message key="xmlui.administrative.ControlPanel.mail_admin">Obecný e-mail správce lokality</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_head">Celosystémové upozornění</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_warning"><strong>Upozornění pro systémy s load balancingem</strong>: Celosystémová upozornění jsou účinná jen pro uzel, na kterém byla aktivována. Musíte se ujistit, že každý uzel v sadě dostane příkaz activate alert.</message>
-	<message key="xmlui.administrative.ControlPanel.alerts_message_label">Správa s upozorněním</message>
+	<message key="xmlui.administrative.ControlPanel.alerts_message_label">Zpráva s upozorněním</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_message_default">Systém bude vypnut z důvodu pravidelné údržby. Prosím, uložte svou práci a odhlaste se</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_countdown_label">Odpočet</message>
 	<message key="xmlui.administrative.ControlPanel.alerts_countdown_none">Bez odpočtu</message>
@@ -2352,9 +2352,9 @@
 	<message key="xmlui.administrative.ControlPanel.activity_sort_url">Stránka URL</message>
 	<message key="xmlui.administrative.ControlPanel.activity_sort_Agent">User-Agent</message>
 	<message key="xmlui.administrative.ControlPanel.activity_anonymous">Anonymní {0}</message>	
-	<message key="xmlui.administrative.ControlPanel.activity_none">Nebyly zaznamenány žádná zobrazení stránek.</message>
+	<message key="xmlui.administrative.ControlPanel.activity_none">Nebyla zaznamenána žádná zobrazení stránek.</message>
 	<message key="xmlui.administrative.ControlPanel.detail">Detail</message>
-	<message key="xmlui.administrative.ControlPanel.show_hide">zobrazit/skrýž</message>
+	<message key="xmlui.administrative.ControlPanel.show_hide">zobrazit/skrýt</message>
 	<message key="xmlui.administrative.ControlPanel.host">Host: {0}</message>
 	<message key="xmlui.administrative.ControlPanel.puser">Principal user: {0}</message>
 	<message key="xmlui.administrative.ControlPanel.headers">Headers: {0}</message>
@@ -2377,7 +2377,7 @@
 	<message key="xmlui.administrative.handle.ManageHandlesMain.trail">Handles</message>
 	<message key="xmlui.administrative.handle.ManageHandlesMain.list_head">Seznam Handle</message>
 	<message key="xmlui.administrative.handle.ManageHandlesMain.list_help">Toto je seznam handlů, které tato instance DSpace rozpozná.</message>
-	<message key="xmlui.administrative.handle.ManageHandlesMain.global_actions_head">Globalní akce</message>
+	<message key="xmlui.administrative.handle.ManageHandlesMain.global_actions_head">Globální akce</message>
 	<message key="xmlui.administrative.handle.ManageHandlesMain.global_actions_help">Toto je seznam globálních akcích na Handlech.</message>
 	<message key="xmlui.administrative.handle.ManageHandlesMain.new_external_handle">Nový externí Handle</message>
 	<message key="xmlui.administrative.handle.ManageHandlesMain.delete_handle">Smazat Handle</message>
@@ -2407,7 +2407,7 @@
 	<message key="xmlui.administrative.handle.ChangeHandlePrefixForm.new_prefix">Nový prefix</message>
 	<message key="xmlui.administrative.handle.ChangeHandlePrefixForm.archive_old_handles">Archivovat staré handles?</message>
 	<message key="xmlui.administrative.handle.ChangeHandlePrefixForm.change">Změnit</message>
-	<message key="xmlui.administrative.handle.ChangeHandlePrefixForm.old_prefix_and_new_prefix_must_differ">Starý prefix and nový prefix se musí lišit.</message>
+	<message key="xmlui.administrative.handle.ChangeHandlePrefixForm.old_prefix_and_new_prefix_must_differ">Starý prefix a nový prefix se musí lišit.</message>
 
 	<!--  cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative.FlowHandleUtils -->
 	<message key="xmlui.administrative.handle.FlowHandleUtils.handle_successfully_deleted">Úspěšně smazáno</message>
@@ -2443,7 +2443,7 @@
 	<message key="xmlui.administrative.handle.ManageExternalHandles.head">Handles</message>
 	<message key="xmlui.administrative.handle.ManageExternalHandles.trail">Handles</message>
 	<message key="xmlui.administrative.handle.ManageExternalHandles.list_head">Handle List</message>
-	<message key="xmlui.administrative.handle.ManageExternalHandles.list_help">Toto je seznam všech handlu pod prefixem {0}.</message>
+	<message key="xmlui.administrative.handle.ManageExternalHandles.list_help">Toto je seznam všech handlů pod prefixem {0}.</message>
 	<message key="xmlui.administrative.handle.ManageExternalHandles.list_filtered_help">Toto jsou výsledky hledání <strong>{0}</strong> pod prefixem {1}.</message>
 	<message key="xmlui.administrative.handle.ManageExternalHandles.new_external_handle">Nový handle</message>
 	<message key="xmlui.administrative.handle.ManageExternalHandles.delete_handle">Smazat handle</message>
@@ -2925,7 +2925,7 @@
     <message key="xmlui.mirage2.page-structure.toggleNavigation">Přepnout navigaci</message>
 
     <message key="xmlui.mirage2.page-structure.heroUnit.title">O tomto repozitáři</message>
-    <message key="xmlui.mirage2.page-structure.heroUnit.content">Pokud chcete na tuto stránku přidat váš vlastní obsah, upravte soubor webapps/xmlui/themes/Mirage2/lib/xsl/core/page-structure.xsl a přidejte vlastní obsah do částí title, trail a body. Pokud si přejete přidat další stránky, budete muset vytvořit další blok xsl:when s příslušnou adresou URI stránku, kterou přidáváte. V současné době, jsou statické stránky vytvořené pomocí úprav XSL k dispozici pouze pod prefixem URI page/.</message>
+    <message key="xmlui.mirage2.page-structure.heroUnit.content">Pokud chcete na tuto stránku přidat váš vlastní obsah, upravte soubor webapps/xmlui/themes/Mirage2/lib/xsl/core/page-structure.xsl a přidejte vlastní obsah do částí title, trail a body. Pokud si přejete přidat další stránky, budete muset vytvořit další blok xsl:when s příslušnou adresou URI stránky, kterou přidáváte. V současné době, jsou statické stránky vytvořené pomocí úprav XSL k dispozici pouze pod prefixem URI page/.</message>
 
     <message key="xmlui.mirage2.navigation.rss.feed">kanál</message>
 
@@ -3287,10 +3287,10 @@
 	<message key="input_forms.field.local.hasMetadata.label">Chystáte se nahrát cmdi soubor?</message>
 	<message key="input_forms.field.local.hasMetadata.hint">Uveďte, jestli se chystáte v dalším kroku nahrát cmdi soubor. Kombinujte se schováváním záznamů pro weblicht příspěvky.</message>
 	<message key="input_forms.field.dc.contributor.author.label">Autoři</message>
-	<message key="input_forms.field.dc.contributor.author.hint">Uveďte jména autorů tohoto záznamu. Začnete-li vyplňovat příjmení, objeví se nápověda. Nechcete-li nápovědu využít stiskněte ESC.</message>
+	<message key="input_forms.field.dc.contributor.author.hint">Uveďte jména autorů tohoto záznamu. Začnete-li vyplňovat příjmení, objeví se nápověda. Nechcete-li nápovědu využít, stiskněte ESC.</message>
 	<message key="input_forms.field.dc.contributor.author.required">Uveďte prosím autora(y)</message>
 	<message key="input_forms.field.dc.publisher.label">Vydavatel</message>
-	<message key="input_forms.field.dc.publisher.hint">Uveďte vydavatele předchozího vydání, nebo vaši domovskou instituci. Začnete-li vyplňovat vydavatele, objeví se nápověda. Nechcete-li nápovědu využít stiskněte ESC.</message>
+	<message key="input_forms.field.dc.publisher.hint">Uveďte vydavatele předchozího vydání, nebo vaši domovskou instituci. Začnete-li vyplňovat vydavatele, objeví se nápověda. Nechcete-li nápovědu využít, stiskněte ESC.</message>
 	<message key="input_forms.field.dc.publisher.required">Musíte uvést vydavatele.</message>
 	<message key="input_forms.field.local.contact.person.label">Kontaktní osoba</message>
 	<message key="input_forms.field.local.contact.person.hint">Osoba, která bude kontaktována v případě problémů s tímto záznamem.</message>
@@ -3325,7 +3325,7 @@
 	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType2.label">Podtyp</message>
 	<message key="input_forms.field.metashare.ResourceInfo#ContentInfo.detailedType2.required">Zvolte jeden z podtypů</message>
 	<message key="input_forms.field.metashare.ResourceInfo#ResourceComponentType#ToolServiceInfo.languageDependent.label">Jazykově zavislý</message>
-	<message key="input_forms.field.metashare.ResourceInfo#ResourceComponentType#ToolServiceInfo.languageDependent.hint">Uveďte zda funkce nástroje či služby zavisý na konkrétním jazyku.</message>
+	<message key="input_forms.field.metashare.ResourceInfo#ResourceComponentType#ToolServiceInfo.languageDependent.hint">Uveďte zda funkce nástroje či služby závisí na konkrétním jazyku.</message>
 	<message key="input_forms.field.metashare.ResourceInfo#ResourceComponentType#ToolServiceInfo.languageDependent.required">Uveďte prosím zda je nástroj jazykově závislý.</message>
 	<message key="input_forms.field.dc.contributor.author1.label">One: Authors</message>
 	<message key="input_forms.field.dc.contributor.author1.hint">Enter the names of the author(s) of this item.</message>
