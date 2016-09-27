@@ -1053,7 +1053,7 @@
 
         <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Nahrané soubory</message>
         <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file">Soubor</message>
-        <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file_help">Prosím, zadejte plnou cestu k souboru na vašem počítači odpovídajícímu vašemu záznamu. Pokud kliknete na „Procházet...“, nové okno vám umožní vybrat soubor z vašeho počítače.</message>
+        <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file_help">Prosím, zadejte plnou cestu k souboru odpovídajícímu vašemu záznamu na vašem počítači. Pokud kliknete na „Procházet...“, nové okno vám umožní vybrat soubor z vašeho počítače.</message>
         <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file_error">Záznam musí obsahovat alespoň jeden soubor.</message>
         <message key="xmlui.Submission.submit.UploadWithEmbargoStep.upload_error">Vyskytl se problém s nahráváním vašeho souboru. Buď jste zadali nesprávný název souboru nebo nastal problém se sítí, který způsobil, že se k nám soubor nedostal, nebo jste se pokusili nahrát formát souboru určený pouze pro vnitřní použití.</message>
         <message key="xmlui.Submission.submit.UploadWithEmbargoStep.virus_error">Soubor nebyl nahrán, protože pravděpodobně obsahuje virus. Prosím, kontaktujte správce systému.</message>
@@ -1177,7 +1177,7 @@
 	<message key="xmlui.Submission.workflow.PerformTaskStep.curate_submit">Spravovat záznam</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.commit_help">Pokud jste již záznam editovali, použijte tuto volbu pro zapsání záznamu do archivu.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.commit_submit">Uložit do archivu</message>
-	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_help">Jestli jste zkontrolovali záznam a je <strong>ne</strong>vhodný pro vložení do kolekce, vyberte „Zamítnout“. Do následující zprávy pak vyplňte proč je záznam nevhodný a zda by měl odesílatel něco změnit a záznam znovu odeslat.</message>
+	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_help">Jestli jste zkontrolovali záznam a je <strong>ne</strong>vhodný pro vložení do kolekce, vyberte „Zamítnout“. Do následující zprávy pak vyplňte, proč je záznam nevhodný a zda by měl odesílatel něco změnit a záznam znovu odeslat.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.reject_submit">Zamítnout záznam</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_help">Vyberte tuto volbu pro změnu metadat záznamu. Bude nutno vyplnit všechna požadovaná pole.</message>
 	<message key="xmlui.Submission.workflow.PerformTaskStep.edit_submit">Editovat metadata</message>
