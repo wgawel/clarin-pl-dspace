@@ -1212,7 +1212,7 @@
 	<message key="xmlui.administrative.FlowCurationUtils.queue_failed_notice">Úlohu nebylo možné zařadit do fronty. Pro další informace prosím kontaktujte <a class="helpdesk-tolink">poradnu</a> nebo zkontrolujte protokol systému.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.add_eperson_success_notice">Uživatel byl úspěšně přidán.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.edit_eperson_success_notice">Uživatel byl úspěšně editován.</message>
-	<message key="xmlui.administrative.FlowEPersonUtils.reset_password_success_notice">Uživateli byla zaslána emailová zpráva obsahující token, který může využít na výběr nového hesla.</message>
+	<message key="xmlui.administrative.FlowEPersonUtils.reset_password_success_notice">Uživateli byla zaslána emailová zpráva obsahující token, který může využít k výběru nového hesla.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.reset_netid_success_notice">Netid bylo úspěšně resetováno.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.delete_eperson_success_notice">Uživatel byl úspěšně smazán.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.delete_eperson_failed_notice">Uvedení uživatelé nebyli smazáni, protože existují omezení zabraňující jejich smazání. Další informace na stránce podrobností e-osoby.</message>
@@ -1292,10 +1292,10 @@
 	<message key="xmlui.administrative.ItemExport.item.not.found">Požadovaný záznam nebyl nalezen.</message>
 	<message key="xmlui.administrative.ItemExport.collection.not.found">Požadovaná kolekce nebyla nalezena.</message>
 	<message key="xmlui.administrative.ItemExport.community.not.found">Požadovaná komunita nebyla nalezena.</message>
-	<message key="xmlui.administrative.ItemExport.item.success">Záznam byl úspěšně exportován. Měli byste obdržet e-mail, jakmile bude archiv připraven na stažení. Můžete také použít odkaz „Moje exporty“ k zobrazení seznamu archivů, které jsou pro vás dostupné.</message>
-	<message key="xmlui.administrative.ItemExport.collection.success">Kolekce byla úspěšně exportována. Měli byste obdržet e-mail, jakmile bude archiv připraven na stažení. Můžete také použít odkaz „Moje exporty“ k zobrazení seznamu archivů, které jsou pro vás dostupné.</message>
-	<message key="xmlui.administrative.ItemExport.community.success">Komunita byla úspěšně exportována. Měli byste obdržet e-mail, jakmile bude archiv připraven na stažení. Můžete také použít odkaz „Moje exporty“ k zobrazení seznamu archivů, které jsou pro vás dostupné.</message>
-	<message key="xmlui.administrative.ItemExport.available.head">Exportní archivy dostupné na stažení:</message>
+	<message key="xmlui.administrative.ItemExport.item.success">Záznam byl úspěšně exportován. Měli byste obdržet e-mail, jakmile bude archiv připraven ke stažení. Můžete také použít odkaz „Moje exporty“ k zobrazení seznamu archivů, které jsou pro vás dostupné.</message>
+	<message key="xmlui.administrative.ItemExport.collection.success">Kolekce byla úspěšně exportována. Měli byste obdržet e-mail, jakmile bude archiv připraven ke stažení. Můžete také použít odkaz „Moje exporty“ k zobrazení seznamu archivů, které jsou pro vás dostupné.</message>
+	<message key="xmlui.administrative.ItemExport.community.success">Komunita byla úspěšně exportována. Měli byste obdržet e-mail, jakmile bude archiv připraven ke stažení. Můžete také použít odkaz „Moje exporty“ k zobrazení seznamu archivů, které jsou pro vás dostupné.</message>
+	<message key="xmlui.administrative.ItemExport.available.head">Exportní archivy dostupné ke stažení:</message>
 	
 
 
@@ -1356,7 +1356,7 @@
 	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_delete">Smazat e-osobu</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_login_as">Přihlásit se jako e-osoba</message>
 	
-	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint">Tuto e-osobu nelze vymazat z důvodu následujících omezení:</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint">Tuto e-osobu nelze vymazat kvůli následujícím omezením:</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.last_conjunction">a</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.item">e-osoba zaslala jeden nebo více záznamů</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint.workflowitem">e-osoba má aktivní proces zasílání příspěvku</message>
@@ -1390,7 +1390,7 @@
 	<message key="xmlui.administrative.group.ManageGroupsMain.actions_browse">Procházet skupiny</message>
 	<message key="xmlui.administrative.group.ManageGroupsMain.actions_browse_link">Prohlížet všechny skupiny.</message>
 	<message key="xmlui.administrative.group.ManageGroupsMain.actions_search">Hledat skupiny</message>
-	<message key="xmlui.administrative.group.ManageGroupsMain.search_help">Skupiny je možné vyhledávat na základe podřetězce jejich názvu</message>
+	<message key="xmlui.administrative.group.ManageGroupsMain.search_help">Skupiny je možné vyhledávat zadáním podřetězce jejich názvu</message>
 	<message key="xmlui.administrative.group.ManageGroupsMain.search_head">Výsledky hledání</message>
 	<message key="xmlui.administrative.group.ManageGroupsMain.search_column1">Smazat</message>
 	<message key="xmlui.administrative.group.ManageGroupsMain.search_column2">ID</message>
@@ -1457,8 +1457,8 @@
 	<message key="xmlui.administrative.registries.general.metadata_registry_trail">Registr metadat</message>	
 	
 	<!-- org.dspace.app.xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.java -->
-	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.title">Smazat formát bitového toku</message>
-	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.trail">Smazat formáty bitového toku</message>
+	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.title">Smazat formáty bitových toků</message>
+	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.trail">Smazat formáty bitových toků</message>
 	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.head">Potvrdit smazání</message>
 	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.para1">Jste si jistý, že chcete formát smazat? Všechny existující bitové toky tohoto formátu budou převedeny na neznámý formát bitového toku.</message>
 	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.column1">ID</message>
@@ -1513,7 +1513,7 @@
 	<message key="xmlui.administrative.registries.EditMetadataSchema.title">Schéma metadat</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.trail">Schéma metadat</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.head1">Schéma metadat: „{0}“</message>
-	<message key="xmlui.administrative.registries.EditMetadataSchema.para1">Toto je schéma metadat pro „{0}“. Můžete přidat nové nebo aktualizovat stávající pole metadat do tohoto schématu. Pole můžete také vybrat pro smazání nebo přesun do jiného schématu.</message>
+	<message key="xmlui.administrative.registries.EditMetadataSchema.para1">Toto je schéma metadat pro „{0}“. Můžete přidat nové nebo aktualizovat stávající pole metadat tohoto schématu. Pole můžete také vybrat pro smazání nebo přesun do jiného schématu.</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.head2">Pole schematu metadat</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.column1"/>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.column2">ID</message>
@@ -1540,7 +1540,7 @@
 	<!-- org.dspace.app.xmlui.administrative.registries.FormatRegistryMain.java -->
 	<message key="xmlui.administrative.registries.FormatRegistryMain.title">Registr formátů</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.head">Registr formátů bitového toku</message>
-	<message key="xmlui.administrative.registries.FormatRegistryMain.para1">Tento seznam formátů bitových toků poskytuje informace o známých formátech a úrovni jejich podpory. Pomocí tohoto nástroje můžete upravovat nebo přidávat nové formáty bitových toků. Formáty označené jako „interní“ jsou uživatelům skryté a používají se na účely správy.</message>
+	<message key="xmlui.administrative.registries.FormatRegistryMain.para1">Tento seznam formátů bitových toků poskytuje informace o známých formátech a úrovni jejich podpory. Pomocí tohoto nástroje můžete upravovat nebo přidávat nové formáty bitových toků. Formáty označené jako „interní“ jsou uživatelům skryté a používají se pro účely správy.</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.new_link">Přidat nový formát bitového toku</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.column1"/>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.column2">ID</message>
