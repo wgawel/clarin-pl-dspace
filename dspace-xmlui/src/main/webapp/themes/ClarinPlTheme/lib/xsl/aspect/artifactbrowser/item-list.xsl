@@ -169,6 +169,7 @@
                 <xsl:variable name="file-count"
                     select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='local' and @element='files' and @qualifier='count']/node()" />
                 <i class="fa fa-paperclip">&#160;</i>
+                HERE <xsl:value-of select="./mets" />
                 <i18n:translate>
                     <xsl:choose>
                         <xsl:when test="$file-count = 1">

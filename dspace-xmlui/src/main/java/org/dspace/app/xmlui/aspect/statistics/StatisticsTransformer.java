@@ -7,14 +7,6 @@
  */
 package org.dspace.app.xmlui.aspect.statistics;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -22,13 +14,7 @@ import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Cell;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Table;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -38,14 +24,17 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.statistics.Dataset;
-import org.dspace.statistics.content.DatasetDSpaceObjectGenerator;
-import org.dspace.statistics.content.DatasetTimeGenerator;
-import org.dspace.statistics.content.DatasetTypeGenerator;
-import org.dspace.statistics.content.StatisticsDataVisits;
-import org.dspace.statistics.content.StatisticsListing;
-import org.dspace.statistics.content.StatisticsTable;
+import org.dspace.statistics.content.*;
 import org.dspace.statistics.content.filter.StatisticsSolrDateFilter;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 /**
  * modified for LINDAT/CLARIN
 */
@@ -445,6 +434,7 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 						.addContent(dataset.getRowLabels().get(row));
 
 				/** Add Rest of Row */
+
 				for (int col = 0; col < matrix[row].length; col++) {
 					Cell cell = valListRow.addCell(row + "-" + col,
 							Cell.ROLE_DATA, "datacell");

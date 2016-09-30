@@ -7,17 +7,11 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.item;
 
-import java.sql.SQLException;
-
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
@@ -25,6 +19,8 @@ import org.dspace.content.DCDate;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+
+import java.sql.SQLException;
 
 /**
  * Display basic meta-meta information about the item and allow the user to change 
@@ -63,7 +59,7 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 	private static final Message T_submit_move = message("xmlui.administrative.item.EditItemStatusForm.submit_move");
 	private static final Message T_submit_delete = message("xmlui.administrative.item.EditItemStatusForm.submit_delete");
 	private static final Message T_na = message("xmlui.administrative.item.EditItemStatusForm.na");
-	
+
 	private static final Message T_not_allowed = message("xmlui.administrative.item.EditItemStatusForm.not_allowed");
 	private static final Message T_collectionadmins_only = message("xmlui.administrative.item.EditItemStatusForm.collection_admins_only");
 
@@ -209,10 +205,7 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		{
 			addNotAllowedButton(itemInfo.addItem(), "submit_delete", T_submit_delete);
 		}
-		
-		
-		
-		
+
 		// PARA: main actions
 		main.addPara().addButton("submit_return").setValue(T_submit_return);
 		
