@@ -732,7 +732,7 @@
 	<message key="xmlui.Submission.general.go_mydspace">Přejít na mou domovskou stránku</message>
 	<message key="xmlui.Submission.general.submission.title">Zaslání záznamu</message>
 	<message key="xmlui.Submission.general.submission.trail">Zaslání záznamu</message>
-	<message key="xmlui.Submission.general.submission.head">Zaslání záznamu {0}</message>
+	<message key="xmlui.Submission.general.submission.head">Zaslání záznamu</message>
 	<message key="xmlui.Submission.general.submission.previous">&lt; Předchozí</message>
 	<message key="xmlui.Submission.general.submission.save">Uložit a ukončit</message>
 	<message key="xmlui.Submission.general.submission.next">Další &gt;</message>
@@ -745,6 +745,8 @@
 	<message key="xmlui.Submission.general.default.title">Příspěvek</message>
 	<message key="xmlui.Submission.general.default.trail">Příspěvek</message>
 	<message key="xmlui.Submission.general.submission.save_share">Uložit a Sdílet</message>
+
+	<message key="xmlui.Submission.general.submission.handle">K citaci můžete použít handle {0}, který byl rezervován pro tento záznam. Berte prosím na vědomí, že handle bude plně funkční až po úspěšném dokončení a schválení záznamu.</message>
 
 	<!-- org.dspace.app.xmlui.submission.CollectionViewer -->
 	<message key="xmlui.Submission.CollectionViewer.link1">Zaslat do této kolekce nový záznam</message>
@@ -1047,6 +1049,7 @@
 	<message key="xmlui.Submission.submit.UploadStep.submit_edit">Editovat</message>
 	<message key="xmlui.Submission.submit.UploadStep.checksum">Kontrolní součet souboru:</message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_remove">Odstranit vybrané soubory</message>
+	<message key="xmlui.Submission.submit.UploadStep.review.no_file">Žádný soubor nebyl nahrán.</message>
 
 
 

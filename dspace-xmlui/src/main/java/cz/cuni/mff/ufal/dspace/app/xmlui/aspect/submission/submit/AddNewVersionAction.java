@@ -30,6 +30,7 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 
 import cz.cuni.mff.ufal.dspace.IOUtils;
+import org.dspace.handle.HandleManager;
 import org.dspace.identifier.IdentifierException;
 
 /**
@@ -143,6 +144,12 @@ public class AddNewVersionAction extends AbstractAction
 
         //clear featured services
         item.clearMetadata("local", "featuredService", Item.ANY, Item.ANY);
+        
+	//clear old replaces & replacedby metadata
+        item.clearMetadata("dc", "relation", "replaces", Item.ANY );
+        item.clearMetadata("dc", "relation", "isreplacedby", Item.ANY );
+        //assume new version replaces the old, this might trigger an update to baseItem in InstallItem#populateMetadata
+        item.addMetadata("dc", "relation", "replaces", Item.ANY, HandleManager.getCanonicalForm(baseItem.getHandle()));
 
         //add new PID if enabled
         try {

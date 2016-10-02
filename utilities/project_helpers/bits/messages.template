@@ -605,7 +605,7 @@
   <message key="xmlui.Submission.general.go_mydspace">Go to My Home</message>
   <message key="xmlui.Submission.general.submission.title">Item submission</message>
   <message key="xmlui.Submission.general.submission.trail">Item submission</message>
-  <message key="xmlui.Submission.general.submission.head">Item submission {0}</message>
+  <message key="xmlui.Submission.general.submission.head">Item submission</message>
   <message key="xmlui.Submission.general.submission.previous">&lt; Previous</message>
   <message key="xmlui.Submission.general.submission.save">Save &amp; Exit</message>
   <message key="xmlui.Submission.general.submission.next">Next &gt;</message>
@@ -618,6 +618,8 @@
   <message key="xmlui.Submission.general.default.title">Submission</message>
   <message key="xmlui.Submission.general.default.trail">Submission</message>
   <message key="xmlui.Submission.general.submission.save_share">Save &amp; Share</message>
+
+  <message key="xmlui.Submission.general.submission.handle">A handle {0} is reserved for your submission, you can use this handle for citation purposes. Please note that the handle will only become active after successful completion and approval of your submission.</message>
   <!-- org.dspace.app.xmlui.submission.CollectionViewer -->
   <message key="xmlui.Submission.CollectionViewer.link1">Submit a new item to this collection</message>
   <!-- org.dspace.app.xmlui.submission.Navigation -->
@@ -894,6 +896,7 @@
   <message key="xmlui.Submission.submit.UploadStep.submit_edit">Edit</message>
   <message key="xmlui.Submission.submit.UploadStep.checksum">File checksum:</message>
   <message key="xmlui.Submission.submit.UploadStep.submit_remove">Remove selected files</message>
+  <message key="xmlui.Submission.submit.UploadStep.review.no_file">You didn't upload any file.</message>
   <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Upload File(s)</message>
   <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file">File</message>
   <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file_help">Please enter the full path of the file on your computer corresponding to your item. If you click "Browse...", a new window will allow you to select the file from your computer.</message>

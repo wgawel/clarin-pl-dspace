@@ -182,9 +182,6 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
                     throw new ProcessingException(e);
                 }
                 this.submission = submissionInfo.getSubmissionItem();
-				if(this.submission != null && this.submission.getItem() != null){
-					T_submission_head = T_submission_head.parameterize(submission.getItem().getHandle());
-				}
             }
 			
 			// Check required error conditions
@@ -260,6 +257,13 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
         // <UFAL> - include ufal-submission.js
         pageMeta.addMetadata("include-library", "submission");
         // </UFAL>
+        
+		if(this.submission != null && this.submission.getItem() != null){
+			if(this.submission.getItem().getHandle() != null) {
+				pageMeta.addMetadata("handle", "submission").addContent(submission.getItem().getHandle());
+			}
+		}
+        
 	}
 
 
@@ -270,6 +274,9 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
 	 */
 	public void addSubmissionProgressList(Division div) throws WingException
 	{
+		
+		div.addDivision("handle-message", "");
+		
 		// each entry in progress bar is placed under this "submit-progress" div
 		List progress = div.addList("submit-progress",List.TYPE_PROGRESS);
 		
