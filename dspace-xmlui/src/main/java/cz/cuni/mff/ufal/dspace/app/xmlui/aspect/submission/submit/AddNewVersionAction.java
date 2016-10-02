@@ -142,7 +142,10 @@ public class AddNewVersionAction extends AbstractAction
         //this is a new item; discard old provenance records
         item.clearMetadata("dc", "description", "provenance", Item.ANY);
 
-        //clear old replaces & replacedby metadata
+        //clear featured services
+        item.clearMetadata("local", "featuredService", Item.ANY, Item.ANY);
+        
+	//clear old replaces & replacedby metadata
         item.clearMetadata("dc", "relation", "replaces", Item.ANY );
         item.clearMetadata("dc", "relation", "isreplacedby", Item.ANY );
         //assume new version replaces the old, this might trigger an update to baseItem in InstallItem#populateMetadata
