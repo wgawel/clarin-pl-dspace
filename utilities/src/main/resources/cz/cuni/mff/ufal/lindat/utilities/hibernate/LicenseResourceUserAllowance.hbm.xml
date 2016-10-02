@@ -7,10 +7,10 @@
             <column name="transaction_id" />
             <generator class="identity" />
         </id>
-        <many-to-one name="userRegistration" class="cz.cuni.mff.ufal.lindat.utilities.hibernate.UserRegistration" fetch="join" lazy="false">
+        <many-to-one name="userRegistration" class="cz.cuni.mff.ufal.lindat.utilities.hibernate.UserRegistration" fetch="select" lazy="false">
             <column name="eperson_id" not-null="true" />
         </many-to-one>
-        <many-to-one name="licenseResourceMapping" class="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseResourceMapping" fetch="join" lazy="false">
+        <many-to-one name="licenseResourceMapping" class="cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseResourceMapping" fetch="select" lazy="false">
             <column name="mapping_id" not-null="true" />
         </many-to-one>
         <property name="createdOn" type="timestamp" generated="insert">

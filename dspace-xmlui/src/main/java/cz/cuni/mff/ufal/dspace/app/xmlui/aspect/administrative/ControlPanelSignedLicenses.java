@@ -73,7 +73,7 @@ public class ControlPanelSignedLicenses extends AbstractControlPanelTab
 			wfhead.addCellContent("BITSTREAM");
 			wfhead.addCellContent("EXTRA METADATA");
 			
-			java.util.List<LicenseResourceUserAllowance> licenses = functionalityManager.getSignedLicensesByDate();
+			java.util.List<LicenseResourceUserAllowance> licenses = functionalityManager.getSignedLicensesByDate(0,MAX_TO_SHOW);
 			
 			// hack for group by /////////
 			
@@ -95,8 +95,7 @@ public class ControlPanelSignedLicenses extends AbstractControlPanelTab
 			
 			/////////////////////////////
 			
-			int cnt = 1;
-			for (LicenseResourceUserAllowance license : licenses) 
+			for (LicenseResourceUserAllowance license : licenses)
 			{				
 				int bitstreamID = license.getLicenseResourceMapping().getBitstreamId();
 				LicenseDefinition ld = license.getLicenseResourceMapping().getLicenseDefinition();
@@ -157,11 +156,7 @@ public class ControlPanelSignedLicenses extends AbstractControlPanelTab
                 for(UserMetadata metadata : extraMetaData) {
                 	c.addHighlight("label label-info font_smaller").addContent(metadata.getMetadataKey() + ": " +metadata.getMetadataValue());
                 }
-                
-                if(++cnt > MAX_TO_SHOW) {
-                	break;
-                }
-			}						
+			}
 			
 		}catch( IllegalArgumentException e1 ) {
 			wftable.setHead( "No items - " + e1.getMessage() );

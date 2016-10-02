@@ -205,7 +205,9 @@ public interface ILicenses {
 	 * @return true if all went well.
 	 */	
 	public boolean defineLicenseLabel(String code, String title, boolean isExtended);
-	
+
+	public List<LicenseResourceUserAllowance> getSignedLicensesByDate(int firstRecord, int limit);
+
 	public List<LicenseResourceUserAllowance> getSignedLicensesByDate();
 	
 	public List<LicenseResourceUserAllowance> getSignedLicensesByUser(int eperson_id);

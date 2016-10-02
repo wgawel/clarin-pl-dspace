@@ -352,6 +352,53 @@ public class HibernateUtil {
 		}
 	}
 
+	public List findByCriterieWithLimits(Class clazz, int first, int limit, Object ... criterion) {
+		log.debug("finding " + clazz.getSimpleName() + " instance by criteria");
+		try {
+			startTransaction();
+			Criteria criteria = session.createCriteria(clazz);
+
+			ArrayList<Criterion> ct = new ArrayList<Criterion>();
+			ArrayList<Order> od = new ArrayList<Order>();
+			ProjectionList pj = Projections.projectionList();
+
+			for (Object o : criterion) {
+				if (o instanceof Criterion) {
+					ct.add((Criterion) o);
+				} else if (o instanceof Order) {
+					od.add((Order) o);
+				} else if (o instanceof Projection) {
+					pj.add((Projection) o);
+				}
+			}
+
+			for (Criterion c : ct) {
+				criteria.add(c);
+			}
+
+			for (Order o : od) {
+				criteria.addOrder(o);
+			}
+
+			if (pj.getLength() != 0)
+				criteria.setProjection(pj);
+
+			criteria.setFirstResult(first);
+			criteria.setMaxResults(limit);
+			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
+			List results = criteria.list();
+			endTransaction();
+			return results;
+		} catch (RuntimeException re) {
+			log.error("find by criteria with limits failed", re);
+			transaction.rollback();
+			closeSession();
+
+			throw re;
+		}
+	}
+
 	public List findByQuery(String query, Hashtable<String, Object> params) {
 		log.debug("finding by query " + query);
 		try {
