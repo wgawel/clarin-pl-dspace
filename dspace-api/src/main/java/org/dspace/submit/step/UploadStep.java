@@ -751,6 +751,8 @@ public class UploadStep extends AbstractProcessingStep
  
         String filePath = null;        
         InputStream fileInputStream = null;
+        CloseableHttpClient client = null;
+        CloseableHttpResponse getResponse = null;
 
         try {
         	filePath = (String)request.getAttribute("fileLocal");
@@ -758,12 +760,10 @@ public class UploadStep extends AbstractProcessingStep
         		filePath = "file://" + filePath;
                 fileInputStream = new URI(filePath).toURL().openStream();
          	}else {
-                try (CloseableHttpClient client = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build()) {
-                    HttpGet httpGet = new HttpGet(filePath);
-                    try (CloseableHttpResponse getResponse = client.execute(httpGet)) {
-                        fileInputStream = getResponse.getEntity().getContent();
-                    }
-                }
+                client = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
+                HttpGet httpGet = new HttpGet(filePath);
+                getResponse = client.execute(httpGet);
+                fileInputStream = getResponse.getEntity().getContent();
             }
         }catch(IllegalArgumentException e) {
         	return STATUS_NOT_FOUND;
@@ -813,6 +813,15 @@ public class UploadStep extends AbstractProcessingStep
         {
             // we have a bundle already, just add bitstream
             b = bundles[0].createBitstream(fileInputStream);
+        }
+        if(fileInputStream != null){
+            fileInputStream.close();
+        }
+        if(getResponse != null){
+            getResponse.close();
+        }
+        if(client != null){
+            client.close();
         }
 
         File f = new File(filePath);
