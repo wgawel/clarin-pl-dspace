@@ -213,7 +213,7 @@ fresh_install:
 
 # Grant rights to installation
 grant_rights:
-	chown -R $(TOMCAT_USER):$(TOMCAT_GROUP) $(DIR_INSTALLATION)/
+	chown -RL $(TOMCAT_USER):$(TOMCAT_GROUP) $(DIR_INSTALLATION)/
 	chmod -R g+w $(DIR_INSTALLATION)/
 	
 # maven uses prerequisites to check for mvn version
