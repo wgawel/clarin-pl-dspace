@@ -81,11 +81,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     private static final Message T_did_you_mean = message("xmlui.Discovery.SimpleSearch.did_you_mean");
     private static final Message T_filter_notavailable = message("xmlui.Discovery.SimpleSearch.filter.notavailable");
 
-    private SearchService searchService = null;
-
     public SimpleSearch() {
-        DSpace dspace = new DSpace();
-        searchService = dspace.getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
     }
 
 

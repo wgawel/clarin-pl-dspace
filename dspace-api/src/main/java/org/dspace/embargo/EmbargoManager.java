@@ -100,10 +100,9 @@ public class EmbargoManager
              }
         }
         String slift = myLift.toString();
-        boolean ignoreAuth = context.ignoreAuthorization();
         try
         {
-            context.setIgnoreAuthorization(true);
+            context.turnOffAuthorisationSystem();
             item.clearMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
             item.addMetadata(lift_schema, lift_element, lift_qualifier, null, slift);
             log.info("Set embargo on Item "+item.getHandle()+", expires on: "+slift);
@@ -114,7 +113,7 @@ public class EmbargoManager
         }
         finally
         {
-            context.setIgnoreAuthorization(ignoreAuth);
+            context.restoreAuthSystemState();
         }
     }
 
@@ -278,7 +277,7 @@ public class EmbargoManager
         try
         {
             context = new Context();
-            context.setIgnoreAuthorization(true);
+            context.turnOffAuthorisationSystem();
             Date now = new Date();
              
             // scan items under embargo

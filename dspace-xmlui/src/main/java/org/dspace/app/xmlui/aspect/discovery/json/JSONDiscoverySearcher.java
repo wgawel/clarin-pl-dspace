@@ -140,8 +140,9 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
             {
                 out.write(buffer, 0, length);
             }
-            out.flush();
         }
+        out.flush();
+        out.close();
     }
 
     /**
@@ -171,4 +172,12 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
 
         return dso;
     }
+
+    @Override
+    public void recycle() {
+        response = null;
+        JSONStream = null;
+        super.recycle();
+    }
+
 }
