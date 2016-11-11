@@ -45,14 +45,15 @@ public class SolrServiceTweaksPlugin implements SolrServiceIndexPlugin,
     {
         String query = discoveryQuery.getQuery();
         // follows previous impl, but is it correct?
-        if (query == null)
-        {
+        if (query == null) {
             query = "*:*";
+        } else {
+        	query = "+(" + query + ")"
+        		   + " OR title:(" + query + ")^2"
+        		   + " OR dc.relation.replaces:[* TO *]^2"
+        		   + " OR (dc.relation.replaces:[* TO *] AND -dc.relation.isreplacedby:[* TO *])^2";
         }
-        String q = solrQuery.getQuery() + " OR title:(" + query + ")^5";
-        q = q + " OR ((" + q + ") AND -dc.relation.isreplacedby:*)^5 OR ((" + q + ") AND dc.relation.replaces:*)^15";
-        solrQuery.setQuery(q);
-
+    	solrQuery.setQuery(query);        
     }
 
     @Override
