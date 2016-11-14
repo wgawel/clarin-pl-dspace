@@ -2551,7 +2551,7 @@
         <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.singleUserReviewStep.singleuserreviewaction">Operace kontroly jedním uživatelem</message>
 
 	<message key="xmlui.statistics.piwik.title">Piwik Statistiky</message>
-	<message key="xmlui.statistics.Navigation.piwik.title">Piwik Statistiky<span class='label label-important' style='font-size: 14px;'>BETA</span></message>
+	<message key="xmlui.statistics.Navigation.piwik.title">Statistiky<span class='label label-important' style='font-size: 14px;'>BETA</span></message>
 	<message key="xmlui.statistics.piwik.trail">Piwik Statistiky</message>
 
 	<message key="PiwikStatisticsTransformer.already_subscribed">  Na váš e-mail již pravidelné měsíční zprávy o tomto záznamu dostáváte</message>

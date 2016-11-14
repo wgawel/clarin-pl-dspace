@@ -2267,7 +2267,7 @@
   <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.singleUserReviewStep.autoassignAction">Single User Auto Assign Action</message>
   <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.singleUserReviewStep.singleuserreviewaction">Single User Review Action</message>
   <message key="xmlui.statistics.piwik.title">Piwik Statistics</message>
-  <message key="xmlui.statistics.Navigation.piwik.title">Piwik Statistics<span class="label label-important" style="font-size: 14px;">BETA</span></message>
+  <message key="xmlui.statistics.Navigation.piwik.title">Statistics<span class="label label-important" style="font-size: 14px;">BETA</span></message>
   <message key="xmlui.statistics.piwik.trail">Piwik Statistics</message>
   <message key="PiwikStatisticsTransformer.already_subscribed">  You are subscribed to receive a monthly report of this item via email</message>
   <message key="PiwikStatisticsTransformer.get_monthly">  Get a monthly report for this item via email</message>
