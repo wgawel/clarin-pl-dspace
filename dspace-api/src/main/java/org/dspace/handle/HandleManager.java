@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.cuni.mff.ufal.dspace.handle.Handle;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
@@ -378,6 +379,11 @@ public class HandleManager
                 // is reusing this handle!
                 row.setColumnNull("resource_id");
                 DatabaseManager.update(context, row);
+                //clear from cache if cached
+                Handle cachedHandle = (Handle)context.fromCache(Handle.class, row.getIntColumn("handle_id"));
+                if(cachedHandle != null){
+                    context.removeCached(cachedHandle, row.getIntColumn("handle_id"));
+                }
 
                 if(log.isDebugEnabled())
                 {
