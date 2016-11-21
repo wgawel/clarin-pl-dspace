@@ -328,5 +328,10 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
             return event;
         }
     }
-    
+
+    @Override
+    public void recycle() {
+        this.bodyEvent = null;
+        super.recycle();
+    }
 }

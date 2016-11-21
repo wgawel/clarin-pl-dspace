@@ -45,7 +45,7 @@ public class VLOCheck extends Check {
                 return "PLEASE configure lr.harvester.info.url";
             }
             String dspace_name = ConfigurationManager.getProperty("dspace.name");
-            dspace_name = dspace_name.replaceAll("[ ,/]+","_");
+            dspace_name = dspace_name.replaceAll("[ ,/-]+","_");
             harvesterInfoUrl = harvesterInfoUrl.endsWith("/") ? harvesterInfoUrl + dspace_name :
                     harvesterInfoUrl + "/" + dspace_name;
             harvesterInfoUrl = harvesterInfoUrl + ".html";
@@ -58,6 +58,8 @@ public class VLOCheck extends Check {
                     page = EntityUtils.toString(entity);
                 }
             }
+
+            info.put("info_url", harvesterInfoUrl);
 
             Reader reader = new StringReader(page);
             HTMLEditorKit.Parser parser = new ParserDelegator();
@@ -185,6 +187,7 @@ public class VLOCheck extends Check {
                 ret += title + "\n";
             }
         }
+        ret += String.format("Results gathered from %s\n", info.get("info_url"));
         return ret;
     }
 

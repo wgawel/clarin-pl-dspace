@@ -722,7 +722,7 @@
     <message key="xmlui.Submission.general.go_mydspace">Go to My Home</message>
 	<message key="xmlui.Submission.general.submission.title">Item submission</message>
 	<message key="xmlui.Submission.general.submission.trail">Item submission</message>
-	<message key="xmlui.Submission.general.submission.head">Item submission {0}</message>
+	<message key="xmlui.Submission.general.submission.head">Item submission</message>
 	<message key="xmlui.Submission.general.submission.previous">&lt; Previous</message>
 	<message key="xmlui.Submission.general.submission.save">Save &amp; Exit</message>
 	<message key="xmlui.Submission.general.submission.next">Next &gt;</message>
@@ -735,6 +735,8 @@
 	<message key="xmlui.Submission.general.default.title">Submission</message>
 	<message key="xmlui.Submission.general.default.trail">Submission</message>
 	<message key="xmlui.Submission.general.submission.save_share">Save &amp; Share</message>
+	
+	<message key="xmlui.Submission.general.submission.handle">A handle {0} is reserved for your submission, you can use this handle for citation purposes. Please note that the handle will only become active after successful completion and approval of your submission.</message>
 
 	<!-- org.dspace.app.xmlui.submission.CollectionViewer -->
 	<message key="xmlui.Submission.CollectionViewer.link1">Submit a new item to this collection</message>
@@ -1037,6 +1039,7 @@
 	<message key="xmlui.Submission.submit.UploadStep.submit_remove_all">Remove All Files</message>
 	<message key="xmlui.Submission.submit.UploadStep.column_checksum">Checksum</message>
 	<message key="xmlui.Submission.submit.UploadStep.column_order">Order</message>
+	<message key="xmlui.Submission.submit.UploadStep.review.no_file">You didn't upload any file.</message>
 
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Upload File(s)</message>
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file">File</message>
@@ -2532,7 +2535,7 @@
     <message key="xmlui.statistics.display.table.workflow.step.selectSingleReviewer.singleUserReviewStep.singleuserreviewaction">Single User Review Action</message>
 
     <message key="xmlui.statistics.piwik.title">Piwik Statistics</message>
-    <message key="xmlui.statistics.Navigation.piwik.title">Piwik Statistics<span class='label label-important' style='font-size: 14px;'>BETA</span></message>
+    <message key="xmlui.statistics.Navigation.piwik.title">Statistics<span class='label label-important' style='font-size: 14px;'>BETA</span></message>
     <message key="xmlui.statistics.piwik.trail">Piwik Statistics</message>
 
 	<message key="PiwikStatisticsTransformer.already_subscribed">  You are subscribed to receive a monthly report of this item via email</message>
