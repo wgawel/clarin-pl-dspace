@@ -20,7 +20,7 @@
      * i18n property list
      */
     var i18n = {
-        default : 'en',
+        defaultLocale : 'en',
         //en is empty aka identity
         dicts: {en : {},},
 
@@ -33,7 +33,7 @@
          */
         load: function(locale, i18n_dict) {
             if(!locale){
-                locale = this.default;
+                locale = this.defaultLocale;
             }
             if (this.dicts[locale]) {
                 $.extend(this.dicts[locale], i18n_dict);
@@ -56,7 +56,7 @@
         _: function (str) {
             currentLocale = $("#ds-language-selection").attr("data-locale");
             if(!currentLocale){
-                currentLocale = this.default;
+                currentLocale = this.defaultLocale;
             }
             dict = this.dicts[currentLocale];
             if (dict && dict.hasOwnProperty(str)) {
