@@ -451,7 +451,7 @@ public class DSpaceApi {
 	}
 
     public static String convertBytesToHumanReadableForm(long bytes) {
-    	int exp = (int)(Math.log(bytes) / Math.log(1024));
+    	int exp = bytes == 0 ? 0 : (int)(Math.log(bytes) / Math.log(1024));
     	String units[] = new String[]{"bytes", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
     	double val = bytes / Math.pow(1024, exp);
     	if(val == (int)val)

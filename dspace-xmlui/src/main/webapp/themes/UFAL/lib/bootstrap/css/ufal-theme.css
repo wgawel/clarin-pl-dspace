@@ -1392,6 +1392,11 @@ div.modal-scrollbar {
 	margin: 10px 0px 10px 0px;
 }
 
+/* this overrides the box-sizing in bootstrap.min.css selector.css depends on the default value */
+.license-selector * {
+    box-sizing: content-box;
+}
+
 .refbox {
 	margin-bottom: 10px;
 }

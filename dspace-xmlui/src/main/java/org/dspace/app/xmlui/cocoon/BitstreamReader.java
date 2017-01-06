@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.Map;
 
 import javax.mail.internet.MimeUtility;
@@ -167,6 +168,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     /** Item containing the Bitstream */
     private Item item = null;
 
+    /** The last modified date of the item containing the bitstream */
+    private Date itemLastModified = null;
+
     /** True if user agent making this request was identified as spider. */
     private boolean isSpider = false;
 
@@ -190,7 +194,6 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         {
             this.request = ObjectModelHelper.getRequest(objectModel);
             this.response = ObjectModelHelper.getResponse(objectModel);
-            
             // Check to see if a context already exists or not. We may
             // have been aggregated into an http request by the XSL document
             // pulling in an XML-based bitstream. In this case the context has
@@ -208,11 +211,6 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             // file download - in par, bitstream, name, handle
             //  see dspace-xmlui/dspace-xmlui-webapp/src/main/webapp/sitemap.xmap
             boolean is_item_bitstream = (-1 == bitstreamID && handle != null);
-
-            if(is_item_bitstream && ConfigurationManager.getBooleanProperty("lr", "lr.tracker.enabled")) {
-                // Track the download for analytics platform
-                TrackerFactory.createInstance(TrackingSite.BITSTREAM).trackPage(request,"Bitstream Download / Single File");
-            }
             
             int sequence = par.getParameterAsInteger("sequence", -1);
             String name = par.getParameter("name", null);
@@ -260,6 +258,10 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                         bitstream = findBitstreamByName(item,name);
                     }
                 }
+            }
+
+            if (item != null) {
+                itemLastModified = item.getLastModified();
             }
 
             // if initial search was by sequence number and found nothing,
@@ -412,6 +414,12 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                     bitstreamName = "bitstream";
                 }
             }
+            
+            if(is_item_bitstream && ConfigurationManager.getBooleanProperty("lr", "lr.tracker.enabled")) {
+                // Track the download for analytics platform
+                TrackerFactory.createInstance(TrackingSite.BITSTREAM).trackPage(request,"Bitstream Download / Single File");
+            }
+            
             
             // Log that the bitstream has been viewed, this is non-cached and the complexity
             // of adding it to the sitemap for every possible bitstream uri is not very tractable
@@ -691,7 +699,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         {
             // Check for if-modified-since header -- ONLY if not authenticated
             long modSince = request.getDateHeader("If-Modified-Since");
-            if (modSince != -1 && item != null && item.getLastModified().getTime() < modSince)
+            if (modSince != -1 && itemLastModified != null && itemLastModified.getTime() < modSince)
             {
                 // Item has not been modified since requested date,
                 // hence bitstream has not been, either; return 304
@@ -711,12 +719,11 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         // users in the cache for a response later to anonymous user.
         try
         {
-            if (item != null && (isSpider || ContextUtil.obtainContext(request).getCurrentUser() == null))
+            if (itemLastModified != null && (isSpider || ContextUtil.obtainContext(request).getCurrentUser() == null))
             {
                 // TODO:  Currently just borrow the date of the item, since
                 // we don't have last-mod dates for Bitstreams
-                response.setDateHeader("Last-Modified", item.getLastModified()
-                        .getTime());
+                response.setDateHeader("Last-Modified", itemLastModified.getTime());
             }
         }
         catch (SQLException e)
@@ -869,6 +876,12 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         this.bitstreamMimeType = null;
         this.bitstreamID = 0;
         this.userID = 0;
+        this.bitstreamName = null;
+        this.itemLastModified = null;
+        this.tempFile = null;
+        this.item = null;
+        this.redirectToURL = null;
+        super.recycle();
     }
 
 
