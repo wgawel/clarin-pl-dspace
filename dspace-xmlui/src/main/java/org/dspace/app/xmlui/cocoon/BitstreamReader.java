@@ -448,8 +448,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             	this.redirectToURL = "";
             }
 
-            XSendFileHeader = ConfigurationManager.getProperty("lr","XSendFileHeader");
-            XSendFilePathPrefix = ConfigurationManager.getProperty("lr", "XSendFilePathPrefix");
+            XSendFileHeader = new DSpace().getConfigurationService().getProperty("lr.XSendFileHeader");
+            XSendFilePathPrefix = new DSpace().getConfigurationService().getProperty("lr.XSendFilePathPrefix");
             XSendFilePathPrefix = XSendFilePathPrefix == null ? "" : XSendFilePathPrefix;
             //assume only one assetstore
             bitstreamPathRelativeToAssetstore = XSendFilePathPrefix + BitstreamStorageManager.getIntermediatePath(bitstream.get_internal_id()) +
