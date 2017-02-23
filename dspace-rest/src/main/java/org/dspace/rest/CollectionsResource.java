@@ -35,11 +35,14 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseException;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.Constants;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.IdentifierService;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Item;
 import org.dspace.rest.common.MetadataEntry;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.usage.UsageEvent;
+import org.dspace.utils.DSpace;
 
 /**
  * This class provides all CRUD operation over collections.
@@ -363,6 +366,11 @@ public class CollectionsResource extends Resource
             browse.indexItem(dspaceItem);
 
             log.trace("Installing item to collection(id=" + collectionId + ").");
+            IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
+            context.turnOffAuthorisationSystem();
+            identifierService.reserve(context, dspaceItem);
+            dspaceItem.update();
+            context.restoreAuthSystemState();
             dspaceItem = org.dspace.content.InstallItem.installItem(context, workspaceItem);
 
             returnItem = new Item(dspaceItem, "", context);
@@ -392,8 +400,9 @@ public class CollectionsResource extends Resource
             processException(
                     "Could not add item into collection(id=" + collectionId + "), ContextException. Message: " + e.getMessage(),
                     context);
-        }
-        finally
+        } catch (IdentifierException e) {
+            processException("Could not reserve handle, IdentifierException. Message: " + e.getMessage(), context);
+        } finally
         {
             processFinally(context);
         }
