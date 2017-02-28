@@ -157,6 +157,8 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
         //If we are on a search page performing a search a query may be used
         String query = request.getParameter("query");
         if(query != null && !"".equals(query)){
+            // Do standard escaping of some characters in this user-entered query
+            query = DiscoveryUIUtils.escapeQueryChars(query);
             queryArgs.setQuery(query);
         }
 
@@ -232,23 +234,31 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                 String displayedValue = value.getDisplayedValue();
                                 String filterQuery = value.getAsFilterQuery();
                                 String filterType = value.getFilterType();
-                                if (fqs.contains(getSearchService().toFilterQuery(context, field.getIndexFieldName(), value.getFilterType(), value.getAsFilterQuery()).getFilterQuery())) {
-                                    filterValsList.addItem(Math.random() + "", "selected").addContent(displayedValue + " (" + value.getCount() + ")");
-                                } else {
-                                    String paramsQuery = retrieveParameters(request);
-
-                                    filterValsList.addItem().addXref(
-                                            contextPath +
-                                                    (dso == null ? "" : "/handle/" + dso.getHandle()) +
-                                                    "/discover?" +
-                                                    paramsQuery +
-                                                    "filtertype=" + field.getIndexFieldName() +
-                                                    "&filter_relational_operator="+ filterType  +
-                                                    "&filter=" + encodeForURL(filterQuery),
-                                            displayedValue + " (" + value.getCount() + ")"
-                                    );
+                                
+                                // add discovery filter only if it can narrow down the search
+                                if(value.getCount() < queryResults.getTotalSearchResults()) {
+                                
+	                                if (fqs.contains(getSearchService().toFilterQuery(context, field.getIndexFieldName(), value.getFilterType(), value.getAsFilterQuery()).getFilterQuery())) {
+	                                    filterValsList.addItem(Math.random() + "", "selected").addContent(displayedValue + " (" + value.getCount() + ")");
+	                                } else {
+	                                    String paramsQuery = retrieveParameters(request);
+	
+	                                    filterValsList.addItem().addXref(
+	                                            contextPath +
+	                                                    (dso == null ? "" : "/handle/" + dso.getHandle()) +
+	                                                    "/discover?" +
+	                                                    paramsQuery +
+	                                                    "filtertype=" + field.getIndexFieldName() +
+	                                                    "&filter_relational_operator="+ filterType  +
+	                                                    "&filter=" + encodeForURL(filterQuery),
+	                                            displayedValue + " (" + value.getCount() + ")"
+	                                    );
+	                                }
+                                
                                 }
                             }
+                                
+                            
                             //Show a "view more" url should there be more values, unless we have a date
                             if (i == shownFacets - 1 && !field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)/*&& facetField.getGap() == null*/) {
                                 addViewMoreUrl(filterValsList, dso, request, field.getIndexFieldName());

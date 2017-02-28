@@ -94,8 +94,6 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 	private final String sfxFile = ConfigurationManager.getProperty("dspace.dir")
             + File.separator + "config" + File.separator + "sfx.xml";
 
-	private String sfxQuery = null;
-
     private static final Logger log = LoggerFactory.getLogger(ItemViewer.class);
 
     /**
@@ -194,7 +192,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         String sfxserverUrl = ConfigurationManager.getProperty("sfx.server.url");
         if (sfxserverUrl != null && sfxserverUrl.length() > 0)
         {
-            sfxQuery = "";
+            String sfxQuery = "";
 
             // parse XML file -> XML document will be build
             sfxQuery = SFXFileReader.loadSFXFile(sfxFile, item);
@@ -351,7 +349,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
         // Add Withdrawn Message if it is
         if(item.isWithdrawn()){
-            Division div = division.addDivision("notice", "notice");
+            Division div = division.addDivision("notice", "alert");
             Para p = div.addPara();
             p.addContent(T_withdrawn);
             //Set proper response. Return "404 Not Found"

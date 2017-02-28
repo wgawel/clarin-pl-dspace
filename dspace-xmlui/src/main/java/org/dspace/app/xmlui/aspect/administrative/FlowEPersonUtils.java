@@ -27,11 +27,15 @@ import org.dspace.eperson.AccountManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.EPersonDeletionException;
 
+import cz.cuni.mff.ufal.DSpaceApi;
+import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
+
 /**
  * Utility methods to processes actions on EPeople. These methods are used
  * exclusively from the administrative flow scripts.
  * 
- * @author Scott Phillips
+ * based on class by scott phillips
+ * modified for LINDAT/CLARIN
  */
 public class FlowEPersonUtils {
 
@@ -44,7 +48,10 @@ public class FlowEPersonUtils {
 	
 	private static final Message T_reset_password_success_notice =
 		new Message("default","xmlui.administrative.FlowEPersonUtils.reset_password_success_notice");
-	
+
+	private static final Message T_reset_netid_success_notice =
+		new Message("default", "xmlui.administrative.FlowEPersonUtils.reset_netid_success_notice");
+
 	private static final Message t_delete_eperson_success_notice =
 		new Message("default","xmlui.administrative.FlowEPersonUtils.delete_eperson_success_notice");
 	
@@ -66,12 +73,13 @@ public class FlowEPersonUtils {
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false); // default to no continue
-		
+
 		// Get all our request parameters
 		String email = request.getParameter("email_address").trim();
 		String first = request.getParameter("first_name").trim();
 		String last  = request.getParameter("last_name").trim();
 		String phone = request.getParameter("phone").trim();
+		String org = request.getParameter("org").trim();
 		boolean login = (request.getParameter("can_log_in") != null) ? true : false;
 		boolean certificate = (request.getParameter("certificate") != null) ? true : false;
 		
@@ -88,6 +96,10 @@ public class FlowEPersonUtils {
         {
             result.addError("last_name");
         }
+		if (StringUtils.isEmpty(org))
+		{
+			result.addError("org");
+		}
 	    
 	    
 		// Check if the email address is already being used.	        		
@@ -111,6 +123,12 @@ public class FlowEPersonUtils {
             newPerson.setSelfRegistered(false);
             
             newPerson.update();
+            
+            IFunctionalities epersonManager = DSpaceApi.getFunctionalityManager();
+            epersonManager.openSession();
+            epersonManager.registerUser(newPerson.getID(), newPerson.getEmail(), org, newPerson.canLogIn());
+            epersonManager.closeSession();
+            
             context.commit();
             // success
             result.setContinue(true);
@@ -146,9 +164,13 @@ public class FlowEPersonUtils {
 		String email = request.getParameter("email_address");
 		String first = request.getParameter("first_name");
 		String last  = request.getParameter("last_name");
+		String language = request.getParameter("language");
 		String phone = request.getParameter("phone");
+		String org = request.getParameter("org").trim();		
+		String welcome_message = request.getParameter("welcome_message").trim();		
 		boolean login = (request.getParameter("can_log_in") != null) ? true : false;
 		boolean certificate = (request.getParameter("certificate") != null) ? true : false;
+		boolean editMetadata = (request.getParameter("can_edit_metadata") != null) ? true : false;
 		
 		
 		// If we have errors, the form needs to be resubmitted to fix those problems
@@ -164,6 +186,10 @@ public class FlowEPersonUtils {
         {
             result.addError("last_name");
         }
+		if (StringUtils.isEmpty(org))
+		{
+			result.addError("org");
+		}		
 		
 		
 	    // No errors, so we edit the EPerson with the data provided
@@ -197,15 +223,31 @@ public class FlowEPersonUtils {
             if (originalLastName == null || !originalLastName.equals(last)) {
         		personModified.setLastName(last);
         	}
+        	String originalLanguage = personModified.getMetadata("language");
+            if (originalLanguage == null || !originalLanguage.equals(language)) {
+        		personModified.setMetadata("language", language);
+        	}
         	String originalPhone = personModified.getMetadata("phone");
             if (originalPhone == null || !originalPhone.equals(phone)) {
         		personModified.setMetadata("phone", phone);
         	}
         	personModified.setCanLogIn(login);
         	personModified.setRequireCertificate(certificate);
+        	personModified.setCanEditSubmissionMetadata(editMetadata);
+        	// set welcome message
+        	String original_welcome_message = personModified.getWelcome();
+            if (original_welcome_message == null || !original_welcome_message.equals(welcome_message)) {
+        		personModified.setWelcome(welcome_message);
+        	}
         	
         	
         	personModified.update();
+        	
+            IFunctionalities epersonManager = DSpaceApi.getFunctionalityManager();
+            epersonManager.openSession();
+            epersonManager.updateRegisteredUser(personModified.getID(), personModified.getEmail(), org, personModified.canLogIn());        	
+            epersonManager.closeSession();
+            
         	context.commit();
         	
         	result.setContinue(true);
@@ -239,8 +281,23 @@ public class FlowEPersonUtils {
     	result.setMessage(T_reset_password_success_notice);
     	return result;
 	}
-	
-	
+
+	public static FlowResult processResetNetid(Context context, int epersonID)
+		throws IOException, MessagingException, SQLException, AuthorizeException
+	{
+		EPerson eperson = EPerson.find(context, epersonID);
+		FlowResult result = null;
+		if ( null != eperson ) {
+			eperson.setNetid(null);
+			eperson.update();
+			result = new FlowResult();
+			result.setContinue(true);
+			result.setOutcome(true);
+			result.setMessage(T_reset_netid_success_notice);
+		}
+		return result;
+	}
+
 	/**
 	 * Log this user in as another user. If the operation failed then the flow result
 	 * will be set to failure with it's message set correctly. Note that after logging out

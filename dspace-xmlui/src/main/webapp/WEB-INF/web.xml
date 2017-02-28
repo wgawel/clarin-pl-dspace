@@ -62,6 +62,36 @@
     <servlet-name>Cocoon</servlet-name>
   </filter-mapping>
     -->
+  <!--
+  <filter>
+    <filter-name>MissingAttributeTestFilter</filter-name>
+    <filter-class>cz.cuni.mff.ufal.MissingAttributeTestFilter</filter-class>
+     <init-param>
+      <param-name>hide</param-name>
+      <param-value>mail,eppn,persistent-id</param-value>
+    </init-param>  
+  </filter>
+  
+  <filter-mapping>
+    <filter-name>MissingAttributeTestFilter</filter-name>
+    <url-pattern>/shibboleth-login</url-pattern>
+  </filter-mapping>
+    -->
+
+  <filter>
+    <filter-name>NoCacheServletFilter</filter-name>
+    <filter-class>cz.cuni.mff.ufal.NoCacheServletFilter</filter-class>  
+  </filter>
+  
+  <filter-mapping>
+    <filter-name>NoCacheServletFilter</filter-name>
+    <url-pattern>/shibboleth-login</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>NoCacheServletFilter</filter-name>
+    <url-pattern>/logout</url-pattern>
+  </filter-mapping>
 
 
   <!--
@@ -161,10 +191,14 @@
 
   <!-- Servlet Context Listener ======================================= -->
   
-    <!-- kernel start listener (from impl), starts up the kernel for standalong webapps -->
-  <listener>
-     <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
-  </listener>
+    <!--
+       DSpace Kernel startup listener. This listener is in charge of initializing/starting the
+       DSpace Kernel. It MUST be listed BEFORE any other DSpace listeners, as DSpace services
+       will not function until the Kernel is initialized.
+    -->
+    <listener>
+       <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
+    </listener>
   
     <!-- Listener to clean up Commons-FileUpload -->
     <listener>
@@ -218,6 +252,16 @@
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
+<!-- UFAL -->
+ <servlet>
+        <servlet-name>DiscoJuice</servlet-name>
+        <jsp-file>/static/disco-juice.html</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DiscoJuice</servlet-name>
+        <url-pattern>/disco-juice</url-pattern>
+    </servlet-mapping>
+<!-- end UFAL -->
 
     <!-- URL space mappings ============================================= -->
 
@@ -284,6 +328,11 @@
     <mime-mapping>
         <extension>grm</extension>
         <mime-type>text/plain</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>js</extension>
+        <mime-type>application/javascript;charset=UTF-8</mime-type>
     </mime-mapping>
 
 </web-app>

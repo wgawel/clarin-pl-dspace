@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.cuni.mff.ufal.dspace.handle.Handle;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -35,6 +37,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * </p>
  *
  * @author Peter Breton
+ * modified for LINDAT/CLARIN
  * @version $Revision$
  */
 public class HandleManager
@@ -44,6 +47,8 @@ public class HandleManager
 
     /** Prefix registered to no one */
     static final String EXAMPLE_PREFIX = "123456789";
+
+    static final String PART_IDENTIFIER_DELIMITER = "@";
 
     /** Private Constructor */
     private HandleManager()
@@ -67,15 +72,34 @@ public class HandleManager
     public static String resolveToURL(Context context, String handle)
             throws SQLException
     {
-        TableRow dbhandle = findHandleInternal(context, handle);
+
+        // <UFAL>
+        String baseHandle = stripPartIdentifier(handle);
+        
+        log.debug(String.format("Base handle [%s]", baseHandle));
+        
+        TableRow dbhandle = findHandleInternal(context, baseHandle);
 
         if (dbhandle == null)
         {
             return null;
         }
 
-        String url = ConfigurationManager.getProperty("dspace.url")
-                + "/handle/" + handle;
+        String url = null;
+
+        if (dbhandle.getStringColumn("url") != null)
+        {
+            url = dbhandle.getStringColumn("url");
+        }
+        else
+        {
+            url = ConfigurationManager.getProperty("dspace.url") + "/handle/"
+                    + baseHandle;
+        }
+        
+        String partIdentifier = extractPartIdentifier(handle);
+        url = appendPartIdentifierToUrl(url, partIdentifier);
+        // </UFAL>
 
         if (log.isDebugEnabled())
         {
@@ -85,6 +109,73 @@ public class HandleManager
         return url;
     }
     
+    /**
+     * Strips the part identifier from the handle
+     * 
+     * @param handle The handle with optional part identifier 
+     * @return The handle without the part identifier
+     */
+    private static String stripPartIdentifier(String handle) 
+    {
+        String baseHandle = null;
+        if (handle != null)
+        {            
+            int pos = handle.indexOf(PART_IDENTIFIER_DELIMITER);
+            if(pos >= 0)
+            {
+                baseHandle = handle.substring(0, pos);
+            }
+            else 
+            {
+                baseHandle = handle;
+            }
+        }
+        return baseHandle;
+    }
+    
+    /**
+     * Extracts the part identifier from the handle
+     * 
+     * @param handle The handle with optional part identifier
+     * @return part identifier or null
+     */
+    private static String extractPartIdentifier(String handle) 
+    {        
+        String partIdentifier = null;
+        if(handle != null)
+        {
+            int pos = handle.indexOf(PART_IDENTIFIER_DELIMITER);
+            if(pos >= 0)
+            {                            
+                partIdentifier = handle.substring(pos+1);
+            }            
+        }        
+        return partIdentifier;
+    }
+    
+    /**
+     * Appends the partIdentifier as parameters to the given URL
+     * 
+     * @param url The URL
+     * @param partIdentifier  Part identifier (can be null or empty)
+     * @return Final URL with part identifier appended as parameters to the given URL
+     */
+    private static String appendPartIdentifierToUrl(String url, String partIdentifier)
+    {
+        String finalUrl = url;
+        if(finalUrl != null && partIdentifier != null && !partIdentifier.isEmpty())
+        {        
+            if(finalUrl.contains("?"))
+            {
+                finalUrl += '&' + partIdentifier;
+            }
+            else 
+            {
+                finalUrl += '?' + partIdentifier;
+            }
+        }        
+        return finalUrl;
+    }
     /**
      * Try to detect a handle in a URL.
      * @param context DSpace context
@@ -282,12 +373,17 @@ public class HandleManager
             while (rows.hasNext())
             {
                 TableRow row = rows.next();
-                //Only set the "resouce_id" column to null when unbinding a handle.
+                //Only set the "resource_id" column to null when unbinding a handle.
                 // We want to keep around the "resource_type_id" value, so that we
                 // can verify during a restore whether the same *type* of resource
                 // is reusing this handle!
                 row.setColumnNull("resource_id");
                 DatabaseManager.update(context, row);
+                //clear from cache if cached
+                Handle cachedHandle = (Handle)context.fromCache(Handle.class, row.getIntColumn("handle_id"));
+                if(cachedHandle != null){
+                    context.removeCached(cachedHandle, row.getIntColumn("handle_id"));
+                }
 
                 if(log.isDebugEnabled())
                 {
@@ -532,8 +628,14 @@ public class HandleManager
             throw new IllegalArgumentException("Handle is null");
         }
 
-        return DatabaseManager
-                .findByUnique(context, "Handle", "handle", handle);
+        if (!ConfigurationManager.getBooleanProperty("handle.caseSensitive", true)){
+            return DatabaseManager
+                    .findByUniqueNonCaseSensitive(context, "Handle", "handle", handle);
+        }else {
+
+            return DatabaseManager
+                    .findByUnique(context, "Handle", "handle", handle);
+        }
     }
 
     /**
@@ -550,5 +652,25 @@ public class HandleManager
 
         return new StringBuffer().append(handlePrefix).append(
                 handlePrefix.endsWith("/") ? "" : "/").append(id).toString();
+    }
+
+    public static boolean isDead(Context context, String handle) throws SQLException {
+        String baseHandle = stripPartIdentifier(handle);
+
+        TableRow dbhandle = findHandleInternal(context, baseHandle);
+
+        return dbhandle.getBooleanColumn("dead");
+
+    }
+
+    public static String getDeadSince(Context context, String handle) throws SQLException {
+        String baseHandle = stripPartIdentifier(handle);
+
+        TableRow dbhandle = findHandleInternal(context, baseHandle);
+
+        java.util.Date timestamptz = dbhandle.getDateColumn("dead_since");
+
+        return timestamptz != null ? DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(timestamptz) : null;
+
     }
 }

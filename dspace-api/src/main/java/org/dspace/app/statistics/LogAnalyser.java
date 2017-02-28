@@ -15,6 +15,8 @@ import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 
+import cz.cuni.mff.ufal.statistics.SimpleSpiderDetector;
+
 import java.sql.SQLException;
 
 import java.text.ParseException;
@@ -40,7 +42,8 @@ import java.io.IOException;
  * can then be used for display purposes using the related ReportGenerator
  * class.
  *
- * @author  Richard Jones
+ * based on class by  Richard Jones
+ * modified for LINDAT/CLARIN
  */
 public class LogAnalyser 
 {
@@ -64,12 +67,16 @@ public class LogAnalyser
     
     /** aggregator for item views */
     private static Map<String, Integer> itemAggregator;
+    private static Map<String, Integer> itemBotlessAggregator;
     
     /** aggregator for current archive state statistics */
     private static Map<String, Integer> archiveStats;
     
     /** warning counter */
     private static int warnCount = 0;
+
+    /** exception counter */
+    private static int excCount = 0;
     
     /** log line counter */
     private static int lineCount = 0;
@@ -99,6 +106,10 @@ public class LogAnalyser
     /** bottom limit to output for item view analysis */
     private static int itemFloor;
     
+    /** bottom limit to output for action view analysis */
+    private static int actionFloor;
+    
+    
     /** number of items from most popular to be looked up in the database */
     private static int itemLookup;
     
@@ -116,6 +127,9 @@ public class LogAnalyser
     
     /** the average number of views per item */
     private static int views = 0;
+    
+    /** ignore actions if one of the strings is contained in the processed log line */
+    private static List<String> actionIgnores;
     
     ///////////////////////
     // regular expressions
@@ -147,10 +161,16 @@ public class LogAnalyser
    
    /** a pattern to match a valid version 1.3 log file line */
    private static Pattern valid13 = null;
-   
+
+  /** basic log line */
+   private static Pattern validBase = null;
+
    /** a pattern to match a valid version 1.4 log file line */
    private static Pattern valid14 = null;
    
+   private static Pattern ip_matcher = null;
+   
+ 
    /** pattern to match valid log file names */
    private static Pattern logRegex = null;
    
@@ -215,7 +235,7 @@ public class LogAnalyser
         
         // create context as super user
         Context context = new Context();
-        context.setIgnoreAuthorization(true);
+        context.turnOffAuthorisationSystem();
         
         // set up our command line variables
         String myLogDir = null;
@@ -288,7 +308,7 @@ public class LogAnalyser
      * @param   myEndDate       the desired end of the analysis.  Goes to the end otherwise
      * @param   myLookUp        force a lookup of the database
      */
-    public static void processLogs(Context context, String myLogDir, 
+    public static String processLogs(Context context, String myLogDir, 
                                     String myFileTemplate, String myConfigFile, 
                                     String myOutFile, Date myStartDate, 
                                     Date myEndDate, boolean myLookUp)
@@ -305,6 +325,7 @@ public class LogAnalyser
         searchAggregator = new HashMap<String, Integer>();
         userAggregator = new HashMap<String, Integer>();
         itemAggregator = new HashMap<String, Integer>();
+        itemBotlessAggregator = new HashMap<String, Integer>();
         archiveStats = new HashMap<String, Integer>();
         
         //instantiate lists
@@ -313,6 +334,7 @@ public class LogAnalyser
         excludeTypes = new ArrayList<String>();
         excludeChars = new ArrayList<String>();
         itemTypes = new ArrayList<String>();
+        actionIgnores = new ArrayList<String>();
               
         // set the parameters for this analysis
         setParameters(myLogDir, myFileTemplate, myConfigFile, myOutFile, myStartDate, myEndDate, myLookUp);
@@ -369,7 +391,7 @@ public class LogAnalyser
                 {
                     // get the log line object
                     LogLine logLine = getLogLine(line);
-                    
+
                     // if there are line segments get on with the analysis
                     if (logLine != null)
                     {
@@ -420,13 +442,22 @@ public class LogAnalyser
                                 logEndDate = logLine.getDate();
                             }
                         }
-                        
+
                         // count the warnings
                         if (logLine.isLevel("WARN"))
                         {
                             // FIXME: really, this ought to be some kind of level
                             // aggregator
                             warnCount++;
+                        }
+                        // count the exceptions
+                        if (logLine.isLevel("ERROR"))
+                        {
+                            excCount++;
+                        }
+
+                        if ( null == logLine.getAction() ) {
+                            continue;
                         }
 
                         // is the action a search?
@@ -467,6 +498,14 @@ public class LogAnalyser
                             // either add the handle to the aggregator or
                             // increment its counter
                             itemAggregator.put(handle, increment(itemAggregator, handle));
+                            if ( logLine.getIp() != null 
+                            		&& !SimpleSpiderDetector.isSpider(logLine.getIp())) 
+                            {
+                                itemBotlessAggregator.put(handle, increment(itemBotlessAggregator, handle));
+                            }else {
+                                // init to 0 or leave
+                                itemBotlessAggregator.put(handle, increment(itemBotlessAggregator, handle) - 1);
+                            }
                         }
 
                         // log all the activity
@@ -513,9 +552,7 @@ public class LogAnalyser
         }
         
         // finally, write the output
-        createOutput();
-
-        return;
+        return createOutput();
     }
    
     
@@ -575,7 +612,7 @@ public class LogAnalyser
     /**
      * generate the analyser's output to the specified out file
      */
-    public static void createOutput()
+    public static String createOutput()
     {
         // start a string buffer to hold the final output
         StringBuffer summary = new StringBuffer();
@@ -588,6 +625,7 @@ public class LogAnalyser
         
         // output the number of warnings encountered
         summary.append("warnings=" + Integer.toString(warnCount) + "\n");
+        summary.append("exceptions=" + Integer.toString(excCount) + "\n");
         
         // set the general summary config up in the aggregator file
         for (int i = 0; i < generalSummary.size(); i++)
@@ -632,10 +670,14 @@ public class LogAnalyser
         
         // write out the action aggregation results
         keys = actionAggregator.keySet().iterator();
+        summary.append("action_floor=" + actionFloor + "\n");
         while (keys.hasNext())
         {
             String key = keys.next();
-            summary.append("action." + key + "=" + actionAggregator.get(key) + "\n");
+            if ((actionAggregator.get(key)).intValue() >= actionFloor)
+            {
+                summary.append("action." + key + "=" + actionAggregator.get(key) + "\n");
+            }
         }
         
         // depending on the config settings for reporting on emails output the
@@ -696,7 +738,7 @@ public class LogAnalyser
             String key = keys.next();
             if ((itemAggregator.get(key)).intValue() >= itemFloor)
             {
-                summary.append("item." + key + "=" + itemAggregator.get(key) + "\n");
+                summary.append("item." + key + "=" + itemBotlessAggregator.get(key) + "|" +  + itemAggregator.get(key) + "\n");
             }
         }
         
@@ -725,7 +767,7 @@ public class LogAnalyser
             System.exit(0);
         }
         
-        return;
+        return summary.toString();
     }
     
     
@@ -796,10 +838,12 @@ public class LogAnalyser
         singleRX = Pattern.compile("( . |^. | .$)");
         
         // set up the standard log file line regular expression
+        String logLineBase = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ (.*)"; //date time LEVEL class @ whatever
         String logLine13 = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ ([^:]+):[^:]+:([^:]+):(.*)";
         String logLine14 = "^(\\d\\d\\d\\d-\\d\\d\\-\\d\\d) \\d\\d:\\d\\d:\\d\\d,\\d\\d\\d (\\w+)\\s+\\S+ @ ([^:]+):[^:]+:[^:]+:([^:]+):(.*)";
         valid13 = Pattern.compile(logLine13);
         valid14 = Pattern.compile(logLine14);
+        validBase = Pattern.compile(logLineBase);
         
         // set up the pattern for validating log file names
         logRegex = Pattern.compile(fileTemplate);
@@ -835,6 +879,12 @@ public class LogAnalyser
         }
         wordRXString.append(")");
         wordRX = Pattern.compile(wordRXString.toString());
+        
+        //
+        ip_matcher = Pattern.compile(
+        		".*:ip_addr=([^:]*):.*"
+        		// :ip_addr=127.0.0.1:
+        );
         
         return;
     }
@@ -876,6 +926,7 @@ public class LogAnalyser
         excludeTypes = new ArrayList<String>();
         excludeChars = new ArrayList<String>();
         itemTypes = new ArrayList<String>();
+        actionIgnores = new ArrayList<String>();
 
         // prepare our standard file readers and buffered readers
         FileReader fr = null;
@@ -950,9 +1001,19 @@ public class LogAnalyser
                     itemLookup = Integer.parseInt(value);
                 }
 
+                if (key.equals("action.floor"))
+                {
+                    actionFloor = Integer.parseInt(value);
+                }
+
                 if (key.equals("user.email"))
                 {
                     userEmail = value;
+                }
+                
+                if (key.equals("action.ignore"))
+                {
+                    actionIgnores.add(value);
                 }
             }
         }
@@ -1103,13 +1164,30 @@ public class LogAnalyser
         // we need to much more carefully define the structure and behaviour
         // of the LogLine class
         Matcher match;
+        String ip = null;
         
         if (line.indexOf(":ip_addr") > 0)
         {
+            // idp=http: caused invalid parsing
+            line = line.replaceAll("https?://", "//");
+            try {
+            	match = ip_matcher.matcher(line);
+            	if (match.matches()) {
+            		ip = match.group(1);
+            	}
+            }catch(Exception e) {
+            }
             match = valid14.matcher(line);
         }
         else
         {
+            // do not log our specific code and DEBUG events #759
+            // todo: optimise
+            for ( String magic : actionIgnores ) {
+                if ( line.contains(magic) ) {
+                    return null;
+                }
+            }
             match = valid13.matcher(line);
         }
         
@@ -1122,10 +1200,23 @@ public class LogAnalyser
                                           LogManager.unescapeLogField(match.group(4)).trim(),
                                           LogManager.unescapeLogField(match.group(5)).trim());
             
+            // ufal
+            logLine.setIp(ip);
+            
             return logLine;
         }
         else
         {
+            match = validBase.matcher(line);
+            if ( match.matches() ) {
+                LogLine logLine = new LogLine(parseDate(match.group(1).trim()),
+                    LogManager.unescapeLogField(match.group(2)).trim(),
+                    null,
+                    null,
+                    null
+                );
+                return logLine;
+            }
             return null;
         }
     }

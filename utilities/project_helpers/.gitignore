@@ -1,0 +1,4 @@
+local.conf*
+!local.conf.dist
+logs/*.log
+bits/libs

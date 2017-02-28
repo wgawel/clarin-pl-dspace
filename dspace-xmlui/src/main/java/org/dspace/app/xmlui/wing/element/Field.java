@@ -56,6 +56,7 @@ package org.dspace.app.xmlui.wing.element;
  * composite: A combination of multile fields into one input control.
  *
  * @author Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 
 import java.util.ArrayList;
@@ -286,6 +287,15 @@ public abstract class Field extends AbstractWingElement implements
     public void setAutofocus(String value)
     {
         this.params.setAutofocus(value);
+    }
+
+    /**
+     * Placeholder.
+     * @param value To add placeholder.
+     */
+    public void setPlaceholder(String value)
+    {
+        this.params.setPlaceholder(value);
     }
 
     /**
@@ -642,5 +652,18 @@ public abstract class Field extends AbstractWingElement implements
         values = null;
         instances = null;
         super.dispose();
+    }
+    
+    //TODO better refactor these in an interface
+    public Instance addInstance() throws WingException{
+    	throw new UnsupportedOperationException();
+    }
+
+    public void setValue(String characters) throws WingException{
+    	throw new UnsupportedOperationException();
+    }
+    
+    public String getName(){
+    	return name;
     }
 }

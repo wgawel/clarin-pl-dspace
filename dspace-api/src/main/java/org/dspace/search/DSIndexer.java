@@ -392,7 +392,7 @@ public class DSIndexer
         {
             setBatchProcessingMode(true);
             Context context = new Context();
-            context.setIgnoreAuthorization(true);
+            context.turnOffAuthorisationSystem();
 
             String usage = "org.dspace.search.DSIndexer [-cbhof[r <item handle>]] or nothing to update/clean an existing index.";
             Options options = new Options();
@@ -639,6 +639,12 @@ public class DSIndexer
     static IndexingTask prepareIndexingTask(Context context, DSpaceObject dso, boolean force) throws SQLException, IOException, DCInputsReaderException
     {
         String handle = HandleManager.findHandle(context, dso);
+		// no handle - skip indexing
+        if ( null == handle ) {
+            log.warn( String.format("Cannot index object with NULL handle - [Item id:%s - %s]!",
+                dso.getID(), dso.toString()) );
+            return null;
+        }
         Term term = new Term("handle", handle);
         IndexingTask action = null;
         switch (dso.getType())

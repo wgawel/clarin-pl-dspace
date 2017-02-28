@@ -17,10 +17,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.LogManager;
+import org.dspace.core.*;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -30,7 +27,8 @@ import org.dspace.storage.rdbms.TableRowIterator;
 /**
  * Class representing an item in the process of being submitted by a user
  * 
- * @author Robert Tansley
+ * based on class by Robert Tansley
+ * modified for LINDAT/CLARIN
  * @version $Revision$
  */
 public class WorkspaceItem implements InProgressSubmission
@@ -249,6 +247,10 @@ public class WorkspaceItem implements InProgressSubmission
             }
         }
 
+        if ( null != coll.getPrincipalCommunity() ) {
+            i.addMetadata("local", "branding", null, null, coll.getPrincipalCommunity().getName());
+        }
+        
         i.update();
 
         // Create the workspace item row
@@ -267,6 +269,34 @@ public class WorkspaceItem implements InProgressSubmission
         WorkspaceItem wi = new WorkspaceItem(c, row);
 
         return wi;
+    }
+    
+    /**
+     * Creates a new workspace item based on a given item
+     * @param context DSpace context object
+     * @param item Item used a a template 
+     * @return New workspace item based on the given item
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public static WorkspaceItem createByItem(Context context, Item item) throws SQLException, AuthorizeException, IOException
+    {
+        Collection coll = item.getOwningCollection();               
+        WorkspaceItem workspaceItem = WorkspaceItem.create(context, coll, false);        
+        Item newItem = workspaceItem.getItem();
+        //clear branding from create(), and use the one from item
+        item.clearMetadata("local", "branding", Item.ANY, Item.ANY);
+        
+        Metadatum[] md = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (int n = 0; n < md.length; n++)
+        {            
+            newItem.addMetadata(md[n].schema, md[n].element, md[n].qualifier, md[n].language,
+                    md[n].value);
+        }
+        newItem.update();        
+        
+        return workspaceItem;
     }
 
     /**
@@ -665,5 +695,14 @@ public class WorkspaceItem implements InProgressSubmission
     public void setPublishedBefore(boolean b)
     {
         wiRow.setColumn("published_before", b);
+    }
+
+    public String getShareToken() {
+        String token = wiRow.getStringColumn("share_token");
+        if(token == null || token.equals("")){
+            token  = Utils.generateHexKey();
+            wiRow.setColumn("share_token", token);
+        }
+        return token;
     }
 }

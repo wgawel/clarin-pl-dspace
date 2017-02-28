@@ -29,11 +29,13 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
+import cz.cuni.mff.ufal.DSpaceApi;
 
 /**
  *  Test class for harvested collections.
  *
- * @author Alexey Maslov
+ * based on class by Alexey Maslov
+ * modified for LINDAT/CLARIN
  */
 public class Harvest
 {

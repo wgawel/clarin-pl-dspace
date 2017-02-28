@@ -22,20 +22,29 @@
           autowire="byType"
           scope="singleton"/>
 
-   <!-- provider for exposing default Handle services implementaion. -->
+    <!-- Identifier Service Application Interface.  Will be autowired with
+         any Identifier Providers present in Spring context.
+    -->
+    <bean id="org.dspace.identifier.HandleIdentifierProvider"
+          class="cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider"
+          scope="singleton">
+        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
+    </bean>
+
+    <!-- provider for exposing default Handle services implementaion. -->
     <!--bean id="org.dspace.identifier.HandleIdentifierProvider" class="org.dspace.identifier.HandleIdentifierProvider"
           scope="singleton">
         <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
     </bean-->
 
-    <bean id="org.dspace.identifier.VersionedHandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider"
-          scope="singleton">
-        <property name="configurationService" ref="org.dspace.services.ConfigurationService"/>
-        <property name="versionDAO">
-            <bean class="org.dspace.versioning.VersionDAO"/>
-        </property>
-        <property name="versionHistoryDAO">
-            <bean class="org.dspace.versioning.VersionHistoryDAO"/>
-        </property>
-    </bean>
+    <!--<bean id="org.dspace.identifier.VersionedHandleIdentifierProvider" class="org.dspace.identifier.VersionedHandleIdentifierProvider"-->
+          <!--scope="singleton">-->
+        <!--<property name="configurationService" ref="org.dspace.services.ConfigurationService"/>-->
+        <!--<property name="versionDAO">-->
+            <!--<bean class="org.dspace.versioning.VersionDAO"/>-->
+        <!--</property>-->
+        <!--<property name="versionHistoryDAO">-->
+            <!--<bean class="org.dspace.versioning.VersionHistoryDAO"/>-->
+        <!--</property>-->
+    <!--</bean>-->
 </beans>

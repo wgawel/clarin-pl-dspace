@@ -49,6 +49,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -62,7 +63,8 @@ import static org.dspace.content.Item.find;
 import static org.dspace.xoai.util.ItemUtils.retrieveMetadata;
 
 /**
- * @author Lyncode Development Team <dspace@lyncode.com>
+ * based on class by Lyncode Development Team <dspace@lyncode.com>
+ * modified for LINDAT/CLARIN
  */
 @SuppressWarnings("deprecation")
 public class XOAI {
@@ -128,7 +130,7 @@ public class XOAI {
             if (clean) {
                 clearIndex();
                 System.out.println("Using full import.");
-                this.indexAll();
+                result = this.indexAll();
             } else {
                 SolrQuery solrParams = new SolrQuery("*:*")
                         .addField("item.lastmodified")
@@ -167,10 +169,11 @@ public class XOAI {
         System.out
                 .println("Incremental import. Searching for documents modified after: "
                         + last.toString());
-
-        String sqlQuery = "SELECT item_id FROM item WHERE in_archive=TRUE AND discoverable=TRUE AND last_modified > ?";
+        // Index both in_archive items AND withdrawn items. Withdrawn items will be flagged withdrawn
+        // (in order to notify external OAI harvesters of their new status)
+        String sqlQuery = "SELECT item_id FROM item WHERE (in_archive=TRUE OR withdrawn=TRUE) AND discoverable=TRUE AND last_modified > ?";
         if(DatabaseManager.isOracle()){
-                sqlQuery = "SELECT item_id FROM item WHERE in_archive=1 AND discoverable=1 AND last_modified > ?";
+                sqlQuery = "SELECT item_id FROM item WHERE (in_archive=1 OR withdrawn=1) AND discoverable=1 AND last_modified > ?";
         }
 
         try {
@@ -187,10 +190,11 @@ public class XOAI {
     private int indexAll() throws DSpaceSolrIndexerException {
         System.out.println("Full import");
         try {
-
-            String sqlQuery = "SELECT item_id FROM item WHERE in_archive=TRUE AND discoverable=TRUE";
+            // Index both in_archive items AND withdrawn items. Withdrawn items will be flagged withdrawn
+            // (in order to notify external OAI harvesters of their new status)
+            String sqlQuery = "SELECT item_id FROM item WHERE (in_archive=TRUE OR withdrawn=TRUE) AND discoverable=TRUE";
             if(DatabaseManager.isOracle()){
-                sqlQuery = "SELECT item_id FROM item WHERE in_archive=1 AND discoverable=1";
+                sqlQuery = "SELECT item_id FROM item WHERE (in_archive=1 OR withdrawn=1) AND discoverable=1";
             }
 
             TableRowIterator iterator = DatabaseManager.query(context,
@@ -244,14 +248,16 @@ public class XOAI {
         String handle = item.getHandle();
         doc.addField("item.handle", handle);
         doc.addField("item.lastmodified", item.getLastModified());
-        doc.addField("item.submitter", item.getSubmitter().getEmail());
+        if (item.getSubmitter() != null) {
+            doc.addField("item.submitter", item.getSubmitter().getEmail());
+        }
         doc.addField("item.deleted", item.isWithdrawn() ? "true" : "false");
         for (Collection col : item.getCollections())
             doc.addField("item.collections",
-                    "col_" + col.getHandle().replace("/", "_"));
+                    "hdl_" + col.getHandle().replace("/", "_"));
         for (Community com : collectionsService.flatParentCommunities(item))
             doc.addField("item.communities",
-                    "com_" + com.getHandle().replace("/", "_"));
+                    "hdl_" + com.getHandle().replace("/", "_"));
 
         Metadatum[] allData = item.getMetadata(Item.ANY, Item.ANY, Item.ANY,
                 Item.ANY);
@@ -276,7 +282,11 @@ public class XOAI {
         retrieveMetadata(item).write(context);
         context.getWriter().flush();
         context.getWriter().close();
-        doc.addField("item.compile", out.toString());
+        try {
+            doc.addField("item.compile", out.toString("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            doc.addField("item.compile", out.toString());
+        }
 
         if (verbose) {
             println("Item with handle " + handle + " indexed");
@@ -287,17 +297,14 @@ public class XOAI {
     }
 
     private boolean isPublic(Item item) {
+        boolean pub = false;
         try {
-            AuthorizeManager.authorizeAction(context, item, Constants.READ);
-            for (Bundle b : item.getBundles())
-                AuthorizeManager.authorizeAction(context, b, Constants.READ);
-            return true;
-        } catch (AuthorizeException ex) {
-            log.debug(ex.getMessage());
+            //Check if READ access allowed on this Item
+            pub = AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ);
         } catch (SQLException ex) {
             log.error(ex.getMessage());
         }
-        return false;
+        return pub;
     }
 
 
@@ -355,6 +362,8 @@ public class XOAI {
         XOAICacheService cacheService = applicationContext.getBean(XOAICacheService.class);
         XOAIItemCacheService itemCacheService = applicationContext.getBean(XOAIItemCacheService.class);
 
+        Context ctx = null;
+
         try {
             CommandLineParser parser = new PosixParser();
             Options options = new Options();
@@ -394,7 +403,7 @@ public class XOAI {
                 String command = line.getArgs()[0];
 
                 if (COMMAND_IMPORT.equals(command)) {
-                    Context ctx = new Context();
+                    ctx = new Context();
                     XOAI indexer = new XOAI(ctx,
                             line.hasOption('o'),
                             line.hasOption('c'),
@@ -404,21 +413,17 @@ public class XOAI {
 
                     int imported = indexer.index();
                     if (imported > 0) cleanCache(itemCacheService, cacheService);
-
-                    ctx.abort();
                 } else if (COMMAND_CLEAN_CACHE.equals(command)) {
                     cleanCache(itemCacheService, cacheService);
                 } else if (COMMAND_COMPILE_ITEMS.equals(command)) {
 
-                    Context ctx = new Context();
+                    ctx = new Context();
                     XOAI indexer = new XOAI(ctx, line.hasOption('v'));
                     applicationContext.getAutowireCapableBeanFactory().autowireBean(indexer);
 
                     indexer.compile();
 
                     cleanCache(itemCacheService, cacheService);
-
-                    ctx.abort();
                 } else if (COMMAND_ERASE_COMPILED_ITEMS.equals(command)) {
                     cleanCompiledItems(itemCacheService);
                     cleanCache(itemCacheService, cacheService);
@@ -435,6 +440,12 @@ public class XOAI {
                 ex.printStackTrace();
             }
             log.error(ex.getMessage(), ex);
+        }
+        finally
+        {
+            // Abort our context, if still open
+            if(ctx!=null && ctx.isValid())
+                ctx.abort();
         }
     }
 
@@ -499,5 +510,32 @@ public class XOAI {
             System.out.println("     -v Verbose output");
             System.out.println("     -h Shows this text");
         }
+    }
+    
+    public void indexItems(java.util.Collection<Item> items) throws Exception{
+    	 try {
+             SolrServer server = solrServerResolver.getServer();
+             for(Item item : items){
+                 try {
+                     server.add(this.index(item));
+                     context.clearCache();
+                 } catch (SQLException ex) {
+                     log.error(ex.getMessage(), ex);
+                 } catch (MetadataBindException e) {
+                     log.error(e.getMessage(), e);
+                 } catch (ParseException e) {
+                     log.error(e.getMessage(), e);
+                 } catch (XMLStreamException e) {
+                     log.error(e.getMessage(), e);
+                 } catch (WritingXmlException e) {
+                     log.error(e.getMessage(), e);
+                 }
+             }
+             server.commit();
+         } catch (SolrServerException ex) {
+             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
+         } catch (IOException ex) {
+             throw new DSpaceSolrIndexerException(ex.getMessage(), ex);
+         }    	
     }
 }

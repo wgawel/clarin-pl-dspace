@@ -12,7 +12,8 @@ import java.util.*;
 /**
  * This class represents a query which the discovery backend can use
  *
- * @author Kevin Van de Velde (kevin at atmire dot com)
+ * based on class by Kevin Van de Velde (kevin at atmire dot com)
+ * modified for LINDAT/CLARIN
  *
  */
 public class DiscoverQuery {
@@ -64,6 +65,10 @@ public class DiscoverQuery {
 
 
     public void setQuery(String query) {
+    	if(query!=null) {
+            query = query.replaceAll("://", "\\\\://");    	    
+    		if(query.equals("")) query = "*:*";
+    	}
         this.query = query;
     }
 
@@ -218,10 +223,20 @@ public class DiscoverQuery {
         this.facetOffset = facetOffset;
     }
 
+    /**
+     * Sets the fields which you want Discovery to return in the search results.
+     * It is HIGHLY recommended to limit the fields returned, as by default
+     * some backends (like Solr) will return everything.
+     * @param field field to add to the list of fields returned
+     */
     public void addSearchField(String field){
         this.searchFields.add(field);
     }
 
+    /**
+     * Get list of fields which Discovery will return in the search results
+     * @return List of field names
+     */
     public List<String> getSearchFields() {
         return searchFields;
     }

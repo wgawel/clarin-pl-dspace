@@ -8,6 +8,8 @@
 package org.dspace.app.xmlui.aspect.administrative.item;
 
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -21,46 +23,44 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+
+import cz.cuni.mff.ufal.dspace.app.xmlui.aspect.general.IfServiceManagerSelector;
 
 /**
  * Display basic meta-meta information about the item and allow the user to
  * change its state such as withdraw or reinstate, possibly even completely
  * deleting the item!
  * 
- * @author Jay Paz
- * @author Scott Phillips
+ * based on class by Jay Paz and Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 
 public class ViewItem extends AbstractDSpaceTransformer {
 
 	/** Language strings */
 	private static final Message T_dspace_home = message("xmlui.general.dspace_home");
-
 	private static final Message T_item_trail = message("xmlui.administrative.item.general.item_trail");
-
 	private static final Message T_option_head = message("xmlui.administrative.item.general.option_head");
-
-	private static final Message T_option_status = message("xmlui.administrative.item.general.option_status");
-
-	private static final Message T_option_bitstreams = message("xmlui.administrative.item.general.option_bitstreams");
-
-	private static final Message T_option_metadata = message("xmlui.administrative.item.general.option_metadata");
-
-	private static final Message T_option_view = message("xmlui.administrative.item.general.option_view");
-        
-        private static final Message T_option_curate = message("xmlui.administrative.item.general.option_curate");
+	
+	public static final Message T_option_status = message("xmlui.administrative.item.general.option_status");
+	public static final Message T_option_bitstreams = message("xmlui.administrative.item.general.option_bitstreams");
+	public static final Message T_option_metadata = message("xmlui.administrative.item.general.option_metadata");
+	public static final Message T_option_view = message("xmlui.administrative.item.general.option_view");
+	public static final Message T_option_curate = message("xmlui.administrative.item.general.option_curate");
+	public static final Message T_option_license = message("xmlui.administrative.item.general.option_license");
+	public static final Message T_option_embargo = message("xmlui.administrative.item.general.option_embargo");
+	public static final Message T_option_services = message("xmlui.administrative.item.general.option_services");
 
 	private static final Message T_title = message("xmlui.administrative.item.ViewItem.title");
-
 	private static final Message T_trail = message("xmlui.administrative.item.ViewItem.trail");
-
 	private static final Message T_head_parent_collections = message("xmlui.ArtifactBrowser.ItemViewer.head_parent_collections");
-	private static final Message T_show_simple =
-        message("xmlui.ArtifactBrowser.ItemViewer.show_simple");
-    
-        private static final Message T_show_full =
-        message("xmlui.ArtifactBrowser.ItemViewer.show_full");
+	private static final Message T_show_simple = message("xmlui.ArtifactBrowser.ItemViewer.show_simple");
+	private static final Message T_show_full = message("xmlui.ArtifactBrowser.ItemViewer.show_full");
+
 	public void addPageMeta(PageMeta pageMeta) throws WingException {
 		pageMeta.addMetadata("title").addContent(T_title);
 
@@ -84,8 +84,10 @@ public class ViewItem extends AbstractDSpaceTransformer {
 		String baseURL = contextPath + "/admin/item?administrative-continue="
 				+ knot.getId() ;
 		
-		String link = baseURL + "&view_item" + (showFullItem?"":"&show=full");
-		String tabLink = baseURL + "&view_item" + (!showFullItem?"":"&show=full");
+		String link = baseURL + "&view_item"
+				+ (showFullItem ? "" : "&show=full");
+		String tabLink = baseURL + "&view_item"
+				+ (!showFullItem ? "" : "&show=full");
 		// DIVISION: main
 		Division main = body.addInteractiveDivision("edit-item-status",
 				contextPath + "/admin/item", Division.METHOD_POST,
@@ -94,18 +96,14 @@ public class ViewItem extends AbstractDSpaceTransformer {
 		
 		// LIST: options
 		List options = main.addList("options", List.TYPE_SIMPLE, "horizontal");
-		options.addItem().addXref(
-				baseURL + "&submit_status", T_option_status);
-		options.addItem().addXref(baseURL + "&submit_bitstreams",
-				T_option_bitstreams);
-		options.addItem().addXref(baseURL + "&submit_metadata",
-				T_option_metadata);
-		options.addItem().addHighlight("bold").addXref(tabLink, T_option_view);
-                options.addItem().addXref(baseURL + "&submit_curate", T_option_curate);
+		add_options(context, eperson, options, baseURL, T_option_view, tabLink, item);
+
+		
+		main = main.addDivision("item-view", "well well-small well-light");
 		
 		// item
 		
-		Para showfullPara = main.addPara(null, "item-view-toggle item-view-toggle-top");
+		Para showfullPara = main.addPara(null, "bold");
 
         if (showFullItem)
         {
@@ -131,7 +129,7 @@ public class ViewItem extends AbstractDSpaceTransformer {
 			appearsInclude.addReference(collection);
 		}
 		
-		showfullPara = main.addPara(null, "item-view-toggle item-view-toggle-bottom");
+		showfullPara = main.addPara(null, "bold");
 
 		if (showFullItem)
         {
@@ -142,4 +140,71 @@ public class ViewItem extends AbstractDSpaceTransformer {
             showfullPara.addXref(link).addContent(T_show_full);
         }
 	}
+
+	public static void add_options(
+			List options, 
+			String baseURL,
+			Message to_highlight) throws WingException 
+	{
+		add_options( null, null, options, baseURL, to_highlight, null, null);
+	}
+	
+	public static void add_options(
+			List options, 
+			String baseURL, Message to_highlight, String highlighted_link) throws WingException 
+	{
+		add_options( null, null, options, baseURL, to_highlight, highlighted_link, null);
+	}
+	
+	public static void add_options(
+			Context context, 
+			EPerson eperson,
+			List options, 
+			String baseURL, Message to_highlight, String highlighted_link, DSpaceObject dso) throws WingException 
+	{
+		
+		LinkedHashMap<String, Message> map = new LinkedHashMap<String, Message>();
+		
+		boolean isServiceManger = false;
+		try {
+			if(dso!=null) {
+				isServiceManger = IfServiceManagerSelector.isNonAdminServiceManager(context, eperson, dso);
+			} else {
+				isServiceManger = IfServiceManagerSelector.isNonAdminServiceManager(context, eperson);
+			}
+		} catch (SQLException e) {
+			
+		}
+		
+		if(isServiceManger) {
+			map.put("&submit_status", T_option_status);
+			map.put("&view_item", T_option_view);			
+			map.put("&services", T_option_services);
+		} else {		
+			map.put("&submit_status", T_option_status);
+			map.put("&submit_bitstreams", T_option_bitstreams);
+			map.put("&submit_metadata", T_option_metadata);
+			map.put("&view_item", T_option_view);
+			map.put("&submit_curate", T_option_curate);
+			map.put("&edit_license", T_option_license);
+			map.put("&embargo", T_option_embargo);
+			map.put("&services", T_option_services);
+		}
+		
+		for ( Map.Entry<String, Message> tab : map.entrySet()) 
+		{
+			org.dspace.app.xmlui.wing.element.Item item = options.addItem(); 
+			if ( to_highlight.equals(tab.getValue()) ) 
+			{
+				if ( highlighted_link == null ) {
+					to_highlight = tab.getValue();
+				}
+				item.addHighlight("bold").addXref(
+						highlighted_link, to_highlight);
+				continue;
+			}
+			item.addXref(baseURL + tab.getKey(), tab.getValue());
+		}
+	}
+	
 }

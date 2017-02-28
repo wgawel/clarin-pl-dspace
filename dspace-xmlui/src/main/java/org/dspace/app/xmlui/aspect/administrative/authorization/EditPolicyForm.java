@@ -9,7 +9,6 @@ package org.dspace.app.xmlui.aspect.administrative.authorization;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -117,6 +116,7 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         pageMeta.addTrail().addContent(T_policyList_trail);
         pageMeta.addTrail().addContent(T_trail);
 
+        pageMeta.addMetadata("include-library", "datepicker");
         pageMeta.addMetadata("javascript", "static").addContent("static/js/editPolicyForm.js");
     }
 
@@ -236,7 +236,7 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         // actions radio buttons
         actionsList.addLabel(T_label_action);
         Radio actionSelect = actionsList.addItem().addRadio("action_id");
-        actionSelect.setLabel(T_label_action);
+        //actionSelect.setLabel(T_label_action);
         for( int i = 0; i < Constants.actionText.length; i++ )
         {
             // only display if action i is relevant

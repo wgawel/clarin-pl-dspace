@@ -37,9 +37,12 @@ import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 import org.dspace.eperson.EPerson;
 import org.xml.sax.SAXException;
+import org.dspace.core.ConfigurationManager;
+
 
 /**
- * @author Scott Phillips
+ * based on class by Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 public class Submissions extends AbstractDSpaceTransformer
 {
@@ -106,6 +109,8 @@ public class Submissions extends AbstractDSpaceTransformer
             message("xmlui.Submission.Submissions.completed.limit");
     protected static final Message T_c_displayall =
             message("xmlui.Submission.Submissions.completed.displayall");
+    protected static final Message T_c_submit_add_new_version = 
+            message("xmlui.Submission.Submissions.completed_submit_add_new_version");
 
     @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
@@ -179,8 +184,7 @@ public class Submissions extends AbstractDSpaceTransformer
                 Division start = division.addDivision("start-submision");
                 start.setHead(T_s_head1);
                 Para p = start.addPara();
-                p.addContent(T_s_info1a);
-                p.addXref(contextPath+"/submit",T_s_info1b);
+                p.addXref(contextPath+"/submit",T_s_info1b, "btn btn-repository");
                 Para secondP = start.addPara();
                 secondP.addContent(T_s_info1c);
                 return;
@@ -191,8 +195,7 @@ public class Submissions extends AbstractDSpaceTransformer
     	unfinished.setHead(T_s_head2);
     	Para p = unfinished.addPara();
     	p.addContent(T_s_info2a);
-    	p.addHighlight("bold").addXref(contextPath+"/submit",T_s_info2b);
-    	p.addContent(T_s_info2c);
+    	p.addHighlight("bold").addXref(contextPath+"/submit",T_s_info2b, "btn btn-repository");
 
     	// Calculate the number of rows.
     	// Each list pluss the top header and bottom row for the button.
@@ -234,7 +237,6 @@ public class Submissions extends AbstractDSpaceTransformer
 
                 Row row = table.addRow(Row.ROLE_DATA);
                 CheckBox remove = row.addCell().addCheckBox("workspaceID");
-                remove.setLabel("remove");
                 remove.addOption(workspaceItemID);
 
                 if (titles.length > 0)
@@ -278,7 +280,6 @@ public class Submissions extends AbstractDSpaceTransformer
 
             Row row = table.addRow(Row.ROLE_DATA);
             CheckBox selected = row.addCell().addCheckBox("workspaceID");
-            selected.setLabel("select");
             selected.addOption(workspaceItemID);
 
             if (titles.length > 0)
@@ -340,8 +341,8 @@ public class Submissions extends AbstractDSpaceTransformer
         if(displayAll) {
             limit = -1;
         } else {
-            //Set a default limit of 50
-            limit = 50;
+            //Set a default limit of 50            
+			limit = ConfigurationManager.getIntProperty("lr", "lr.webui.submit.submitted.limit", 50);
         }
         ItemIterator subs = Item.findBySubmitterDateSorted(context, context.getCurrentUser(), limit);
 
@@ -373,6 +374,7 @@ public class Submissions extends AbstractDSpaceTransformer
         // Create table, headers
         Table table = completedSubmissions.addTable("completed-submissions",subList.size() + 2,3);
         Row header = table.addRow(Row.ROLE_HEADER);
+        header.addCellContent(""); // CHECKBOX
         header.addCellContent(T_c_column1); // ISSUE DATE
         header.addCellContent(T_c_column2); // ITEM TITLE (LINKED)
         header.addCellContent(T_c_column3); // COLLECTION NAME (LINKED)
@@ -400,11 +402,15 @@ public class Submissions extends AbstractDSpaceTransformer
 
             Row row = table.addRow();
 
+            CheckBox checkBox = row.addCell().addCheckBox("itemID");
+            checkBox.addOption(published.getID());
+
             // Item accession date
             if (ingestDate != null && ingestDate.length > 0 &&
                 ingestDate[0].value != null)
             {
-                String displayDate = ingestDate[0].value.substring(0,10);
+                String displayDate = ingestDate[0].value.substring(
+                    0, Math.min(10, ingestDate[0].value.length()) );
                 Cell cellDate = row.addCell();
                 cellDate.addContent(displayDate);
             }
@@ -427,6 +433,12 @@ public class Submissions extends AbstractDSpaceTransformer
             row.addCell().addXref(collUrl,collectionName);
         }//end while
 
+        header = table.addRow();
+        Cell lastCell = header.addCell(0,5);
+        if (count > 0)
+        {
+            lastCell.addButton("submit_submissions_add_new_version").setValue(T_c_submit_add_new_version);
+        }
         //Display limit text & link to allow user to override this default limit
         if(!displayAll && count == limit)
         {

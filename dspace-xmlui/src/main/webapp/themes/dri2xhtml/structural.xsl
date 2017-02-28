@@ -11,6 +11,7 @@
 <!--
     TODO: Describe this XSL file
     Author: Alexey Maslov
+    modified for LINDAT/CLARIN
     
 -->
 
@@ -177,6 +178,10 @@
                 </link>
             </xsl:for-each>
             
+            <!-- jmisutka adding css globally -->
+            <link rel="stylesheet" href="{$theme-path}/lib/css/jquery-ui.css" id="theme"> </link>
+            <link rel="stylesheet" href="{$theme-path}/lib/css/ui-lightness/jquery-ui.css" id="theme"> </link>
+            
             <!-- Add syndication feeds -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='feed']">
                 <link rel="alternate" type="application">
@@ -259,6 +264,9 @@
                         <xsl:value-of select="."/>
                     </xsl:attribute>&#160;</script>
             </xsl:for-each>
+           <!-- jmisutka adding js globally and jquery no conflict because of prototype and other older js stuff -->
+            <script type="text/javascript">jQuery.noConflict();</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/jquery-ui.js">&#160;</script>
 
             <!-- Add theme javascript  -->
             <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
@@ -271,9 +279,35 @@
                         <xsl:value-of select="."/>
                     </xsl:attribute>&#160;</script>
             </xsl:for-each>
+            <!-- jmisutka
+                Drag and drop support; a bit nasty because of double js import
+                but required.
+            -->
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='dragNdrop']">
+                <script type="text/javascript" src="{$theme-path}/lib/js/fileupload.js">&#160;</script>
+            </xsl:if>
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='extrametadata']">
+                <script type="text/javascript" src="{$theme-path}/lib/js/extrametadata.js">&#160;</script>
+            </xsl:if>
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='licenseselect']">
+                <script type="text/javascript" src="{$theme-path}/lib/js/licenseselect.js">&#160;</script>
+            </xsl:if>
             
-            <xsl:call-template name="buildHead-google-analytics" />
-            
+            <!-- Add a google analytics script if the key is present -->
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
+                <script type="text/javascript"><xsl:text>
+                       var _gaq = _gaq || [];
+                       _gaq.push(['_setAccount', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>']);
+                       _gaq.push(['_trackPageview']);
+
+                       (function() {
+                           var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                           ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                           var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                       })();
+               </xsl:text></script>
+            </xsl:if>
+
             <!-- Add the title in -->
             <xsl:variable name="page_title" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']" />
             <title>
@@ -2413,6 +2447,13 @@
                             with the value 'submit'. No reset buttons for now...
                     -->
                     <xsl:otherwise>
+                           <!-- UFAL
+                                adding ISO 639-3 support
+							    -->
+                        <xsl:if test="@n = 'dc_language_iso'">
+                            <script type="text/javascript" src="{$theme-path}/lib/js/languages.js">&#160;</script>
+                            <br />
+                        </xsl:if>
                         <input>
                             <xsl:call-template name="fieldAttributes"/>
                             <xsl:if test="@type='button'">
@@ -2469,8 +2510,20 @@
                             </xsl:call-template>
                           </xsl:when>
                         </xsl:choose>
+                        <!-- dragNdrop support if specified 
+                             for a file input button
+                        -->
+                        <xsl:call-template name="dragNdrop"/>
                     </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+
+    <!--
+        If page metadata specify that they want to use drag and drop then
+        include it as a button. This relies on js/css added in buildHeader.
+    jmisutka 2011/04/07 -->
+    <xsl:template name="dragNdrop">
     </xsl:template>
     
     <!-- A set of standard attributes common to all fields -->

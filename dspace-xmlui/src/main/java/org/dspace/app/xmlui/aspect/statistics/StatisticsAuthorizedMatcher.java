@@ -17,6 +17,8 @@ import org.dspace.core.Constants;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.DSpaceObject;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
 import org.dspace.authorize.AuthorizeManager;
 
 import java.util.Map;
@@ -69,6 +71,15 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
                 }
             }
 
+            // checking special rights if an eperson is part of the special group
+            // only if authorization.special is true
+            Group specialGroup = Group.findByName(context, "statistics_viewers");
+            if(authorized
+            		&& specialGroup!=null 
+            		&& ConfigurationManager.getBooleanProperty("solr-statistics", "authorization.special")
+            		&& isMemberOfGroup(specialGroup, context.getCurrentUser())) {
+	            	authorized = true;
+            } else
             //If we are authorized check for any other authorization actions present
             if(authorized && adminCheckNeeded)
             {
@@ -106,4 +117,21 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
             throw new PatternException("Unable to obtain DSpace Context", sqle);
         }
     }
+    
+    public boolean isMemberOfGroup(Group g, EPerson e) {
+    	if(e==null) return false;
+    	if(g.isMember(e)) return true;
+    	for(Group sg : g.getMemberGroups()) {
+    		// this is a hack .. default Authenticated group needs to be 
+    		if(sg.getName().equalsIgnoreCase("Authenticated")) {
+    			return true;
+    		}
+    		else
+    		if(sg.isMember(e)) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
 }
+

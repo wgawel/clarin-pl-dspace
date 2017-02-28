@@ -45,6 +45,17 @@ and searching the repository.
 			<map:transformer name="ItemRequestStatusChanged" src="org.dspace.app.xmlui.aspect.artifactbrowser.ItemRequestStatusChanged" />
 
             <map:transformer name="Statistics" src="org.dspace.app.xmlui.aspect.artifactbrowser.StatisticsViewer"/>
+<!--
+<UFAL>
+-->
+			<map:transformer name="UFALLicenceAgreement" src="cz.cuni.mff.ufal.UFALLicenceAgreement"/>
+			<map:transformer name="UFALUserValidation" src="cz.cuni.mff.ufal.UFALUserValidation"/>
+			<map:transformer name="HandleRemoved" src="cz.cuni.mff.ufal.HandleRemoved"/>
+			<map:transformer name="ShibError" src="cz.cuni.mff.ufal.ShibError"/>
+<!--
+</UFAL>
+-->
+            
         </map:transformers>
 
 
@@ -72,10 +83,25 @@ and searching the repository.
 
 
 	</map:components>
+
+	<map:flow language="javascript">
+		<map:script src="licenseAgreement.js"/>
+	</map:flow>
+
 	<map:pipelines>
 		<map:pipeline>
 
 
+            <!-- <UFAL> licence agreement -->
+            <map:match pattern="handle/**/license/agree">
+                <map:match type="request" pattern="license-continue">
+                    <map:call continuation="{1}"/>
+                </map:match>
+                <map:call function="startLicenseAgree">
+                	<map:parameter name="handle" value="{1}"/>
+                </map:call>
+            </map:match>
+            <!-- </UFAL> -->
                         <map:generate/>
 
                         <!--
@@ -122,10 +148,43 @@ and searching the repository.
 			<map:match pattern="restricted-resource">
 				<map:transform type="RestrictedItem" />
 				<map:serialize type="xml" />
+                <map:match type="HandleAuthorizedMatcher" pattern="!READ">
+                        <map:select type="AuthenticatedSelector">
+                                <map:when test="eperson">
+                                  <map:transform type="RestrictedItem"/>
+                                  <map:serialize/>
+                                </map:when>
+                                <map:otherwise>
+                                  <map:act type="StartAuthentication">
+                                      <map:parameter name="header"
+                                      value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
+                                      <map:parameter name="message"
+                                      value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"
+                                      />
+                                  </map:act>
+                                  <map:serialize/>
+                                </map:otherwise>
+                        </map:select>
+                </map:match>
+            </map:match>
+
+
+
+            <!-- <UFAL> -->
+            <map:match pattern="ufal-user-validation">
+                    <map:transform type="UFALUserValidation"/>
+                    <map:serialize type="xml"/>
 			</map:match>
+            <!-- </UFAL> -->
 
 
 			<!-- Handle specific features -->
+                        <map:match pattern="handle_removed/**">
+                            <map:transform type="HandleRemoved">
+                                <map:parameter name="myHandle" value="{1}"/>
+                            </map:transform>
+                            <map:serialize type="xml"/>
+                        </map:match>
 			<map:match pattern="handle/*/**">
 
 				<!-- Inform the user that the item they are viewing is a restricted resource -->
@@ -148,7 +207,31 @@ and searching the repository.
 					<!-- If request copy is disabled normal flow -->
 					<map:transform type="RestrictedItem"/> 
 					<map:serialize type="xml"/> 
-				</map:match>
+                </map:match>
+
+					<!-- <UFAL> -->
+                                <map:match pattern="handle/*/*/ufal-licence-agreement">
+                                		<!-- only available through flowscript -->
+                                        <map:match type="WildcardParameterMatcher" pattern="true">
+                                                <map:parameter name="parameter-name" value="flow"/>
+                                                <map:parameter name="flow" value="{flow-attribute:flow}"/>
+                                                <map:select type="AuthenticatedSelector">
+                                                        <map:when test="eperson">                                                                                       
+                                                                <map:transform type="UFALLicenceAgreement">
+                                                                    <map:parameter name="allzip" value="{flow-attribute:allzip}"/>
+                                                                    <map:parameter name="bitstreamId" value="{flow-attribute:bitstreamId}"/>
+                                                                    <map:parameter name="errors" value="{flow-attribute:errors}"/>
+                                                                </map:transform>
+                                                                <map:serialize type="xml"/>
+                                                        </map:when>
+                                                        <map:otherwise>
+                                                                <map:act type="StartAuthentication"/>
+                                                        </map:otherwise>
+                                                </map:select>
+                                        </map:match>
+                                </map:match>
+                    <!-- </UFAL> -->
+
 
 				<!-- Community, Collection, and Item Viewers -->
 				<map:match pattern="handle/*/*">
@@ -191,13 +274,13 @@ and searching the repository.
 											<map:serialize />
 										</map:when>
 										<map:otherwise>
-											<map:transform type="ItemViewer" />
+                                            <map:transform type="ItemViewer"/>
 											<map:serialize type="xml" />
 										</map:otherwise>
 									</map:select>
 								</map:when>
 								<map:otherwise>
-									<map:transform type="ItemViewer" />
+                                    <map:transform type="ItemViewer"/>
 									<map:serialize type="xml" />
 								</map:otherwise>
 							</map:select>
@@ -353,6 +436,13 @@ and searching the repository.
 				<map:transform type="Contact" />
 				<map:serialize type="xml" />
 			</map:match>
+
+                        <!-- <UFAL> shibboleth exception page; shibboleth2.xml should redirect here -->
+                        <map:match pattern="shibboleth_exception">
+                        		<map:transform type="ShibError"/>
+                        		<map:serialize type="xml"/>
+                        </map:match>
+                        <!-- </UFAL> -->
 
 
 			<!-- Not a URL we care about, so just pass it on. -->

@@ -46,9 +46,12 @@ import java.util.List;
 /**
  * Filter which displays facets on which a user can filter his discovery search
  *
- * @author Kevin Van de Velde (kevin at atmire dot com)
- * @author Mark Diggory (markd at atmire dot com)
- * @author Ben Bosman (ben at atmire dot com)
+ * based on class by:
+ * Kevin Van de Velde (kevin at atmire dot com)
+ * Mark Diggory (markd at atmire dot com)
+ * Ben Bosman (ben at atmire dot com)
+ *
+ * modified for LINDAT/CLARIN
  */
 public class SearchFacetFilter extends AbstractDSpaceTransformer implements CacheableProcessingComponent {
 
@@ -73,10 +76,13 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
     protected DiscoverQuery queryArgs;
 
     private int DEFAULT_PAGE_SIZE = 10;
+    private int currentOffset = 0;
 
 
     private SearchService searchService = null;
     private static final Message T_go = message("xmlui.general.go");
+    private static final Message T_rpp = message("xmlui.Discovery.AbstractSearch.rpp");
+    private static final int[] RESULTS_PER_PAGE_PROGRESSION = {5, 10, 20, 40, 60, 80, 100};
 
     public SearchFacetFilter() {
 
@@ -220,9 +226,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         DiscoverFacetField discoverFacetField;
         if(request.getParameter(SearchFilterParam.STARTS_WITH) != null)
         {
-            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, DEFAULT_PAGE_SIZE + 1, DiscoveryConfigurationParameters.SORT.VALUE, request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase());
+            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, getPageSize() + 1, DiscoveryConfigurationParameters.SORT.VALUE, request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase());
         }else{
-            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, DEFAULT_PAGE_SIZE + 1, DiscoveryConfigurationParameters.SORT.VALUE);
+            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, getPageSize() + 1, DiscoveryConfigurationParameters.SORT.VALUE);
         }
 
 
@@ -263,12 +269,13 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
         Request request = ObjectModelHelper.getRequest(objectModel);
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-
+        updateQueryResultsAndOffset(request, dso);
         SearchFilterParam browseParams = new SearchFilterParam(request);
         // Build the DRI Body
         Division div = body.addDivision("browse-by-" + request.getParameter(SearchFilterParam.FACET_FIELD), "primary");
 
         addBrowseJumpNavigation(div, browseParams, request);
+        addBrowseControls(div, browseParams);
 
         // Set up the major variables
         //Collection collection = (Collection) dso;
@@ -276,7 +283,6 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         // Build the collection viewer division.
 
         //Make sure we get our results
-        queryResults = getQueryResponse(dso);
         if (this.queryResults != null) {
 
             Map<String, List<DiscoverResult.FacetResult>> facetFields = this.queryResults.getFacetResults();
@@ -292,7 +298,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                 String facetField = facetFields.keySet().toArray(new String[facetFields.size()])[0];
                 java.util.List<DiscoverResult.FacetResult> values = facetFields.get(facetField);
 
-                Division results = body.addDivision("browse-by-" + facetField + "-results", "primary");
+                Division results = div.addDivision("browse-by-" + facetField + "-results", "primary");
 
                 results.setHead(message("xmlui.Discovery.AbstractSearch.type_" + browseParams.getFacetField()));
                 if (values != null && 0 < values.size()) {
@@ -304,23 +310,24 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                     if(offSet == -1){
                         offSet = 0;
                     }
+                    currentOffset=offSet;
 
                     //Only show the nextpageurl if we have at least one result following our current results
                     String nextPageUrl = null;
-                    if (values.size() == (DEFAULT_PAGE_SIZE + 1))
+                    if (values.size() == (getPageSize() + 1))
                     {
                         nextPageUrl = getNextPageURL(browseParams, request);
                     }
 
 
 
-                    int shownItemsMax = offSet + (DEFAULT_PAGE_SIZE < values.size() ? values.size() - 1 : values.size());
+                    int shownItemsMax = offSet + (getPageSize() < values.size() ? values.size() - 1 : values.size());
 
 
 
                     // We put our total results to -1 so this doesn't get shown in the results (will be hidden by the xsl)
                     // The reason why we do this is because solr 1.4 can't retrieve the total number of facets found
-                    results.setSimplePagination(-1, offSet + 1,
+                    results.setSimplePagination((int) queryResults.getTotalSearchResults(), offSet + 1,
                                                     shownItemsMax, getPreviousPageURL(browseParams, request), nextPageUrl);
 
                     Table singleTable = results.addTable("browse-by-" + facetField + "-results", (int) (queryResults.getDspaceObjects().size() + 1), 1);
@@ -329,9 +336,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
 
                     int end = values.size();
-                    if(DEFAULT_PAGE_SIZE < end)
+                    if(getPageSize() < end)
                     {
-                        end = DEFAULT_PAGE_SIZE;
+                        end = getPageSize();
                     }
                     for (int i = 0; i < end; i++) {
                         DiscoverResult.FacetResult value = values.get(i);
@@ -341,6 +348,19 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                     results.addPara(message("xmlui.discovery.SearchFacetFilter.no-results"));
                 }
             }
+        }
+    }
+
+    private void updateQueryResultsAndOffset(Request request, DSpaceObject dso) {
+        int configuredOffset=-1;
+        boolean retainOffset = false;
+        if (request.getParameters().containsKey("update")) {
+            configuredOffset = currentOffset;
+            retainOffset=true;
+        }
+        queryResults = getQueryResponse(dso);
+        if (retainOffset) {
+            queryArgs.setFacetOffset(configuredOffset);
         }
     }
 
@@ -375,8 +395,11 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
         //We cannot create a filter for dates
         if(!browseParams.getFacetField().endsWith(".year")){
+        	
+        	org.dspace.app.xmlui.wing.element.List jumpForm = jump.addList("jump-date", org.dspace.app.xmlui.wing.element.List.TYPE_FORM);
+        	
             // Create a clickable list of the alphabet
-            org.dspace.app.xmlui.wing.element.List jumpList = jump.addList("jump-list", org.dspace.app.xmlui.wing.element.List.TYPE_SIMPLE, "alphabet");
+            org.dspace.app.xmlui.wing.element.List jumpList = jumpForm.addList("jump-list", org.dspace.app.xmlui.wing.element.List.TYPE_SIMPLE, "alphabet");
 
             //Create our basic url
             String basicUrl = generateURL("search-filter", params);
@@ -393,11 +416,11 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
             }
 
             // Create a free text field for the initial characters
-            Para jumpForm = jump.addPara();
-            jumpForm.addContent(T_starts_with);
-            jumpForm.addText("starts_with").setHelp(T_starts_with_help);
+            Text startswith = jumpForm.addItem().addText(browseParams.STARTS_WITH);
+            startswith.setLabel(T_starts_with);
+            startswith.setHelp(T_starts_with_help);
 
-            jumpForm.addButton("submit").setValue(T_go);
+            jumpForm.addItem().addButton("submit").setValue(T_go);
         }
     }
 
@@ -435,13 +458,13 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         int offSet = Util.getIntParameter(request, SearchFilterParam.OFFSET);
         if (offSet == -1)
         {
-            offSet = 0;
+            offSet = currentOffset;
         }
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.putAll(browseParams.getCommonBrowseParams());
         parameters.putAll(browseParams.getControlParameters());
-        parameters.put(SearchFilterParam.OFFSET, String.valueOf(offSet + DEFAULT_PAGE_SIZE));
+        parameters.put(SearchFilterParam.OFFSET, String.valueOf(offSet + getPageSize()));
 
         // Add the filter queries
         String url = generateURL("search-filter", parameters);
@@ -452,13 +475,14 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
     private String getPreviousPageURL(SearchFilterParam browseParams, Request request) throws UnsupportedEncodingException, UIException {
         //If our offset should be 0 then we shouldn't be able to view a previous page url
-        if (0 == queryArgs.getFacetOffset() && Util.getIntParameter(request, "offset") == -1)
+        boolean currentOffsetSmallerOrEqualTO0 = currentOffset <= 0;
+        if (0 == queryArgs.getFacetOffset() && Util.getIntParameter(request, "offset") == -1 && currentOffsetSmallerOrEqualTO0)
         {
             return null;
         }
 
         int offset = Util.getIntParameter(request, SearchFilterParam.OFFSET);
-        if(offset == -1 || offset == 0)
+        if(currentOffsetSmallerOrEqualTO0 && (offset == -1 || offset == 0))
         {
             return null;
         }
@@ -466,7 +490,8 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.putAll(browseParams.getCommonBrowseParams());
         parameters.putAll(browseParams.getControlParameters());
-        parameters.put(SearchFilterParam.OFFSET, String.valueOf(offset - DEFAULT_PAGE_SIZE));
+        String offSet = String.valueOf((currentOffset - getPageSize()<0)? 0:currentOffset - getPageSize());
+        parameters.put(SearchFilterParam.OFFSET, offSet);
 
         // Add the filter queries
         String url = generateURL("search-filter", parameters);
@@ -481,6 +506,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
     public void recycle() {
         // Clear out our item's cache.
         this.queryResults = null;
+        this.queryArgs = null;
         this.validity = null;
         super.recycle();
     }
@@ -573,6 +599,55 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         }
 
         return dso;
+    }
+    protected int getPageSize() {
+        try {
+            int rpp =Integer.parseInt(ObjectModelHelper.getRequest(objectModel).getParameter("rpp"));
+            DEFAULT_PAGE_SIZE=rpp;
+            return rpp;
+        }
+        catch (Exception e) {
+            return DEFAULT_PAGE_SIZE;
+        }
+    }
+
+    /**
+     * Add the controls to changing sorting and display options.
+     *
+     * @param div
+     * @param params
+     * @throws WingException
+     */
+    private void addBrowseControls(Division div, SearchFilterParam params)
+            throws WingException
+    {
+        // Prepare a Map of query parameters required for all links
+        Map<String, String> queryParams = new HashMap<String, String>();
+
+        queryParams.putAll(params.getCommonBrowseParams());
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        queryParams.put("order",request.getParameter("order"));
+        String facetField = request.getParameter(SearchFilterParam.FACET_FIELD);
+        Division controls = div.addInteractiveDivision("browse-controls", "search-filter?field="+facetField,
+                Division.METHOD_POST, "browse controls");
+
+        // Add all the query parameters as hidden fields on the form
+        for (Map.Entry<String, String> param : queryParams.entrySet())
+        {
+            controls.addHidden(param.getKey()).setValue(param.getValue());
+        }
+
+        Para controlsForm = controls.addPara();
+        // Create a control for the number of records to display
+        controlsForm.addContent(T_rpp);
+
+        Select rppSelect = controlsForm.addSelect("rpp");
+
+        for (int i : RESULTS_PER_PAGE_PROGRESSION)
+        {
+            rppSelect.addOption((i == getPageSize()), i, Integer.toString(i));
+        }
+        controlsForm.addButton("update").setValue("update");
     }
 
 }

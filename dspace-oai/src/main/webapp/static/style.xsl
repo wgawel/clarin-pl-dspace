@@ -21,7 +21,7 @@
 	<xsl:template match="/">
 		<html>
 			<head>
-                <title>DSpace OAI-PMH Data Provider</title>
+                <title>LINDAT/CLARIN OAI-PMH Data Provider Endpoint</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
                 <script src="static/js/jquery.js" type="text/javascript"></script>
@@ -35,7 +35,7 @@
                 <div class="container">
                     <div class="navbar navbar-default" role="navigation">
                         <div class="navbar-header">
-                            <a class="navbar-brand" href="#">DSpace OAI-PMH Data Provider</a>
+                            <a class="navbar-brand" href="#">LINDAT/CLARIN OAI-PMH Data Provider Endpoint</a>
                         </div>
                         <div class="navbar-collapse collapse">
                             <ul class="nav navbar-nav navbar-right">
@@ -121,7 +121,7 @@
                     </div>
 
 
-                    <div class="row-fluid text-center">
+                    <div class="container-fluid text-center">
                         <div class="vertical-space"></div>
                         <p><small>Design by Lyncode</small></p>
                         <p>
@@ -285,11 +285,15 @@
                             <h5>Identifier <small><xsl:value-of select="oai:header/oai:identifier/text()"></xsl:value-of></small></h5>
                         </div>
                         <div class="col-lg-6">
-                            <h5>Last Modfied <small><xsl:value-of select="translate(oai:header/oai:datestamp/text(), 'TZ', ' ')"></xsl:value-of></small></h5>
+                            <h5>Last Modified <small><xsl:value-of select="translate(oai:header/oai:datestamp/text(), 'TZ', ' ')"></xsl:value-of></small></h5>
                         </div>
                     </div>
                 </div>
                 <div class="panel-body">
+                    <!-- If this record has a "status", display it as a warning -->
+                    <xsl:if test="oai:header/@status">
+                      <div class="alert alert-warning">Record Status: <xsl:value-of select="oai:header/@status"/></div>
+                    </xsl:if>
                     <div class="panel panel-success">
                         <a data-toggle="collapse">
                             <xsl:attribute name="href">#sets<xsl:value-of select="translate(oai:header/oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>
@@ -350,11 +354,15 @@
                             <h5>Identifier <small><xsl:value-of select="oai:header/oai:identifier/text()"></xsl:value-of></small></h5>
                         </div>
                         <div class="col-lg-6">
-                            <h5>Last Modfied <small><xsl:value-of select="translate(oai:header/oai:datestamp/text(), 'TZ', ' ')"></xsl:value-of></small></h5>
+                            <h5>Last Modified <small><xsl:value-of select="translate(oai:header/oai:datestamp/text(), 'TZ', ' ')"></xsl:value-of></small></h5>
                         </div>
                     </div>
                 </div>
                 <div class="panel-body">
+                    <!-- If this record has a "status", display it as a warning -->
+                    <xsl:if test="oai:header/@status">
+                      <div class="alert alert-warning">Record Status: <xsl:value-of select="oai:header/@status"/></div>
+                    </xsl:if>
                     <div class="panel panel-success">
                             <div class="panel-heading">
                                 <h5 class="panel-title">
@@ -410,7 +418,7 @@
                             <h5>Identifier <small><xsl:value-of select="oai:identifier/text()"></xsl:value-of></small></h5>
                         </div>
                         <div class="col-lg-4">
-                            <h5>Last Modfied <small><xsl:value-of select="translate(oai:datestamp/text(), 'TZ', ' ')"></xsl:value-of></small></h5>
+                            <h5>Last Modified <small><xsl:value-of select="translate(oai:datestamp/text(), 'TZ', ' ')"></xsl:value-of></small></h5>
                         </div>
                         <div class="col-lg-4">
                             <a class="btn btn-default pull-right">
@@ -423,6 +431,10 @@
                     </div>
                 </div>
                 <div class="panel-body">
+                    <!-- If this record has a "status", display it as a warning -->
+                    <xsl:if test="@status">
+                      <div class="alert alert-warning">Record Status: <xsl:value-of select="@status"/></div>
+                    </xsl:if>
                     <div class="panel panel-success">
                         <a data-toggle="collapse">
                             <xsl:attribute name="href">#sets<xsl:value-of select="translate(oai:identifier/text(), ':/.', '')"></xsl:value-of></xsl:attribute>

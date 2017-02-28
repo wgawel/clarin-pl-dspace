@@ -12,7 +12,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.dspace.content.*;
+import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
+import org.dspace.content.Community;
+import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -20,6 +26,9 @@ import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.workflow.WorkflowItem;
+
+import cz.cuni.mff.ufal.DSpaceApi;
 
 /**
  * AuthorizeManager handles all authorization checks for DSpace. For better
@@ -35,6 +44,8 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * Note: If an eperson is a member of the administrator group (id 1), then they
  * are automatically given permission for all requests another special group is
  * group 0, which is anonymous - all EPeople are members of group 0.
+ *
+ * modified for LINDAT/CLARIN
  */
 public class AuthorizeManager
 {
@@ -182,6 +193,14 @@ public class AuthorizeManager
                     + actionText + " on " + Constants.typeText[otype] + ":"
                     + oid + " by user " + userid, o, action);
         }
+
+//<UFAL>
+        // This function throws exception if the authorization fails - if it is not reported, the license restrictions are OK
+		if (o.getType() == Constants.BITSTREAM && !isAdmin(c)) {
+			DSpaceApi.authorizeBitstream(c, o);
+		}
+//</UFAL>
+
     }
 
     /**
@@ -295,8 +314,43 @@ public class AuthorizeManager
             }
         }
 
+        // In case the dso is an bundle or bitstream we must ignore custom 
+        // policies if it does not belong to at least one installed item (see 
+        // DS-2614).
+        // In case the dso is an item and a corresponding workspace or workflow
+        // item exist, we have to ignore custom policies (see DS-2614).
+        boolean ignoreCustomPolicies = false;
+        if (o instanceof Bitstream)
+        {
+            Bitstream b = (Bitstream) o;
+
+            // Ensure that this is not a collection or community logo
+            DSpaceObject parent = b.getParentObject();
+            if (!(parent instanceof Collection) && !(parent instanceof Community))
+            {
+                ignoreCustomPolicies = !isAnyItemInstalled(c, b.getBundles());
+            }
+        }
+        if (o instanceof Bundle)
+        {
+            ignoreCustomPolicies = !isAnyItemInstalled(c, new Bundle[] {(Bundle) o});
+        }
+        if (o instanceof Item)
+        {
+            if (WorkspaceItem.findByItem(c, (Item) o) != null ||
+                    WorkflowItem.findByItem(c, (Item) o) != null)
+            {
+                ignoreCustomPolicies = true;
+            }
+        }
+        
         for (ResourcePolicy rp : getPoliciesActionFilter(c, o, action))
         {
+            if (ignoreCustomPolicies 
+                    && ResourcePolicy.TYPE_CUSTOM.equals(rp.getRpType()))
+            {
+                continue;
+            }
             // check policies for date validity
             if (rp.isDateValid())
             {
@@ -318,7 +372,26 @@ public class AuthorizeManager
         // default authorization is denial
         return false;
     }
-
+    
+    // check whether any bundle belongs to any item that passed submission 
+    // and workflow process
+    protected static boolean isAnyItemInstalled(Context ctx, Bundle[] bundles)
+            throws SQLException
+    {
+        for (Bundle bundle : bundles)
+        {
+            for (Item item : bundle.getItems())
+            {
+                if (WorkspaceItem.findByItem(ctx, item) == null
+                        && WorkflowItem.findByItem(ctx, item) == null)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
     ///////////////////////////////////////////////
     // admin check methods
     ///////////////////////////////////////////////
@@ -480,7 +553,9 @@ public class AuthorizeManager
 
         rp.update();
 
+        c.turnOffAuthorisationSystem();
         o.updateLastModified();
+        c.restoreAuthSystemState();
     }
 
     /**
@@ -534,8 +609,10 @@ public class AuthorizeManager
         rp.setRpType(type);
 
         rp.update();
-
+        
+        c.turnOffAuthorisationSystem();
         o.updateLastModified();
+        c.restoreAuthSystemState();
     }
 
     /**
@@ -799,7 +876,9 @@ public class AuthorizeManager
             drp.update();
         }
 
+        c.turnOffAuthorisationSystem();
         dest.updateLastModified();
+        c.restoreAuthSystemState();
     }
 
     /**
@@ -815,12 +894,14 @@ public class AuthorizeManager
     public static void removeAllPolicies(Context c, DSpaceObject o)
             throws SQLException
     {
-        o.updateLastModified();
-
         // FIXME: authorization check?
         DatabaseManager.updateQuery(c, "DELETE FROM resourcepolicy WHERE "
                 + "resource_type_id= ? AND resource_id= ? ",
                 o.getType(), o.getID());
+        
+        c.turnOffAuthorisationSystem();
+        o.updateLastModified();
+        c.restoreAuthSystemState();
     }
 
     /**
@@ -861,6 +942,29 @@ public class AuthorizeManager
                 + "resource_type_id= ? AND resource_id= ? AND rptype=? ",
                 o.getType(), o.getID(), type);
     }
+    
+	/**
+	 * Change all the policies related to the action (fromPolicy) of the
+	 * specified object to the new action (toPolicy)
+	 * 
+	 * @param context
+	 * @param dso
+	 *            the dspace object
+	 * @param fromAction
+	 *            the action to change
+	 * @param toAction
+	 *            the new action to set
+	 * @throws SQLException
+	 * @throws AuthorizeException
+	 */
+	public static void switchPoliciesAction(Context context, DSpaceObject dso, int fromAction, int toAction)
+			throws SQLException, AuthorizeException {
+		List<ResourcePolicy> rps = getPoliciesActionFilter(context, dso, fromAction);
+		for (ResourcePolicy rp : rps) {
+			rp.setAction(toAction);
+			rp.update();
+		}
+	}
 
     /**
      * Remove all policies from an object that match a given action. FIXME
@@ -879,7 +983,6 @@ public class AuthorizeManager
     public static void removePoliciesActionFilter(Context context,
                                                   DSpaceObject dso, int actionID) throws SQLException
     {
-        dso.updateLastModified();
         if (actionID == -1)
         {
             // remove all policies from object
@@ -891,6 +994,10 @@ public class AuthorizeManager
                             "resource_id= ? AND action_id= ? ",
                     dso.getType(), dso.getID(), actionID);
         }
+        
+        context.turnOffAuthorisationSystem();
+        dso.updateLastModified();
+        context.restoreAuthSystemState();
     }
 
     /**
@@ -927,11 +1034,13 @@ public class AuthorizeManager
     public static void removeGroupPolicies(Context c, DSpaceObject o, Group g)
             throws SQLException
     {
-        o.updateLastModified();
-
         DatabaseManager.updateQuery(c, "DELETE FROM resourcepolicy WHERE "
                 + "resource_type_id= ? AND resource_id= ? AND epersongroup_id= ? ",
                 o.getType(), o.getID(), g.getID());
+        
+        c.turnOffAuthorisationSystem();
+        o.updateLastModified();
+        c.restoreAuthSystemState();
     }
 
     /**
@@ -950,10 +1059,13 @@ public class AuthorizeManager
     public static void removeEPersonPolicies(Context c, DSpaceObject o, EPerson e)
             throws SQLException
     {
-        o.updateLastModified();
         DatabaseManager.updateQuery(c, "DELETE FROM resourcepolicy WHERE "
                 + "resource_type_id= ? AND resource_id= ? AND eperson_id= ? ",
                 o.getType(), o.getID(), e.getID());
+        
+        c.turnOffAuthorisationSystem();
+        o.updateLastModified();
+        c.restoreAuthSystemState();
     }
 
     /**

@@ -27,12 +27,12 @@ import org.xml.sax.SAXException;
 
 public class FailedAuthentication extends AbstractDSpaceTransformer {
 	private static final String SESSION_ATTRIBUTE_NAME = "xmlui.Eperson.FailedAuthentication.message";
-	
+
 	public static final Message BAD_CREDENTIALS = message("xmlui.EPerson.FailedAuthentication.BadCreds");
 	public static final Message BAD_ARGUMENTS   = message("xmlui.EPerson.FailedAuthentication.BadArgs");
 	public static final Message NO_SUCH_USER    = message("xmlui.EPerson.FailedAuthentication.NoSuchUser");
-	
-	
+
+
 	/**language strings */
     public static final Message T_title =
     message("xmlui.EPerson.FailedAuthentication.title");
@@ -40,14 +40,14 @@ public class FailedAuthentication extends AbstractDSpaceTransformer {
         message("xmlui.general.dspace_home");
     public static final Message T_trail =
         message("xmlui.EPerson.FailedAuthentication.trail");
-    
+
     public static final Message T_h1 =
         message("xmlui.EPerson.FailedAuthentication.h1");
-    
-	
+
+
 	public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
 		Request request = ObjectModelHelper.getRequest(objectModel);
-		
+
 		Division div = body.addDivision("failed_auth");
 		div.setHead(T_h1);
 		div.addPara((Message)request.getSession().getAttribute(SESSION_ATTRIBUTE_NAME));

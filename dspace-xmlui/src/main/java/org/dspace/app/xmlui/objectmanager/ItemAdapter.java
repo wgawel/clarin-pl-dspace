@@ -102,6 +102,11 @@ public class ItemAdapter extends AbstractAdapter
         super(contextPath);
         this.item = item;
         this.context = context;
+        
+        // <UFAL>
+        this.setRightsMDTypes("UFAL_LICENSES");
+        // </UFAL>
+        
     }
 
     /** Return the item */
@@ -267,7 +272,7 @@ public class ItemAdapter extends AbstractAdapter
                 Metadatum[] dcvs = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
                 for (Metadatum dcv : dcvs)
                 {
-                        if (!MetadataExposure.isHidden(context, dcv.schema, dcv.element, dcv.qualifier))
+                        if (!MetadataExposure.isHidden(context, dcv.schema, dcv.element, dcv.qualifier, item))
                         {
                         // ///////////////////////////////
                         // Field element for each metadata field.
@@ -1113,9 +1118,26 @@ public class ItemAdapter extends AbstractAdapter
         // ///////////////////////
         // End file location
         endElement(METS,"FLocate");
+
+
+        // show bitstream metadata
+        Metadatum[] ms = bitstream.getMetadata("local", "bitstream", Item.ANY, Item.ANY);
+        startElement(METS, "Local");
+        for (Metadatum m : ms) {
+            attributes = new AttributeMap();
+            startElement(METS, m.qualifier, attributes);
+            if ( null != m.value ) {
+                sendCharacters(m.value);
+            }
+            endElement(METS, m.qualifier);
+        }
+        endElement(METS, "Local");
+
+
         
         // ////////////////////////////////
         // End the file
         endElement(METS,"file");
 	}
 }
+

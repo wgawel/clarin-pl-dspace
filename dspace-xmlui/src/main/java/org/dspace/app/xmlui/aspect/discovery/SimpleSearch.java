@@ -79,12 +79,9 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     private static final Message T_filter_authority = message("xmlui.Discovery.SimpleSearch.filter.authority");
     private static final Message T_filter_notauthority = message("xmlui.Discovery.SimpleSearch.filter.notauthority");
     private static final Message T_did_you_mean = message("xmlui.Discovery.SimpleSearch.did_you_mean");
-
-    private SearchService searchService = null;
+    private static final Message T_filter_notavailable = message("xmlui.Discovery.SimpleSearch.filter.notavailable");
 
     public SimpleSearch() {
-        DSpace dspace = new DSpace();
-        searchService = dspace.getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
     }
 
 
@@ -116,7 +113,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
         // Build the DRI Body
         Division search = body.addDivision("search", "primary");
-        search.setHead(T_head);
+        //search.setHead(T_head);
         String searchUrl = ConfigurationManager.getProperty("dspace.url") + "/JSON/discovery/search";
 
         search.addHidden("discovery-json-search-url").setValue(searchUrl);
@@ -184,20 +181,23 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             if(filterTypes.size() > 0)
             {
 
-                filtersTable.addRow(Row.ROLE_HEADER).addCell("", Cell.ROLE_HEADER, 1, 4, "new-filter-header").addContent(T_filter_current_filters);
+                filtersTable.addRow(Row.ROLE_HEADER).addCell("", Cell.ROLE_HEADER, 1, 4, "new-filter-header hidden").addContent(T_filter_current_filters);
                 for (int i = 0; i <  filterTypes.size(); i++)
                 {
                     String filterType = filterTypes.get(i);
                     String filterValue = filterValues.get(i);
-                    String filterOperator = filterOperators.get(i);
+                    String filterOperator = null;
+                    if (i < filterOperators.size()) {
+                        filterOperator = filterOperators.get(i);
+                    }
 
                     if(StringUtils.isNotBlank(filterValue))
                     {
-                        Row row = filtersTable.addRow("used-filters-" + i+1, Row.ROLE_DATA, "search-filter used-filter");
+                        Row row = filtersTable.addRow("used-filters-" + i+1, Row.ROLE_DATA, "search-filter used-filter hidden");
                         addFilterRow(filterFields, i+1, row, filterType, filterOperator, filterValue);
                     }
                 }
-                filtersTable.addRow("filler-row", Row.ROLE_DATA, "search-filter filler").addCell(1, 4).addContent("");
+                //filtersTable.addRow("filler-row", Row.ROLE_DATA, "search-filter filler").addCell(1, 4).addContent("");
                 filtersTable.addRow(Row.ROLE_HEADER).addCell("", Cell.ROLE_HEADER, 1, 4, "new-filter-header").addContent(T_filter_new_filters);
             }
 
@@ -243,10 +243,11 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         Select typeSelect = row.addCell("", Cell.ROLE_DATA, "selection").addSelect("filter_relational_operator_" + index);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "contains"), "contains", T_filter_contain);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "equals"), "equals", T_filter_equals);
-        typeSelect.addOption(StringUtils.equals(relationalOperator, "authority"), "authority", T_filter_authority);
+        //typeSelect.addOption(StringUtils.equals(relationalOperator, "authority"), "authority", T_filter_authority);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "notcontains"), "notcontains", T_filter_notcontain);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "notequals"), "notequals", T_filter_notequals);
-        typeSelect.addOption(StringUtils.equals(relationalOperator, "notauthority"), "notauthority", T_filter_notauthority);
+        //typeSelect.addOption(StringUtils.equals(relationalOperator, "notauthority"), "notauthority", T_filter_notauthority);
+        typeSelect.addOption(StringUtils.equals(relationalOperator, "notavailable"), "notavailable", T_filter_notavailable);
          
 
 
@@ -255,9 +256,9 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         row.addCell("", Cell.ROLE_DATA, "discovery-filter-input-cell").addText("filter_" + index, "discovery-filter-input").setValue(value == null ? "" : value);
 
         //And last add an add button
-        Cell buttonsCell = row.addCell("filter-controls_" + index, Cell.ROLE_DATA, "filter-controls");
-        buttonsCell.addButton("add-filter_" + index, "filter-control filter-add").setValue(T_filter_controls_add);
-        buttonsCell.addButton("remove-filter_" + index, "filter-control filter-remove").setValue(T_filter_controls_remove);
+        //Cell buttonsCell = row.addCell("filter-controls_" + index, Cell.ROLE_DATA, "filter-controls");
+        //buttonsCell.addButton("add-filter_" + index, "filter-control filter-add").setValue(T_filter_controls_add);
+        //buttonsCell.addButton("remove-filter_" + index, "filter-control filter-remove").setValue(T_filter_controls_remove);
 
     }
 

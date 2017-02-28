@@ -77,9 +77,9 @@ import org.dspace.handle.HandleManager;
  * <P>
  * Modified by David Little, UCSD Libraries 12/21/04 to allow the registration
  * of files (bitstreams) into DSpace.
- *
- * @author David Little
- * @author Jay Paz
+ * 
+ * based on class by David Little and Jay Paz
+ * modified for LINDAT/CLARIN
  */
 public class ItemExport
 {
@@ -209,7 +209,7 @@ public class ItemExport
         }
 
         Context c = new Context();
-        c.setIgnoreAuthorization(true);
+        c.turnOffAuthorisationSystem();
 
         if (myType == Constants.ITEM)
         {
@@ -485,9 +485,7 @@ public class ItemExport
                      ("date".equals(dcv.element) && "issued".equals(qualifier)) ||
                      ("date".equals(dcv.element) && "accessioned".equals(qualifier)) ||
                      ("date".equals(dcv.element) && "available".equals(qualifier)) ||
-                     ("identifier".equals(dcv.element) && "uri".equals(qualifier) &&
-                      (dcv.value != null && dcv.value.startsWith("http://hdl.handle.net/" +
-                       HandleManager.getPrefix() + "/"))) ||
+                     ("identifier".equals(dcv.element) && "uri".equals(qualifier))  ||
                      ("description".equals(dcv.element) && "provenance".equals(qualifier)) ||
                      ("format".equals(dcv.element) && "extent".equals(qualifier)) ||
                      ("format".equals(dcv.element) && "mimetype".equals(qualifier)))))

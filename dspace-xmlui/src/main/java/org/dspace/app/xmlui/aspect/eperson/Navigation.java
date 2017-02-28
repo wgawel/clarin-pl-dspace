@@ -17,10 +17,12 @@ import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
+import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -28,9 +30,14 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.UserMeta;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -46,14 +53,31 @@ import org.xml.sax.SAXException;
  * 4) The user's language preferences (whether someone is logged 
  *    in or not)
  * 
- * @author Scott Phillips
+ * based on class by Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 
 public class Navigation extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
+	/** log4j category */
+	private static Logger log = LoggerFactory.getLogger(Navigation.class);
+
     /** Language Strings */
     private static final Message T_my_account =
         message("xmlui.EPerson.Navigation.my_account");
+    
+    private static final Message T_about_head =
+            message("xmlui.EPerson.Navigation.about-head");
+    private static final Message T_deposit =
+            message("xmlui.EPerson.Navigation.deposit");
+    private static final Message T_cite =
+            message("xmlui.EPerson.Navigation.cite");
+    private static final Message T_lifecycle =
+            message("xmlui.EPerson.Navigation.item-lifecycle");
+    private static final Message T_faq =
+            message("xmlui.EPerson.Navigation.faq");
+    private static final Message T_about =
+            message("xmlui.EPerson.Navigation.about");
     
     private static final Message T_profile =
         message("xmlui.EPerson.Navigation.profile");
@@ -61,11 +85,19 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_logout =
         message("xmlui.EPerson.Navigation.logout");
     
-    private static final Message T_login =
-        message("xmlui.EPerson.Navigation.login");
+    //private static final Message T_login =
+    //    message("xmlui.EPerson.Navigation.login");
     
     private static final Message T_register =
         message("xmlui.EPerson.Navigation.register");
+
+    private static final Message T_helpdesk =
+            message("xmlui.EPerson.Navigation.helpdesk");
+
+    private static final Message T_discojuice_login =
+        message("xmlui.EPerson.Navigation.discojuice.login");
+
+    private static final Message T_context_head 				= message("xmlui.administrative.Navigation.context_head");
 
 	/** Cached validity object */
 	private SourceValidity validity;
@@ -173,7 +205,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     	 */
         options.addList("browse");
         List account = options.addList("account");
-        options.addList("context");
+        List about = options.addList("about");
+        List contextList = options.addList("context");
         options.addList("administrative");
         
         account.setHead(T_my_account);
@@ -182,16 +215,61 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         {
             String fullName = eperson.getFullName();
             account.addItemXref(contextPath+"/logout",T_logout);
-            account.addItemXref(contextPath+"/profile",T_profile.parameterize(fullName));
+            //account.addItemXref(contextPath+"/profile",T_profile.parameterize(fullName));
+            account.addItemXref(contextPath+"/profile",T_profile);
         } 
         else 
         {
-            account.addItemXref(contextPath+"/login",T_login);
-            if (ConfigurationManager.getBooleanProperty("xmlui.user.registration", true))
+            // UFAL
+            account.addItem().addXref(contextPath + "/login",
+                    T_discojuice_login, "signon");
+
+            final javax.servlet.http.HttpServletRequest hreq = (javax.servlet.http.HttpServletRequest) this.objectModel
+                    .get(org.apache.cocoon.environment.http.HttpEnvironment.HTTP_REQUEST_OBJECT);
+
+            String redirect = hreq.getPathInfo();
+            String query = hreq.getQueryString();
+            if(!StringUtils.isBlank(query)){
+            	redirect += "?" + query;
+            }
+            if (redirect.endsWith(".continue"))
+            {
+                // Don't remember continuation addresses #896
+                redirect = "login"; // See ShibbolethAction or
+                                    // AuthenticateAction
+            }
+            hreq.getSession()
+                    .setAttribute("xmlui.user.loginredirect", redirect);
+
+            if (ConfigurationManager.getBooleanProperty(
+                    "xmlui.user.registration", true))
             {
                 account.addItemXref(contextPath + "/register", T_register);
             }
         }
+        
+        // about
+        about.setHead( T_about_head );
+        about.addItemXref( contextPath + "/page/deposit", T_deposit );
+        about.addItemXref( contextPath + "/page/cite", T_cite);
+        about.addItemXref( contextPath + "/page/item-lifecycle", T_lifecycle );
+        about.addItemXref( contextPath + "/page/faq", T_faq);
+        about.addItemXref( contextPath + "/page/about", T_about );
+        about.addItem().addXref("mailto:" + ConfigurationManager.getProperty("lr.help.mail"),T_helpdesk, "helpdesk");
+        
+        //context
+        // Context Administrative options
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+    	if (dso instanceof Item)
+    	{
+    		Item item = (Item) dso;
+    		if (item.canEditMetadata() && !AuthorizeManager.isAdmin(context, item))
+    		{
+                    contextList.setHead(T_context_head);
+                    contextList.addItem().addXref(contextPath+"/edit/item?itemID="+item.getID(), "Edit metadata");
+            }
+    	}
+
     }
 
     /**
@@ -209,6 +287,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             userMeta.addMetadata("identifier","email").addContent(eperson.getEmail());
             userMeta.addMetadata("identifier","firstName").addContent(eperson.getFirstName());
             userMeta.addMetadata("identifier","lastName").addContent(eperson.getLastName());
+            userMeta.addMetadata("identifier","displayName").addContent(eperson.getFullName());
             userMeta.addMetadata("identifier","logoutURL").addContent(contextPath+"/logout");
             userMeta.addMetadata("identifier","url").addContent(contextPath+"/profile");
         }
@@ -217,8 +296,11 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             userMeta.setAuthenticated(false);
         }
 
-        // Always have a login URL.
+        // Allways have a login URL.
+// <UFAL>
+//        userMeta.addMetadata("identifier","loginURL").addContent(contextPath+"/shibboleth-login");
         userMeta.addMetadata("identifier","loginURL").addContent(contextPath+"/login");
+// </UFAL>
         
         // Always add language information
         Request request = ObjectModelHelper.getRequest(objectModel);

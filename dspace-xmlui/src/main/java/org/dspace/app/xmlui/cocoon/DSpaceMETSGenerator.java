@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.cocoon;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import cz.cuni.mff.ufal.dspace.handle.ConfigurableHandleIdentifierProvider;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -74,6 +75,7 @@ import org.xml.sax.SAXException;
  * render all structure types.
  * 
  * @author Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 public class DSpaceMETSGenerator extends AbstractGenerator
 {
@@ -163,7 +165,7 @@ public class DSpaceMETSGenerator extends AbstractGenerator
                         // all non-repository types need integer IDs
                         if ("repository".equals(type))
                         {
-                                if (HandleManager.getPrefix().equals(strid))
+                                if (ConfigurableHandleIdentifierProvider.isSupportedPrefix(strid))
                                 {
                                     adapter = new RepositoryAdapter(context, contextPath);
                                 }

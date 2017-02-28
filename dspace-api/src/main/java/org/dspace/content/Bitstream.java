@@ -26,6 +26,9 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
+import cz.cuni.mff.ufal.DSpaceApi;
+import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
+
 /**
  * Class representing bitstreams stored in the DSpace system.
  * <P>
@@ -33,7 +36,8 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * database until <code>update</code> is called. Note that you cannot alter
  * the contents of a bitstream; you need to create a new bitstream.
  * 
- * @author Robert Tansley
+ * based on class by Robert Tansley
+ * modified for LINDAT/CLARIN
  * @version $Revision$
  */
 public class Bitstream extends DSpaceObject
@@ -181,6 +185,48 @@ public class Bitstream extends DSpaceObject
 
         return bitstreamArray;
     }
+    
+    public static Bitstream[] findAll(Context context, String query) throws SQLException
+    {
+        TableRowIterator tri = DatabaseManager.queryTable(context, "bitstream", query);
+
+        List<Bitstream> bitstreams = new ArrayList<Bitstream>();
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                // First check the cache
+                Bitstream fromCache = (Bitstream) context.fromCache(
+                        Bitstream.class, row.getIntColumn("bitstream_id"));
+
+                if (fromCache != null)
+                {
+                    bitstreams.add(fromCache);
+                }
+                else
+                {
+                    bitstreams.add(new Bitstream(context, row));
+                }
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+
+        Bitstream[] bitstreamArray = new Bitstream[bitstreams.size()];
+        bitstreamArray = bitstreams.toArray(bitstreamArray);
+
+        return bitstreamArray;
+    }
+    
 
     /**
      * Create a new bitstream, with a new ID. The checksum and file size are
@@ -540,6 +586,11 @@ public class Bitstream extends DSpaceObject
                 .getIntColumn("bitstream_id"));
 
         removeMetadataFromDatabase();
+        int bitstream_id = bRow.getIntColumn("bitstream_id");
+        IFunctionalities functionalityManger = DSpaceApi.getFunctionalityManager();
+        functionalityManger.openSession();
+        functionalityManger.detachLicenses(bitstream_id);
+        functionalityManger.closeSession();
     }
 
     /**
@@ -548,7 +599,7 @@ public class Bitstream extends DSpaceObject
      *
      * @return true if the bitstream has been deleted
      */
-    boolean isDeleted() throws SQLException
+    public boolean isDeleted() throws SQLException
     {
         String query = "select count(*) as mycount from Bitstream where deleted = '1' and bitstream_id = ? ";
         TableRowIterator tri = DatabaseManager.query(ourContext, query, bRow.getIntColumn("bitstream_id"));
@@ -730,5 +781,13 @@ public class Bitstream extends DSpaceObject
     {
         //Also fire a modified event since the bitstream HAS been modified
         ourContext.addEvent(new Event(Event.MODIFY, Constants.BITSTREAM, getID(), null, getIdentifiers(ourContext)));
+    }
+    //UFAL okosarko we need this for harvesting
+    public String get_internal_id(){
+    	return bRow.getStringColumn("internal_id");
+    }
+
+    public void contextCanRead() throws AuthorizeException, SQLException{
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.READ);
     }
 }

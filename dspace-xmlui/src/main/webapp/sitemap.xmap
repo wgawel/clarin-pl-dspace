@@ -22,9 +22,10 @@
                         <map:generator name="StandardOpenSearchGenerator" src="org.dspace.app.xmlui.opensearch.StandardOpenSearchGenerator"/>
                         <map:generator name="DiscoveryOpenSearchGenerator" src="org.dspace.app.xmlui.opensearch.DiscoveryOpenSearchGenerator"/>
                         <map:generator name="notifying" src="org.apache.cocoon.sitemap.NotifyingGenerator"/>
-                        <map:generator name="exception" src="org.apache.cocoon.generation.ExceptionGenerator"/>
+                        <map:generator name="exception" src="cz.cuni.mff.ufal.dspace.app.xmlui.cocoon.generation.EmailExceptionGenerator"/>
                         <map:generator name="AJAXMenuGenerator"
                              src="org.dspace.app.xmlui.cocoon.AJAXMenuGenerator"/>
+                        <map:generator name="DiscoJuiceFeeds" src="cz.cuni.mff.ufal.DiscoJuiceFeeds" />
                 </map:generators>
                 <map:serializers default="xml">
                         <map:serializer logger="sitemap.serializer.xml" mime-type="text/xml; charset=utf-8" name="xml"
@@ -65,6 +66,11 @@
                             <encoding>UTF-8</encoding>
                             <indent>yes</indent>
                         </map:serializer>
+                        <map:serializer name="json" mime-type="application/javascrit;charset=utf-8"
+                                       src="org.apache.cocoon.serialization.TextSerializer">
+                            <encoding>UTF-8</encoding>
+                        </map:serializer>
+
                 </map:serializers>
                 <map:transformers default="xslt">
                         <map:transformer logger="sitemap.transformer.xslt" name="xslt" pool-max="32"
@@ -175,6 +181,7 @@
                         <map:selector name="parameter" src="org.apache.cocoon.selection.ParameterSelector"/>
                         <map:selector logger="sitemap.selector.exception" name="exception" src="org.apache.cocoon.selection.ExceptionSelector">
                                 <exception name="not-found" class="org.apache.cocoon.ResourceNotFoundException"/>
+                                <exception name="file-not-found" class="java.io.FileNotFoundException"/>
                                 <exception name="invalid-continuation" class="org.apache.cocoon.components.flow.InvalidContinuationException"/>
                                 <exception name="bad-request" class="org.dspace.app.xmlui.utils.BadRequestException"/>
                                 <!-- The statement below tells the selector to unroll as much exceptions as possible -->
@@ -188,7 +195,9 @@
                             logger="sitemap.reader.resource" pool-max="32">
                             <expires>3600000</expires> <!-- 1000 * 60 * 60 = 3600000 = One hour -->
                     </map:reader>
+                    <map:reader name="ThemeResourceReader" src="org.dspace.app.xmlui.cocoon.ThemeResourceReader"/>
                     <map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
+                    <map:reader name="AllBitstreamZipArchiveReader" src="cz.cuni.mff.ufal.AllBitstreamZipArchiveReader"/>
                     <map:reader name="ExportReader" src="org.dspace.app.xmlui.cocoon.ItemExportDownloadReader"/>
                     <map:reader name="MetadataExportReader" src="org.dspace.app.xmlui.cocoon.MetadataExportReader"/>
 
@@ -199,6 +208,7 @@
                     <map:reader name="ConcatenationReader" src="org.dspace.app.xmlui.cocoon.ConcatenationReader"/>
                     <map:reader name="JQueryLoaderReader" src="org.dspace.app.xmlui.utils.JQueryLoaderReader"/>
                     <map:reader name="JSONControlledVocabularyReader" src="org.dspace.app.xmlui.cocoon.JSONControlledVocabularyReader"/>
+                    <map:reader name="PiwikStatisticsReader" src="cz.cuni.mff.ufal.PiwikStatisticsReader"/>
                                         
                     <map:reader name="HandleResolverReader" src="org.dspace.app.xmlui.aspect.handle.HandleResolverReader"/>
                 </map:readers>
@@ -207,6 +217,7 @@
                         <map:action name="StartAuthentication" src="org.dspace.app.xmlui.aspect.eperson.StartAuthenticationAction"/>
                         <map:action name="DSpacePropertyFileReader" src="org.dspace.app.xmlui.cocoon.DSpacePropertyFileReader" />
                         <map:action name="PropertyFileReader" src="org.dspace.app.xmlui.cocoon.PropertyFileReader" />
+                        <map:action name="CurrentActivityAction" src="org.dspace.app.xmlui.aspect.administrative.CurrentActivityAction" />
                 </map:actions>
                 <map:pipes default="caching">
                         <map:pipe name="noncaching" src="org.apache.cocoon.components.pipeline.impl.NonCachingProcessingPipeline">
@@ -233,6 +244,38 @@
         <!-- =========================== Pipelines ================================= -->
         <map:pipelines>
 
+                <!-- piwik statistics reader -->
+                <map:pipeline type="noncaching">
+                    <map:match pattern="handle/*/*/piwik">
+                        <map:read type="PiwikStatisticsReader">
+                                <map:parameter name="handle" value="{1}/{2}"/>
+                                <map:parameter name="rest" value=""/>
+                        </map:read>                    
+                    </map:match>
+                </map:pipeline>
+                <!-- end piwik -->        
+        
+                <!-- piwik statistics reader -->
+                <map:pipeline type="noncaching">
+                    <map:match pattern="handle/*/*/piwik/**">
+                        <map:read type="PiwikStatisticsReader">
+                                <map:parameter name="handle" value="{1}/{2}"/>
+                                <map:parameter name="rest" value="{3}"/>
+                        </map:read>                    
+                    </map:match>
+                </map:pipeline>
+                <!-- end piwik -->        
+        
+
+                <!-- ufal dicojuice feeds -->
+                <map:pipeline type="noncaching">
+                    <map:match pattern="discojuice/feeds">
+                        <map:generate type="DiscoJuiceFeeds"/>
+                        <map:serialize type="json"/>
+                    </map:match>
+                </map:pipeline>
+                <!-- end feeds -->
+                
 
                 <!-- Bitstream pipeline -->
                 <map:pipeline type="noncaching">
@@ -251,6 +294,7 @@
                                 that on to the generator so it can implement If-Modified-Since protocol.
                         -->
                         <map:match pattern="bitstream/handle/*/*/**">
+                               <map:act type="CurrentActivityAction"/>
                                 <map:match type="request-parameter" pattern="sequence">
                                         <map:select type="browser">
                                           <map:when test="spider">
@@ -288,6 +332,25 @@
                                 </map:select>
                         </map:match>
 
+                        
+                        <map:match pattern="handle/*/*/allzip">
+				<map:select type="AuthenticatedSelector">
+		                        <map:when test="authorized">
+		                            <map:read type="AllBitstreamZipArchiveReader">
+		                                <map:parameter name="handle" value="{1}/{2}"/>
+		                            </map:read>
+		                        </map:when>
+		                        <map:when test="eperson">
+						<map:read type="AllBitstreamZipArchiveReader">
+							<map:parameter name="handle" value="{1}/{2}"/>
+						</map:read>
+		                        </map:when>
+		                        <map:otherwise>
+		                                <map:act type="StartAuthentication"/>
+		                        </map:otherwise>
+                            	</map:select>
+                        </map:match>
+
                         <!--
                                 Bitstreams for items that do not have a handle assigned. If the
                                 sequence parameter is given then that will be used to resolve the
@@ -296,6 +359,7 @@
                                 /bitstream/item/[itemID]/[name]?sequence=[sequence]
                         -->
                         <map:match pattern="bitstream/item/*/**">
+                               <map:act type="CurrentActivityAction"/>
                                 <map:match type="request-parameter" pattern="sequence">
                                   <map:select type="browser">
                                     <map:when test="spider">
@@ -338,6 +402,7 @@
                                 /bitstream/id/[bitstreamID]/[ignored]
                         -->
                         <map:match pattern="bitstream/id/*/**">
+                                <map:act type="CurrentActivityAction"/>
                                 <map:select type="browser">
                                   <map:when test="spider">
                                     <map:read type="BitstreamReader">
@@ -378,12 +443,14 @@
                                 Downloads for the package download export
                         -->
                         <map:match pattern="exportdownload/*">
+                                <map:act type="CurrentActivityAction"/>
                                 <map:read type="ExportReader">
                                         <map:parameter name="fileName" value="{1}"/>
                                 </map:read>
                         </map:match>
 
                         <map:match pattern="csv/handle/*/*">
+                                <map:act type="CurrentActivityAction"/>
                                 <map:read type="MetadataExportReader">
                                     <map:parameter name="handle" value="{1}/{2}" />
                                 </map:read>
@@ -522,6 +589,7 @@
 
                     <!-- Syndication feeds for whole repo or community/collection -->
                     <map:match pattern="feed/*/**">
+                        <map:act type="CurrentActivityAction"/>
                         <map:generate type="DSpaceFeedGenerator">
                             <map:parameter name="feedFormat" value="{1}"/>
                             <map:parameter name="handle" value="{2}"/>
@@ -620,10 +688,18 @@
                             </map:read>
                     </map:match>
 
+                    <!-- Redirect / block for DS-3094 (security issue) for custom themes -->
+                    <!-- This ensures any custom themes are not affected by DS-3094 by redirecting
+                         vulnerable URL paths to /error (which returns a 404 File Not Found).
+                         Custom themes may still be affected by this issue, if they have not
+                         been updated to use ThemeResourceReader in all <map:read> settings. -->
+                    <map:match pattern="themes/**:**">
+                        <map:redirect-to uri="{request:contextPath}/error" permanent="yes"/>
+                    </map:match>
 
                     <!-- handle common theme resources, such as dri2xhtml -->
                     <map:match pattern="themes/*">
-                        <map:read src="themes/{1}"/>
+                        <map:read type="ThemeResourceReader" src="themes/{1}"/>
                     </map:match>
 
                     <!-- handle theme specific resources static or dynamic -->
@@ -635,15 +711,23 @@
                        This is specifically for global HTML files or robots.txt files,
                        either of which can be placed in the 'static/' directory.-->
                     <map:match pattern="*.txt">
-                        <map:read src="static/{1}.txt"/>
+                        <map:read type="ThemeResourceReader" src="static/{1}.txt"/>
                     </map:match>
                     <map:match pattern="*.html">
-                        <map:read src="static/{1}.html"/>
+                        <map:read type="ThemeResourceReader" src="static/{1}.html"/>
                     </map:match>
                     <!-- Also, allow reference to globally static content via the /static path.
                         This will allow your globally static HTML docs to load static CSS or images. -->
                     <map:match pattern="static/*/**">
-                        <map:read src="static/{1}/{2}"/>
+                        <map:read type="ThemeResourceReader" src="static/{1}/{2}"/>
+                    </map:match>
+
+                    <!-- DSpace does not have any paths beginning with numbers (0-9). If one is accessed,
+                         assume that it is an identifier & redirect it. This also avoids an internal
+                         error, where the XMLUI AspectMatcher wrongly assumes numbers at beginning
+                         of path are direct references to individual Aspects in the aspect chain.-->
+                    <map:match type="regexp" pattern="(^[0-9]+\/?.*$)">
+                        <map:redirect-to uri="{request:contextPath}/handle/{1}" permanent="yes"/>
                     </map:match>
 
                     <!-- DSpace does not have any paths beginning with numbers (0-9). If one is accessed,
@@ -720,9 +804,23 @@
                                         <map:serialize type="xhtml" status-code="404"/>
                                 </map:when>
 
-                                <map:when test="invalid-continuation">
+                                <map:when test="file-not-found">
                                         <map:generate type="exception"/>
                                         <map:transform src="exception2html.xslt">
+                                                <map:parameter name="contextPath" value="{request:contextPath}"/>
+                                                <map:parameter name="pageTitle" value="File not found"/>
+                                        </map:transform>
+                                        <map:act type="locale">
+                                            <map:transform type="i18n">
+                                                    <map:parameter name="locale" value="{locale}"/>
+                                            </map:transform>
+                                        </map:act>
+                                        <map:serialize type="xhtml" status-code="404"/>
+                                </map:when>
+
+                                <map:when test="invalid-continuation">
+                                        <map:generate type="exception"/>
+                                        <map:transform src="exceptionSessionExpired2html.xslt">
                                                 <map:parameter name="contextPath" value="{request:contextPath}"/>
                                                 <map:parameter name="pageTitle" value="Your Session has Expired"/>
                                         </map:transform>
@@ -735,7 +833,9 @@
                                 </map:when>
 
                                 <map:otherwise>
-                                        <map:generate type="exception"/>
+                                        <map:generate type="exception">
+                                        	<map:parameter name="send_email" value="true"/>
+                                        </map:generate>
                                         <map:transform src="exception2html.xslt">
                                                 <map:parameter name="contextPath" value="{request:contextPath}"/>
                                         </map:transform>

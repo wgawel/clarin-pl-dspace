@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -24,14 +25,16 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.IndexBrowse;
+import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.authority.Choices;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.ChoiceAuthorityManager;
-import org.dspace.event.Event;
+import org.dspace.embargo.EmbargoManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierService;
@@ -40,6 +43,8 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.VersioningService;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Class representing an item in DSpace.
@@ -51,12 +56,15 @@ import org.dspace.versioning.VersioningService;
  * Creating, adding or removing bundles or bitstreams has immediate effect in
  * the database.
  *
- * @author Robert Tansley
- * @author Martin Hald
+ * based on class by Robert Tansley and Martin Hald
+ * modified for LINDAT/CLARIN
  * @version $Revision$
  */
 public class Item extends DSpaceObject
 {
+	
+	public static final String metadata_isreplacedby = "dc.relation.isreplacedby";
+	
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
      */
@@ -263,7 +271,7 @@ public class Item extends DSpaceObject
         }
 
         String query = "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' " +
-                "AND item.item_id = metadatavalue.item_id AND metadata_field_id = ?";
+                "AND item.item_id = metadatavalue.resource_id AND metadatavalue.resource_type_id=2 AND metadata_field_id = ?";
         TableRowIterator rows = null;
         if (Item.ANY.equals(authority)) {
             rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID());
@@ -380,7 +388,7 @@ public class Item extends DSpaceObject
      */
     public boolean isDiscoverable()
     {
-        return itemRow.getBooleanColumn("discoverable");
+        return itemRow.getBooleanColumn("discoverable") && !this.isHidden();
     }
 
     /**
@@ -517,6 +525,47 @@ public class Item extends DSpaceObject
         }
         modified = true;
     }
+    
+    /**
+     * Change the e-person.
+     * This is a public method since it is handled by the WorkspaceItem class
+     * in the ingest package. <code>update</code> must be called to write
+     * the change to the database.
+     *
+     * @param sub
+     *            the submitter
+     */
+    public void changeSubmitter(EPerson sub) throws SQLException, AuthorizeException
+    {
+        submitter = sub;
+
+        if (submitter != null)
+        {
+            itemRow.setColumn("submitter_id", submitter.getID());
+        }
+        else
+        {
+            itemRow.setColumnNull("submitter_id");
+        }
+        
+        
+        // changing policies to new owner
+        List<ResourcePolicy> oldPolicies = AuthorizeManager.getPolicies(ourContext, this);
+        for(Bundle bundle : this.getBundles()){
+            oldPolicies.addAll(AuthorizeManager.getPolicies(ourContext, bundle));
+            for(Bitstream bitstream : bundle.getBitstreams()){
+                oldPolicies.addAll(AuthorizeManager.getPolicies(ourContext, bitstream));
+            }
+        }
+        for(ResourcePolicy policy : oldPolicies) {
+        	if(policy.getEPerson()!=null) {
+        		policy.setEPerson(submitter);
+        		policy.update();
+        	}
+        }        
+                
+        modified = true;
+    }    
 
     /**
      * See whether this Item is contained by a given Collection.
@@ -946,6 +995,20 @@ public class Item extends DSpaceObject
 
         return bitstreamList.toArray(new Bitstream[bitstreamList.size()]);
     }
+    
+    public long getTotalSize() throws SQLException 
+    {
+        long size = 0;
+        Bundle[] bunds = getBundles();
+        for (int i = 0; i < bunds.length; i++)
+        {
+            Bitstream[] bitstreams = bunds[i].getBitstreams();
+            for (int j = 0; j < bitstreams.length; ++j) {
+                size += bitstreams[j].getSize();
+            }
+        }
+        return size;
+    }
 
     /**
      * Remove just the DSpace license from an item This is useful to update the
@@ -1027,7 +1090,7 @@ public class Item extends DSpaceObject
     {
         // Check authorisation
         // only do write authorization if user is not an editor
-        if (!canEdit())
+        if (!canEdit() && !canEditMetadata())
         {
             AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
         }
@@ -1071,6 +1134,32 @@ public class Item extends DSpaceObject
                 }
             }
         }
+        
+        int totalNumberOfFiles = 0;
+        long totalSizeofFiles = 0;
+        
+        /* Add local.has.files metadata */
+        boolean hasFiles = false;
+        Bundle[] origs = getBundles("ORIGINAL");
+        for(Bundle orig : origs) {
+        	if(orig.getBitstreams().length > 0) {
+        		hasFiles = true;
+        	}        	
+        	for(Bitstream bit : orig.getBitstreams()) {
+        		totalNumberOfFiles ++;
+        		totalSizeofFiles += bit.getSize();
+        	}
+        }
+        clearMetadata("local", "has", "files", Item.ANY);
+        clearMetadata("local", "files", "count", Item.ANY);
+        clearMetadata("local", "files", "size", Item.ANY);
+        if(hasFiles) {
+        	addMetadata("local", "has", "files", Item.ANY, "yes");
+        } else {
+        	addMetadata("local", "has", "files", Item.ANY, "no");
+        }
+        addMetadata("local", "files", "count", Item.ANY, "" + totalNumberOfFiles);
+        addMetadata("local", "files", "size", Item.ANY, "" + totalSizeofFiles);
 
         if (modifiedMetadata || modified)
         {
@@ -1107,6 +1196,11 @@ public class Item extends DSpaceObject
         }
     }
 
+    // if we update dc scheme during the life of Item (e.g., harvesting) we need
+    // to reset this field
+    public void reset_metadata_fields() {
+        allMetadataFields = null;
+    }
 
     /**
      * Withdraw the item from the archive. It is kept in place, and the content
@@ -1122,8 +1216,6 @@ public class Item extends DSpaceObject
         // or be COLLECTION_EDITOR of owning collection
         AuthorizeUtil.authorizeWithdrawItem(ourContext, this);
 
-        String timestamp = DCDate.getCurrent().toString();
-
         // Add suitable provenance - includes user, date, collections +
         // bitstream checksums
         EPerson e = ourContext.getCurrentUser();
@@ -1131,9 +1223,8 @@ public class Item extends DSpaceObject
         // Build some provenance data while we're at it.
         StringBuilder prov = new StringBuilder();
 
-        prov.append("Item withdrawn by ").append(e.getFullName()).append(" (")
-                .append(e.getEmail()).append(") on ").append(timestamp).append("\n")
-                .append("Item was in collections:\n");
+        prov.append("Item withdrawn by ").append(get_provenance_header(e));
+        prov.append("Item was in collections:\n");
 
         Collection[] colls = getCollections();
 
@@ -1148,18 +1239,23 @@ public class Item extends DSpaceObject
         // in_archive flag is now false
         itemRow.setColumn("in_archive", false);
 
-        prov.append(InstallItem.getBitstreamProvenanceMessage(this));
-
-        addDC("description", "provenance", "en", prov.toString());
+        // add bitstream info and store the change in metadata
+        store_provenance_info(prov);
 
         // Update item in DB
         update();
 
-        ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), 
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(),
                 "WITHDRAW", getIdentifiers(ourContext)));
 
-        // remove all authorization policies, saving the custom ones
-        AuthorizeManager.removeAllPoliciesByDSOAndTypeNotEqualsTo(ourContext, this, ResourcePolicy.TYPE_CUSTOM);
+        // switch all READ authorization policies to WITHDRAWN_READ
+		AuthorizeManager.switchPoliciesAction(ourContext, this, Constants.READ, Constants.WITHDRAWN_READ);
+		for (Bundle bnd : this.getBundles()) {
+			AuthorizeManager.switchPoliciesAction(ourContext, bnd, Constants.READ, Constants.WITHDRAWN_READ);
+			for (Bitstream bs : bnd.getBitstreams()) {
+				AuthorizeManager.switchPoliciesAction(ourContext, bs, Constants.READ, Constants.WITHDRAWN_READ);
+			}
+		}
 
         // Write log
         log.info(LogManager.getHeader(ourContext, "withdraw_item", "user="
@@ -1180,8 +1276,6 @@ public class Item extends DSpaceObject
         // check authorization
         AuthorizeUtil.authorizeReinstateItem(ourContext, this);
 
-        String timestamp = DCDate.getCurrent().toString();
-
         // Check permission. User must have ADD on all collections.
         // Build some provenance data while we're at it.
         Collection[] colls = getCollections();
@@ -1190,9 +1284,8 @@ public class Item extends DSpaceObject
         // bitstream checksums
         EPerson e = ourContext.getCurrentUser();
         StringBuilder prov = new StringBuilder();
-        prov.append("Item reinstated by ").append(e.getFullName()).append(" (")
-                .append(e.getEmail()).append(") on ").append(timestamp).append("\n")
-                .append("Item was in collections:\n");
+        prov.append("Item reinstated by ").append(get_provenance_header(e));
+        prov.append("Item was in collections:\n");
 
         for (int i = 0; i < colls.length; i++)
         {
@@ -1205,28 +1298,37 @@ public class Item extends DSpaceObject
         // in_archive flag is now true
         itemRow.setColumn("in_archive", true);
 
-        // Add suitable provenance - includes user, date, collections +
-        // bitstream checksums
-        prov.append(InstallItem.getBitstreamProvenanceMessage(this));
-
-        addDC("description", "provenance", "en", prov.toString());
+        // add bitstream info and store the change in metadata
+        store_provenance_info( prov );
 
         // Update item in DB
         update();
 
-        ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), 
+        ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(),
                 "REINSTATE", getIdentifiers(ourContext)));
 
-        // authorization policies
-        if (colls.length > 0)
-        {
-            // FIXME: not multiple inclusion friendly - just apply access
-            // policies from first collection
-            // remove the item's policies and replace them with
-            // the defaults from the collection
-            inheritCollectionDefaultPolicies(colls[0]);
+        // restore all WITHDRAWN_READ authorization policies back to READ
+        for (Bundle bnd : this.getBundles()) {
+			AuthorizeManager.switchPoliciesAction(ourContext, bnd, Constants.WITHDRAWN_READ, Constants.READ);
+			for (Bitstream bs : bnd.getBitstreams()) {
+				AuthorizeManager.switchPoliciesAction(ourContext, bs, Constants.WITHDRAWN_READ, Constants.READ);
+			}
+		}
+        
+        // check if the item was withdrawn before the fix DS-3097
+        if (AuthorizeManager.getPoliciesActionFilter(ourContext, this, Constants.WITHDRAWN_READ).size() != 0) {
+        	AuthorizeManager.switchPoliciesAction(ourContext, this, Constants.WITHDRAWN_READ, Constants.READ);
         }
-
+        else {
+	        // authorization policies
+	        if (colls.length > 0)
+	        {
+	            // remove the item's policies and replace them with
+	            // the defaults from the collection
+	        	adjustItemPolicies(getOwningCollection());
+	        }
+        }
+        
         // Write log
         log.info(LogManager.getHeader(ourContext, "reinstate_item", "user="
                 + e.getEmail() + ",item_id=" + getID()));
@@ -1241,7 +1343,7 @@ public class Item extends DSpaceObject
      * @throws AuthorizeException
      * @throws IOException
      */
-    void delete() throws SQLException, AuthorizeException, IOException
+    public void delete() throws SQLException, AuthorizeException, IOException
     {
         // Check authorisation here. If we don't, it may happen that we remove the
         // metadata but when getting to the point of removing the bundles we get an exception
@@ -1750,7 +1852,12 @@ public class Item extends DSpaceObject
         // is this collection not yet created, and an item template is created
         if (getOwningCollection() == null)
         {
-            return true;
+        	if (!isInProgressSubmission()) {
+        		return true;
+        	}
+        	else {
+        		return false;
+        	}
         }
 
         // is this person an COLLECTION_EDITOR for the owning collection?
@@ -1760,6 +1867,48 @@ public class Item extends DSpaceObject
         }
 
         return false;
+    }
+    
+	public boolean canEditMetadata() throws java.sql.SQLException {
+		boolean ownersCanEditCollection = false;
+		// get from config editable collections names/id
+		String editableCollections = ConfigurationManager.getProperty("lr", "lr.allow.edit.metadata");
+		if (editableCollections != null) {
+			SEARCH: for (String ec : editableCollections.split(",")) {
+				ec = ec.trim();
+				for (Collection col : this.getCollections()) {
+					ownersCanEditCollection = Integer.toString(col.getID())
+							.equals(ec) || col.getName().equals(ec);
+					if (ownersCanEditCollection) {
+						break SEARCH;
+					}
+				}
+			}
+		}
+
+		EPerson e = this.ourContext.getCurrentUser();
+		boolean canEditOwn = e != null && e.canEditSubmissionMetadata();
+		boolean isOwner = this.getSubmitter().equals(e);
+		boolean epersonIsReviewer = false;
+        if(this.getOwningCollection() != null ){
+            epersonIsReviewer = this.getOwningCollection().epersonIsReviewer();
+        }
+
+        return (((ownersCanEditCollection || canEditOwn) && isOwner) || epersonIsReviewer);
+	}
+
+    /**
+     * Check if the item is an inprogress submission
+     * @param context
+     * @param item
+     * @return <code>true</code> if the item is an inprogress submission, i.e. a WorkspaceItem or WorkflowItem
+     * @throws SQLException
+     */
+    public boolean isInProgressSubmission() throws SQLException {
+		return WorkspaceItem.findByItem(ourContext, this) != null ||
+				((ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow")
+						&& XmlWorkflowItem.findByItem(ourContext, this) != null)
+						|| WorkflowItem.findByItem(ourContext, this) != null);
     }
     
     public String getName()
@@ -1781,7 +1930,13 @@ public class Item extends DSpaceObject
      *
      */
     public static ItemIterator findByMetadataField(Context context,
-               String schema, String element, String qualifier, String value)
+            String schema, String element, String qualifier, String value)
+       throws SQLException, AuthorizeException, IOException {
+    	return findByMetadataField(context, schema, element, qualifier, value, true);
+    }
+
+    public static ItemIterator findByMetadataField(Context context,
+               String schema, String element, String qualifier, String value, boolean in_archive_only)
           throws SQLException, AuthorizeException, IOException
     {
         MetadataSchema mds = MetadataSchema.find(context, schema);
@@ -1796,8 +1951,11 @@ public class Item extends DSpaceObject
                     "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
         }
         
-        String query = "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' "+
-                       "AND item.item_id = metadatavalue.resource_id AND metadata_field_id = ? AND resource_type_id = ?";
+        String query = "SELECT distinct(item.*) FROM metadatavalue,item WHERE "+
+                       "item.item_id = metadatavalue.resource_id AND metadata_field_id = ? AND resource_type_id = ?";
+        if ( in_archive_only ) {
+        	query += " AND item.in_archive='1'";
+        }
         TableRowIterator rows = null;
         if (Item.ANY.equals(value))
         {
@@ -1810,6 +1968,43 @@ public class Item extends DSpaceObject
         }
         return new ItemIterator(context, rows);
      }
+    
+    
+    /** 
+     * Get embargo date. 
+     * @throws Exception 
+     */
+    public DCDate getEmbargo() throws Exception 
+    {
+    	try {
+			return EmbargoManager.getEmbargoTermsAsDate(ourContext, this);
+		} catch (Exception e) {
+			if ( e instanceof IllegalArgumentException ) {
+				throw e;
+			}
+			log.error(String.format("Could not get embargo date for item [%s].", getHandle()));
+		}
+    	return null;
+    }
+    
+    
+    public boolean isReplacedBy()
+    {
+    	return getMetadataByMetadataString(metadata_isreplacedby).length > 0;
+    }
+
+    public List<String> getReplacedBy()
+    {
+    	List<String> ret = new ArrayList<String>();
+    	Metadatum[] vals = getMetadataByMetadataString(metadata_isreplacedby);
+    	for ( int i = 0; i < vals.length; ++i ) {
+    		Metadatum dc = vals[i];
+    		ret.add( dc.value );
+    	}
+    	return ret;
+    }
+    
+    //
     
     public DSpaceObject getAdminObject(int action) throws SQLException
     {
@@ -1986,4 +2181,70 @@ public class Item extends DSpaceObject
         authorities[i] = c.values.length > 0 ? c.values[0].authority : null;
         confidences[i] = c.confidence;
     }
+    //
+    //
+    //
+    //
+    public String get_provenance_header(EPerson e) 
+    {
+        final String timestamp = DCDate.getCurrent().toString();
+        return new StringBuilder()
+        .append(e != null ? e.getFullName() : "null")
+        .append(" (")
+        .append(e != null ? e.getEmail() : "null")
+        .append(") on ")
+        .append(timestamp).append("\n").toString();
+    }
+    
+    public void store_provenance_info(StringBuilder sb) throws SQLException
+    {
+        // Add suitable provenance - includes user, date, collections +
+        // bitstream checksums
+        sb.append(InstallItem.getBitstreamProvenanceMessage(this));
+        addMetadata("dc","description", "provenance", "en", sb.toString());
+    }
+
+    public void store_provenance_info(String header, EPerson e) throws SQLException
+    {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(header).append(" by ").append(get_provenance_header(e));
+        store_provenance_info(sb);
+    }
+
+	public boolean isHidden() {
+		Metadatum[] dcvs = this.getMetadataByMetadataString("local.hidden");
+		if(dcvs != null && dcvs.length == 1 && dcvs[0].value.equalsIgnoreCase("hidden")){
+			return true;
+		}
+		return false;
+	}
+
+	public boolean hasOwnMetadata() {
+		Metadatum[] dcvs = this.getMetadataByMetadataString("local.hasMetadata");
+		if(dcvs != null && dcvs.length == 1 && dcvs[0].value.equalsIgnoreCase("true")){
+			return true;
+		}
+		return false;
+	}
+
+
+	/**
+	 * Use the schema, element, qualifier, language and value in addMetadata
+	 * @param md
+	 */
+	public void addMetadatum(Metadatum md){
+		this.addMetadata(md.schema, md.element, md.qualifier, md.language, md.value);
+	}
+	
+
+	public void setReplacedBy(String pid) {
+		Metadatum[] mds = this.getMetadataByMetadataString(metadata_isreplacedby);
+		this.clearMetadata("dc", "relation", "isreplacedby", Item.ANY);
+		//ensure this goes first
+		this.addMetadata("dc", "relation", "isreplacedby", null, pid);
+		for(Metadatum md : mds){
+			this.addMetadatum(md);
+		}
+	}
 }
+

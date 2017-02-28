@@ -22,6 +22,8 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
+import org.dspace.app.xmlui.wing.element.Text;
+import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 
@@ -35,8 +37,8 @@ import org.dspace.content.Item;
  * There are three possible values, "delete", "withdraw", or
  * "reinstate"
  * 
- * @author Jay Paz
- * @author Scott Phillips
+ * based on class by Jay Paz and Scott Phillips
+ * modified for LINDAT/CLARIN
  */
 public class ConfirmItemForm extends AbstractDSpaceTransformer {
 
@@ -60,6 +62,12 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 
     private static final Message T_submit_private = message("xmlui.administrative.item.ConfirmItemForm.submit_private");
     private static final Message T_submit_public = message("xmlui.administrative.item.ConfirmItemForm.submit_public");
+
+    private static final Message T_para_withdraw_extraInfo = message("xmlui.administrative.item.ConfirmItemForm.withdraw_para_extraInfo");
+    private static final Message T_help_withdraw_extra_handle = message("xmlui.administrative.item.ConfirmItemForm.withdraw_help_extra_handle");
+    private static final Message T_label_withdraw_extra_handle = message("xmlui.administrative.item.ConfirmItemForm.withdraw_label_extra_handle");
+    private static final Message T_help_withdraw_extra_reason = message("xmlui.administrative.item.ConfirmItemForm.withdraw_help_extra_reason");
+    private static final Message T_label_withdraw_extra_reason = message("xmlui.administrative.item.ConfirmItemForm.withdraw_label_extra_reason");
 
 
 	public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -85,7 +93,7 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 
 
 		// DIVISION: Main
-		Division main = body.addInteractiveDivision("confirm-item", contextPath+"/admin/item", Division.METHOD_POST,"primary administrative item");
+		Division main = body.addInteractiveDivision("confirm-item", contextPath+"/admin/item", Division.METHOD_POST,"alert alert-danger");
 		main.setHead(T_head1.parameterize(item.getHandle()));
 
 		// PARA: descriptive instructions
@@ -118,8 +126,20 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 		}
 
 		// LIST: actions, confirm or return
-		org.dspace.app.xmlui.wing.element.Item actions = main.addList("actions", List.TYPE_FORM).addItem();
+		org.dspace.app.xmlui.wing.element.List actionsList = main.addList("actions", List.TYPE_FORM);
+		
+		if("withdraw".equals(confirm)){
+			org.dspace.app.xmlui.wing.element.Item extraInfo = actionsList.addItem();
+			extraInfo.addContent(T_para_withdraw_extraInfo);
+			Text handle = actionsList.addItem().addText("extra_handle", "form-control");
+			handle.setHelp(T_help_withdraw_extra_handle);
+			handle.setLabel(T_label_withdraw_extra_handle);
+			TextArea reason = actionsList.addItem().addTextArea("extra_reason", "form-control");
+			reason.setHelp(T_help_withdraw_extra_reason);
+			reason.setLabel(T_label_withdraw_extra_reason);
+		}
 
+		org.dspace.app.xmlui.wing.element.Item actions = actionsList.addItem();
 		Button confirmButton = actions.addButton("submit_confirm");
 
 		if("delete".equals(confirm))

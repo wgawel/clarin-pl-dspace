@@ -7,17 +7,27 @@
  */
 package org.dspace.submit.step;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.SQLException;
-import java.util.Enumeration;
+import java.util.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.LaxRedirectStrategy;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
@@ -26,8 +36,9 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
-import org.dspace.core.Context;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.curate.Curator;
 import org.dspace.submit.AbstractProcessingStep;
 
@@ -43,7 +54,8 @@ import org.dspace.submit.AbstractProcessingStep;
  * @see org.dspace.app.util.SubmissionStepConfig
  * @see org.dspace.submit.AbstractProcessingStep
  * 
- * @author Tim Donohue
+ * based on class Tim Donohue
+ * modified for LINDAT/CLARIN
  * @version $Revision$
  */
 public class UploadStep extends AbstractProcessingStep
@@ -76,6 +88,10 @@ public class UploadStep extends AbstractProcessingStep
     // error - no files uploaded!
     public static final int STATUS_NO_FILES_ERROR = 5;
 
+    // error - no files uploaded!
+    public static final int STATUS_NO_CMDI_FILE_ERROR = 401;
+    public static final int STATUS_ORDER_MAYHAM = 402;
+
     // format of uploaded file is unknown
     public static final int STATUS_UNKNOWN_FORMAT = 10;
 
@@ -90,6 +106,12 @@ public class UploadStep extends AbstractProcessingStep
 
     // return from editing file information
     public static final int STATUS_EDIT_COMPLETE = 25;
+    
+    // file not found while processing local file
+    public static final int STATUS_NOT_FOUND = 101;
+
+    // file failed virus check
+    public static final int STATUS_SERVER_FILE_CONTAINS_VIRUS = 116;
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(UploadStep.class);
@@ -151,6 +173,18 @@ public class UploadStep extends AbstractProcessingStep
             }
         }
         
+        
+        // process local file on server
+        if(buttonPressed.equals("submit_upload_local")){
+        	int status = processFileOnServer(context, request, response, subInfo);
+            // if error occurred, return immediately
+            // if (status != STATUS_COMPLETE)
+            {
+                return status;
+            }        	
+        }
+        
+            
         // if user pressed jump-to button in process bar,
         // return success (so that jump will occur)
         if (buttonPressed.startsWith(PROGRESS_BAR_PREFIX) || 
@@ -214,7 +248,8 @@ public class UploadStep extends AbstractProcessingStep
         // Step #2: Process any remove file request(s)
         // ---------------------------------------------
         // Remove-selected requests come from Manakin
-        if (buttonPressed.equalsIgnoreCase("submit_remove_selected"))
+        ArrayList<Integer> removed = new ArrayList<Integer>();
+        if (buttonPressed.equalsIgnoreCase("submit_remove_selected") || buttonPressed.equalsIgnoreCase("submit_remove_all"))
         {
             // this is a remove multiple request!
 
@@ -235,6 +270,7 @@ public class UploadStep extends AbstractProcessingStep
                     {
                         return status;
                     }
+                    removed.add(id);
                 }
 
                 // remove current bitstream from Submission Info
@@ -253,6 +289,7 @@ public class UploadStep extends AbstractProcessingStep
             {
                 return status;
             }
+            removed.add(id);
 
             // remove current bitstream from Submission Info
             subInfo.setBitstream(null);
@@ -274,6 +311,29 @@ public class UploadStep extends AbstractProcessingStep
             {
                 return status;
             }
+        }
+
+	Enumeration<String> descriptions = request.getParameterNames();
+        while(descriptions.hasMoreElements()){
+        	String desc = descriptions.nextElement();
+        	if(desc.startsWith("description_")){
+        		String fd = request.getParameter(desc);
+	        	int bitId = Integer.parseInt(desc.substring(12)); //description_123
+        		if(!removed.contains(bitId) && fd != null && fd.length() > 0){
+        			Bitstream bs = Bitstream.find(context, bitId); 
+        			subInfo.setBitstream(bs);
+        	        if (bs != null)
+        	        {
+        	            bs.setDescription(fd);
+        	            bs.update();
+        	            context.commit();
+        	        }
+        	        else
+        	        {
+        	            return STATUS_INTEGRITY_ERROR;
+        	        }
+        		}
+        	}
         }
 
         // ------------------------------------------
@@ -301,7 +361,59 @@ public class UploadStep extends AbstractProcessingStep
         // ---------------------------------------------------
         // Step #5: Check if primary bitstream has changed
         // -------------------------------------------------
-        if (request.getParameter("primary_bitstream_id") != null)
+        
+        //File ordering the first file is set as primary
+        int maxIndex = -1;
+        final java.util.Map<Integer,Integer> idToOrd = new java.util.HashMap<Integer,Integer>();
+        try {
+            Enumeration<String> order = request.getParameterNames();
+            while(order.hasMoreElements()){
+                String ord = order.nextElement();
+                if(ord.startsWith("order_")){
+                    int bitId = Integer.parseInt(ord.substring(6));
+                    int index = Integer.parseInt(request.getParameter(ord));
+                    if(index > maxIndex){
+                        maxIndex = index;
+                    }
+                    idToOrd.put(bitId, index);
+                }
+            }
+            Bundle[] oBundles = item.getBundles("ORIGINAL");
+            if(oBundles != null && oBundles.length > 0){
+                for(Bitstream bitstream : oBundles[0].getBitstreams()){
+                    if(!idToOrd.containsKey(bitstream.getID())){
+                        idToOrd.put(bitstream.getID(), ++maxIndex);
+                    }
+                }
+            }
+            for (int bitId : removed) {
+                idToOrd.remove(bitId);
+            }
+            SortedSet<Integer> orderedIds = new TreeSet<>(new Comparator<Integer>(){
+
+                @Override
+                public int compare(Integer id1, Integer id2) {
+                    return Integer.compare(idToOrd.get(id1), idToOrd.get(id2));
+                }
+            });
+            orderedIds.addAll(idToOrd.keySet());
+            int[] ordered = new int[orderedIds.size()];
+            int i = 0;
+            for(Integer id : orderedIds){
+                ordered[i++] = id;
+            }
+
+
+            Bundle[] bundles = item.getBundles("ORIGINAL");
+            if (bundles.length > 0) {
+                bundles[0].setOrder(ordered);
+                bundles[0].setPrimaryBitstreamID(ordered[0]);
+                bundles[0].update();
+            }
+        }catch(Exception e) {
+            return STATUS_ORDER_MAYHAM;
+        }
+        /*if (request.getParameter("primary_bitstream_id") != null)
         {
             Bundle[] bundles = item.getBundles("ORIGINAL");
             if (bundles.length > 0)
@@ -310,7 +422,7 @@ public class UploadStep extends AbstractProcessingStep
                     .getParameter("primary_bitstream_id")).intValue());
             	bundles[0].update();
             }
-        }
+        }*/
 
         // ---------------------------------------------------
         // Step #6: Determine if there is an error because no
@@ -321,6 +433,28 @@ public class UploadStep extends AbstractProcessingStep
                 && !buttonPressed.equals(SUBMIT_MORE_BUTTON))
         {
             return STATUS_NO_FILES_ERROR;
+        }
+        
+        // Check if we need (and have) a cmdi file
+        // Only check if user clicked the "next", the "previous" or the "progress bar" button
+        if ((buttonPressed.equals(NEXT_BUTTON)
+                || buttonPressed.startsWith(PROGRESS_BAR_PREFIX)
+                || buttonPressed.equals(PREVIOUS_BUTTON)
+                || buttonPressed.equals(CANCEL_BUTTON)) && item.hasOwnMetadata())
+        {
+        	try{
+                if (!(item.getBundles("METADATA")[0].getBitstreams().length >= 1))
+                {
+                	return STATUS_NO_CMDI_FILE_ERROR;
+                }
+        	}catch(Exception e){
+                	return STATUS_NO_CMDI_FILE_ERROR;
+        	}
+        }
+
+        if(subInfo.getSubmissionItem() instanceof WorkspaceItem) {
+        	int stepNumber = subInfo.getStepConfig("upload").getStepNumber();
+        	((WorkspaceItem)subInfo.getSubmissionItem()).setStageReached(stepNumber);
         }
 
         // commit all changes to database
@@ -404,15 +538,15 @@ public class UploadStep extends AbstractProcessingStep
         // delete bundle if it's now empty
         Bundle[] bundles = bitstream.getBundles();
 
-        bundles[0].removeBitstream(bitstream);
+        if ( 0 < bundles.length ) {
+            bundles[0].removeBitstream(bitstream);
+            Bitstream[] bitstreams = bundles[0].getBitstreams();
 
-        Bitstream[] bitstreams = bundles[0].getBitstreams();
-
-        // remove bundle if it's now empty
-        if (bitstreams.length < 1)
-        {
-            item.removeBundle(bundles[0]);
-            item.update();
+            // remove bundle if it's now empty
+            if (bitstreams.length < 1) {
+                item.removeBundle(bundles[0]);
+                item.update();
+            }
         }
 
         // no errors occurred
@@ -492,14 +626,20 @@ public class UploadStep extends AbstractProcessingStep
 
                 // Create the bitstream
                 Item item = subInfo.getSubmissionItem().getItem();
+                
+                String bundleName = "ORIGINAL";
+                //If we indicated upload of cmdi file and this file has cmdi suffix, change the target bundle
+                if(item.hasOwnMetadata() && filePath.toLowerCase().endsWith("cmdi")){
+                	bundleName = "METADATA";
+                }
 
                 // do we already have a bundle?
-                Bundle[] bundles = item.getBundles("ORIGINAL");
+                Bundle[] bundles = item.getBundles(bundleName);
 
                 if (bundles.length < 1)
                 {
                     // set bundle's name to ORIGINAL
-                    b = item.createSingleBitstream(fileInputStream, "ORIGINAL");
+                    b = item.createSingleBitstream(fileInputStream, bundleName);
                 }
                 else
                 {
@@ -578,6 +718,167 @@ public class UploadStep extends AbstractProcessingStep
         }//end while
         
 
+        return STATUS_COMPLETE;
+
+              
+    }
+    
+    
+    /**
+     * Process file on server
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
+     * 
+     * @return Status or error flag which will be processed by
+     *         UI-related code! (if STATUS_COMPLETE or 0 is returned,
+     *         no errors occurred!)
+     */
+    protected int processFileOnServer(Context context, HttpServletRequest request,
+            HttpServletResponse response, SubmissionInfo subInfo)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
+    {
+        boolean formatKnown = true;
+        boolean fileOK = false;
+        BitstreamFormat bf = null;
+        Bitstream b = null;
+ 
+        String filePath = null;        
+        InputStream fileInputStream = null;
+        CloseableHttpClient client = null;
+        CloseableHttpResponse getResponse = null;
+
+        try {
+        	filePath = (String)request.getAttribute("fileLocal");
+        	if(filePath.startsWith("/")) {
+        		filePath = "file://" + filePath;
+                fileInputStream = new URI(filePath).toURL().openStream();
+         	}else {
+                client = HttpClientBuilder.create().setRedirectStrategy(new LaxRedirectStrategy()).build();
+                HttpGet httpGet = new HttpGet(filePath);
+                getResponse = client.execute(httpGet);
+                fileInputStream = getResponse.getEntity().getContent();
+            }
+        }catch(IllegalArgumentException e) {
+        	return STATUS_NOT_FOUND;
+        }catch(MalformedURLException e) {
+        	return STATUS_NOT_FOUND;
+        }catch(URISyntaxException e) {
+        	return STATUS_NOT_FOUND;
+        }catch(IOException e){
+        	return STATUS_NOT_FOUND;
+        }
+        
+        //attempt to get description from attribute first, then direct from a parameter
+        String fileDescription =  (String) request.getAttribute("descriptionLocal");
+        if(fileDescription==null ||fileDescription.length()==0)
+        {
+			// jmisutka - dragNdrop fix
+            fileDescription = request.getParameter("descriptionLocal");
+        }
+        
+        /* if information wasn't passed by User Interface, we had a problem
+        // with the upload
+        if (filePath == null || fileInputStream == null)
+        {
+            return STATUS_UPLOAD_ERROR;
+        }*/
+
+        if (subInfo == null)
+        {
+            // In any event, if we don't have the submission info, the request
+            // was malformed
+            return STATUS_INTEGRITY_ERROR;
+        }
+
+
+        // Create the bitstream
+        Item item = subInfo.getSubmissionItem().getItem();
+
+        // do we already have a bundle?
+        Bundle[] bundles = item.getBundles("ORIGINAL");
+
+        if (bundles.length < 1)
+        {
+            // set bundle's name to ORIGINAL
+            b = item.createSingleBitstream(fileInputStream, "ORIGINAL");
+        }
+        else
+        {
+            // we have a bundle already, just add bitstream
+            b = bundles[0].createBitstream(fileInputStream);
+        }
+        if(fileInputStream != null){
+            fileInputStream.close();
+        }
+        if(getResponse != null){
+            getResponse.close();
+        }
+        if(client != null){
+            client.close();
+        }
+
+        File f = new File(filePath);
+        b.setName(f.getName());
+        b.setSource(filePath);
+        b.setDescription(fileDescription);
+
+        // Identify the format
+        bf = FormatIdentifier.guessFormat(context, b);
+        b.setFormat(bf);
+
+        // Update to DB
+        b.update();
+        item.update();
+
+        if ((bf != null) && (bf.isInternal()))
+        {
+            log.warn("Attempt to upload file format marked as internal system use only");
+            backoutBitstream(subInfo, b, item);
+            return STATUS_UPLOAD_ERROR;
+        }
+
+        // Check for virus
+        if (ConfigurationManager.getBooleanProperty("submission-curation", "virus-scan"))
+        {
+            Curator curator = new Curator();
+            curator.addTask("vscan").curate(item);
+            int status = curator.getStatus("vscan");
+            if (status == Curator.CURATE_ERROR)
+            {
+                backoutBitstream(subInfo, b, item);
+                return STATUS_VIRUS_CHECKER_UNAVAILABLE;
+            }
+            else if (status == Curator.CURATE_FAIL)
+            {
+                backoutBitstream(subInfo, b, item);
+                return STATUS_SERVER_FILE_CONTAINS_VIRUS;
+            }
+        }
+
+        // If we got this far then everything is more or less ok.
+
+        // Comment - not sure if this is the right place for a commit here
+        // but I'm not brave enough to remove it - Robin.
+        context.commit();
+
+        // save this bitstream to the submission info, as the
+        // bitstream we're currently working with
+        subInfo.setBitstream(b);
+        
+        //if format was not identified
+        if (bf == null)
+        {
+            return STATUS_UNKNOWN_FORMAT;
+        }
+        
         return STATUS_COMPLETE;
 
               

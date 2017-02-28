@@ -14,6 +14,7 @@
     Author: lieven.droogmans at atmire.com
     Author: ben at atmire.com
     Author: Alexey Maslov
+    modified for LINDAT/CLARIN
 
 -->
 
