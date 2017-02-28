@@ -29,7 +29,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.ibm.icu.text.SimpleDateFormat;
+import java.text.SimpleDateFormat;
 
 import cz.cuni.mff.ufal.dspace.PIDService;
 import cz.cuni.mff.ufal.dspace.handle.PIDCommunityConfiguration;
@@ -59,7 +59,7 @@ public class ControlPanelPIDTab extends AbstractControlPanelTab {
 	}
 	
 	private static String get_param(String module, String param, String default_value) {
-		String value = ConfigurationManager.getProperty(param);
+		String value = ConfigurationManager.getProperty(module,param);
 		if (value == null || value.length() == 0)
 			value = default_value;
 		return value;
@@ -76,7 +76,8 @@ public class ControlPanelPIDTab extends AbstractControlPanelTab {
 		String pid_url = get_param("lr", "lr.pid.service.url", "not defined");
 		String pid_user = get_param("lr", "lr.pid.service.user", "not defined");
 		String pid_testpid = get_param("lr", "lr.pid.service.testPid", "not defined");
-		String all_pids = String.format("%sread/search?creator=%s", pid_url, pid_user);
+		String epicv1_url = "http://handle.gwdg.de:8080/pidservice/";
+		String all_pids = String.format("%sread/search?creator=%s", epicv1_url, "EPICV1_USER");
 
 		addResults(div, all_pids);
 		
@@ -101,15 +102,19 @@ public class ControlPanelPIDTab extends AbstractControlPanelTab {
 		info.addLabel("PID test pid");
 		info.addItem(pid_testpid);
 
-		info.addLabel("PID server web app (valid for EPIC!)");
-		String webapp_pid = "http://handle.gwdg.de:8080/pidservice/";
+		info.addLabel("PID server web app (valid for EPICv1!)");
+		String webapp_pid = epicv1_url;
 		info.addItemXref(webapp_pid, webapp_pid);
 
-		info.addLabel("PID see all created records (use wisely)");
+		info.addLabel("EPICv2 11372 all PIDS");
+		webapp_pid = "https://pid.gwdg.de/handles/11372?limit=0";
+		info.addItemXref(webapp_pid, webapp_pid);
+
+		info.addLabel("EPICv1 see all created records (use wisely)");
 		info.addItemXref(all_pids, all_pids);
 		info.addLabel();
 		info.addItem().addButton("submit_pid_dummy")
-				.setValue("List dummy urls for this instance");
+				.setValue("List dummy urls for this instance epicv1 only");
 
 		// test
 		List form = div.addList("pid", List.TYPE_FORM, "cp-pid");
@@ -269,7 +274,10 @@ public class ControlPanelPIDTab extends AbstractControlPanelTab {
 	        
             info.addLabel("--- alternative prefixes");
             info.addItem(nvl(alternativePrefixesString, UNDEFINED));
-	        
+
+			info.addLabel("--- subprefix");
+			info.addItem(nvl(pidCommunityConfiguration.getSubprefix(), UNDEFINED));
+
 	        info.addLabel("--- canonical prefix");
 	        info.addItem(nvl(pidCommunityConfiguration.getCanonicalPrefix(), UNDEFINED));
 	        	        

@@ -3,6 +3,7 @@ package cz.cuni.mff.ufal.dspace.app.xmlui.aspect.administrative;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -10,27 +11,26 @@ import java.util.Properties;
 import org.apache.cocoon.environment.Request;
 import org.apache.commons.io.FileUtils;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Cell;
 import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.Highlight;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 
-import cz.cuni.mff.ufal.b2safe.ReplicationServiceIRODSImpl.CONFIGURATION;
 import cz.cuni.mff.ufal.dspace.b2safe.ReplicationManager;
 
 public class ControlPanelReplicationTabHelper {
 	
-	private final static String delete_prefix = "checkbox-delete";
+	private final static String checkbox_prefix = "checkbox-select";
 	private final static String url_hdl_prefix = ConfigurationManager.getProperty("handle.canonical.prefix");
+	private final static String retrieve_path = ConfigurationManager.getProperty("lr", "lr.replication.eudat.retrievetopath");
 		
 	public static void showTabs(Division div, Request request, Context context) throws WingException {
 		String action = request.getParameter("action");
@@ -67,16 +67,12 @@ public class ControlPanelReplicationTabHelper {
 
 		if(isReplicationOn) {
 			
-			// if not initialized try initializing it
-			if (!ReplicationManager.isInitialized()) {
-				try {
-					ReplicationManager.initialize();
-				} catch (Exception e) {
+			// if not initialized try initializing it, show error if it fails
+			if (!ReplicationManager.initialize()) {
 					List info = mainDiv.addList("replication-config");
-					info.addItem().addContent(e.getLocalizedMessage());
+					info.addItem().addContent("Failed to initialize ReplicationManager");
 					return;
-				}
-			}					
+			}
 			
 			Map<String, String> serverInfo = null;
 			try {
@@ -102,69 +98,24 @@ public class ControlPanelReplicationTabHelper {
 	
 			Properties config = ReplicationManager.getConfiguration();
 	
-			for (CONFIGURATION configElement : CONFIGURATION.values()) {
-				if (configElement.equals(CONFIGURATION.PASSWORD))
+            Enumeration e = config.propertyNames();
+
+            while (e.hasMoreElements()) {
+                  String key = (String) e.nextElement();
+                  if ( key.toLowerCase().contains("password") ) {
 					continue;
-				statusList.addLabel(configElement.name());
-				String value = config.getProperty(configElement.name());
-				if (value == null) {
+                  }
+				String value = config.getProperty(key);
+				if (value == null || value.isEmpty()) {
 					value = "N/A";
 				}
+				statusList.addLabel(key);
 				statusList.addItem(value);
 			}
-	
-			/*
-			 * jargon specific for ( String s : new String[] {
-			 * "lr.replication.jargon.numThreads" }) { Row row =
-			 * table.addRow(Row.ROLE_DATA); row.addCellContent(s);
-			 * row.addCellContent(String.format("%s", System.getProperty("jargon." +
-			 * s))); }
-			 */
+
+			statusList.addLabel("Replica directory (relative to home)");
+			statusList.addItem(ReplicationManager.replicadirectory);
 		}
-	}
-	
-	public static void addForm(Division div, Request request) throws WingException {
-		
-		List form = div.addList("standalone-programs", List.TYPE_FORM, "cp-programs");
-		org.dspace.app.xmlui.wing.element.Item item_row = form.addItem();
-
-		item_row.addButton("submit_repl_list_home").setValue("List HomeDir");
-		item_row.addButton("submit_repl_list_replicas").setValue("List Replicas");
-		item_row.addButton("submit_repl_tobe").setValue("Tobe Replicated");
-		item_row.addButton("submit_repl_not_tobe").setValue("Cannot Replicate");
-
-		form = div.addList("standalone-programs-input", List.TYPE_FORM, "cp-programs");
-		
-		org.dspace.app.xmlui.wing.element.Item form_item = null;
-
-		form_item = form.addItem(null, "prog-param");
-		form_item.addText("submit_repl_missing_count").setValue("3");
-		Button btasync = form_item.addButton("submit_repl_missing");
-		btasync.setValue("Replicate missing (async.)");
-		btasync.setHelp("Number of items to replicate, use with caution as it may be resource intensive");
-
-		form_item = form.addItem(null, "prog-param");
-		form_item.addText("submit_repl_replicate_handle").setValue("");
-		Button btrepl = form_item.addButton("submit_repl_replicate");
-		btrepl.setValue("Replicate specific handle");
-		btrepl.setHelp("Enter handle e.g. 11858/00-097C-0000-000D-F696-9");
-
-		form_item = form.addItem(null, "prog-param");
-		form_item.addText("submit_repl_delete_filepath").setValue("");
-		Button btdel = form_item.addButton("submit_repl_delete");
-		btdel.setValue("Delete replica");
-		btdel.setHelp("Enter Absolute Remote Path e.g. /CINESZone/home/cuni/dspace_1.8.2_ufal_point_dev/11858_1017.zip");
-
-		form_item = form.addItem(null, "prog-param");
-		Text repPath = form_item.addText("submit_repl_download_filepath");
-		repPath.setLabel("Remote Path");
-		repPath.setHelp("Enter Absolute Remote Path e.g. /CINESZone/home/cuni/dspace_1.8.2_ufal_point_dev/11858_1017.zip");		
-		Text localPath = form_item.addText("submit_local_download_filepath");
-		localPath.setLabel("Local Path");
-		localPath.setHelp("Enter local path where the file should be downloaded.");
-		Button btdown = form_item.addButton("submit_repl_download");
-		btdown.setValue("Download replica");
-		
 	}
 
 	public static void executeCommand(Division div, Request request, Context context) throws WingException {
@@ -185,23 +136,23 @@ public class ControlPanelReplicationTabHelper {
 			ArrayList<String> todel = new ArrayList<String>();
 	
 			for (String key : params.keySet()) {
-				if (key.startsWith(delete_prefix)) {
-					String path = params.get(key);
-					todel.add(path);
+				if (key.startsWith(checkbox_prefix)) {
+					String fileName = params.get(key);
+					todel.add(fileName);
 				}
 			}
 			
 			if(!todel.isEmpty()) {
 				Division m = div.addDivision("message", "alert alert-success bold");
-				for(String path : todel) {
+				for(String fileName : todel) {
 					try {
-						if(ReplicationManager.delete(path)) {
-							m.addPara().addContent("Deleted Successfully " + path);
+						if(ReplicationManager.delete(fileName)) {
+							m.addPara().addContent("Deleted Successfully " + fileName);
 						} else {
-							m.addPara(null, "text-error").addContent("Unable to delete " + path);
+							m.addPara(null, "text-error").addContent("Unable to delete " + fileName);
 						}
 					} catch (Exception e) {
-						m.addPara(null, "text-error").addContent("Unable to delete " + path + " " + e.getLocalizedMessage());
+						m.addPara(null, "text-error").addContent("Unable to delete " + fileName + " " + e.getLocalizedMessage());
 					}
 				}
 			} else {
@@ -211,6 +162,36 @@ public class ControlPanelReplicationTabHelper {
 			action = "list_replicas";
 		}
 		
+		if(action.equals("Retrieve")) {
+			Map<String, String> params = request.getParameters();
+			
+			ArrayList<String> toret = new ArrayList<String>();
+	
+			for (String key : params.keySet()) {
+				if (key.startsWith(checkbox_prefix)) {
+					String fileName = params.get(key);
+					toret.add(fileName);
+				}
+			}
+			
+			if(!toret.isEmpty()) {
+				Division m = div.addDivision("message", "alert alert-success bold");
+				for(String fileName : toret) {
+					try {
+						ReplicationManager.retrieveFile(fileName, retrieve_path);
+						m.addPara().addContent("Retrieve Successfully " + fileName);
+					} catch (Exception e) {
+						m.addPara(null, "text-error").addContent("Unable to retrieve file " + fileName + " " + e.getLocalizedMessage());
+					}
+				}
+			} else {
+				Division m = div.addDivision("message", "alert alert-error");
+				m.addPara("Please select an item to retreive .");
+			}
+			action = "list_replicas";
+		}
+		
+		
 		if(action.equals("replicate_all_on")) {
 			ReplicationManager.setReplicateAll(true);
 			action = "repl_tobe";
@@ -219,8 +200,6 @@ public class ControlPanelReplicationTabHelper {
 			ReplicationManager.setReplicateAll(false);
 			action = "repl_tobe";
 		}
-				
-		//if (!ReplicationManager.isReplicationOn()) return;
 				
 		if(action.equals("show_info")) {
 			showConfiguration(div, request, context);
@@ -238,27 +217,16 @@ public class ControlPanelReplicationTabHelper {
 		if(action.equals("repl_not_tobe")) {
 			showCannotReplicate(div, request, context);
 		}
-		
-		// Download path
-		//
-		else if (request.getParameter("submit_repl_download") != null) {
-			try {
-				String remPath = request.getParameter("submit_repl_download_filepath");
-				String locPath = request.getParameter("submit_local_download_filepath");
-				File file = new File(locPath);
-				if(file.exists()) {
-					file.delete();
-				}
-				ReplicationManager.retriveFile(remPath, file.getAbsolutePath());
-				//message = "file retrived and stored to " + file.getAbsolutePath();
-			} catch (Exception e) {
-				//message += "Could not download path: " + e.toString();
-			}
-
-		}
 
 	}
 
+	/**
+	 * Calls ReplicationManager.listMissingReplicas shows the handles with their status and button to replicate
+	 * @param div
+	 * @param request
+	 * @param context
+	 * @throws WingException
+	 */
 	public static void showTobeReplicated(Division div, Request request, Context context) throws WingException {		
 		int size = 0;
 		ItemIterator it;
@@ -316,6 +284,13 @@ public class ControlPanelReplicationTabHelper {
 		}
 	}
 
+	/**
+	 * Lists handles of ReplicationManager.getNonPublicItemHandles
+	 * @param div
+	 * @param request
+	 * @param context
+	 * @throws WingException
+	 */
 	public static void showCannotReplicate(Division div, Request request, Context context) throws WingException {
 		int size = 0;
 		ItemIterator it;		
@@ -349,6 +324,13 @@ public class ControlPanelReplicationTabHelper {
 		}
 	}
 
+	/**
+	 * Replicate one specified file
+	 * @param div
+	 * @param request
+	 * @param context
+	 * @throws WingException
+	 */
 	public static void replicate(Division div, Request request, Context context) throws WingException {
 		try {
 			String handle = null;
@@ -366,7 +348,7 @@ public class ControlPanelReplicationTabHelper {
 				if (item != null) {
 					try {
 						Division msg = div.addDivision("message", "alert alert-success");
-						ReplicationManager.replicate(context, handle, item, true);
+						ReplicationManager.replicate(handle, true);
 						msg.addPara().addContent("Replication started successfully for item " + handle);
 					} catch (Exception e) {
 						Division msg = div.addDivision("message", "alert alert-error");
@@ -386,10 +368,17 @@ public class ControlPanelReplicationTabHelper {
 		}
 	}
 
+	/**
+	 * List stored files (inside homedir/replicadir) and their metadata
+	 * @param div
+	 * @param request
+	 * @param context
+	 * @throws WingException
+	 */
 	public static void listReplicas(Division div, Request request, Context context) throws WingException {
 		java.util.List<String> list = new ArrayList<>();
 		try {
-			list = ReplicationManager.list(true);
+			list = ReplicationManager.listFilenames();
 		} catch (Exception e) {
 			Division msg = div.addDivision("message", "alert alert-error");
 			msg.addPara().addContent("Replication Failed");
@@ -398,17 +387,20 @@ public class ControlPanelReplicationTabHelper {
 		
 		Division msg = div.addDivision("message", "alert alert-info");
 		
-		msg.addPara().addHighlight("pull-right").addButton("action", "label label-important btn btn-sm btn-danger").setValue("Delete");
+		Highlight h = msg.addPara().addHighlight("pull-right");		
+		h.addButton("action", "label label-primary btn btn-sm btn-primary").setValue("Retrieve");
+		h.addButton("action", "label label-important btn btn-sm btn-danger").setValue("Delete");
 		
 		// display it
 		Table table = div.addTable("replica_items", 1, 6);
 		Row head = table.addRow(Row.ROLE_HEADER);
 		head.addCellContent("#");
 		head.addCellContent("STATUS");
+		head.addCellContent("EUDAT PID");
 		head.addCellContent("ITEM");
 		head.addCellContent("SIZE REP/ORIG");
 		head.addCellContent("INFO");
-		head.addCell("DEL_COL", null, null).addContent("DEL");
+		head.addCell("DEL_COL", null, null).addContent("");
 
 		int pos = 0;
 		long all_file_size = 0;
@@ -441,12 +433,12 @@ public class ControlPanelReplicationTabHelper {
 						
 			row.addCell().addHighlight(rend_status).addContent(adminStatus);
 			
-			String eudatPID = metadata.get("EUDAT_PID");
+			String eudatPID = metadata.get("PID");
 			if (eudatPID!=null) {
 				eudatPID = "http://hdl.handle.net" + eudatPID;
 			}
 
-			row.addCell().addXref(eudatPID, metadata.get("EUDAT_ROR"));
+			row.addCell().addXref(eudatPID, metadata.get("PID"));
 			
 			// check md5 too
 			String md5 = metadata.get("INFO_Checksum");
@@ -457,8 +449,9 @@ public class ControlPanelReplicationTabHelper {
 			} catch(NumberFormatException e) {
 				
 			}
-			
-			String itemHandle = metadata.get("EUDAT_ROR");
+
+			String itemHandle = metadata.get("EUDAT/ROR");
+			Cell ourPid = row.addCell();
 							
 			String sizes = orig_file_size < 0 ? "NA" : FileUtils.byteCountToDisplaySize(orig_file_size);
 			sizes += " / ";
@@ -466,11 +459,14 @@ public class ControlPanelReplicationTabHelper {
 
 			if(itemHandle != null) {
 				itemHandle = itemHandle.substring(url_hdl_prefix.length());
+				ourPid.addXref(metadata.get("EUDAT/ROR"), itemHandle);
 				try {
 					Item item = (Item) HandleManager.resolveToObject(context, itemHandle);
 					sizes += FileUtils.byteCountToDisplaySize(item.getTotalSize());
 				} catch (Exception e) {
 				}					
+			}else{
+				ourPid.addContent(itemHandle);
 			}
 			
 			row.addCell().addHighlight("label label-info").addContent(sizes);
@@ -489,7 +485,7 @@ public class ControlPanelReplicationTabHelper {
 			c.addHighlight(rend_status).addContent(" " + md5);
 			c.addHighlight("label label-default fa fa-clock-o bold").addContent(" " + metadata.get("INFO_TimeOfTransfer"));
 			
-			CheckBox r = row.addCell("todelete", Row.ROLE_DATA, "todelete").addCheckBox(delete_prefix + "_" + pos);
+			CheckBox r = row.addCell("todelete", Row.ROLE_DATA, "todelete").addCheckBox(checkbox_prefix + "_" + pos);
 			r.addOption(name);
 
 		}
@@ -501,5 +497,3 @@ public class ControlPanelReplicationTabHelper {
 	} // list_replicas	
 	
 }
-
-

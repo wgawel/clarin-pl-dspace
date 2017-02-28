@@ -212,7 +212,23 @@ public class DatabaseManager
         PreparedStatement statement = null;
         try
         {
-            statement = context.getDBConnection().prepareStatement(query);
+            Connection connection = null;
+            try {
+                connection = context.getDBConnection();
+                statement = connection.prepareStatement(query);
+            }catch(NullPointerException e){
+                StringBuilder sb = new StringBuilder("Running query \"").append(query).append("\"  with parameters: ");
+                for (int i = 0; i < parameters.length; i++)
+                {
+                    if (i > 0)
+                    {
+                        sb.append(",");
+                    }
+                    sb.append(parameters[i].toString());
+                }
+                log.error(String.format("%s\ncontext=%s;dbConnection=%s", sb.toString(), context, connection));
+                throw e;
+            }
 
             loadParameters(statement, parameters);
 
@@ -528,6 +544,28 @@ public class DatabaseManager
             }
             StringBuilder sql = new StringBuilder("select * from ").append(ctable).append(" where ").append(column).append(" = ? ");
             return querySingleTable(context, ctable, sql.toString(), value);
+        } catch (SQLException e) {
+            log.error("SQL findByUnique Error - ", e);
+            throw e;
+        }
+    }
+
+    public static TableRow findByUniqueNonCaseSensitive(Context context, String table,
+                                        String column, String value) throws SQLException {
+        String ctable = canonicalize(table);
+
+        try {
+            if ( ! DB_SAFE_NAME.matcher(ctable).matches())
+            {
+                throw new SQLException("Unable to execute select query because table name (" + ctable + ") contains non alphanumeric characters.");
+            }
+
+            if ( ! DB_SAFE_NAME.matcher(column).matches())
+            {
+                throw new SQLException("Unable to execute select query because column name (" + column + ") contains non alphanumeric characters.");
+            }
+            StringBuilder sql = new StringBuilder("select * from ").append(ctable).append(" where UPPER(").append(column).append(") = ? ");
+            return querySingleTable(context, ctable, sql.toString(), value.toUpperCase());
         } catch (SQLException e) {
             log.error("SQL findByUnique Error - ", e);
             throw e;

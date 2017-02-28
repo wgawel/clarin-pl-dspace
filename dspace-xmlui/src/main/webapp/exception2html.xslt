@@ -25,6 +25,7 @@
 
 	<xsl:include href="themes/ClarinPlTheme/lib/xsl/clarinpl/header.xsl" />
 	<xsl:include href="themes/ClarinPlTheme/lib/xsl/clarinpl/footer.xsl" />
+	<xsl:include href="themes/UFAL/lib/xsl/core/global-variables.xsl" />
 
 	<xsl:param name="realPath" />
 
@@ -255,8 +256,8 @@
 	        </xsl:variable>
 	        <script type="text/javascript" src="{concat($protocol, 'ajax.googleapis.com/ajax/libs/jquery/', $jqueryVersion ,'/jquery.min.js')}">&#160;</script>
 	        <script type="text/javascript" src="{$contextPath}/themes/ClarinPlTheme/lib/js/jquery-ui.js">&#160;</script>
-	
             <script type="text/javascript" src="{concat($aaiURL, '/discojuice/discojuice-3.0.pl_PL.min.js')}">&#160;</script>
+			<script type="text/javascript" src="{$contextPath}/themes/ClarinPlTheme/lib/js/jquery.i18n.js">&#160;</script>
             <script type="text/javascript" src="{concat($aaiURL, '/aai.js')}">&#160;</script>
 	
 	        <xsl:variable name="localJQuerySrc">

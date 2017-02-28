@@ -78,6 +78,7 @@ import cz.cuni.mff.ufal.dspace.app.util.ACL;
  */
 public class DescribeStep extends AbstractSubmissionStep
 {
+    public static final Message T_regexp_error = message("xmlui.Submission.submit.DescribeStep.regexp_error");
     private static Logger log = Logger.getLogger(DescribeStep.class);
         /** Language Strings **/
     protected static final Message T_head =
@@ -102,6 +103,8 @@ public class DescribeStep extends AbstractSubmissionStep
         message("xmlui.Submission.submit.DescribeStep.series_name");
     protected static final Message T_report_no=
         message("xmlui.Submission.submit.DescribeStep.report_no");
+    protected static final Message T_missing_field =
+            message("xmlui.Submission.submit.DescribeStep.missing_field");
         
         /**
      * A shared resource of the inputs reader. The 'inputs' are the
@@ -489,7 +492,7 @@ public class DescribeStep extends AbstractSubmissionStep
                     if (displayValue!=null && displayValue.length()>0)
                     {
 
-                        describeSection.addLabel(input.getLabel());
+                        describeSection.addLabel(message(input.getLabel()));
                         if (mam.isAuthorityControlled(value.schema, value.element, value.qualifier))
                         {
                             String confidence = (value.authority != null && value.authority.length() > 0) ?
@@ -497,7 +500,7 @@ public class DescribeStep extends AbstractSubmissionStep
                                 "blank";
                             org.dspace.app.xmlui.wing.element.Item authItem =
                                 describeSection.addItem("submit-review-field-with-authority", "ds-authority-confidence cf-"+confidence);
-                            authItem.addContent(displayValue);
+                            authItem.addContent(message(displayValue));
                         }
                         else
                         {
@@ -508,7 +511,7 @@ public class DescribeStep extends AbstractSubmissionStep
                         			describeSection.addItem().addHighlight("label label-default").addContent(fVal);
                         		}*/
                         	} //else{                        	
-                            describeSection.addItem(displayValue);
+                            describeSection.addItem(message(displayValue));
                         	//}
                         }
                     }
@@ -602,22 +605,15 @@ public class DescribeStep extends AbstractSubmissionStep
                 }
         }
                 // Setup the full name
-                fullName.setLabel(dcInput.getLabel());
-                fullName.setHelp(cleanHints(dcInput.getHints()));
+                fullName.setLabel(message(dcInput.getLabel()));
+                fullName.setHelp(message(dcInput.getHints()));
                 if (dcInput.isRequired())
                 {
                     fullName.setRequired();
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        fullName.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        fullName.addError(T_required_field);
-                    }
+                    setFieldWarning(dcInput, fullName);
                 }
                 if (dcInput.isRepeatable() && !readonly)
                 {
@@ -681,22 +677,15 @@ public class DescribeStep extends AbstractSubmissionStep
                 Text day = fullDate.addText(fieldName+"_day");
 
                 // Set up the full field
-                fullDate.setLabel(dcInput.getLabel());
-                fullDate.setHelp(cleanHints(dcInput.getHints()));
+                fullDate.setLabel(message(dcInput.getLabel()));
+                fullDate.setHelp(message(dcInput.getHints()));
                 if (dcInput.isRequired())
                 {
                     fullDate.setRequired();
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        fullDate.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        fullDate.addError(T_required_field);
-                    }
+                    setFieldWarning(dcInput, fullDate);
                 }
                 if (dcInput.isRepeatable() && !readonly)
                 {
@@ -792,22 +781,15 @@ public class DescribeStep extends AbstractSubmissionStep
                 Text number = fullSeries.addText(fieldName+"_number");
 
                 // Setup the full field.
-                fullSeries.setLabel(dcInput.getLabel());
-                fullSeries.setHelp(cleanHints(dcInput.getHints()));
+                fullSeries.setLabel(message(dcInput.getLabel()));
+                fullSeries.setHelp(message(dcInput.getHints()));
                 if (dcInput.isRequired())
                 {
                     fullSeries.setRequired();
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        fullSeries.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        fullSeries.addError(T_required_field);
-                    }
+                    setFieldWarning(dcInput, fullSeries);
                 }
                 if (dcInput.isRepeatable() && !readonly)
                 {
@@ -870,28 +852,21 @@ public class DescribeStep extends AbstractSubmissionStep
         {
                 String rend = dcInput.getRendsAsString();
                 rend += " submit-qualdrop";
-            
+
                 Composite qualdrop = form.addItem().addComposite(fieldName, rend);
                 Select qual = qualdrop.addSelect(fieldName+"_qualifier");
                 Text value = qualdrop.addText(fieldName+"_value");
 
                 // Setup the full field.
-                qualdrop.setLabel(dcInput.getLabel());
-                qualdrop.setHelp(cleanHints(dcInput.getHints()));
+                qualdrop.setLabel(message(dcInput.getLabel()));
+                qualdrop.setHelp(message(dcInput.getHints()));
                 if (dcInput.isRequired())
                 {
                     qualdrop.setRequired();
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        qualdrop.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        qualdrop.addError(T_required_field);
-                    }
+                    setFieldWarning(dcInput, qualdrop);
                 }
                 if (dcInput.isRepeatable() && !readonly)
                 {
@@ -909,13 +884,13 @@ public class DescribeStep extends AbstractSubmissionStep
                     qual.setDisabled();
                     value.setDisabled();
                 }
-                
+
                 // Setup the possible options
                 @SuppressWarnings("unchecked") // This cast is correct
                 java.util.List<String> pairs = dcInput.getPairs();
                 for (int i = 0; i < pairs.size(); i += 2)
                 {
-                        String display = pairs.get(i);
+                        Message display = message(pairs.get(i));
                         String returnValue = pairs.get(i+1);
                         qual.addOption(returnValue,display);
                 }
@@ -959,8 +934,8 @@ public class DescribeStep extends AbstractSubmissionStep
                 TextArea textArea = form.addItem().addTextArea(fieldName, rend);
 
                 // Setup the text area
-                textArea.setLabel(dcInput.getLabel());
-                textArea.setHelp(cleanHints(dcInput.getHints()));
+                textArea.setLabel(message(dcInput.getLabel()));
+                textArea.setHelp(message(dcInput.getHints()));
                 String fieldKey = MetadataAuthorityManager.makeFieldKey(dcInput.getSchema(), dcInput.getElement(), dcInput.getQualifier());
                 boolean isAuth = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
                 if (isAuth)
@@ -980,14 +955,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        textArea.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        textArea.addError(T_required_field);
-                    }
+                    setFieldWarning(dcInput, textArea);
                 }
                 if (dcInput.isRepeatable() && !readonly)
                 {
@@ -1069,22 +1037,15 @@ public class DescribeStep extends AbstractSubmissionStep
                 Select select = form.addItem().addSelect(fieldName, rend);
 
                 //Setup the select field
-                select.setLabel(dcInput.getLabel());
-                select.setHelp(cleanHints(dcInput.getHints()));
+                select.setLabel(message(dcInput.getLabel()));
+                select.setHelp(message(dcInput.getHints()));
                 if (dcInput.isRequired())
                 {
                     select.setRequired();
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        select.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        select.addError(T_required_field);
-                    }
+                    setFieldWarning(dcInput, select);
                 }
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
@@ -1142,22 +1103,15 @@ public class DescribeStep extends AbstractSubmissionStep
                 Select select = form.addItem().addSelect(fieldName, rend);
 
                 //Setup the select field
-                select.setLabel(dcInput.getLabel());
-                select.setHelp(cleanHints(dcInput.getHints()));
+                select.setLabel(message(dcInput.getLabel()));
+                select.setHelp(message(dcInput.getHints()));
                 if (dcInput.isRequired())
                 {
                     select.setRequired();
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        select.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        select.addError(T_required_field);
-                    }
+                    setFieldWarning(dcInput, select);
                 }
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
@@ -1171,13 +1125,13 @@ public class DescribeStep extends AbstractSubmissionStep
                 {
                     select.setDisabled();
                 }
-                
+
                 // Setup the possible options
                 @SuppressWarnings("unchecked") // This cast is correct
                 java.util.List<String> pairs = dcInput.getPairs();
                 for (int i = 0; i < pairs.size(); i += 2)
                 {
-                        String display = pairs.get(i);
+                        Message display = message(pairs.get(i));
                         String value   = pairs.get(i+1);
                         select.addOption(value,display);
                 }
@@ -1235,22 +1189,15 @@ public class DescribeStep extends AbstractSubmissionStep
                 }
                 
                 //      Setup the field
-                listField.setLabel(dcInput.getLabel());
-                listField.setHelp(cleanHints(dcInput.getHints()));
+                listField.setLabel(message(dcInput.getLabel()));
+                listField.setHelp(message(dcInput.getHints()));
                 if (dcInput.isRequired())
                 {
                     listField.setRequired();
                 }
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        listField.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        listField.addError(T_required_field);
-                    }
+                    setFieldWarning(dcInput, listField);
                 }
 
         
@@ -1258,7 +1205,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 java.util.List<String> pairs = dcInput.getPairs();
                 for (int i = 0; i < pairs.size(); i += 2)
                 {
-                        String display = pairs.get(i);
+                        Message display = message(pairs.get(i));
                         String value   = pairs.get(i+1);
                         
                         if(listField instanceof CheckBox)
@@ -1288,125 +1235,161 @@ public class DescribeStep extends AbstractSubmissionStep
         protected void renderComplexField(List form, String fieldName, DCInput dcInput, Metadatum[] dcValues, boolean readonly) throws WingException
         {
 
-                        String rend = dcInput.getRendsAsString();
+            String rend = dcInput.getRendsAsString();
 
-                        org.dspace.app.xmlui.wing.element.Item item = form.addItem(null, rend + " list-complex-field");
+            org.dspace.app.xmlui.wing.element.Item item = form.addItem(null, rend + " list-complex-field");
 
-                        rend += "submit-complex";
+            rend += "submit-complex";
 
-                        Composite composite = item.addComposite(fieldName, rend);
+            Composite composite = item.addComposite(fieldName, rend);
 
-                        DCInput.ComplexDefinition definition = dcInput.getComplexDefinition();
-                        java.util.List<Field> fields = new ArrayList<Field>();
-                        for (String name : definition.getInputNames()) {
-                        		String fullInputName = fieldName + "_" + name;
-                        	    Field field = null;
-                                String type = definition.getInput(name).get("type");
-                                if ("text".equals(type)) {
-                                		String autocomplete  = definition.getInput(name).get("autocomplete");
-                                		if(isAutocompletable(autocomplete)) {
-                                            field = composite.addText(fullInputName, rend + " autocomplete"); 
-                                			addAutocompleteComponents(fullInputName, autocomplete, item);
-                                		} else {
-                                            field = composite.addText(fullInputName, rend); 
-                                		}
-                                } else if ("dropdown".equals(type)){
-                                        Select select = composite.addSelect(fullInputName, rend);
-                                        // Setup the possible options
-                                        java.util.List<String> pairs = definition.getValuePairsForInput(name);
-                                        for (int i = 0; i < pairs.size(); i += 2)
-                                        {
-                                                String display = pairs.get(i);
-                                                String value   = pairs.get(i+1);
-                                                select.addOption(value,display);
-                                        }
-                                        field = select;
-                                } else {
-                                        // nothing yet;
-                                }
-                                
-                                String label = definition.getInput(name).get("label");
-                                if(label != null && field != null){
-                                	field.setLabel(label);
-                                }
-                                String help = definition.getInput(name).get("help");
-                                if(help != null && field != null){
-                                	field.setHelp(help);
-                                }
-                                if(field != null){
-                                    fields.add(field);
-                                }
-                        }
+            DCInput.ComplexDefinition definition = dcInput.getComplexDefinition();
+            Map<String, Field> fields = new HashMap<>();
+            for (String name : definition.getInputNames()) {
+                String fullInputName = fieldName + "_" + name;
+                Field field = null;
+                Map<String, String> input_map = definition.getInput(name);
+                String type = input_map.get("type");
+                String rend_field = "";
+                if (null != input_map.get("class")) {
+                    rend_field += " " + input_map.get("class");
+                }
 
-                        // Setup the field's values
-                        for (Metadatum dcValue : dcValues) {
-                                java.util.List<String> values = split(dcValue.value);
-                                fill(fields,values,true,definition,fieldName);
-                                composite.addInstance().setValue(StringUtils.join(values.iterator(), ";"));
+                if ("text".equals(type)) {
+                        String autocomplete = input_map.get("autocomplete");
+                        if(isAutocompletable(autocomplete)) {
+                            field = composite.addText(fullInputName, rend_field + " autocomplete");
+                            addAutocompleteComponents(fullInputName, autocomplete, item);
+                        } else {
+                            field = composite.addText(fullInputName, rend_field);
                         }
+                } else if ("dropdown".equals(type)){
+                        Select select = composite.addSelect(fullInputName, rend_field);
+                        // Setup the possible options
+                        java.util.List<String> pairs = definition.getValuePairsForInput(name);
+                        for (int i = 0; i < pairs.size(); i += 2)
+                        {
+                            Message display = message(pairs.get(i));
+                            String value   = pairs.get(i+1);
+                            select.addOption(value,display);
+                        }
+                        field = select;
+                } else {
+                        // nothing yet;
+                }
 
-                         if(regexError.containsKey(fieldName)) {
-                                // partially fill the form
-                        	 	java.util.List<String> values = split(regexError.get(fieldName));
-                                fill(fields,values,false,definition,fieldName);
-                        }
+                if (null == field) {
+                    continue;
+                }
+                String label = input_map.get("label");
+                if(label != null){
+                    field.setLabel(message(label));
+                }
+                String help = input_map.get("help");
+                if(help != null){
+                    field.setHelp(message(help));
+                }
+                String placeholder = input_map.get("placeholder");
+                if(placeholder != null){
+                    //This is translated in themes/UFAL/lib/xsl/core/forms.xsl:~1089
+                    field.setPlaceholder(placeholder);
+                }
+                String field_readonly = input_map.get("readonly");
+                if(field_readonly != null && field_readonly.equals("true")){
+                    field.setDisabled();
+                }
+                String value = input_map.get("value");
+                if(value != null){
+                    field.setValue(value);
+                }
+                fields.put(name, field);
+            }
 
-                        // Setup the full name
-                        composite.setLabel(dcInput.getLabel());
-                        composite.setHelp(cleanHints(dcInput.getHints()));
-                        if (dcInput.isRequired()) {
-                                composite.setRequired();
-                        }
-                        if (isFieldInError(fieldName) || regexError.containsKey(fieldName)) {
-                                if (dcInput.getWarning() != null
-                                                && dcInput.getWarning().length() > 0) {
-                                        composite.addError(dcInput.getWarning());
-                                } else {
-                                        composite.addError("Fill all the fields, please.");
-                                }
-                        }
-                        if (dcInput.isRepeatable() && !readonly) {
-                                composite.enableAddOperation();
-                        }
-                        if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly) {
-                                composite.enableDeleteOperation();
-                        }
+            // Setup the field's values
+            // The values must be added to the right fields, watch out for the fields order!
+            for (Metadatum dcValue : dcValues) {
+                    java.util.List<String> values = split(dcValue.value);
+                    fillExistingValues(definition, fields, values);
+                    composite.addInstance().setValue(StringUtils.join(values.iterator(), ";"));
+            }
 
-                        if (readonly) {
-                                composite.setDisabled();
-                                for (Field field : fields) {
-                                        field.setDisabled();
-                                }
-                        }
+             if(regexError.containsKey(fieldName)) {
+                 // partially fill the form
+                 java.util.List<String> values = split(regexError.get(fieldName));
+                 fillPartialError(definition, fields, values);
+            }
+
+            // Setup the full name
+            composite.setLabel(message(dcInput.getLabel()));
+            composite.setHelp(message(dcInput.getHints()));
+            if (dcInput.isRequired()) {
+                    composite.setRequired();
+            }
+            if (isFieldInError(fieldName) || regexError.containsKey(fieldName)) {
+                setFieldWarning(dcInput, composite, true, T_missing_field);
+            }
+            if (dcInput.isRepeatable() && !readonly) {
+                    composite.enableAddOperation();
+            }
+            if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly) {
+                    composite.enableDeleteOperation();
+            }
+
+            if (readonly) {
+                    composite.setDisabled();
+                    for (Field field : fields.values()) {
+                            field.setDisabled();
+                    }
+            }
 
         }
-        
-		private void fill(java.util.List<Field> fields,
-				java.util.List<String> values, boolean addInstances, ComplexDefinition definition, String fieldName) throws WingException {
-                //fill the form
-                for (int i = 0; i < fields.size(); i++) {
-                        Field field = fields.get(i);
-                        String value = values.get(i);
-                        if(addInstances){
-                                Instance instance = field.addInstance();
-                                //XXX: Branching on type
-                                if(field instanceof Select){
-                                        instance.setOptionSelected(value);
-                                } else{
-                                        instance.setValue(value);
-                                }
-                        } else{
-                        	//currently with error only
-                                field.setValue(value);
-                                String inputName = StringUtils.difference(fieldName+"_", field.getName());
-                                String regex = definition.getInput(inputName).get("regexp");
-                                if(!DCInput.isAllowedValue(value, regex)){
-                                	//attach the regex error to the right field
-                                	field.addError(String.format("The field doesn't match the required regular expression (format) \"%s\"",regex));
-                                }
-                        }
+
+        private void fillExistingValues(ComplexDefinition definition, Map<String, Field> fields, java.util.List<String> values) throws WingException {
+            //fill the form
+            int i = 0;
+            for (String name : definition.getSortedInputNames()) {
+                Field field = fields.get(name);
+                try {
+                    String value = values.get(i);
+                    Instance instance = field.addInstance();
+                    //XXX: Branching on type
+                    if (field instanceof Select) {
+                        instance.setOptionSelected(value);
+                    } else {
+                        instance.setValue(value);
+                    }
+                    ++i;
+                } catch (IndexOutOfBoundsException e){
+                    //someone possibly added a new field to this complex input
+                    //we might be starting a new version
+                    break;
                 }
-		}
+            }
+        }
+
+        private void fillPartialError(ComplexDefinition definition,
+                                      Map<String, Field> fields,
+                                      java.util.List<String> values) throws WingException {
+            int i = 0;
+            for (String input_name : definition.getSortedInputNames()) {
+                try{
+                    // input value
+                    String value = values.get(i);
+                    // field specified by input name (could be displayed differently than stored)
+                    Field field = fields.get(input_name);
+                    field.setValue(value);
+                    // any regexp error?
+                    String regex = definition.getInput(input_name).get("regexp");
+                    if(!DCInput.isAllowedValue(value, regex)){
+                        //attach the regex error to the right field
+                        field.addError(T_regexp_error.parameterize(regex));
+                    }
+                } catch (IndexOutOfBoundsException e){
+                    break;
+                }
+                ++i;
+            }
+        }
 
 		private java.util.List<String> split(String value) {
         	//
@@ -1488,6 +1471,10 @@ public class DescribeStep extends AbstractSubmissionStep
             	rend += " autocomplete";
             	addAutocompleteComponents(fieldName, dcInput, item);
             }
+
+            if (null != dcInput.getExtraClass()) {
+                rend += " " + dcInput.getExtraClass();
+            }
             
             Text text = item.addText(fieldName, rend);                                    
 
@@ -1500,8 +1487,8 @@ public class DescribeStep extends AbstractSubmissionStep
             }
             
                 // Setup the select field
-                text.setLabel(dcInput.getLabel());
-                text.setHelp(cleanHints(dcInput.getHints()));
+                text.setLabel(message(dcInput.getLabel()));
+                text.setHelp(message(dcInput.getHints()));
                 String fieldKey = MetadataAuthorityManager.makeFieldKey(dcInput.getSchema(), dcInput.getElement(), dcInput.getQualifier());
                 boolean isAuth = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
                 if (isAuth)
@@ -1528,26 +1515,16 @@ public class DescribeStep extends AbstractSubmissionStep
                     if( !dcInput.isAllowedValue(dcv.value) ) {
                         regexp_warning_issued = true;
                         if (dcInput.getRegexpWarning() != null && dcInput.getRegexpWarning().length() > 0) {
-                            text.addError(dcInput.getRegexpWarning());
+                            text.addError(message(dcInput.getRegexpWarning()));
                         }else {
-                            text.addError(String.format(
-                                "This value must match the given regular expression [%s].", dcInput.getRegexp()) );
+                            text.addError(T_regexp_error.parameterize(dcInput.getRegexp()) );
                         }
                     }
                 }
 
                 if (isFieldInError(fieldName))
                 {
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
-                    {
-                        text.addError(dcInput.getWarning());
-                    }
-                    else
-                    {
-                        if ( !regexp_warning_issued || dcInput.isRequired() ) {
-                            text.addError(T_required_field);
-                        }
-                    }
+                    setFieldWarning(dcInput, text, !regexp_warning_issued || dcInput.isRequired(), T_required_field);
                 }
 
 
@@ -1563,6 +1540,11 @@ public class DescribeStep extends AbstractSubmissionStep
                 if (readonly)
                 {
                     text.setDisabled();
+                }else {
+                    if (null != dcInput.getPlaceholder())
+                    {
+                        text.setPlaceholder(dcInput.getPlaceholder());
+                    }
                 }
                 
                 // Setup the field's values
@@ -1615,39 +1597,6 @@ public class DescribeStep extends AbstractSubmissionStep
             return (this.errorFields.contains(fieldName));
         }
         
-        /**
-         * There is a problem with the way hints are handled. The class that we use to
-         * read the input-forms.xml configuration will append and prepend HTML to hints.
-         * This causes all sorts of confusion when inserting into the DRI page, so this
-         * method will strip that extra HTML and just leave the cleaned comments.
-         *
-         *
-         * However this method will not remove naughty or sexual innuendoes from the
-         * field's hints.
-         *
-         *
-         * @param dirtyHints HTML-ized hints
-         * @return Hints without HTML.
-         */
-        private static final String HINT_HTML_PREFIX = "<tr><td colspan=\"4\" class=\"submitFormHelp\">";
-        private static final String HINT_HTML_POSTFIX = "</td></tr>";
-        private String cleanHints(String dirtyHints)
-        {
-                String clean = (dirtyHints!=null ? dirtyHints : "");
-
-                if (clean.startsWith(HINT_HTML_PREFIX))
-                {
-                        clean = clean.substring(HINT_HTML_PREFIX.length());
-                }
-
-                if (clean.endsWith(HINT_HTML_POSTFIX))
-                {
-                        clean = clean.substring(0,clean.length() - HINT_HTML_POSTFIX.length());
-                }
-
-                return clean;
-        }
-             
         /**
          * Adds hidden field with the name of the element to jump to using js after page reload
          * 
@@ -1712,4 +1661,19 @@ public class DescribeStep extends AbstractSubmissionStep
     		
     		return fields;
     	}
+
+        private void setFieldWarning(DCInput dcInput, Field field) throws WingException {
+            setFieldWarning(dcInput, field, true, T_required_field);
+        }
+
+        private void setFieldWarning(DCInput dcInput, Field field, boolean useDefault, Message defaultMessage) throws WingException {
+            if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+            {
+                field.addError(message(dcInput.getWarning()));
+            }
+            else if (useDefault)
+            {
+                field.addError(defaultMessage);
+            }
+        }
 }

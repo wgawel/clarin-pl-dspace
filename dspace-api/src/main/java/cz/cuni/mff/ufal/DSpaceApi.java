@@ -1,6 +1,28 @@
 /* Created for LINDAT/CLARIN */
 package cz.cuni.mff.ufal;
 
+import cz.cuni.mff.ufal.dspace.PIDService;
+import cz.cuni.mff.ufal.lindat.utilities.hibernate.CmdiProfile;
+import cz.cuni.mff.ufal.lindat.utilities.hibernate.UserMetadata;
+import cz.cuni.mff.ufal.lindat.utilities.hibernate.UserRegistration;
+import cz.cuni.mff.ufal.lindat.utilities.hibernate.VerificationTokenEperson;
+import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
+import org.apache.log4j.Logger;
+import org.dspace.app.util.SubmissionInfo;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.core.*;
+import org.dspace.eperson.EPerson;
+import org.dspace.handle.HandleManager;
+import org.dspace.handle.HandlePlugin;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
+
+import javax.mail.MessagingException;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.sql.SQLException;
@@ -8,34 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import javax.mail.MessagingException;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-
-import cz.cuni.mff.ufal.lindat.utilities.hibernate.CmdiProfile;
-import org.apache.log4j.Logger;
-import org.dspace.app.util.SubmissionInfo;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.Utils;
-import org.dspace.eperson.EPerson;
-import org.dspace.handle.HandleManager;
-import org.dspace.servicemanager.DSpaceKernelImpl;
-import org.dspace.servicemanager.DSpaceKernelInit;
-import org.dspace.utils.DSpace;
-
-import cz.cuni.mff.ufal.dspace.PIDService;
-import cz.cuni.mff.ufal.lindat.utilities.hibernate.UserMetadata;
-import cz.cuni.mff.ufal.lindat.utilities.hibernate.UserRegistration;
-import cz.cuni.mff.ufal.lindat.utilities.hibernate.VerificationTokenEperson;
-import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
 
 /*
  * This class is an extension of the DSpace source code. Initial version is 1.6.2
@@ -58,8 +52,10 @@ public class DSpaceApi {
 
 			@SuppressWarnings("unchecked")
 			Class<IFunctionalities> functionalities = (Class<IFunctionalities>) Class.forName(className);
-			Constructor<IFunctionalities> constructor = functionalities.getConstructor();
-			manager = constructor.newInstance();
+			Constructor<IFunctionalities> constructor = functionalities.getConstructor(String.class);
+			ConfigurationService configurationService = new DSpace().getConfigurationService();
+			String lr_cfg = configurationService.getProperty("dspace.dir") + File.separator + "config/modules/lr.cfg";			
+			manager = constructor.newInstance(lr_cfg);
 
 			log.debug("Class " + className + " loaded successfully");
 
@@ -142,14 +138,15 @@ public class DSpaceApi {
 				manager.openSession();
 				boolean tokenFound = manager.verifyToken(resourceID, dtoken);
 				manager.close();
-				// Check token
-				if (tokenFound) { // database token match with url token
-					return true;
-				} else {
-					throw new AuthorizeException("The download token is invalid or expires.");
-				}
 
-			}
+	            // Check token				
+			    if(tokenFound) { // database token match with url token 
+			        return true;
+			    } else {
+			    	throw new DownloadTokenExpiredException("The download token is invalid or expires.");
+			    }
+			    
+			}			
 
 			// Check licenses
 			manager.openSession();
@@ -163,12 +160,12 @@ public class DSpaceApi {
 		return true;
 	}
 
-	public static void updateFileDownloadStatistics(int userID, int resourceID) {
-		IFunctionalities manager = DSpaceApi.getFunctionalityManager();
-		manager.openSession();
+	public static void updateFileDownloadStatistics(int userID, int resourceID) {	   
+	    IFunctionalities manager = DSpaceApi.getFunctionalityManager();	    
+        manager.openSession();
 		manager.updateFileDownloadStatistics(userID, resourceID);
-		manager.close();
-	}
+        manager.close();
+	}	    		
 
 	public static boolean registerUser(String organization, EPerson eperson) {
 		IFunctionalities manager = DSpaceApi.getFunctionalityManager();
@@ -249,7 +246,7 @@ public class DSpaceApi {
 					.getSubmissionItem().getItem());
 			log.info("registering final URL for handle " + handle);
 			// HandleManager.registerFinalHandleURL(handle);
-			DSpaceApi.handle_HandleManager_registerFinalHandleURL(log, handle);
+			DSpaceApi.handle_HandleManager_registerFinalHandleURL(log, handle, null);
 			context.restoreAuthSystemState();
 		} catch (Exception error) {
 			throw new ServletException(error);
@@ -301,7 +298,6 @@ public class DSpaceApi {
 
 	public static void main(String[] t) {
 		try {
-			load_dspace();
 			handle_HandleManager_createId(null, 9999, "11372/LRT-", "TEST-1");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -369,7 +365,7 @@ public class DSpaceApi {
 	 *                If a database error occurs
 	 */
 	public static void handle_HandleManager_registerFinalHandleURL(Logger log,
-			String pid) throws IOException {
+			String pid, DSpaceObject dso) throws IOException {
 		if (pid == null) {
 			log.info("Modification failed invalid/null PID.");
 			return;
@@ -385,7 +381,8 @@ public class DSpaceApi {
 		log.debug("Asking for changing the PID '" + pid + "' to " + url);
 		
 		try {
-			PIDService.modifyPID(pid, url);
+			Map<String, String> fields = HandlePlugin.extractMetadata(dso);
+			PIDService.modifyPID(pid, url, fields);
 		} catch (Exception e) {
 			throw new IOException("Failed to map PID " + pid + " to " + url
 				+ " (" + e.toString() + ")");
@@ -446,7 +443,7 @@ public class DSpaceApi {
 		IFunctionalities manager = DSpaceApi.getFunctionalityManager();
 		try{
 			manager.openSession();
-			VerificationTokenEperson vte = manager.getVerificationToken(token);			
+			VerificationTokenEperson vte = manager.getVerificationToken(token);
 			manager.delete(VerificationTokenEperson.class, vte);
 			manager.close();
 			return true;
@@ -470,7 +467,7 @@ public class DSpaceApi {
 		}		
 	}
 	
-	public static boolean sendRegistrationInfo(Context context, String email, int eid) throws IOException, MessagingException{
+	public static boolean sendRegistrationInfo(Context context, String email, int eid) throws IOException, MessagingException {
 		IFunctionalities manager = DSpaceApi.getFunctionalityManager();
 		manager.openSession();
 		boolean exists = false;
@@ -512,33 +509,8 @@ public class DSpaceApi {
 		return true;
 	}
 
-	public static void load_dspace() {
-		load_dspace("./config/dspace.cfg");
-	}
-
-
-    public static void load_dspace(String explicit_file)
-    {
-        try {
-        	ConfigurationManager.getProperty("dspace.url");
-        	return;
-        }catch( Exception e) {
-        }
-
-        try {
-	        DSpaceKernelImpl kernelImpl = DSpaceKernelInit.getKernel(null);
-	        if (!kernelImpl.isRunning())
-	            kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
-	        return;
-	    }catch( Exception e) {
-	    }
-
-        // last option
-        ConfigurationManager.loadConfig(explicit_file);
-    }
-    
     public static String convertBytesToHumanReadableForm(long bytes) {
-    	int exp = (int)(Math.log(bytes) / Math.log(1024));
+    	int exp = bytes == 0 ? 0 : (int)(Math.log(bytes) / Math.log(1024));
     	String units[] = new String[]{"bytes", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
     	double val = bytes / Math.pow(1024, exp);
     	if(val == (int)val)
@@ -548,4 +520,6 @@ public class DSpaceApi {
     }
     
 }
+
+
 

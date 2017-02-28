@@ -4,8 +4,8 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>5.3-SNAPSHOT</version>
-   <name>DSpace Parent Project (github)</name>
+   <version>5.7-SNAPSHOT</version>
+   <name>DSpace Parent Project</name>
    <description>
    	DSpace open source software is a turnkey institutional repository application.
    </description>
@@ -352,6 +352,7 @@
                                         <descriptor>src/main/assembly/testEnvironment.xml</descriptor>
                                     </descriptors>
                                     <filters>
+                                        <filter>local.properties</filter>
                                         <filter>src/main/filters/testEnvironment.properties</filter>
                                     </filters>
                                 </configuration>
@@ -747,89 +748,89 @@
          <dependency>
             <groupId>cz.cuni.mff.ufal.lindat</groupId>
             <artifactId>utilities</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
          </dependency>
 
          <!-- DSpace core and endorsed Addons -->
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace.modules</groupId>
             <artifactId>additions</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
          </dependency>
 
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-swordv2</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-swordv2</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-client</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
             <type>war</type>
          </dependency>
 	 <dependency>
@@ -840,51 +841,51 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
          </dependency>
          <dependency>
              <groupId>org.dspace</groupId>
              <artifactId>dspace-rdf</artifactId>
-             <version>5.3-SNAPSHOT</version>
+             <version>5.7-SNAPSHOT</version>
              <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-rest</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
             <type>jar</type>
              <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-rest</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-solr</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-solr</artifactId>
-            <version>5.3-SNAPSHOT</version>
+            <version>5.7-SNAPSHOT</version>
             <type>war</type>
             <classifier>skinny</classifier>
          </dependency>
@@ -1105,17 +1106,17 @@
          <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
-            <version>1.8.7</version>
+            <version>1.8.12</version>
          </dependency>
          <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>fontbox</artifactId>
-            <version>1.8.7</version>
+            <version>1.8.12</version>
          </dependency>
          <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>jempbox</artifactId>
-            <version>1.8.7</version>
+            <version>1.8.12</version>
          </dependency>
          <dependency>
 	        <groupId>org.bouncycastle</groupId>
@@ -1301,24 +1302,28 @@
         </dependency>
           <!-- Google Analytics -->
           <dependency>
-            <groupId>com.google.api-client</groupId>
-            <artifactId>google-api-client</artifactId>
-            <version>1.19.0</version>
-          </dependency>
-
-          <dependency>
               <groupId>com.google.apis</groupId>
               <artifactId>google-api-services-analytics</artifactId>
               <version>v3-rev103-1.19.0</version>
           </dependency>
           <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>1.19.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client</artifactId>
+            <version>1.19.0</version>
+        </dependency>
+        <dependency>
               <groupId>com.google.http-client</groupId>
               <artifactId>google-http-client-jackson2</artifactId>
               <version>1.19.0</version>
           </dependency>
           <dependency>
               <groupId>com.google.oauth-client</groupId>
-              <artifactId>google-oauth-client-jetty</artifactId>
+              <artifactId>google-oauth-client</artifactId>
               <version>1.19.0</version>
           </dependency>
           <!-- Findbugs annotations -->

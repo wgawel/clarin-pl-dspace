@@ -1,11 +1,6 @@
 package cz.cuni.mff.ufal.dspace.discovery;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import cz.cuni.mff.ufal.IsoLangCodes;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.SolrInputDocument;
 import org.dspace.content.DSpaceObject;
@@ -13,11 +8,7 @@ import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.discovery.DiscoverQuery;
-import org.dspace.discovery.SearchUtils;
-import org.dspace.discovery.SolrServiceImpl;
-import org.dspace.discovery.SolrServiceIndexPlugin;
-import org.dspace.discovery.SolrServiceSearchPlugin;
+import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.DiscoverySearchFilter;
@@ -25,7 +16,11 @@ import org.dspace.discovery.configuration.DiscoverySearchFilterFacet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cz.cuni.mff.ufal.IsoLangCodes;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Keeps most of our search query/index tweaks

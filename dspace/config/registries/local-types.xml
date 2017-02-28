@@ -69,4 +69,48 @@
     	<schema>local</schema>
     	<element>genre</element>
     </dc-type>
+    <dc-type>
+        <schema>local</schema>
+        <element>files</element>
+        <qualifier>size</qualifier>
+        <scope_note>Size of all the files in the item in bytes</scope_note>
+    </dc-type>
+	<dc-type>
+        <schema>local</schema>
+        <element>files</element>
+        <qualifier>count</qualifier>
+        <scope_note>Count of files in the item</scope_note>
+    </dc-type>                            
+    <dc-type>
+        <schema>local</schema>
+        <element>featuredService</element>
+        <qualifier>kontext</qualifier>
+        <scope_note>Links to data in kontext</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>local</schema>
+        <element>featuredService</element>
+        <qualifier>pmltq</qualifier>
+        <scope_note>Links to data in PML-TQ</scope_note>
+    </dc-type>
+	<dc-type>
+        <schema>local</schema>
+        <element>bitstream</element>
+        <qualifier>file</qualifier>
+        <scope_note>Files inside a bitstream if an archive</scope_note>
+    </dc-type>
+	<dc-type>
+        <schema>local</schema>
+        <element>bitstream</element>
+        <qualifier>info</qualifier>
+        <scope_note>Arbitrary info seprated key and value with |</scope_note>
+    </dc-type>
+    <dc-type>
+        <schema>local</schema>
+        <element>bitstream</element>
+        <qualifier>redirectToURL</qualifier>
+        <scope_note>Get the bitstream from this URL.</scope_note>
+    </dc-type>
 </dspace-dc-types>
+
+

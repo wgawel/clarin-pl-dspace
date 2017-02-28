@@ -4,5 +4,5 @@
       <scheme>oai</scheme>
       <repositoryIdentifier>${lr.repository.identifier}</repositoryIdentifier>
       <delimiter>:</delimiter>
-      <sampleIdentifier>oai:dspace-eu.pl:11321/7</sampleIdentifier>
+      <sampleIdentifier>${lr.repository.sampleIdentifier}</sampleIdentifier>
    </oai-identifier>

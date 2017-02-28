@@ -1,19 +1,24 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.xmlui.cocoon;
-
-import java.io.IOException;
-import java.util.Map;
 
 import org.apache.avalon.framework.configuration.Configurable;
 import org.apache.avalon.framework.parameters.Parameters;
-import org.apache.cocoon.ResourceNotFoundException;
-import org.apache.cocoon.reading.ResourceReader;
-
 import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.SourceResolver;
+import org.apache.cocoon.reading.ResourceReader;
 import org.apache.excalibur.source.Source;
-
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * The SafeResourceReader blocks access to specific paths which we do NOT want
@@ -37,6 +42,10 @@ public class SafeResourceReader extends ResourceReader
         // If the requested path includes any of the following strings/characters
         // then block access and return "Resource Not Found"
         if(src != null && (
+
+            src.toLowerCase().contains(":") ||
+            // %3a = encoded colon (:)
+            src.toLowerCase().contains("%3a") ||
             // %252e = double encoded dot (.)
             src.toLowerCase().contains("%252e") ||
             // %2e = encoded dot (.)

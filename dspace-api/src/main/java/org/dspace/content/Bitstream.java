@@ -7,16 +7,11 @@
  */
 package org.dspace.content;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
+import cz.cuni.mff.ufal.DSpaceApi;
+import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -26,8 +21,11 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-import cz.cuni.mff.ufal.DSpaceApi;
-import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class representing bitstreams stored in the DSpace system.
@@ -187,6 +185,48 @@ public class Bitstream extends DSpaceObject
 
         return bitstreamArray;
     }
+    
+    public static Bitstream[] findAll(Context context, String query) throws SQLException
+    {
+        TableRowIterator tri = DatabaseManager.queryTable(context, "bitstream", query);
+
+        List<Bitstream> bitstreams = new ArrayList<Bitstream>();
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                // First check the cache
+                Bitstream fromCache = (Bitstream) context.fromCache(
+                        Bitstream.class, row.getIntColumn("bitstream_id"));
+
+                if (fromCache != null)
+                {
+                    bitstreams.add(fromCache);
+                }
+                else
+                {
+                    bitstreams.add(new Bitstream(context, row));
+                }
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+
+        Bitstream[] bitstreamArray = new Bitstream[bitstreams.size()];
+        bitstreamArray = bitstreams.toArray(bitstreamArray);
+
+        return bitstreamArray;
+    }
+    
 
     /**
      * Create a new bitstream, with a new ID. The checksum and file size are
@@ -784,8 +824,12 @@ public class Bitstream extends DSpaceObject
     }
 
     public void setCmdiBitstreamId(int cmdiBitstreamId) {
-    	this.cmdiBitstreamId = cmdiBitstreamId;
-    	bRow.setColumn("cmdi_id", cmdiBitstreamId);
+        this.cmdiBitstreamId = cmdiBitstreamId;
+        bRow.setColumn("cmdi_id", cmdiBitstreamId);
         modifiedMetadata = true;
+    }
+
+    public void contextCanRead() throws AuthorizeException, SQLException{
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.READ);
     }
 }

@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>5.3-SNAPSHOT</version>
+        <version>5.7-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -223,6 +223,9 @@
                                 <output>
                                     <outputPath>${agnostic.build.dir}/testing</outputPath>
                                     <name>dspace.cfg.woven</name>
+                                    <properties>
+                                        <dspace.test.install.dir>${agnostic.build.dir}/testing/dspace</dspace.test.install.dir>
+                                    </properties>
                                     <parts>
                                         <part>
                                             <path>${agnostic.build.dir}/testing/dspace/config/dspace.cfg</path>
@@ -230,10 +233,25 @@
                                         <part>
                                             <path>${agnostic.build.dir}/testing/dspace.cfg.more</path>
                                         </part>
+                                        <part>
+                                            <path>${agnostic.build.dir}/testing/lindat.cfg.more</path>
+                                        </part>
                                     </parts>
+                                </output>
+                                <output>
+                                    <outputPath>${agnostic.build.dir}/testing</outputPath>
+                                    <name>lr.cfg.woven</name>
                                     <properties>
-                                        <dspace.install.dir>${agnostic.build.dir}/testing/dspace</dspace.install.dir>
+                                        <dspace.test.install.dir>${agnostic.build.dir}/testing/dspace</dspace.test.install.dir>
                                     </properties>
+                                    <parts>
+                                        <part>
+                                            <path>${agnostic.build.dir}/testing/dspace/config/modules/lr.cfg</path>
+                                        </part>
+                                        <part>
+                                            <path>${agnostic.build.dir}/testing/lindat.cfg.more</path>
+                                        </part>
+                                    </parts>
                                 </output>
                             </outputs>
                         </configuration>
@@ -260,6 +278,7 @@
                                 <configuration>
                                     <target>
                                         <copy file="${agnostic.build.dir}/testing/dspace.cfg.woven" tofile="${agnostic.build.dir}/testing/dspace/config/dspace.cfg" />
+                                        <copy file="${agnostic.build.dir}/testing/lr.cfg.woven" tofile="${agnostic.build.dir}/testing/dspace/config/modules/lr.cfg" />
                                     </target>
                                 </configuration>
                                 <goals>
@@ -279,6 +298,12 @@
                                 <!-- Turn off any DSpace logging -->
                                 <dspace.log.init.disable>true</dspace.log.init.disable>
                             </systemPropertyVariables>
+                            <additionalClasspathElements>
+                                <additionalClasspathElement>${root.basedir}/lr-b2safe-dspace/repo/B2SAFE-repository-package/b2safe_rp_pilot/1.0.5/b2safe_rp_pilot-1.0.5.jar</additionalClasspathElement>
+                                <additionalClasspathElement>${root.basedir}/lr-b2safe-dspace/target/b2safe-dspace-${project.version}.jar</additionalClasspathElement>
+                                <additionalClasspathElement>${root.basedir}/dspace-oai/target/dspace-oai-${project.version}-classes.jar</additionalClasspathElement>
+                                <additionalClasspathElement>${root.basedir}/dspace-oai/target/dspace-oai-${project.version}/WEB-INF/lib/xoai-3.2.10.jar</additionalClasspathElement>
+                            </additionalClasspathElements>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -293,7 +318,6 @@
             <groupId>cz.cuni.mff.ufal.lindat</groupId>
             <artifactId>utilities</artifactId>
         </dependency>
-            
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
@@ -609,12 +633,20 @@
             <artifactId>google-api-services-analytics</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.http-client</groupId>
             <artifactId>google-http-client-jackson2</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.oauth-client</groupId>
-            <artifactId>google-oauth-client-jetty</artifactId>
+            <artifactId>google-oauth-client</artifactId>
         </dependency>
         <!-- FindBugs -->
         <dependency>

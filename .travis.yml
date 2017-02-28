@@ -1,41 +1,57 @@
 language: java
-
+jdk:
+  - oraclejdk7
+  - oraclejdk8
+sudo: true
 addons:
-  postgresql: "9.4"
-
+  postgresql: '9.4'
 before_install:
-  - sudo rm /etc/mavenrc
-  - export MAVEN_OPTS="-Dmaven.repo.local=/home/travis/.m2/repository -Xmx1024M -XX:MaxPermSize=192m"
-  -     echo "########################"
+  # https://github.com/travis-ci/travis-ci/issues/4629
+  - sed -i.bak -e 's|https://nexus.codehaus.org/snapshots/|https://oss.sonatype.org/content/repositories/codehaus-snapshots/|g' ~/.m2/settings.xml
+  # https://github.com/travis-ci/travis-ci/issues/4613
+  - echo "MAVEN_OPTS='-Xmx4g -XX:MaxPermSize=1g'" > ~/.mavenrc
   - whoami
   - java -version
   - pwd
   - mvn help:system
   - export FS=`pwd`
-  - sudo apt-get install -qq cloc
-  -     echo "########################"
-  - cloc ../
-  -     echo "########################"
+  - rm -rf /tmp/dspace
 
-install:
-  - echo "Update settings"
-  - cd $FS/utilities/project_helpers
-  - sed -i'' 's/tomcat.(TOMCAT_VERSION)/travis/' ./config/variable.makefile.example
-  - sed -i'' 's/lr.common.theme = /lr.common.theme = \/tmp\/dspace/' ./config/local.conf.dist
-  - sed -i'' 's/lr.dspace.dir = /lr.dspace.dir = \/tmp\/dspace/' ./config/local.conf.dist
-  - cd $FS/utilities/project_helpers/config
-  - cp local.conf.dist ../sources/local.properties
-  - cd $FS/utilities/project_helpers/scripts
-  - echo "Creating dspace DB user and initialising databases"
-  - sudo -u postgres createuser --superuser dspace
-  - make create_databases
-  - echo "Installing prerequisites"
-  - make install_libs
-  - make new_deploy > /dev/null
-  - make print_message
-
-script:
-  - make test_dspace_database
-  - make test_utilities_database
-  - cd $FS/ && mvn -Dmaven.test.skip=false -Dtest=cz.cuni.mff.ufal.dspace.**.*Test,cz.cuni.mff.ufal.*Test -DfailIfNoTests=false test
-  - #make selenium_tests || echo "Tests failed"
+# see https://github.com/travis-ci/travis-ci/issues/1066 for the && signs
+# yaml format: "When a string contains line breaks, you can use the literal style, indicated by the pipe (|), to indicate that the string will span several lines. In literals, newlines are preserved" (might not be necessary)
+install: |
+  echo "Update settings" &&
+  cd $FS/utilities/project_helpers &&
+  sed -i'' 's/tomcat.(TOMCAT_VERSION)/travis/' ./config/variable.makefile.example &&
+  sed -i'' 's#DIR_LINDAT_COMMON_THEME.*#DIR_LINDAT_COMMON_THEME :=/tmp/dspace/lindat-common#' ./config/variable.makefile.example &&
+  sed -i'' 's/dspace.install.dir = /dspace.install.dir = \/tmp\/dspace/' ./config/local.conf.dist &&
+  cd $FS/utilities/project_helpers/config &&
+  cp local.conf.dist ../sources/local.properties &&
+  cd $FS/utilities/project_helpers/scripts &&
+  echo "Creating dspace DB user and initialising databases" &&
+  createuser --username=postgres --superuser dspace &&
+  make create_databases &&
+  echo "Installing prerequisites" &&
+  free -m -t &&
+  make install_libs &&
+  free -m -t &&
+  make mvn_help &&
+  make new_deploy | grep -v "Download" &&
+  free -m -t &&
+  make print_message
+script: |
+  free -m -t &&
+  make test_dspace_database &&
+  free -m -t &&
+  make test_utilities_database &&
+  free -m -t &&
+  cd $FS/ && mvn -Dmaven.test.skip=false -Dtest=cz.cuni.mff.ufal.dspace.**.*Test,cz.cuni.mff.ufal.*Test -DfailIfNoTests=false test | grep -v "Download" &&
+  free -m -t &&
+  cd $FS/utilities/project_helpers/scripts &&
+  free -m -t &&
+  make tests
+  #make selenium_tests || echo "Tests failed"
+notifications:
+  slack:
+    on_success: always
+    secure: RVKF3ge2FZ92r2HCD3LKgEFdIya/JQmm6fjfH3WTsvaNYOaiyG2qf2dzBZd76uUNoB6u3aV8gL/kWmm6lmJGlgg8wSgmi16bQOmKz9OmYDPcnMCwOVP+5NyiK8qoZhzgXUvUNlpqUAOdj1VUHyo7ROgzi2WyvIDPwl77Yo4hONc=

@@ -1,15 +1,16 @@
 /* Created for LINDAT/CLARIN */
 package cz.cuni.mff.ufal.dspace.authenticate.shibboleth;
 
-import java.sql.SQLException;
-import javax.servlet.http.HttpServletRequest;
+import cz.cuni.mff.ufal.DSpaceApi;
+import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import cz.cuni.mff.ufal.DSpaceApi;
-import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
+
+import javax.servlet.http.HttpServletRequest;
+import java.sql.SQLException;
 
 /**
  * Shibboleth authentication for DSpace

@@ -34,7 +34,7 @@
 		<xsl:if test="/dri:document/dri:options/dri:list[@n='discovery']/dri:list[count(dri:item/dri:xref)>1]">
 		<div class="col-md-4 accordion" id="search-filters">
 			<h4>
-				Limit your search
+				<i18n:text>xmlui.UFAL.artifactbrowser.search.limit</i18n:text>
 			</h4>
 			<xsl:for-each select="/dri:document/dri:options/dri:list[@n='discovery']/dri:list[count(dri:item/dri:xref)>1]">
 				<div class="well well-sm well-white accordion-group" style="margin-bottom: 5px;">
@@ -58,9 +58,7 @@
 							<xsl:for-each select="dri:item/dri:xref">
 								<li>
 									<a>										
-										<xsl:attribute name="href">
-											<xsl:value-of select="@target" />
-										</xsl:attribute>
+										<xsl:attribute name="href"><xsl:value-of select="@target" /></xsl:attribute>
 										<span class="wordbreak">
 												<xsl:apply-templates select="./node()"/>
 										</span>
@@ -156,14 +154,14 @@
             </xsl:choose>
             <div class="label label-info" style="margin-bottom: 20px;">
                 <xsl:variable name="file-size"
-                    select="sum(mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file/@SIZE)" />
+                    select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='local' and @element='files' and @qualifier='size']/node()" />
                 <xsl:variable name="formatted-file-size">
                     <xsl:call-template name="format-size">                   
                         <xsl:with-param name="size" select="$file-size" />
                     </xsl:call-template>
                 </xsl:variable>
                 <xsl:variable name="file-count"
-                    select="count(mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file)" />
+                    select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='local' and @element='files' and @qualifier='count']/node()" />
                 <i class="fa fa-paperclip">&#160;</i>
                 <i18n:translate>
                     <xsl:choose>
@@ -253,12 +251,7 @@
              <xsl:if test="dim:field[@element='publisher']">
              	<xsl:for-each select="dim:field[@element='publisher']">
                     <a class="publisher">
-                        <xsl:attribute name="href">
-                            <xsl:copy-of select="$context-path"/>
-                            /browse?value=
-                            <xsl:copy-of select="./node()"/>
-                            &amp;type=publisher
-                        </xsl:attribute>
+                        <xsl:attribute name="href"><xsl:copy-of select="$context-path"/>/browse?value=<xsl:copy-of select="./node()"/>&amp;type=publisher</xsl:attribute>
                         <xsl:copy-of select="./node()"/>
                     </a>
 					<xsl:if
@@ -282,7 +275,7 @@
                 &#xFEFF; <!-- non-breaking space to force separating the end tag -->
             </span>        
             <div class="author-head">
-                Author(s):
+               <i18n:text>xmlui.UFAL.artifactbrowser.item_list.authors</i18n:text>
             </div>
             <div class="author">
                 <xsl:choose>
@@ -294,12 +287,7 @@
                                     <xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
                                 </xsl:if>
                                 <a>
-									<xsl:attribute name="href">
-										<xsl:copy-of select="$context-path"/>
-										/browse?value=
-										<xsl:copy-of select="node()" />
-										&amp;type=author
-									</xsl:attribute>
+									<xsl:attribute name="href"><xsl:copy-of select="$context-path"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
 									<xsl:copy-of select="node()" />
 								</a>                                
                             </span>
@@ -312,12 +300,7 @@
                     <xsl:when test="dim:field[@element='creator']">
                         <xsl:for-each select="dim:field[@element='creator']">
                         	<a>
-								<xsl:attribute name="href">
-									<xsl:copy-of select="$context-path"/>
-									/browse?value=
-									<xsl:copy-of select="node()" />
-									&amp;type=author
-								</xsl:attribute>
+								<xsl:attribute name="href"><xsl:copy-of select="$context-path"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
 								<xsl:copy-of select="node()" />
 							</a>                            
                             <xsl:if
@@ -384,7 +367,7 @@
                 </xsl:if>
                 <div class="bold accordion-heading">
                     <a class="accordion-toggle" data-toggle="collapse" data-parent="#filters" href="#add-filters">
-                        Advanced Search
+                        <i18n:text>xmlui.UFAL.artifactbrowser.filters.add_filters</i18n:text>
                     </a>
                 </div>
                 <div id="add-filters">
@@ -421,8 +404,8 @@
     <xsl:template name="selected-filters">
         <div class="filters well well-light">
         	<h5>
-               Selected Filters
-			</h5>               
+                <i18n:text>xmlui.UFAL.artifactbrowser.filters.selected</i18n:text>
+			</h5>
 	        <xsl:for-each select="/dri:document//dri:div[@n='general-query']/dri:p[@n='hidden-fields']/dri:field[starts-with(@n,'filtertype')]">
 	        	<xsl:variable name="filter_number" select="substring-after(@n, 'filtertype_')" />
 	        	<xsl:variable name="filtertype" select="dri:value/node()" />
@@ -469,8 +452,8 @@
 				</span>
 			</xsl:for-each>
             <span class="badge selected-filter-clearall" style="padding: 5px 10px; margin: 2px; cursor: pointer">
-            	Clear All
-            </span>            
+                <i18n:text>xmlui.UFAL.artifactbrowser.filters.clear</i18n:text>
+            </span>
         </div>
     </xsl:template>
     
@@ -495,5 +478,6 @@
     </xsl:template>    
             
 </xsl:stylesheet>
+
 
 

@@ -59,7 +59,17 @@
 
 			<!-- Javascript at the bottom for fast page loading -->
 			<xsl:call-template name="addJavascript" />
-				
+
+			<!--Invisible link to HTML sitemap (for search engines) -->
+			<a class="hidden">
+				<xsl:attribute name="href">
+					<xsl:value-of
+							select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+					<xsl:text>/htmlmap</xsl:text>
+				</xsl:attribute>
+				<xsl:text>&#160;</xsl:text>
+			</a>
+
             <xsl:text disable-output-escaping="yes">&lt;/body&gt;</xsl:text>				
 					
 		</html>
@@ -156,8 +166,7 @@
                         <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverPort']" />
                         <xsl:value-of select="$context-path" />
                         <xsl:text>/</xsl:text>
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='context']" />
-                        <xsl:text>description.xml</xsl:text>
+                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='autolink']" />
                     </xsl:attribute>
 					<xsl:attribute name="title">
                         <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='shortName']" />
@@ -253,9 +262,9 @@
 
 
 	<xsl:template match="dri:body">
-    	<xsl:if test="/dri:document/dri:meta/dri:userMeta[@authenticated = 'yes']">
-    		<xsl:call-template name="userbox" />
-    	</xsl:if>	
+
+        <xsl:call-template name="navbar" />
+        
 		<div class="container-fluid">
 			<div class="container">
 			
@@ -278,7 +287,7 @@
 
 		       	<div class="visible-xs text-center" style="margin-top: 5px; ">
 					<button id="showhidemenu" type="button" class="btn btn-default btn-sm" style="border-radius: 30px; width: 100%;">
-							<i class="fa fa-align-justify">&#160;</i> Show/Hide Menu
+							<i class="fa fa-align-justify">&#160;</i> <i18n:text i18n:key="homepage.show_hide_menu">Show/Hide Menu</i18n:text>
 					</button>        	        		
 		       	</div>        
 
@@ -295,7 +304,7 @@
 								<xsl:call-template name="recent-submission" />
 							</xsl:when>
 							<xsl:otherwise>
-										<div class="alert alert-warning">No Recent Items !</div>
+										<div class="alert alert-warning"><i18n:text i18n:key="homepage.norecent">No Recent Items !</i18n:text></div>
 							</xsl:otherwise>
 						</xsl:choose>
 
@@ -368,14 +377,15 @@
 		<xsl:for-each
 			select="/dri:document/dri:body/dri:div[@n='site-home']/dri:div[@n='site-recent-submission']">
 			<div class="well well-lg" id="recent-submissions">
-				<h3 class="recent-submissions-head">What's New</h3>
+				<h3 class="recent-submissions-head"><i18n:text i18n:key="homepage.whatsnew">What's New</i18n:text></h3>
 				<xsl:for-each select="dri:referenceSet">
 					<xsl:for-each select="dri:reference">
 						<xsl:if test="position() &lt; 4">
 							<xsl:variable name="externalMetadataURL">
 								<xsl:text>cocoon:/</xsl:text>
 								<xsl:value-of select="@url" />
-								<!-- No options selected, render the full METS document -->
+								<!-- only grab the descriptive metadata, no files section -->
+								<xsl:text>?sections=dmdSec,amdSec</xsl:text>
 							</xsl:variable>
 							<xsl:apply-templates select="document($externalMetadataURL)" mode="recentList" />
 						</xsl:if>
@@ -390,14 +400,7 @@
 			<xsl:variable name="itemWithdrawn" select="mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/@withdrawn" />
 
 			<xsl:variable name="href">
-				<xsl:choose>
-					<xsl:when test="$itemWithdrawn">
-						<xsl:value-of select="@OBJEDIT" />
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:value-of select="@OBJID" />
-					</xsl:otherwise>
-				</xsl:choose>
+				<xsl:value-of select="@OBJID" />
 			</xsl:variable>
 
 			<xsl:choose>
@@ -408,15 +411,13 @@
 				</xsl:when>
 			</xsl:choose>
 			<div class="label label-info" style="margin-bottom: 20px;">
-                <xsl:variable name="file-size"
-                    select="sum(mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file/@SIZE)" />
+                <xsl:variable name="file-size" select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='local' and @element='files' and @qualifier='size']/node()" />
                 <xsl:variable name="formatted-file-size">
                     <xsl:call-template name="format-size">                   
                         <xsl:with-param name="size" select="$file-size" />
                     </xsl:call-template>
                 </xsl:variable>
-                <xsl:variable name="file-count"
-                    select="count(mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file)" />
+                <xsl:variable name="file-count" select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/dim:field[@mdschema='local' and @element='files' and @qualifier='count']/node()" />
                 <i class="fa fa-paperclip">&#160;</i>
                 <i18n:translate>
                     <xsl:choose>
@@ -465,7 +466,9 @@
 	<xsl:template match="dim:dim" mode="recentList-DIM-metadata">
 		<xsl:param name="href" />
 		<div class="item-type">
+			<xsl:text>&#160;</xsl:text>
 			<xsl:value-of select="dim:field[@element='type'][1]/node()" />
+			<xsl:text>&#160;</xsl:text>
 		</div>
 		
         <xsl:if test="dim:field[@mdschema='local' and @element='branding']">
@@ -505,7 +508,7 @@
 		</div>
 		<div class="artifact-info">
 			<div class="author-head">
-				Author(s):
+				<i18n:text i18n:key="homepage.item.authors">Author(s):</i18n:text>
 			</div>
 			<div class="author">
 				<xsl:choose>
@@ -517,12 +520,7 @@
 									<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
 								</xsl:if>
                                 <a>
-									<xsl:attribute name="href">
-										<xsl:copy-of select="$context-path"/>
-										/browse?value=
-										<xsl:copy-of select="node()" />
-										&amp;type=author
-									</xsl:attribute>
+									<xsl:attribute name="href"><xsl:copy-of select="$context-path"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
 									<xsl:copy-of select="node()" />
 								</a>                                
 							</span>
@@ -535,12 +533,7 @@
 					<xsl:when test="dim:field[@element='creator']">
 						<xsl:for-each select="dim:field[@element='creator']">
                             <a>
-                                <xsl:attribute name="href">
-                                    <xsl:copy-of select="$context-path"/>
-                                    /browse?value=
-                                    <xsl:copy-of select="node()" />
-                                    &amp;type=author
-                                </xsl:attribute>
+                                <xsl:attribute name="href"><xsl:copy-of select="$context-path"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
                                 <xsl:copy-of select="node()" />
                             </a>                                
 							<xsl:if
@@ -562,7 +555,7 @@
 				<xsl:variable name="abstract"
 					select="dim:field[@element = 'description' and @qualifier='abstract']/node()" />
 				<div class="artifact-abstract-head">
-					Description:
+					<i18n:text i18n:key="homepage.item.description">Description:</i18n:text>
 				</div>
 				<div class="artifact-abstract">
 					<xsl:value-of select="util:shortenString($abstract, 220, 10)" />
@@ -572,7 +565,7 @@
 				<xsl:variable name="description"
 					select="dim:field[@element = 'description' and not(@qualifier)]/node()" />
 				<div class="artifact-abstract-head">
-					Description:
+					<i18n:text i18n:key="homepage.item.description">Description:</i18n:text>
 				</div>
 				<div class="artifact-abstract">
 					<xsl:value-of select="util:shortenString($description, 220, 10)" />
@@ -600,7 +593,8 @@
 									<xsl:text>cocoon://metadata</xsl:text>
 									<xsl:value-of select="substring-after(dri:xref/@target, $context-path)" />
 									<xsl:text>/mets.xml</xsl:text>
-									<!-- No options selected, render the full METS document -->
+									<!-- only grab the descriptive metadata, no files section -->
+									<xsl:text>?sections=dmdSec,amdSec</xsl:text>
 								</xsl:variable>
 								<xsl:apply-templates select="document($externalMetadataURL)"
 									mode="recentList" />
@@ -645,10 +639,7 @@
 								<li class="no-padding">
 									<strong>
 									<a class="btn btn-link btn-small no-padding">
-									<xsl:attribute name="href">
-		                                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='advancedURL']" />
-		                                <xsl:text>?advance</xsl:text>
-		                            </xsl:attribute>
+									<xsl:attribute name="href"><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='advancedURL']" /><xsl:text>?advance</xsl:text></xsl:attribute>
 									<i18n:text>xmlui.dri2xhtml.structural.search-advanced</i18n:text>
 									</a>
 									</strong>
@@ -689,7 +680,8 @@
 		<script type="text/javascript"
 			src="{concat($protocol, 'ajax.googleapis.com/ajax/libs/jquery/', $jqueryVersion ,'/jquery.min.js')}">&#160;</script>
 		<script type="text/javascript" src="{$theme-path}/lib/js/jquery-ui.js">&#160;</script>
-		
+		<script type="text/javascript" src="{$theme-path}/lib/js/jquery.i18n.js">&#160;</script>
+
         <script type="text/javascript" src="{concat($aaiURL, '/discojuice/discojuice-2.1.en.min.js')}">&#160;</script>
         <script type="text/javascript" src="{concat($aaiURL, '/aai.js')}">&#160;</script>
 
@@ -840,17 +832,17 @@
 				<div class="item active">
 					<div style="position: relative; height: 180px;">
 						<img style="width: 100px; position: absolute; left: 22%; top: 20%" src="{$context-path}/themes/UFALHome/lib/images/glass.png" />
-						<h3 style="left: 34%; position: absolute; top: 25%;">Linguistic Data and NLP Tools</h3>
-						<h5 style="left: 40%; position: absolute; top: 15%;">Find</h5>
-						<h5 style="left: 54%; position: absolute; top: 45%;">Citation Support (with Persistent IDs)</h5>
+						<h3 style="left: 34%; position: absolute; top: 25%;"><i18n:text i18n:key="homepage.carousel.data_tools">Linguistic Data and NLP Tools</i18n:text></h3>
+						<h5 style="left: 40%; position: absolute; top: 15%;"><i18n:text i18n:key="homepage.carousel.find">Find</i18n:text></h5>
+						<h5 style="left: 54%; position: absolute; top: 45%;"><i18n:text i18n:key="homepage.carousel.citation_support">Citation Support (with Persistent IDs)</i18n:text></h5>
 					</div>
 				</div>
 				<div class="item">
 					<div style="position: relative; height: 180px;">
-						<h3 style="left: 40%; position: absolute; top: 10%;">Deposit Free and Safe</h3>
-						<h5 style="left: 28%; position: absolute; top: 30%;">License of your Choice (Open licenses encouraged)</h5>
-						<h5 style="left: 32%; position: absolute; top: 42%;">Easy to Find</h5>
-						<h5 style="left: 36%; position: absolute; top: 54%;">Easy to Cite</h5>
+						<h3 style="left: 40%; position: absolute; top: 10%;"><i18n:text i18n:key="homepage.carousel.deposit">Deposit Free and Safe</i18n:text></h3>
+						<h5 style="left: 28%; position: absolute; top: 30%;"><i18n:text i18n:key="homepage.carousel.license">License of your Choice (Open licenses encouraged)</i18n:text></h5>
+						<h5 style="left: 32%; position: absolute; top: 42%;"><i18n:text i18n:key="homepage.carousel.easy_find">Easy to Find</i18n:text></h5>
+						<h5 style="left: 36%; position: absolute; top: 54%;"><i18n:text i18n:key="homepage.carousel.easy_cite">Easy to Cite</i18n:text></h5>
 					</div>
 				</div>
 				<div class="item">
@@ -859,9 +851,9 @@
 							<blockquote>
 								<strong>
 									<i class="fa fa-quote-left fa-2x pull-left">&#160;</i>
-									“There ought to be only one grand dépôt of art in the world, to
+									<i18n:text i18n:key="homepage.carousel.quote">“There ought to be only one grand dépôt of art in the world, to
 									which the artist might repair with his works, and on presenting them
-									receive what he required... ”
+									receive what he required... ”</i18n:text>
 								</strong>
 								<small>Ludwig van Beethoven, 1801</small>
 							</blockquote>
@@ -885,5 +877,6 @@
 	</div>	
 	</xsl:template>
 </xsl:stylesheet>
+
 
 

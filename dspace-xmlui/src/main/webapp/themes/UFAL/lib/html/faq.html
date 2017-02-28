@@ -6,19 +6,21 @@
 	<ul id="faqs-list">
 		<li><a href="#what-is-the-repository">What is the repository?</a></li>
 		<li><a href="#what-submissions-do-you-accept">What submissions do we accept?</a></li>
-		<li><a href="#do-i-need-to-create-an-account-to-download-andor-make-a-submission">Do I need to create an account to download and/or
-			make a submission?</a></li>
+		<li><a href="#do-i-need-to-create-an-account-to-download-andor-make-a-submission">Do I need to create an account to download and/or make a submission?</a></li>
+		<li><a href="#cant-login">I see an error logging in</a></li>
 		<li><a href="#why-should-i-submit-my-data-into-your-repository">Why should I submit my data into your repository?</a></li>
 		<li><a href="#why-should-i-submit-my-tools">Why should I submit my tools?</a></li>
 		<li><a href="#what-is-the-handle-good-for">What is the PID (handle) good for?</a></li>
 		<li><a href="#what-is-deposit-procedure">What is the actual depositing/archiving procedure?</a></li>
 		<li><a href="#how-to-update">What if I want/need to update the archived data?</a></li>
         <li><a href="#how-to-delete">What if I want to withdraw the resources in the future? Can I delete the data?</a></li>
+		<li><a href="#how-to-lrt-submissions">We have started our own repository, can we somehow move records submitted to the LRT collection?</a></li>
 		<li><a href="#how-to-cite">How to cite a submission?</a></li>
 		<li><a href="#how-safe-is-my-data-if-i-store-it-with-you">How safe is my data if I store it with you?</a></li>
 		<li><a href="#what-license-should-i-pick-for-my-datatool">What license should I pick for my data/tool?</a></li>
 		<li><a href="#list-of-licenses">Where can I find more information about supported licenses?</a></li>
 		<li><a href="#real-authors">Why we strongly prefer real authors to institutions?</a></li>
+		<li><a href="#searching">How do I get the most of my searches?</a></li>
 	</ul>
     <hr />
 
@@ -62,14 +64,21 @@
 		</li>
 		<li>To download data and tools that require you to sign a
 			license, you need to log in. To make a submission, you also need to
-			log in. However, if you are from academic world, you probably don't
+			log in. However, if you are from the academic world, you probably don't
 			need any new account.</li>
 		<li><strong>Just click &quot;Login&quot; and search for
 				your academic institution.</strong> To sign in, you can use any account with
-			a Identity Provider that is a member of EduGAIN federation.</li>
+			an Identity Provider that is a member of EduGAIN federation.</li>
 		<li>If you don't have an academic account that works with us, let
 			us know. We will make you a local account.</li>
 	</ul>
+	</div>
+
+	<div>
+	<h3	id="cant-login">I see an error logging in</h3>
+    <p>Please let us know through our <a class="helpdesk-tolink" href="#">Help Desk</a>, if you have any trouble logging in.</p>
+    <p>Ocassionally (usually when you are the first one logging in using your home institution) you might see an error stating &quot;<strong>The authentication was successful; however, your identity provider did provide neither your email, eppn nor targeted id.</strong>&quot; This means your home institution did not send us enough data about you to operate our service; the institution is doing so to protect your personal data. We only require an email and we are following <a href="http://www.geant.net/uri/dataprotection-code-of-conduct">Data Protection Code of Conduct</a>, which helps us convince the institution we won't abuse data about you.</p>
+    <p>If you have an account with multiple providers and you login with different one each time, you might see error stating &quot;<strong>Your email is already associated with a different user.</strong>&quot;. Please try to use the same provider each time, if that is not possible, let us know and we'll change the default one.</p>
 	</div>
 	
 	<div>
@@ -143,6 +152,14 @@
 		administrative metadata will be retained indicating that the data itself were removed.</p>
     </div>
 
+	<div>
+	<h3 id="how-to-lrt-submissions">We have started our own repository, can we somehow move records submitted to the LRT collection?</h3>
+    <p>We can create a tombstone page for the moved record and we can add a notice to that page saying the resource is now at a new location.
+		The submission is effectively hidden from search, browse and harvesting (oai-pmh), but the PID still resolves.
+		Thus instead of the actual data, we show a link to the item in your repository.
+		Please contact the <a class="helpdesk-tolink" href="#">Help Desk</a> for more details.</p>
+    </div>
+
     <div>
 	<h3 id="how-to-embargo">I don't want / cannot make the data publicly available or make 
     them available after a specific date. Would you still archive them for me?</h3>
@@ -165,7 +182,7 @@
 	<p>Quite safe, probably much more than in your computer. Our
 		storage plan:</p>
 	<ul>
-		<li>All the data in the repository have a on-site backup copy.</li>
+		<li>All the data in the repository have an on-site backup copy.</li>
 		<li>There is another off-site copy, so even complete destruction
 			of our building does not destroy your data.</li>
 		<li>We check all the copies regularly and should any of them
@@ -181,7 +198,7 @@
 	<p>
 		We encourage using a free license. A representative selection of free
 		licenses as well as CC licenses (more appropriate for data) is
-		available directly during submission.<BR/>
+		available directly during submission. There is a great <a href="./deposit#license_selector">OPEN License Selector</a> which can guide you through the selection of appropriate license.<BR/>
 		If for some reason you need a different license, <a class="helpdesk-tolink" href="#">Contact Us</a>.
 	</p>
 	</div>
@@ -191,12 +208,12 @@
 		<p>
 			The list of licenses currently supported is <a href="licenses" id="available-licenses">here.</a>
 			However, do not hesitate to <a class="helpdesk-tolink" href="#">Contact Us</a>
-			in case you need your specific license.
+			in case you need your specific license. The licenses can be accompanied by various requirements; eg. limiting to logged in users, filling additional details (purpose) etc.
 		</p>
 	</div>
 
 	<div>
-		<h3 id="real-authors">Why we strongly prefer real authors to institutions?</h3>
+		<h3 id="real-authors">Why do we strongly prefer real authors to institutions?</h3>
 		<p>
 			It is not about contact, it is about citations, credit and trust. That is why we have separate metadata
 			fields for authors and for contact person. Contact to a helpdesk is perfect, not acknowledging the
@@ -207,5 +224,32 @@
 		</p>
 	</div>
 
+	<div>
+		<h3 id="searching">How do I get the most of my searches?</h3>
+		<p>
+			In contrast to other search engines this one uses OR as a default operator; see examples below that clarify this. If you are not satisfied with the results of your searches, you might wish to go beyond plain text searches.
+			You may search only in certain fields, use negation, add score (emphasis) to some parts of the query and match
+			more. The search engine is SOLR so use it's syntax if you know it or check it in <a href="https://cwiki.apache.org/confluence/display/solr/The+Standard+Query+Parser">the documentation</a>.
+		</p>
+		<h4>Examples</h4>
+		<p>
+		<dl>
+			<style scoped="scoped">
+				dt{
+					padding-top:5px;
+					padding-bottom:5px;
+				}
+			</style>
+			<dt><a href="../discover?query=PDT+wordnet">PDT wordnet</a> vs <a href="../discover?query=PDT+AND+wordnet">PDT AND wordnet</a></dt>
+			<dd>The default operator is OR; ie. the first example searches for PDT OR WordNet in all text fields.</dd>
+			<dt><a href="../discover?query=dc.title%3AP%3FT+%26%26+-dc.title%3AWordNet">dc.title:P?T &amp;&amp; -dc.title:WordNet</a></dt>
+			<dd>Returns all items having P?T in title - ? stands for any character (eg. PDT) - and not having WordNet in the title</dd>
+			<dt><a href="../discover?query=dc.title%3A%22Czech+WordNet%22">dc.title:"Czech WordNet"</a></dt>
+			<dd>Use double quotes (&quot;) for exact matches and multiword expressions</dd>
+			<dt><a href="../discover?query=author%3A%28Bojar+%26%26+-Tamchyna%29+%26%26+%28dc.language.iso%3A%28ces+AND+eng%29+OR+language%3A%28czech+AND+english%29%29">author:(Bojar &amp;&amp; -Tamchyna) &amp;&amp; (dc.language.iso:(ces AND eng) OR language:(czech AND english))</a></dt>
+			<dd>Search for items by one author and not the other; interesting are only items about both czech and english languages.</dd>
+		</dl>
+		</p>
+	</div>
 </div>
 

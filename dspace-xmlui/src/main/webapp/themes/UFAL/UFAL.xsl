@@ -17,6 +17,7 @@
 	xmlns:mods="http://www.loc.gov/mods/v3"
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:confman="org.dspace.core.ConfigurationManager"
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
 	<xsl:import href="../dri2xhtml-alt/dri2xhtml.xsl" />
@@ -123,5 +124,24 @@
         </div>
 
     </xsl:template>
+    
+    <xsl:template match="dri:div[@id='aspect.submission.StepTransformer.div.handle-message']" priority="10">
+    	<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@qualifier='submission'][@element='handle']">
+    		<div class='alert alert-warning'>
+    			<i18n:translate>
+    				<i18n:text key="xmlui.Submission.general.submission.handle">{0}</i18n:text>
+    				<i18n:param>
+    					<a>
+    						<xsl:attribute name="href">
+    							<xsl:value-of select="confman:getProperty('handle.canonical.prefix')" /><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@qualifier='submission'][@element='handle']" />
+    						</xsl:attribute>
+    						<xsl:value-of select="confman:getProperty('handle.canonical.prefix')" /><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@qualifier='submission'][@element='handle']" />
+    					</a>
+    				</i18n:param>
+    			</i18n:translate>    			    			
+    		</div>
+    	</xsl:if>
+    </xsl:template>
+    
 </xsl:stylesheet>
 

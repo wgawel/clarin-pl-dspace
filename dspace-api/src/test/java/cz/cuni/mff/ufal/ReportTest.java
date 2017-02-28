@@ -2,6 +2,7 @@
 package cz.cuni.mff.ufal;
 
 import org.dspace.core.ConfigurationManager;
+import org.dspace.health.Report;
 import org.junit.Test;
 
 import javax.security.auth.login.Configuration;
@@ -12,18 +13,7 @@ public class ReportTest
 {
     @Test
     public void testReportHandleResolutionStatistics() throws IllegalAccessException {
-        String args[] = {"-s", "1"};
-        try {
-            DSpaceApi.load_dspace("../dspace/");
-        }catch(Exception e) {
-        }
-        // this is revolting, but, works (for the moment)
-        for (Field f : ConfigurationManager.class.getDeclaredFields()) {
-            f.setAccessible(true);
-            if ( f.getName().equals("properties") ) {
-                ((Properties)f.get(null)).setProperty("dspace.url", "XXX");
-            }
-        }
+        String args[] = {"-c", "0"};
         Report.main(args);
     }
 }

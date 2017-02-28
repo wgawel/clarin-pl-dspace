@@ -23,15 +23,16 @@
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:mods="http://www.loc.gov/mods/v3"
     xmlns:confman="org.dspace.core.ConfigurationManager"
+    xmlns:file="java.io.File"
     xmlns="http://www.w3.org/1999/xhtml"
-    exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods confman">
+    exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods confman file">
 
     <xsl:output indent="yes" />
 
     <xsl:variable name="aaiURL">
         <xsl:value-of select="confman:getProperty('lr', 'lr.aai.url')"/>
     </xsl:variable>
-                    
+
     <xsl:template match="dri:document">
     	<xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
         <html>
@@ -135,14 +136,10 @@
                 <link rel="stylesheet" href="{$theme-path}/lib/bootstrap/css/datepicker.css" />
             </xsl:if>
 
-            <!-- dragNdrop -->
-            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='dragNdrop']">
-                <link rel="stylesheet" href="{$theme-path}/lib/css/jquery.fileupload-ui.css"> </link>
-	    </xsl:if>
 	    
 	    <!-- license selector -->
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='licenseselect']">
-            <link rel="stylesheet" href="{$theme-path}/lib/lindat-license-selector/license-selector.min.css"> </link>
+            <link rel="stylesheet" href="{$theme-path}/lib/lindat-license-selector/license-selector.css"> </link>
         </xsl:if>
 	    
 
@@ -160,6 +157,7 @@
 			<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='jqplot']">
 				<link rel="stylesheet" href="{$theme-path}/lib/js/jqplot/jquery.jqplot.css"> </link>
 				<link rel="stylesheet" href="{$theme-path}/lib/css/jqplot.css"> </link>
+				<link rel="stylesheet" href="{$theme-path}/lib/css/daterangepicker.css"> </link>
 	        	</xsl:if>            
             
             <!-- select2 -->
@@ -196,8 +194,7 @@
                         <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='serverPort']"/>
                         <xsl:value-of select="$context-path"/>
                         <xsl:text>/</xsl:text>
-                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='context']"/>
-                        <xsl:text>description.xml</xsl:text>
+                        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='autolink']"/>
                     </xsl:attribute>
                     <xsl:attribute name="title" >
                         <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='opensearch'][@qualifier='shortName']"/>
@@ -329,7 +326,7 @@
 		                        select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='simpleURL']"/>
 		            </xsl:attribute>
 		            <div class="input-group input-group-sm">
-	                <input type="text" class="form-control small-search-input" placeholder="Search">
+	                <input type="text" class="form-control small-search-input" placeholder="xmlui.general.search" i18n:attr="placeholder">
 	                     <xsl:attribute name="name">
 	                         <xsl:value-of
 	                                 select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='queryField']"/>
@@ -379,9 +376,9 @@
         templates of the body's child elements (which consists entirely of dri:div tags).
     -->
     <xsl:template match="dri:body">
-        <xsl:if test="/dri:document/dri:meta/dri:userMeta[@authenticated = 'yes']">
-            <xsl:call-template name="userbox" />
-        </xsl:if>
+
+        <xsl:call-template name="navbar" />
+        
         <div class="container-fluid">
             
             <div class="container">
@@ -423,7 +420,6 @@
         </div>
     </xsl:template>
 
-
     <!-- Currently the dri:meta element is not parsed directly. Instead, parts of it are referenced from inside
         other elements (like reference). The blank template below ends the execution of the meta branch -->
     <xsl:template match="dri:meta" />
@@ -446,7 +442,8 @@
         </xsl:variable>
         <script type="text/javascript" src="{concat($protocol, 'ajax.googleapis.com/ajax/libs/jquery/', $jqueryVersion ,'/jquery.min.js')}">&#160;</script>
         <script type="text/javascript" src="{$theme-path}/lib/js/jquery-ui.js">&#160;</script>
-      
+        <script type="text/javascript" src="{$theme-path}/lib/js/jquery.i18n.js">&#160;</script>
+
         <script type="text/javascript" src="{concat($aaiURL, '/discojuice/discojuice-2.1.en.min.js')}">&#160;</script>
         <script type="text/javascript" src="{concat($aaiURL, '/aai.js')}">&#160;</script>
 
@@ -543,9 +540,22 @@
             </xsl:attribute>&#160;</script>
 
         <script type="text/javascript">
+            <xsl:variable name="currentLocale">
+                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
+            </xsl:variable>
             <xsl:attribute name="src">
-                 <xsl:value-of select="$theme-path" />
-                 <xsl:text>/lib/js/citation.js</xsl:text>
+                <xsl:variable name="localizedContextPath" select="concat($theme-path,'/lib/lindat/public/js/',$currentLocale,'/lindat-refbox.js')" />
+                <xsl:variable name="localizedDiskPath" select="concat($theme-path-on-disk,'/lib/lindat/public/js/',$currentLocale,'/lindat-refbox.js')" />
+                <xsl:variable name="path" select="file:new($localizedDiskPath)"/>
+                <xsl:choose>
+                    <xsl:when test="file:isFile($path)">
+                        <xsl:value-of select="$localizedContextPath" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="$theme-path" />
+                        <xsl:text>/lib/lindat/public/js/lindat-refbox.js</xsl:text>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:attribute>&#160;</script>
 
 
@@ -561,6 +571,8 @@
             <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.dateAxisRenderer.min.js">&#160;</script>
             <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.enhancedLegendRenderer.js">&#160;</script>
             <script type="text/javascript" src="{$theme-path}/lib/js/piwik_charts.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/moment.min.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/daterangepicker.js">&#160;</script>
         </xsl:if>        
         
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='datepicker']">
@@ -568,10 +580,8 @@
         </xsl:if>
 
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='dragNdrop']">
-            <script type="text/javascript" src="{$theme-path}/lib/js/jquery.fileupload.js">&#160;</script>
-            <script type="text/javascript" src="{$theme-path}/lib/js/jquery.fileupload-ui.js">&#160;</script>
             <script type="text/javascript" src="{$theme-path}/lib/js/dragndrop.js">&#160;</script>
-			<script type="text/javascript" src="{$theme-path}/lib/js/fileupload.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/fileupload.js">&#160;</script>
         </xsl:if>
 
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='extrametadata']">
@@ -587,7 +597,7 @@
             <script type="text/javascript" src="{$theme-path}/lib/select2/select2.js">&#160;</script>
         </xsl:if>
 
-        <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='controlpanel']">
+        <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']='admin/panel'">
             <script type="text/javascript" src="{$theme-path}/lib/js/ufal-controlpanel.js">&#160;</script>
         </xsl:if>
 
@@ -601,7 +611,7 @@
 
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='licenseselect']">
             <script type="text/javascript" src="{$theme-path}/lib/lindat-license-selector/lodash.min.js">&#160;</script>
-            <script type="text/javascript" src="{$theme-path}/lib/lindat-license-selector/license-selector.min.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/lindat-license-selector/license-selector.js">&#160;</script>
         </xsl:if>
         
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='bootstrap-toggle']">
@@ -633,6 +643,7 @@
     </xsl:template>
 
 </xsl:stylesheet>
+
 
 
 

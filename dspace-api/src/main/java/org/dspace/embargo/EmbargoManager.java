@@ -100,10 +100,9 @@ public class EmbargoManager
              }
         }
         String slift = myLift.toString();
-        boolean ignoreAuth = context.ignoreAuthorization();
         try
         {
-            context.setIgnoreAuthorization(true);
+            context.turnOffAuthorisationSystem();
             item.clearMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
             item.addMetadata(lift_schema, lift_element, lift_qualifier, null, slift);
             log.info("Set embargo on Item "+item.getHandle()+", expires on: "+slift);
@@ -114,7 +113,7 @@ public class EmbargoManager
         }
         finally
         {
-            context.setIgnoreAuthorization(ignoreAuth);
+            context.restoreAuthSystemState();
         }
     }
 
@@ -278,7 +277,7 @@ public class EmbargoManager
         try
         {
             context = new Context();
-            context.setIgnoreAuthorization(true);
+            context.turnOffAuthorisationSystem();
             Date now = new Date();
              
             // scan items under embargo
@@ -354,11 +353,11 @@ public class EmbargoManager
         if (line.hasOption('s'))
         {
         	if ( lift.length > 0 ) {
-        		System.err.println( "Creating new embargo" );
+                DCDate liftDate = new DCDate(lift[0].value);
+                System.err.println( String.format(
+                        "Overriding embargo [%s]", liftDate.toString()) );
         	}else {
-        		DCDate liftDate = new DCDate(lift[0].value);
-        		System.err.println( String.format(
-        				"Overriding embargo [%s]", liftDate.toString()) );
+                System.err.println( "Creating new embargo" );
         	}
             if (!line.hasOption('n'))
             {
@@ -430,6 +429,29 @@ public class EmbargoManager
             {
                 throw new IllegalStateException("Missing one or more of the required DSpace configuration properties for EmbargoManager, check your configuration file.");
             }
+
+            try{
+                    Context context = new Context();
+                    for(String property : new String[]{terms, lift}){
+                            String schema = getSchemaOf(property);
+                            String element = getElementOf(property);
+                            String qualifier = getQualifierOf(property);
+                            MetadataSchema mds = MetadataSchema.find(context, schema);
+                            if (mds == null)
+                            {
+                                throw new IllegalStateException("No such metadata schema: " + schema + "\nCheck configuration for embargo.field.*\nThe erroneous value is " + property);
+                            }
+                            MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, qualifier);
+                            if (mdf == null)
+                            {
+                                throw new IllegalStateException("No such metadatafield: \nCheck configuration for embargo.field.*\nThe erroneous value is " + property);
+                            }
+                    }
+                    context.abort();
+            }catch(SQLException e){
+                throw new IllegalStateException("Problem during init()", e);
+            }
+
             terms_schema = getSchemaOf(terms);
             terms_element = getElementOf(terms);
             terms_qualifier = getQualifierOf(terms);

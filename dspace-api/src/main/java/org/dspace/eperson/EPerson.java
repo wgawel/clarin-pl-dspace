@@ -30,6 +30,7 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.codec.DecoderException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -521,7 +522,7 @@ public class EPerson extends DSpaceObject
             break;
 
         case LANGUAGE:
-            s = "m_text_value";
+            s = "m.text_value";
             t = "language";
             break;
         case NETID:
@@ -529,23 +530,26 @@ public class EPerson extends DSpaceObject
             break;
 
         default:
-            s = "m_text_value";
+            s = "m.text_value";
             t = "lastname";
         }
 
         // NOTE: The use of 's' in the order by clause can not cause an SQL
         // injection because the string is derived from constant values above.
-        TableRowIterator rows = DatabaseManager.query(context, "SELECT * FROM eperson e ORDER BY ?",s);
+        TableRowIterator rows;
         if(!t.equals("")) {
             rows = DatabaseManager.query(context,
                     "SELECT * FROM eperson e " +
-                            "LEFT JOIN metadatavalue m on (m.resource_id = e.eperson_id and m.resource_type_id = ? and m.metadata_field_id = ?) " +
-                            "ORDER BY ?",
+                    "LEFT JOIN metadatavalue m on (m.resource_id = e.eperson_id and m.resource_type_id = ? and m.metadata_field_id = ?) " +
+                    "ORDER BY " + s,
                     Constants.EPERSON,
-                    MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), t, null).getFieldID(),
-                    s
+                    MetadataField.findByElement(context, MetadataSchema.find(context, "eperson").getSchemaID(), t, null).getFieldID()
             );
         }
+        else {
+        	rows =  DatabaseManager.query(context, "SELECT * FROM eperson e ORDER BY " + s);
+        }
+        
 
 
 
@@ -827,11 +831,11 @@ public class EPerson extends DSpaceObject
         String f = getFirstName();
         String l= getLastName();
 
-        if ((l == null) && (f == null))
+        if (StringUtils.isBlank(l) && StringUtils.isBlank(f))
         {
             return getEmail();
         }
-        else if (f == null)
+        else if (StringUtils.isBlank(f))
         {
             return l;
         }
@@ -1402,6 +1406,8 @@ public class EPerson extends DSpaceObject
 
     private static final Option OPT_NEW_EMAIL = new Option("i", "newEmail", true, "new email address");
     private static final Option OPT_NEW_NETID = new Option("I", "newNetid", true, "new network ID");
+
+    private static final Option OPT_ORGANIZATION = new Option("o", "organization", true, "organization the user belongs to");
     
     /**
      * Tool for manipulating user accounts.
@@ -1483,6 +1489,7 @@ public class EPerson extends DSpaceObject
         options.addOption(OPT_PHONE);
         options.addOption(OPT_LANGUAGE);
         options.addOption(OPT_REQUIRE_CERTIFICATE);
+        options.addOption(OPT_ORGANIZATION);
 
         Option option = new Option("p", "password", true, "password to match the EPerson name");
         options.addOption(option);
@@ -1515,6 +1522,12 @@ public class EPerson extends DSpaceObject
         if (!command.hasOption('p'))
         {
             System.err.println("You must provide a password for the new user.");
+            return 1;
+        }
+
+        if (!command.hasOption('o'))
+        {
+            System.err.println("You must provide an organization for the new user.");
             return 1;
         }
 
@@ -1551,6 +1564,7 @@ public class EPerson extends DSpaceObject
         try {
             eperson.update();
             context.commit();
+            DSpaceApi.registerUser(command.getOptionValue(OPT_ORGANIZATION.getOpt()), eperson);
             System.out.printf("Created EPerson %d\n", eperson.getID());
         } catch (SQLException ex) {
             context.abort();

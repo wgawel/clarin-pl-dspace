@@ -14,6 +14,7 @@ import java.net.URISyntaxException;
 import java.util.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -776,11 +777,11 @@ public class ItemsResource extends Resource
      *         found, UNAUTHORIZED(401) if user is not allowed to delete item
      *         metadata.
      * @throws WebApplicationException
-     *             It is thrown by three exceptions. SQLException, when was
-     *             problem with reading item from database or editting metadata
-     *             fields. AuthorizeException, when was problem with
-     *             authorization to item. And ContextException, when was problem
-     *             with creating context of DSpace.
+     *             Thrown by three exceptions. SQLException, when there was
+     *             a problem reading item from database or editing metadata
+     *             fields. AuthorizeException, when there was a problem with
+     *             authorization to item. And ContextException, when there was a problem
+     *             with creating a DSpace context.
      */
     @DELETE
     @Path("/{item_id}/metadata")
@@ -1006,41 +1007,50 @@ public class ItemsResource extends Resource
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
             }
 
+            List<Object> parameterList = new LinkedList<>();
+
             String sql = "SELECT RESOURCE_ID, TEXT_VALUE, TEXT_LANG, SHORT_ID, ELEMENT, QUALIFIER " +
                     "FROM METADATAVALUE " +
                     "JOIN METADATAFIELDREGISTRY ON METADATAVALUE.METADATA_FIELD_ID = METADATAFIELDREGISTRY.METADATA_FIELD_ID " +
                     "JOIN METADATASCHEMAREGISTRY ON METADATAFIELDREGISTRY.METADATA_SCHEMA_ID = METADATASCHEMAREGISTRY.METADATA_SCHEMA_ID " +
                     "WHERE " +
-                    "SHORT_ID='" + metadata[0] + "'  AND " +
-                    "ELEMENT='" + metadata[1] + "' AND ";
+                    "SHORT_ID= ?  AND " +
+                    "ELEMENT= ? AND ";
+                    parameterList.add(metadata[0]);
+                    parameterList.add(metadata[1]);
             if (metadata.length > 3)
             {
-                sql += "QUALIFIER='" + metadata[2] + "' AND ";
+                sql += "QUALIFIER= ? AND ";
+                parameterList.add(metadata[2]);
             }
             if (org.dspace.storage.rdbms.DatabaseManager.isOracle())
             {
-                sql += "dbms_lob.compare(TEXT_VALUE, '" + metadataEntry.getValue() + "') = 0 AND ";
+                sql += "dbms_lob.compare(TEXT_VALUE, ?) = 0 AND ";
+                parameterList.add(metadataEntry.getValue());
             }
             else
             {
-                sql += "TEXT_VALUE='" + metadataEntry.getValue() + "' AND ";
+                sql += "TEXT_VALUE=? AND ";
+                parameterList.add(metadataEntry.getValue());
             }
             if (metadataEntry.getLanguage() != null)
             {
-                sql += "TEXT_LANG='" + metadataEntry.getLanguage() + "'";
+                sql += "TEXT_LANG=?";
+                parameterList.add(metadataEntry.getLanguage());
             }
             else
             {
                 sql += "TEXT_LANG is null";
             }
 
-            TableRowIterator iterator = org.dspace.storage.rdbms.DatabaseManager.query(context, sql);
+            Object[] parameters = parameterList.toArray();
+            TableRowIterator iterator = org.dspace.storage.rdbms.DatabaseManager.query(context, sql, parameters);
             while (iterator.hasNext())
             {
                 TableRow row = iterator.next();
                 org.dspace.content.Item dspaceItem = this.findItem(context, row.getIntColumn("RESOURCE_ID"),
                         org.dspace.core.Constants.READ);
-                Item item = new Item(dspaceItem, "", context);
+                Item item = new Item(dspaceItem, expand, context);
                 writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers,
                         request, context);
                 items.add(item);
