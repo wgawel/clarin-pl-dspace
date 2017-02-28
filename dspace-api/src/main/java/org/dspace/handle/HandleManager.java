@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.cuni.mff.ufal.dspace.handle.Handle;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -377,6 +379,11 @@ public class HandleManager
                 // is reusing this handle!
                 row.setColumnNull("resource_id");
                 DatabaseManager.update(context, row);
+                //clear from cache if cached
+                Handle cachedHandle = (Handle)context.fromCache(Handle.class, row.getIntColumn("handle_id"));
+                if(cachedHandle != null){
+                    context.removeCached(cachedHandle, row.getIntColumn("handle_id"));
+                }
 
                 if(log.isDebugEnabled())
                 {
@@ -621,8 +628,14 @@ public class HandleManager
             throw new IllegalArgumentException("Handle is null");
         }
 
-        return DatabaseManager
-                .findByUnique(context, "Handle", "handle", handle);
+        if (!ConfigurationManager.getBooleanProperty("handle.caseSensitive", true)){
+            return DatabaseManager
+                    .findByUniqueNonCaseSensitive(context, "Handle", "handle", handle);
+        }else {
+
+            return DatabaseManager
+                    .findByUnique(context, "Handle", "handle", handle);
+        }
     }
 
     /**
@@ -641,4 +654,23 @@ public class HandleManager
                 handlePrefix.endsWith("/") ? "" : "/").append(id).toString();
     }
 
+    public static boolean isDead(Context context, String handle) throws SQLException {
+        String baseHandle = stripPartIdentifier(handle);
+
+        TableRow dbhandle = findHandleInternal(context, baseHandle);
+
+        return dbhandle.getBooleanColumn("dead");
+
+    }
+
+    public static String getDeadSince(Context context, String handle) throws SQLException {
+        String baseHandle = stripPartIdentifier(handle);
+
+        TableRow dbhandle = findHandleInternal(context, baseHandle);
+
+        java.util.Date timestamptz = dbhandle.getDateColumn("dead_since");
+
+        return timestamptz != null ? DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(timestamptz) : null;
+
+    }
 }

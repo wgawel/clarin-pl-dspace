@@ -1,5 +1,7 @@
 package cz.cuni.mff.ufal.lindat.utilities;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -9,6 +11,7 @@ import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -35,13 +38,25 @@ import cz.cuni.mff.ufal.lindat.utilities.units.Variables;
 public class HibernateFunctionalityManager implements IFunctionalities {
 
 	private static Logger log = Logger.getLogger(HibernateFunctionalityManager.class);
-
-	HibernateUtil hibernateUtil = new HibernateUtil();
+	static boolean initialized = false;
+	
+	HibernateUtil hibernateUtil = new HibernateUtil();	
 	
 	public HibernateFunctionalityManager() {
-		init();
 	}
-
+	
+	public HibernateFunctionalityManager(String configuration_file) throws IOException {
+		init(configuration_file);
+	}
+	
+	public static void init(String configuration_file) throws IOException {
+		if(!initialized) {
+			Variables.init(configuration_file);		
+			HibernateUtil.init();
+			initialized = true;
+		}
+	}	
+	
 	@Override
 	public void setErrorMessage(String message) {
 		Variables.setErrorMessage(message);
@@ -65,11 +80,7 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 		return "";
 	}
 
-	public static void init() {
-		Variables.init();
-	}
-
-	public  boolean isFunctionalityEnabled(String functionalityName) {
+	public boolean isFunctionalityEnabled(String functionalityName) {
 		// this logic needs inspection
 		if(!Variables.isConfigurationTrue(functionalityName)){
 			log.log(Level.FATAL,"Functionality " + functionalityName + " is not enabled!");
@@ -98,6 +109,7 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 			switch (license.getConfirmation()) {
 
 			case 2:
+			case 3:
 				result.add(license);
 				break;
 			case 0:
@@ -189,7 +201,7 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 	@Override
 	public List<LicenseDefinition> getAllLicenses() {
 		List<LicenseDefinition> results = (List<LicenseDefinition>) hibernateUtil
-				.findAll(LicenseDefinition.class);
+				.findByCriterie(LicenseDefinition.class, Order.asc("licenseLabel.labelId"), Order.desc("licenseId"));		
 		return results;
 	}
 
@@ -417,13 +429,13 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 	public static void main(String args[]) {
 		try {
 			//expecting INSTALL_DIR in args[0]
-			String dspace_path = "file://" + args[0] + "/config/modules/lr.cfg";
-			Variables.init(dspace_path);
+			String dspace_path = args[0] + "/config/" + Variables.default_config_file;
+			HibernateFunctionalityManager functionalityManager = new HibernateFunctionalityManager(dspace_path);
 			System.out
 					.println(String
 							.format("\nUsing dspace configuration from %s.\nTrying to connect to %s",
 									dspace_path, Variables.databaseURL));
-			SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+			SessionFactory sessionFactory = functionalityManager.hibernateUtil.getSessionFactory();
 			Session session = sessionFactory.openSession();
 			Query query = session.createSQLQuery("select current_date");
             List result = query.list();
@@ -443,6 +455,13 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 	public List<LicenseResourceUserAllowance> getSignedLicensesByDate() {
 		return (List<LicenseResourceUserAllowance>) hibernateUtil
 				.findByCriterie(LicenseResourceUserAllowance.class,
+						Order.desc("createdOn"));
+	}
+
+	@Override
+	public List<LicenseResourceUserAllowance> getSignedLicensesByDate(int firstRecord, int limit) {
+		return (List<LicenseResourceUserAllowance>) hibernateUtil
+				.findByCriterieWithLimits(LicenseResourceUserAllowance.class, firstRecord, limit,
 						Order.desc("createdOn"));
 	}
 
@@ -829,8 +848,14 @@ public class HibernateFunctionalityManager implements IFunctionalities {
 		
 		return true;
 	}
+	
+	public static void shutdown() {
+		HibernateUtil.getSessionFactory().close();
+	}
 
 }
+
+
 
 
 

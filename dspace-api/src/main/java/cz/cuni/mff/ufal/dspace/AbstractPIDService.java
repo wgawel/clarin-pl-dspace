@@ -29,7 +29,14 @@ public abstract class AbstractPIDService {
 	}
 	
 	public enum HANDLE_FIELDS {
-		URL
+		URL,
+		TITLE,
+		REPOSITORY,
+		SUBMITDATE,
+		REPORTEMAIL,
+		DATASETNAME,
+		DATASETVERSION,
+		QUERY
 	}
 
 	public PIDServiceAuthenticator authenticator = null;

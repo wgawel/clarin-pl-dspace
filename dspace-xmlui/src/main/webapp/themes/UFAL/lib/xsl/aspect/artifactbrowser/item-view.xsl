@@ -17,8 +17,9 @@
 	xmlns:confman="org.dspace.core.ConfigurationManager"
     xmlns:str="http://exslt.org/strings"
     xmlns:isocodes="cz.cuni.mff.ufal.IsoLangCodes"
-	exclude-result-prefixes="xalan java encoder solrClientUtils i18n dri mets dim xlink xsl confman util isocodes">
-
+    xmlns:ft="cz.cuni.mff.ufal.FileTreeViewGenerator"
+	exclude-result-prefixes="xalan java encoder solrClientUtils i18n dri mets dim xlink xsl confman util isocodes ft">
+	
 	<xsl:output indent="yes" />
 
 	<xsl:template name="itemSummaryView-DIM">
@@ -99,13 +100,7 @@
 		<xsl:choose>
 			<!-- identifier.uri row -->
 			<xsl:when test="$clause = 2 and (dim:field[@element='identifier' and @qualifier='uri'])">
-				<div data-target="#exporter_model_div" class="citationbox">
-					<xsl:attribute name="uri">
-                 		<xsl:value-of select="dim:field[@element='identifier' and @qualifier='uri']/node()" />
-               		</xsl:attribute>
-					<xsl:attribute name="oai">
-						<xsl:value-of select="$oai-url" />
-					</xsl:attribute>               		
+				<div class="refbox">
 					<xsl:attribute name="handle">
                         <xsl:value-of select="substring-after(/mets:METS/@ID,'hdl:')" />
                     </xsl:attribute>               		
@@ -188,7 +183,7 @@
 					<dl id="item-authors" class="dl-horizontal" style="clear:both;">
 					<dt style="text-align: left">
 						<i class="fa fa-pencil">&#160;</i>
-						<span>Authors</span>
+						<span><i18n:text>xmlui.UFAL.artifactbrowser.authors</i18n:text></span>
 					</dt>
 					<dd style="padding-right: 40px;">
 					<xsl:choose>
@@ -200,12 +195,7 @@
 										<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
 									</xsl:if>
 									<a>
-								<xsl:attribute name="href">
-									<xsl:copy-of select="$contextPath"/>
-									/browse?value=
-									<xsl:copy-of select="node()" />
-									&amp;type=author
-								</xsl:attribute>
+								<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
 								<xsl:copy-of select="node()" />
 								</a>
 
@@ -219,12 +209,8 @@
 						<xsl:when test="dim:field[@element='creator']">
 							<xsl:for-each select="dim:field[@element='creator']">
 								<a>
-								<xsl:attribute name="href">
-									<xsl:copy-of select="$contextPath"/>
-									/browse?value=
-									<xsl:copy-of select="node()" />
-									&amp;type=author
-								</xsl:attribute>
+								<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
+
 								<xsl:copy-of select="node()" />
 								</a>
 								<xsl:if
@@ -347,12 +333,7 @@
 					</dt>
 					<dd>
 						<a>
-							<xsl:attribute name="href">
-								<xsl:copy-of select="$contextPath"/>
-								/browse?value=
-								<xsl:value-of select="dim:field[@element='type'][not(@qualifier)][1]/node()" />
-								&amp;type=type
-							</xsl:attribute>
+							<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:value-of select="dim:field[@element='type'][not(@qualifier)][1]/node()" />&amp;type=type</xsl:attribute>
 							<xsl:value-of select="dim:field[@element='type'][not(@qualifier)][1]/node()" />
 						</a>							
 					</dd>
@@ -419,13 +400,9 @@
 						<xsl:when test="dim:field[@element='language'][@qualifier='iso']">
 							<xsl:for-each
 								select="dim:field[@element='language'][@qualifier='iso']">
+								<xsl:sort select="isocodes:getLangForCode(node())" />
 								<a>
-									<xsl:attribute name="href">
-										<xsl:copy-of select="$contextPath"/>
-										/browse?value=
-										<xsl:copy-of select="isocodes:getLangForCode(node())" />
-										&amp;type=language
-									</xsl:attribute>
+									<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="isocodes:getLangForCode(node())" />&amp;type=language</xsl:attribute>
 									<span class="language-iso-code"><xsl:copy-of select="isocodes:getLangForCode(node())" /></span>									
 								</a>
 								<xsl:if
@@ -537,12 +514,7 @@
 						<xsl:for-each
 							select="dim:field[@element='publisher' and not(@qualifier)]">
 							<a>
-								<xsl:attribute name="href">
-									<xsl:copy-of select="$contextPath"/>
-									/browse?value=
-									<xsl:copy-of select="./node()" />
-									&amp;type=publisher
-								</xsl:attribute>
+								<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="./node()" />&amp;type=publisher</xsl:attribute>
 								<xsl:copy-of select="./node()" />									
 							</a>													
 							<xsl:if
@@ -564,7 +536,7 @@
 				<dl id="item-sponsor" class="dl-horizontal">
 					<dt style="text-align: left">
 						<i class="fa fa-money">&#160;</i>
-						<xsl:text>Acknowledgement</xsl:text>
+						<i18n:text>xmlui.UFAL.artifactbrowser.acknowledgement</i18n:text>
 					</dt>
 					<dd>
 						<xsl:variable name="my_elem">
@@ -592,10 +564,20 @@
 														<p class="funding-org"><xsl:value-of select="."/></p>
 													</xsl:when>
 													<xsl:when test="position()=2">
-														<p class="funding-code"><xsl:value-of select="concat('Project code: ',.)"/></p>
+														<p class="funding-code">
+															<i18n:translate>
+																<i18n:text>xmlui.UFAL.artifactbrowser.project.code</i18n:text>
+																<i18n:param><xsl:value-of select="."/></i18n:param>
+															</i18n:translate>
+														</p>
 													</xsl:when>
 													<xsl:when test="position()=3">
-														<p class="funding-name"><xsl:value-of select="concat('Project name: ',.)"/></p>
+														<p class="funding-name">
+															<i18n:translate>
+																<i18n:text>xmlui.UFAL.artifactbrowser.project.name</i18n:text>
+																<i18n:param><xsl:value-of select="."/></i18n:param>
+															</i18n:translate>
+														</p>
 													</xsl:when>
 												</xsl:choose>
 											</xsl:for-each>
@@ -632,12 +614,7 @@
 							select="dim:field[@element='subject' and not(@qualifier)]">
 							<span class="tag">
 								<a class="label label-primary">
-									<xsl:attribute name="href">
-										<xsl:copy-of select="$contextPath"/>
-										/browse?value=
-										<xsl:copy-of select="node()" />
-										&amp;type=subject
-									</xsl:attribute>
+									<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=subject</xsl:attribute>
 									<xsl:copy-of select="node()" />
 								</a>
 							</span>														
@@ -662,10 +639,8 @@
 						<xsl:for-each select="$ufal-collection-references">
 							<span><a>
 							<xsl:variable name="collection" select="document(concat('cocoon:/',./@url))" />							
-							<xsl:attribute name="href">									
-									<xsl:value-of select="$collection/mets:METS/@OBJID" />									
-								</xsl:attribute>
-								<xsl:copy-of select="$collection/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title'][1]" />
+							<xsl:attribute name="href"><xsl:value-of select="$collection/mets:METS/@OBJID" /></xsl:attribute>
+							<xsl:copy-of select="$collection/mets:METS/mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title'][1]" />
 							</a></span>
 							<xsl:if test="count(following-sibling::dri:reference) != 0">
 								<xsl:text>, </xsl:text>
@@ -681,26 +656,38 @@
 
 			<xsl:when test="$clause = 15 and $ds_item_view_toggle_url != ''">
 
-				<!-- replacedby info -->
-				<xsl:if test="count(dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']) = 1">
-					<div class="alert" id="replaced_by_alert">											
-						<span><i class="fa fa-info-circle fa-3x pull-left">&#160;</i>						
-							<xsl:text>This item is replaced by a newer submission:</xsl:text><br/>						
-							<a>
-								<xsl:attribute name="href">
-			                            <xsl:value-of select="dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']" />
-			                    </xsl:attribute>
-			                    <xsl:value-of select="dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']" />
-							</a>									
-						</span>																													
-				   </div>				   
-				</xsl:if>				
-				
+                <!-- replacedby info -->
+                <xsl:if test="count(dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']) &gt;= 1">
+	                <div class="alert" id="replaced_by_alert">
+                        <span style="dispaly: table-cell">
+	                        <i class="fa fa-info-circle fa-3x pull-left">&#160;</i>
+                        </span>
+                        <span style="display: table-cell">
+	                         <xsl:choose>
+                                 <xsl:when test="count(dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']) = 1">
+                                         <i18n:text>xmlui.UFAL.artifactbrowser.item_view.replaced_one</i18n:text><br/>
+                                 </xsl:when>
+                                 <xsl:otherwise>
+                                         <i18n:text>xmlui.UFAL.artifactbrowser.item_view.replaced_many</i18n:text><br/>
+                                 </xsl:otherwise>
+	                         </xsl:choose>
+	                         <xsl:for-each select="dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']">
+                                 <div>
+	                                 <a>
+	                                     <xsl:attribute name="href">
+	                                             <xsl:value-of select="." />
+	                                     </xsl:attribute>
+	                                     <xsl:value-of select="." />
+	                                 </a>
+                                 </div>
+	                         </xsl:for-each>
+	                     </span>
+	                </div>
+                </xsl:if>				
 				<dl class="dl-horizontal">
 					<dt style="text-align: left">
 						<a class="btn btn-link" style="padding-left:0">
-						<xsl:attribute name="href"><xsl:value-of
-							select="$ds_item_view_toggle_url" /></xsl:attribute>
+							<xsl:attribute name="href"><xsl:value-of select="$ds_item_view_toggle_url" /></xsl:attribute>
 							<i18n:text>xmlui.ArtifactBrowser.ItemViewer.show_full</i18n:text>
 						</a>					
 					</dt>
@@ -732,13 +719,7 @@
 
 	<xsl:template match="dim:dim" mode="itemDetailView-DIM">
 		<xsl:if test="dim:field[@element='identifier' and @qualifier='uri']">
-				<div data-target="#exporter_model_div" class="citationbox">
-					<xsl:attribute name="uri">
-                 		<xsl:value-of select="dim:field[@element='identifier' and @qualifier='uri']/node()" />
-               		</xsl:attribute>
-					<xsl:attribute name="oai">
-						<xsl:value-of select="$oai-url" />
-					</xsl:attribute>               		               		
+				<div class="refbox">
 					<xsl:attribute name="handle">
                         <xsl:value-of select="substring-after(/mets:METS/@ID,'hdl:')" />
                     </xsl:attribute>               		
@@ -860,8 +841,7 @@
 			<div class="thumbnail" style="margin-bottom: 10px;">
 				<a>
 					<xsl:attribute name="href">
-                        <xsl:value-of
-						select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
+                        <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
                     </xsl:attribute>
 					<xsl:choose>
 						<xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]">
@@ -887,6 +867,18 @@
 						<xsl:value-of
 							select="mets:FLocat[@LOCTYPE='URL']/@xlink:title" />
 					</dd>
+					
+					<xsl:for-each select="mets:Local/*[local-name()!='file' and local-name()!='redirectToURL' ]">
+						<dt>
+							<xsl:value-of
+									select="local-name()" />
+						</dt>
+						<dd>
+							<xsl:value-of
+									select="./node()" />
+						</dd>
+					</xsl:for-each>
+					
 					<dt>
 						<i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-size</i18n:text>
 					</dt>
@@ -914,10 +906,9 @@
 						</dd>
 					</xsl:if>
 				</dl>
-				<a class="label label-info">
+				<a class="filebutton label label-info">
 					<xsl:attribute name="href">
-                        <xsl:value-of
-						select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
+                        <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
                     </xsl:attribute>				
                     <i class="fa fa-chevron-circle-down">&#160;</i>
                     <i18n:translate>
@@ -925,16 +916,92 @@
                         <i18n:param><xsl:copy-of select="$formatted-file-size"/></i18n:param>
                     </i18n:translate>
 				</a>
+				<xsl:if test="mets:Local/mets:file">
+					<a class="filebutton label label-info" role="button" data-toggle="collapse">
+						<xsl:attribute name="href">
+							<xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
+						</xsl:attribute>					
+                    	<i class="fa fa-eye">&#160;</i>
+						<i18n:text>xmlui.UFAL.artifactbrowser.item_view.preview</i18n:text>
+					</a>
+					<div class="collapse">
+						<xsl:attribute name="id">
+							<xsl:text>file_</xsl:text><xsl:value-of select="@ID" />
+						</xsl:attribute>
+  						<div class="panel panel-info" style="margin: 5px 1px 1px 1px;">
+							<div class="bold panel-heading text-center" style="height: auto; padding: 0px;">
+								<i class="fa fa-eye">&#160;</i>
+								<i18n:text>xmlui.UFAL.artifactbrowser.item_view.file_preview</i18n:text>
+								<a role="button" data-toggle="collapse" class="pull-right">
+									<xsl:attribute name="href">
+										<xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
+									</xsl:attribute>								
+									<i class="fa fa-remove">&#160;</i>
+								</a>
+							</div>  						
+  							<div class="panel-body" style="max-height: 200px; overflow: scroll;">
+								<xsl:variable name="files">
+									<xsl:copy-of select="mets:Local/mets:file"/>
+								</xsl:variable>  						  							
+  								<xsl:choose>
+  									<xsl:when test="@MIMETYPE='text/plain'">
+			  							<xsl:value-of select="$files" disable-output-escaping="yes" /> . . . 			  							
+		  							</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="ft:parse($files)" disable-output-escaping="yes" />
+									</xsl:otherwise>
+	  							</xsl:choose>
+  							</div>
+						</div>
+					</div>					
+				</xsl:if>
+				<xsl:if test="@MIMETYPE='text/html'" >
+					<a class="filebutton label label-info" role="button" data-toggle="collapse">
+						<xsl:attribute name="href">
+							<xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
+						</xsl:attribute>					
+                    	<i class="fa fa-eye">&#160;</i>
+						<i18n:text>xmlui.UFAL.artifactbrowser.item_view.preview</i18n:text>
+					</a>
+					<div class="collapse">
+						<xsl:attribute name="id">
+							<xsl:text>file_</xsl:text><xsl:value-of select="@ID" />
+						</xsl:attribute>
+  						<div class="panel panel-info" style="margin: 5px 1px 1px 1px;">
+							<div class="bold panel-heading text-center" style="height: auto; padding: 0px;">
+								<i class="fa fa-eye">&#160;</i>
+								<i18n:text>xmlui.UFAL.artifactbrowser.item_view.file_preview</i18n:text>
+								<a role="button" data-toggle="collapse" class="pull-right">
+									<xsl:attribute name="href">
+										<xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
+									</xsl:attribute>								
+									<i class="fa fa-remove">&#160;</i>
+								</a>
+							</div>  						
+  							<div class="panel-body" style="max-height: 500px; overflow: hidden; padding: 0px;">
+  								 <iframe frameborder="0" scrolling="yes" height="500" width="100%">
+  								 	<xsl:attribute name="src">
+  								 		<xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
+  								 	</xsl:attribute>
+  								 	&#160;
+  								 </iframe>
+  							</div>
+						</div>
+					</div>									
+				</xsl:if>
 			</div>			
 	</xsl:template>
 
 	<xsl:template match="license">
 		<div class="alert alert-info text-center">
-		This item is 
-			<div class="label label-{@label}">			
-			<xsl:value-of select="@label_title" />
-			</div>
-		and licensed under:<BR/>
+			<i18n:translate>
+				<i18n:text>xmlui.UFAL.artifactbrowser.item_view.licensed_under</i18n:text>
+				<i18n:param>
+					<div class="label label-{@label}">
+						<xsl:value-of select="@label_title" />
+					</div>
+				</i18n:param>
+			</i18n:translate>
 		<a>
 		<xsl:attribute name="href">
 			<xsl:value-of select="@url" />
@@ -971,7 +1038,7 @@
                     </xsl:when>
                     <xsl:otherwise>
                         <!-- direct download of smaller files -->
-                        <xsl:attribute name="href"><xsl:value-of select="$download-all-url" /></xsl:attribute>
+                        <xsl:attribute name="data-href"><xsl:value-of select="$download-all-url" /></xsl:attribute>
                     </xsl:otherwise>
                 </xsl:choose>
                 <i class="fa fa-download">&#160;</i>
@@ -985,7 +1052,7 @@
 			<button type="button" class="close" onclick="$('#download_all_alert').hide();">&#215;</button>
 			<p>Large Size</p>
 			<p style="margin-bottom: 10px;"><small class="text-warning">The requested files are being packed into one large file. This process can take some time, please be patient.</small></p>			
-          				<a href="{$download-all-url}" style="text-decoration: none;"><button class="btn btn-warning btn-sm">Continue</button></a>
+          				<a data-href="{$download-all-url}" style="text-decoration: none;"><button class="btn btn-warning btn-sm">Continue</button></a>
           				<button type="button" class="btn btn-default btn-sm" onclick="javascript:$('#download_all_alert').hide();">Cancel</button>
             </div>
 
@@ -1031,11 +1098,88 @@
     <xsl:template name="visits_over_time">
         <xsl:variable name="reportURL">
             <xsl:value-of select="concat($context-path, '/', substring-before($request-uri, '/piwik-statistics'))"/>
-            <xsl:text disable-output-escaping="yes">/piwik?module=API&amp;method=API.get&amp;period=day</xsl:text>
+            <xsl:text disable-output-escaping="yes">/piwik?period=day</xsl:text>
         </xsl:variable>
+        
+        
+<div id="piwik-charts" style="font-family: verdana;" interval='2 day'>
 
-                <div class="panel panel-default">
-                        <div class="panel-heading bold">Views Over Time 
+	                                <xsl:attribute name="data-url">
+                                        <xsl:value-of select="$reportURL" />
+                                </xsl:attribute>
+
+
+
+	<div class="row" style="margin-bottom: 20px;">
+	  <div class="col-md-offset-2 col-md-8">
+		<div class="input-group input-group-lg">
+		<span style="cursor: pointer;" class="input-group-addon" id="sizing-addon1" onclick="jQuery('input[name=\'daterange\']').click();"><span class="label label-primary">Period</span></span>
+		  <input type="text" name="daterange" class="form-control" value="" aria-describedby="sizing-addon1" />
+		  <span style="cursor: pointer;" class="input-group-addon" id="sizing-addon1" onclick="jQuery('input[name=\'daterange\']').click();"><i class="glyphicon glyphicon-calendar fa fa-calendar">&#160;</i></span>    
+		</div>
+	  </div>
+	</div>
+
+
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active" style="min-width: 200px;">        
+      <a href="#views" aria-controls="views" role="tab" data-toggle="tab" style="color: #60a22a;"  class="text-center">
+        <div class="bold text-center"><i class="fa fa-eye fa-2x">&#160;</i></div>
+        <div>
+          Views
+          <span class="bold text-center" id="views_tab_count">&#160;</span>
+        </div>        
+      </a>
+    </li>
+    <li role="presentation" class="text-center" style="min-width: 200px;">
+      <a href="#downloads" aria-controls="downloads" role="tab" data-toggle="tab" style="color: #1f78b4;" class="text-center">
+        <div class="bold text-center"><i class="fa fa-download fa-2x">&#160;</i></div>
+        <div>
+     	     Downloads
+			<span class="bold text-center" id="downloads_tab_count">&#160;</span>
+        </div>
+      </a>
+    </li>
+    <li role="presentation" style="min-width: 200px;">
+      <a href="#summary" aria-controls="summary" role="tab" data-toggle="tab" style="color: #888888" class="text-center">
+        <div class="bold text-center"><i class="fa fa-info-circle fa-2x">&#160;</i></div>
+        <div>
+     	     Summary
+		<span class="bold">&#160;</span>
+        </div>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="views" style="padding: 40px;">
+      <div id="visits_over_time_chart" class="jqplot-target">
+        <div id="piwik-loading" style="width: 100%; height: 100%; display: none;">
+          <i class="fa fa-pulse fa-3x" >&#xf110;</i>
+        </div>            
+      </div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="downloads" style="padding: 40px;">
+      <div id="downloads_over_time_chart" class="jqplot-target">
+        <div id="piwik-loading" style="width: 100%; height: 100%; display: none;">
+          <i class="fa fa-pulse fa-3x" >&#xf110;</i>
+        </div>            
+      </div>      
+    </div>
+    <div role="tabpanel" class="tab-pane" id="summary" style="padding: 40px;">
+			<div id="visits_summary_report">
+				<div class="views">&#160;</div>
+				<div class="visits">&#160;</div>
+				<div class="downloads">&#160;</div>
+			</div>      
+    </div>
+  </div>
+
+</div>        
+
+                <!-- div class="panel panel-default">
+                        <div class="panel-heading bold"><i18n:text>xmlui.UFAL.artifactbrowser.piwik.views</i18n:text>
 				<a class="jqplot-to-picture pull-right" href="#" target-div="#visits_over_time_chart">
 					<i class="fa fa-file-image-o">&#160;</i>
 				</a>
@@ -1046,37 +1190,15 @@
                                 </a>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="export-dropdown">
                                         <li role="presentation">
-						<a role="menuitem" tabindex="-1" target="_blank">
-							<xsl:attribute name="href">
-							<xsl:value-of select="$reportURL" />
-                		                        <xsl:text disable-output-escaping="yes">&amp;format=CSV</xsl:text>
-							</xsl:attribute>
-							CSV
-						</a>
-					</li>
-                                        <li role="presentation">
                                                 <a role="menuitem" tabindex="-1" target="_blank">
-                                                        <xsl:attribute name="href">
-                                                        <xsl:value-of select="$reportURL" />
-                                                        <xsl:text disable-output-escaping="yes">&amp;format=TSV</xsl:text>
-                                                        </xsl:attribute>
-                                                        TSV (Excel)
-                                                </a>
-                                        </li>
-                                        <li role="presentation">
-                                                <a role="menuitem" tabindex="-1" target="_blank">
-                                                        <xsl:attribute name="href">
-                                                        <xsl:value-of select="$reportURL" />
-                                                        <xsl:text disable-output-escaping="yes">&amp;format=XML</xsl:text>
-                                                        </xsl:attribute>
+                                                        <xsl:attribute name="href"><xsl:value-of select="$reportURL" /><xsl:text disable-output-escaping="yes">&amp;format=XML</xsl:text></xsl:attribute>
                                                         XML
                                                 </a>
                                         </li>
                                         <li role="presentation">
                                                 <a role="menuitem" tabindex="-1" target="_blank">
                                                         <xsl:attribute name="href">
-                                                        <xsl:value-of select="$reportURL" />
-                                                        <xsl:text disable-output-escaping="yes">&amp;format=JSON</xsl:text>
+	                                                        <xsl:value-of select="$reportURL" />
                                                         </xsl:attribute>
                                                         JSON
                                                 </a>
@@ -1090,7 +1212,6 @@
                         <div id="visits_over_time_chart" class="jqplot-target">
                                 <xsl:attribute name="data-url">
                                         <xsl:value-of select="$reportURL" />
-					<xsl:text disable-output-escaping="yes">&amp;format=JSON</xsl:text>
                                 </xsl:attribute>
                                 <div id="piwik-loading" style="width: 100%; height: 100%; z-index=1; display: none;"><i class="fa fa-pulse fa-3x" >&#xf110;</i></div>
                         </div>
@@ -1102,7 +1223,7 @@
                                 <div class="downloads">&#160;</div>
                         </div>
                         </div>
-                </div>
+                </div-->
 
 		<div id="jqplot-save-as-picture" class="modal fade">
 			<div class="modal-dialog">
@@ -1122,7 +1243,4 @@
 		</div><!-- /.modal -->
         </xsl:template>
 </xsl:stylesheet>
-
-
-
 

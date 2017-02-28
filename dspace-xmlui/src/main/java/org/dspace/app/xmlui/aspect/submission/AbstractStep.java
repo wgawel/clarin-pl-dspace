@@ -56,7 +56,7 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
         message("xmlui.Submission.general.submission.title");
     protected static final Message T_submission_trail = 
         message("xmlui.Submission.general.submission.trail");
-    protected static final Message T_submission_head = 
+    protected static Message T_submission_head =
         message("xmlui.Submission.general.submission.head");
     protected static final Message T_previous = 
         message("xmlui.Submission.general.submission.previous");
@@ -83,6 +83,9 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
         message("xmlui.Submission.general.default.title");
     protected static final Message T_default_trail = 
         message("xmlui.Submission.general.default.trail");
+
+    protected static final Message T_save_share =
+            message("xmlui.Submission.general.submission.save_share");
     
     
     /** Progress Bar Language Strings */
@@ -225,7 +228,7 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
 		if (submission instanceof WorkspaceItem)
 		{
 			pageMeta.addMetadata("title").addContent(T_submission_title);
-	
+
 			Collection collection = submission.getCollection();
 			
 	        pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
@@ -254,6 +257,13 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
         // <UFAL> - include ufal-submission.js
         pageMeta.addMetadata("include-library", "submission");
         // </UFAL>
+        
+		if(this.submission != null && this.submission.getItem() != null){
+			if(this.submission.getItem().getHandle() != null) {
+				pageMeta.addMetadata("handle", "submission").addContent(submission.getItem().getHandle());
+			}
+		}
+        
 	}
 
 
@@ -264,6 +274,9 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
 	 */
 	public void addSubmissionProgressList(Division div) throws WingException
 	{
+		
+		div.addDivision("handle-message", "");
+		
 		// each entry in progress bar is placed under this "submit-progress" div
 		List progress = div.addList("submit-progress",List.TYPE_PROGRESS);
 		
@@ -351,6 +364,8 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
         
         // always show "Save/Cancel"
         actions.addButton(AbstractProcessingStep.CANCEL_BUTTON).setValue(T_save);
+        // always show "Save & Share"
+        actions.addButton(AbstractProcessingStep.SAVE_SHARE_BUTTON).setValue(T_save_share);
         
         // If last step, show "Complete Submission"
         if(isLastStep())

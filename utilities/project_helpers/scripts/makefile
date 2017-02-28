@@ -65,13 +65,11 @@ endif
 # LINDAT/CLARIN specific
 
 LOCAL_CONF              :=$(DIR_SOURCE)/local.properties
-URL_LINDAT_COMMON_GIT   :=https://redmine.ms.mff.cuni.cz/lindat/lindat-common.git
 
 DATABASE_NAME           :=$(shell cd $(BASE) && python setup.lindat.py --get="lr.database" --from="$(LOCAL_CONF)")
 UTILITIES_DATABASE_NAME :=$(shell cd $(BASE) && python setup.lindat.py --get="lr.utilities.database" --from="$(LOCAL_CONF)")
 DB_PORT			:=$(shell cd $(BASE) && python setup.lindat.py --get="lr.database.port" --from="$(LOCAL_CONF)")
-DIR_INSTALLATION        :=$(shell cd $(BASE) && python setup.lindat.py --get="lr.dspace.dir" --from="$(LOCAL_CONF)")
-DIR_LINDAT_COMMON_THEME :=$(shell cd $(BASE) && python setup.lindat.py --get="lr.common.theme" --from="$(LOCAL_CONF)")
+DIR_INSTALLATION        :=$(shell cd $(BASE) && python setup.lindat.py --get="dspace.install.dir" --from="$(LOCAL_CONF)")
 
 DIR_DATABASE_BACKUP         :=$(DIR_INSTALLATION)/../database_backup
 
@@ -86,7 +84,9 @@ DSPACE_MVN_PROJECTS     :=-P 'xpdf-mediafilter-support,!dspace-jspui,!dspace-swo
 
 MVN_ENV			:=local
 
-MVN_OPTS		:=-Dassembly.recompressZippedFiles=false -Dmaven.test.skip=true -Dassembly.ignorePermissions=true -Denforcer.skip=true -Dfork=true -Denv=$(MVN_ENV) $(DSPACE_MVN_PROJECTS) -P '!generate-test-env'
+MVN_OPTS_BASE	:=-Dassembly.recompressZippedFiles=false -Dassembly.ignorePermissions=true -Denforcer.skip=true -Dfork=true -Denv=$(MVN_ENV)
+MVN_OPTS		:=$(MVN_OPTS_BASE) -Dmaven.test.skip=true $(DSPACE_MVN_PROJECTS) -P '!generate-test-env'
+MVN_OPTS_TEST	:=$(MVN_OPTS_BASE) -Dmaven.test.skip=false $(DSPACE_MVN_PROJECTS) -B
 
 # makefile specific
 
@@ -173,13 +173,18 @@ clean_installation:
 	@cd $(DIR_BUILD) && $(ANT_WITH_CONF) clean_backups 2>&1 | $(HIDE_PASSW) | tee  $(DIR_DEPLOY_LOGS)/$@.log
 	
 compile: deploy_logs
+	@if [[ -f $@.sh ]]; then echo "Running customised $@"; bash $@.sh; fi 
 	@echo "COMPILING SOURCE ..."
 	@echo "Updating lr.compile.time..."
 	@if grep -q "lr\.compile\.time" $(LOCAL_CONF);then sed --follow-symlinks -i'' "s/^lr\.compile\.time=.*/lr.compile.time=`date`/" $(LOCAL_CONF); else echo -e "$(RED)Compile time not updated$(NORMAL)";fi
-	@cd $(DIR_SOURCE) && mvn $(MVN_OPTS) package 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log
+	@cd $(DIR_SOURCE) && mvn clean package $(MVN_OPTS) 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log
 	@echo ""
 	@if grep -q "BUILD FAILURE" $(DIR_DEPLOY_LOGS)/compile.log; then \
 	        echo -e "$(RED)compile.log contains BUILD FAILURE, exiting$(NORMAL)" && exit -1; fi
+
+tests:
+	@echo "UNIT TESTING ..."
+	@cd $(DIR_SOURCE) && mvn $(MVN_OPTS_TEST) -Dlog4j.configuration=file:$(DIR_INSTALLATION)/config/log4j-console.properties test
 
 install:        print_message \
                 test_databases \
@@ -190,23 +195,26 @@ install_guru:   print_message \
                 install_dspace
 
 install_dspace: 
+	@if test -L $(DIR_LINDAT_THEME_IN_WEBAPPS); then unlink $(DIR_LINDAT_THEME_IN_WEBAPPS); fi
 	@echo "DEPLOYING CLARIN-PL DSpace ..."
-	@cd $(DIR_BUILD) &&  $(ANT_WITH_CONF) update 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log 
+	@cd $(DIR_BUILD) &&  $(ANT_WITH_CONF) update 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log
 	@$(MAKE) clean_installation
 	@echo "INSTALLATION SUCCESSFUL ..."
 
-postinstall: update_lindat_common
+postinstall:
+	@$(MAKE) update_lindat_common
 	@$(MAKE) grant_rights
+	@if [[ -f $@.sh ]]; then echo "Running customised $@"; bash $@.sh; fi 
 	@echo "DEPLOYMENT (INSTALL + POSTINSTALL) SUCCESSFUL"
 
-fresh_install: update_lindat_common
+fresh_install:
 	@echo "INSTALLING FRESH CLARIN-PL DSpace ..."
-	@cd $(DIR_BUILD) && $(ANT_WITH_CONF) fresh_install 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log 
+	@cd $(DIR_BUILD) && $(ANT_WITH_CONF) fresh_install 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log
 
 # Grant rights to installation
 grant_rights:
-	sudo chown -R $(TOMCAT_USER):$(TOMCAT_GROUP) $(DIR_INSTALLATION)/
-	sudo chmod -R g+w $(DIR_INSTALLATION)/
+	chown -RL $(TOMCAT_USER):$(TOMCAT_GROUP) $(DIR_INSTALLATION)/
+	chmod -R g+w $(DIR_INSTALLATION)/
 	
 # maven uses prerequisites to check for mvn version
 # keep this here for non _guru builds
@@ -229,22 +237,26 @@ test_dspace_database:
 	@cd $(DIR_BUILD) && $(ANT_WITH_CONF) -logger org.apache.tools.ant.listener.AnsiColorLogger test_database | $(HIDE_PASSW)
 
 test_utilities_database: 
-	@cd $(DIR_INSTALLATION)/bin && ./dspace dsrun "cz.cuni.mff.ufal.lindat.utilities.HibernateFunctionalityManager" "$(DIR_INSTALLATION)"
+	@cd $(DIR_INSTALLATION)/bin && JAVA_OPTS="-Dlog4j.configuration=file:$(DIR_INSTALLATION)/config/log4j-console.properties -Xmx1024m -Dfile.encoding=UTF-8" ./dspace dsrun "cz.cuni.mff.ufal.lindat.utilities.HibernateFunctionalityManager" "$(DIR_INSTALLATION)"
 
 test_databases: test_utilities_database test_dspace_database
 
 create_databases:
-	@echo "CREATING DSpace DATABASE .."
-	sudo -u postgres createdb -p $(DB_PORT) "$(DATABASE_NAME)" --owner $(DSPACE_DATABASE_USER) --encoding "UTF-8" --template=template0
-	@echo "CREATING UTILITIES DATABASE ..."
-	sudo -u postgres createdb -p $(DB_PORT) "$(UTILITIES_DATABASE_NAME)" --owner $(DSPACE_DATABASE_USER) --encoding "UTF-8" --template=template0
-	@echo "CREATING CUSTOM SQL FILE (with proper database user) ..."
-	@sed -e s/dspace\;/$(DSPACE_DATABASE_USER)\;/ $(DIR_UTILITIES)/utilities.sql > $(DIR_UTILITIES)/utilities.sql.temp
-	@echo "RUN SQL ..."
-	sudo -u postgres psql -p $(DB_PORT) $(UTILITIES_DATABASE_NAME) < $(DIR_UTILITIES)/utilities.sql.temp
-	@echo "REMOVE CUSTOM SQL FILE ..."
-	@rm $(DIR_UTILITIES)/licenses.sql.temp
-	@echo "DONE"
+ifeq ("${CI}", "true")
+			@echo "CREATING DSpace DATABASE .."
+			createdb --username=postgres  -p $(DB_PORT) "$(DATABASE_NAME)" --owner $(DSPACE_USER) --encoding "UTF-8" --template=template0
+			@echo "CREATING UTILITIES DATABASE ..."
+			createdb --username postgres  -p $(DB_PORT) "$(UTILITIES_DATABASE_NAME)" --owner $(DSPACE_USER) --encoding "UTF-8" --template=template0
+			psql --username postgres  --set=utildir="$(DIR_UTILITIES)" -p $(DB_PORT) $(UTILITIES_DATABASE_NAME) < $(DIR_UTILITIES)/utilities.sql
+			@echo "DONE"
+else
+			@echo "CREATING DSpace DATABASE .."
+			sudo -u postgres createdb -p $(DB_PORT) "$(DATABASE_NAME)" --owner $(DSPACE_USER) --encoding "UTF-8" --template=template0
+			@echo "CREATING UTILITIES DATABASE ..."
+			sudo -u postgres createdb -p $(DB_PORT) "$(UTILITIES_DATABASE_NAME)" --owner $(DSPACE_USER) --encoding "UTF-8" --template=template0
+			sudo -u postgres psql --set=utildir="$(DIR_UTILITIES)" -p $(DB_PORT) $(UTILITIES_DATABASE_NAME) < $(DIR_UTILITIES)/utilities.sql
+			@echo "DONE"
+endif
 
 #update utilities database
 #dspace5+ db updated through flywaydb only!
@@ -288,7 +300,6 @@ update_themes:
 #======================================================
 # lindat theme related
 #
-
 check_lindat_common:
 	@echo "[CLARIN-PL] Skip 'check_lindat_common'"
 #	@echo "Checking lindat common theme into $(DIR_LINDAT_COMMON_THEME)... "
@@ -298,7 +309,6 @@ update_lindat_common:
 	@echo "[CLARIN-PL] Skip 'update_lindat_common'"
 #	check_lindat_common
 #	cd $(DIR_LINDAT_COMMON_THEME) && $(LINDAT_COMMON_THEME_FETCH)
-
 
 #======================================================
 # webserver&co. related
@@ -355,7 +365,7 @@ lift_embargos:
 
 # This command creates and sends repository report
 send_info:
-	$(DSPACE_BIN) ufal-info -e default
+	$(DSPACE_BIN) healthcheck -e info.recipient
 
 update_oai:
 	LC_ALL=en_US.UTF-8 $(DSPACE_BIN) oai import
@@ -426,3 +436,5 @@ migrate_databases:
 	./migrate_db.sh $(DATABASE_NAME)
 	./migrate_db.sh $(UTILITIES_DATABASE_NAME)
 
+generate_piwik_reports:
+	LC_ALL=en_US.UTF-8 $(DSPACE_BIN) piwik-report-generator

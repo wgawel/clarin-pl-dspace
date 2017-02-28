@@ -10,6 +10,7 @@ package cz.cuni.mff.ufal.dspace.b2safe;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,11 +34,10 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 
-import _org.irods.jargon.core.connection.IRODSServerProperties;
-import _org.irods.jargon.core.connection.SettableJargonProperties;
-import cz.cuni.mff.ufal.b2safe.ReplicationService;
-import cz.cuni.mff.ufal.b2safe.ReplicationServiceIRODSImpl;
-import cz.cuni.mff.ufal.dspace.b2safe.ReplicationManager.MANDATORY_METADATA;
+import fr.cines.eudat.repopack.b2safe_rp_core.AVUMetaData;
+import fr.cines.eudat.repopack.b2safe_rp_core.DataObject;
+import fr.cines.eudat.repopack.b2safe_rp_core.DataSet;
+import fr.cines.eudat.repopack.b2safe_rp_core.DataSet.B2SAFE_CONFIGURATION;
 
 /**
  * This class is responsible for managing replication. It should be called
@@ -53,47 +53,53 @@ import cz.cuni.mff.ufal.dspace.b2safe.ReplicationManager.MANDATORY_METADATA;
  */
 @SuppressWarnings("deprecation")
 public class ReplicationManager {
-	
+		
 	static final Logger log = Logger.getLogger(ReplicationManager.class);
 
 	static boolean replicationOn = ConfigurationManager.getBooleanProperty("lr", "lr.replication.eudat.on", false);
-	
-	static final String NOTIFICATION_EMAIL = ConfigurationManager.getProperty("lr", "lr.replication.eudat.notification_email");
-	static final String WHO = ConfigurationManager.getProperty("dspace.url");
-	
-	static ReplicationService replicationService = null;
+		
+	static DataSet replicationService = null;
+		
+	static Properties config = null;
 	
 	public static final List<String> replicationQueue = new ArrayList();
 	public static final List<String> inProgress = new ArrayList<String>();
 	public static final Map<String, Exception> failed = new HashMap<String, Exception>();
 	
+	public static final String replicadirectory = ConfigurationManager.getProperty("lr", "lr.replication.eudat.replicadirectory");
 	
 	private static boolean replicateAll = ConfigurationManager.getBooleanProperty("lr", "lr.replication.eudat.replicateall", false);
 	
 	//only one replication job at a time
-	private static ExecutorService executor = Executors.newFixedThreadPool(1);
-	
-	// mandatory from CINES: EUDAT_ROR, OTHER_From, OTHER_AckEmail
-	public enum MANDATORY_METADATA {
-		EUDAT_ROR,
-		OTHER_From,
-		OTHER_AckEmail
-	}
-	
-	static Properties config = null;
+	private static ExecutorService executor = Executors.newFixedThreadPool(1);	
 
-	public static boolean initialize() throws Exception {
-		boolean res = false;
+	public static boolean initialize() {
+		if(ReplicationManager.isInitialized()){
+			return true;
+		}
 		config = new Properties();
 		populateConfig(config);
-		replicationService = new ReplicationServiceIRODSImpl();
-		res = replicationService.initialize(config);
-		overrideJargonProperties(((ReplicationServiceIRODSImpl)replicationService).getSettableJargonProperties());
-		
-		// run the replicate all background thread 
-		ReplicateAllBackgroundThread.initiate();
-		
-		return res;
+
+		// jargon specific
+		String maxThreads = ConfigurationManager.getProperty(
+				"lr", "lr.replication.jargon.numThreads");
+		// must be set or b2_core crashes
+		if (null == maxThreads) {
+			maxThreads = "1";
+		}
+		if (null != maxThreads) {
+			config.put(B2SAFE_CONFIGURATION.IRODS_TRANSFER_MAX_THREADS.name(), maxThreads);
+		}
+
+		replicationService = new HackedDataSet(config);
+		if(!replicationService.initB2safeConnection()){
+			//imo DataSet should do a proper cleanup
+			replicationService.closeConnection();
+			replicationService = null;
+			return false;
+		}else {
+			return true;
+		}
 	}
 	
 	public static Properties getConfiguration(){
@@ -112,24 +118,60 @@ public class ReplicationManager {
 		return replicationOn;
 	}
 
+	//fixme shouldn't the connection be opened/closed with this flag? Also the executor should be terminated
 	public static void setReplicationOn(boolean flag) {
 		replicationOn = flag;
 	}
 
-	public static List<String> list() throws Exception {
-		return replicationService.list();
+
+	/**
+	 * List all the file names inside configured directory homedir/replicadir
+	 * @return
+	 */
+	public static List<String> listFilenames() {
+		return listFilenames(replicadirectory, false);
 	}
 
-	public static List<String> list(boolean returnAbsPath) throws Exception {
-		return replicationService.list(returnAbsPath);
+	/**
+	 * List filenames of replicated DOs.
+	 * @param remotePath is relative to homedir if not absolute
+	 * @param isAbsolute
+	 * @return
+	 */
+	public static List<String> listFilenames(String remotePath, boolean isAbsolute) {
+		List<DataObject> dos = list(remotePath, isAbsolute);
+		List<String> fileNames = new ArrayList<String>();
+		for(DataObject one_do : dos) {
+			String name = one_do.getFileName();
+			fileNames.add(name);
+		}
+		return fileNames;
 	}
 
-	public static List<String> list(String remoteDirectory, boolean returnAbsPath) throws Exception {
-		return replicationService.list(remoteDirectory, returnAbsPath);
+	/**
+	 * Just a wrapper around DataSet.lisDOFromDirectory(String, boolean)
+	 * @param remotePath
+	 * @param isAbsolute
+	 * @return
+	 */
+	public static List<DataObject> list(String remotePath, boolean isAbsolute){
+		return replicationService.listDOFromDirectory(remotePath, isAbsolute);
 	}
 
-	public static List<String> listMissingReplicas() throws Exception {
-		List<String> alreadyReplicatedItems = replicationService.list();
+	/**
+	 * List DOs from the configured homedir/replicadir
+	 * @return
+	 */
+	public static List<DataObject> list(){
+		return list(replicadirectory, false);
+	}
+
+	/**
+	 * Returns handles of items not found in the replicadirectory
+	 * @return
+	 */
+	public static List<String> listMissingReplicas() throws SQLException{
+		List<String> alreadyReplicatedItems = listFilenames();
 		List<String> allPublicItems = getPublicItemHandles();
 		List<String> notFound = new ArrayList<String>();
 		for(String publicItem : allPublicItems) {
@@ -140,39 +182,144 @@ public class ReplicationManager {
 		return notFound; 
 	}
 	
-	public static List<String> search(Map<String, String> metadata) throws Exception {
-		return replicationService.search(metadata);
-	}
-
+	/**
+	 * Return metadata map of the specified fileName. The file should be in replicadirectory
+	 * @param fileName
+	 * @return
+	 */
 	public static Map<String, String> getMetadataOfDataObject(
-			String dataObjectAbsolutePath) throws Exception {
-		return replicationService.getMetadataOfDataObject(dataObjectAbsolutePath);
+			String fileName){
+		return getMetadataOfDataObject(fileName, replicadirectory, false);
 	}
 
-	
-	public static boolean delete(String path) throws Exception  {
-		return replicationService.delete(path);
+	/**
+	 * Return metadata map for file in remoteDir (possibly absolute path)
+	 * @param fileName
+	 * @param remoteDir
+	 * @param isAbsolute
+	 * @return
+	 */
+	public static Map<String, String> getMetadataOfDataObject(String fileName, String remoteDir, boolean isAbsolute){
+		DataObject one_do = new DataObject();
+		one_do.setRemoteDirPath(remoteDir);
+		one_do.setRemoteDirPathIsAbsolute(isAbsolute);
+		one_do.setFileName(fileName);
+		one_do = replicationService.getMetadataFromOneDOByPath(one_do);
+		return getMetadataMap(one_do);
 	}
 
-	public static void retriveFile(String remoteFileName, String localFileName) throws Exception {
-		replicationService.retriveFile(remoteFileName, localFileName);
+	/**
+	 * Returns the values of AVUMetadata, keys stays the same attribute and unit is ignored
+	 * @param one_do
+	 * @return
+	 * @throws Exception
+	 */
+	private static Map<String, String> getMetadataMap(
+			DataObject one_do) {
+		Map<String, AVUMetaData> m = one_do.getEudatMetadata();
+		Map<String, String> ret = new HashMap<String, String>();
+		for (Map.Entry<String, AVUMetaData> entry : m.entrySet()) {
+			ret.put(entry.getKey(), entry.getValue().getValue());
+		}
+		return ret;
 	}
 
+
+	/**
+	 * Delete file from replicadirectory
+	 * seeing JargonException caught and logged on delete:No access to item in catalog
+	 * org.irods.jargon.core.exception.CatNoAccessException: No access to item in catalog
+	 * might mean insufficient rights.
+	 * @param fileName
+	 * @return
+	 */
+	public static boolean delete(String fileName) {
+		return delete(fileName, replicadirectory, false);
+	}
+
+	/**
+	 * Delete file from remoteDir (possibly absolute path)
+	 * seeing JargonException caught and logged on delete:No access to item in catalog
+	 * org.irods.jargon.core.exception.CatNoAccessException: No access to item in catalog
+	 * might mean insufficient rights.
+	 * @param fileName
+	 * @param remoteDir
+	 * @param isAbsolute
+	 * @return
+	 */
+	public static boolean delete(String fileName, String remoteDir, boolean isAbsolute){
+        DataObject one_do = new DataObject();
+        one_do.setFileName( fileName );
+        one_do.setRemoteDirPath( remoteDir );
+        one_do.setRemoteDirPathIsAbsolute( isAbsolute );
+        one_do = replicationService.deleteDO(one_do);
+        return one_do.getOperationIsSuccess();
+	}
+
+	/**
+	 * Remote DO to be retrieved is identified by the fileName and the remoteDir.
+	 * The remoteDir might be absolute.
+	 * The local copy is stored in localDir directory
+	 * @param fileName
+	 * @param remoteDir
+	 * @param isAbsolute
+	 * @param localDir
+	 */
+	public static void retrieveFile(String fileName, String remoteDir, boolean isAbsolute, String localDir) {
+        DataObject one_do = new DataObject();
+		one_do.setFileName(fileName);
+		one_do.setRemoteDirPath(remoteDir);
+		one_do.setRemoteDirPathIsAbsolute(isAbsolute);
+		one_do.setLocalFilePath(localDir);
+		replicationService.retrieveOneDOByPath(one_do);
+	}
+
+	/**
+	 * Retrieve a f ile from replicadir and store it in localDir
+	 * @param fileName
+	 * @param localDir
+	 */
+	public static void retrieveFile(String fileName, String localDir){
+		retrieveFile(fileName, replicadirectory, false, localDir);
+	}
+
+	//fixme neither replicateMissing is ever called
 	public static void replicateMissing(Context context) throws Exception {
+		//fixme the -1 is odd
 		replicateMissing(context, -1);
 	}
 
 	public static void replicateMissing(Context c, int max) throws Exception {
-		for (String handle : listMissingReplicas()) {
-			if(failed.containsKey(handle) || inProgress.contains(handle)) continue;
-			if (max-- <= 0) return;						
-			DSpaceObject dso = HandleManager.resolveToObject(c, handle);
-			replicate(c, handle, (Item) dso);
+		for (String handle : listMissingReplicas()) {			
+			if (max-- <= 0) {
+				return;
+			}			
+			replicate(handle);
 		}
 	}
 
 
-	// Must be PUB without embargo.
+
+	public static boolean isReplicatable(String handle){
+		Context context = null;
+		boolean ret = false;
+		try{
+			context = new Context();
+			Item item = (Item)HandleManager.resolveToObject(context, handle);
+			ret = isReplicatable(item);
+		}catch (SQLException e){
+			log.error(e);
+		}
+		if(context != null) {
+			context.abort();
+		}
+		return ret;
+	}
+	/**
+	 * Must be PUB without embargo.
+	 * @param item
+	 * @return
+	 */
 	public static boolean isReplicatable(Item item) {
 		
 		Context context = null;
@@ -180,7 +327,7 @@ public class ReplicationManager {
 		try {
 			
 			context = new Context();
-	
+
 			// not even public
 			if (!isPublic(item)) {
 				return false;
@@ -227,7 +374,7 @@ public class ReplicationManager {
 		return false;
 	}
 	
-	public static ReplicationService getReplicationSerice() {
+	public static DataSet getReplicationService() {
 		return replicationService;
 	}
 
@@ -259,13 +406,12 @@ public class ReplicationManager {
 		return handles;
 	}
 
-	public static void replicate(Context context, String handle, Item item) throws UnsupportedOperationException, SQLException {
-		replicate(context, handle, item, false);
+	public static void replicate(String handle) throws UnsupportedOperationException, SQLException {
+		replicate(handle, false);
 	}
 
-	public static void replicate(Context context, String handle, Item item, boolean force) throws UnsupportedOperationException, SQLException {
-		
-		//If replication queue still contains this handle remove it
+	public static void replicate(String handle, boolean force) throws UnsupportedOperationException, SQLException {
+		//fixme DataSet doesn't allow passing the force flag, can't be overridden without use of reflections
 		ReplicationManager.replicationQueue.remove(handle);
 		
 		// not set up
@@ -282,18 +428,18 @@ public class ReplicationManager {
 			throw new UnsupportedOperationException(msg);
 		}
 
-		if (!isReplicatable(item)) {
+		if (!isReplicatable(handle)) {
 			String msg = String.format("Cannot replicate non-public item [%s]", handle);
 			log.warn(msg);
 			throw new UnsupportedOperationException(msg);
 		}
-		
-		Thread runner = new Thread(new ReplicationThread(context, handle, item, force));
+
+		Thread runner = new Thread(new ReplicationThread(handle, force));
 		runner.setPriority(Thread.MIN_PRIORITY);
 		runner.setDaemon(true);
-		
+		//don't start the thread if using executors
+		//runner.start();
 		executor.submit(runner);
-
 	}
 
     public static String handleToFileName(String handle) {
@@ -301,38 +447,28 @@ public class ReplicationManager {
     }
     
     static void populateConfig(Properties config) {
-    	config.put(ReplicationServiceIRODSImpl.CONFIGURATION.HOST.name(), ConfigurationManager.getProperty("lr", "lr.replication.eudat.host"));
-		config.put(ReplicationServiceIRODSImpl.CONFIGURATION.PORT.name(), ConfigurationManager.getProperty("lr", "lr.replication.eudat.port"));
-		config.put(ReplicationServiceIRODSImpl.CONFIGURATION.USER_NAME.name(), ConfigurationManager.getProperty("lr", "lr.replication.eudat.username"));
-		config.put(ReplicationServiceIRODSImpl.CONFIGURATION.PASSWORD.name(), ConfigurationManager.getProperty("lr", "lr.replication.eudat.password"));
-		config.put(ReplicationServiceIRODSImpl.CONFIGURATION.HOME_DIRECTORY.name(), ConfigurationManager.getProperty("lr", "lr.replication.eudat.homedirectory"));
-		config.put(ReplicationServiceIRODSImpl.CONFIGURATION.ZONE.name(), ConfigurationManager.getProperty("lr", "lr.replication.eudat.zone"));
-		config.put(ReplicationServiceIRODSImpl.CONFIGURATION.DEFAULT_STORAGE.name(), ConfigurationManager.getProperty("lr", "lr.replication.eudat.defaultstorage"));
-		config.put(ReplicationServiceIRODSImpl.CONFIGURATION.REPLICA_DIRECTORY.name(), ConfigurationManager.getProperty("lr", "lr.replication.eudat.replicadirectory"));
-    }
-
-    public static void overrideJargonProperties(SettableJargonProperties properties) {
-        String maxThreads = ConfigurationManager.getProperty("lr", "lr.replication.jargon.numThreads");
-        
-        if(maxThreads!=null) {
-        	try{
-        		properties.setMaxParallelThreads(Integer.parseInt(maxThreads));
-        	}catch(Exception ex) {        		
-        	}
-        }
-        
+		config.put(B2SAFE_CONFIGURATION.B2SAFE_TRANS_PROTOCOL.name(),
+		        ConfigurationManager.getProperty("lr", "lr.replication.eudat.protocol"));
+		config.put(B2SAFE_CONFIGURATION.HOST.name(),
+		    ConfigurationManager.getProperty("lr", "lr.replication.eudat.host"));
+		config.put(B2SAFE_CONFIGURATION.PORT.name(),
+		    ConfigurationManager.getProperty("lr", "lr.replication.eudat.port"));
+		config.put(B2SAFE_CONFIGURATION.USER_NAME.name(),
+		    ConfigurationManager.getProperty("lr", "lr.replication.eudat.username"));
+		config.put(B2SAFE_CONFIGURATION.PASSWORD.name(),
+		    ConfigurationManager.getProperty("lr", "lr.replication.eudat.password"));
+		config.put(B2SAFE_CONFIGURATION.HOME_DIRECTORY.name(),
+		    ConfigurationManager.getProperty("lr", "lr.replication.eudat.homedirectory"));
+		config.put(B2SAFE_CONFIGURATION.ZONE.name(),
+		    ConfigurationManager.getProperty("lr", "lr.replication.eudat.zone"));
+		config.put(B2SAFE_CONFIGURATION.DEFAULT_STORAGE.name(),
+		    ConfigurationManager.getProperty("lr", "lr.replication.eudat.defaultstorage"));		
+		config.put(B2SAFE_CONFIGURATION.RESOURCE_ID.name(),
+		    ConfigurationManager.getProperty("lr", "lr.replication.eudat.id"));
     }
     
     public static Map<String, String> getServerInformation() {
-    	Map<String, String> info = new HashMap<String, String>();
-    	IRODSServerProperties serverProperties = ((ReplicationServiceIRODSImpl)replicationService).gerIRODSServerProperties();
-    	info.put("JARGON_VERSION", IRODSServerProperties.getJargonVersion());    	
-    	info.put("API_VERSION", serverProperties.getApiVersion());
-    	info.put("REL_VERSION", serverProperties.getRelVersion());
-    	info.put("RODS_ZONE", serverProperties.getRodsZone());
-    	info.put("INITIALIZE_DATE", serverProperties.getInitializeDate().toString());
-    	info.put("SERVER_BOOT_TIME", "" + serverProperties.getServerBootTime());
-    	info.put("ICAT_ENABLED", serverProperties.getIcatEnabled().toString());    	
+    	Map<String, String> info = replicationService.getServerInformation();
     	return info;
     }
     
@@ -349,66 +485,39 @@ public class ReplicationManager {
     public static boolean isReplicateAllOn() {
     	return replicateAll;
     }
-    
+
     @Override
     protected void finalize() throws Throwable {
     	super.finalize();
     	executor.shutdown();
     }
-    
 } // class
 
 @SuppressWarnings("deprecation")
 class ReplicationThread implements Runnable {
 	
 	String handle;
-	int itemId;	
 	boolean force;
-	Context context;
-	
-	public ReplicationThread(Context context, String handle, Item item, boolean force) {
-		this.context = context;
+
+	public ReplicationThread(String handle, boolean force) {
 		this.handle = handle;
-		this.itemId = item.getID();
 		this.force = force;
 	}
 
-	public Item waitForDspaceItem(Context context) {
-		Item item = null;
-		// loop for few secs
-		for (int i = 0; i < 20; ++i) {
-			// sleep 1 sec
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException ex) {
-				Thread.currentThread().interrupt();
-			}
-			try {
-				item = Item.find(context, itemId);
-				if (item.getOwningCollection()!=null && item.isArchived()) {
-					break;
-				}
-			} catch (SQLException e) {
-			}
-		}
-
-		return item;
-	}
-
 	public void run() {
+		Context context = null;
 		try {
-			
+
+			context = new Context();
+			Item item = (Item) HandleManager.resolveToObject(context, handle);
 			//If retrying a failed item removed from failed
 			if(ReplicationManager.failed.containsKey(handle)) ReplicationManager.failed.remove(handle);						
 			ReplicationManager.inProgress.add(handle);
-			ReplicationManager.log.info("Replication started for item: " + handle);			
+			ReplicationManager.log.info("Replication started for item: " + handle);	
 			
 			context.turnOffAuthorisationSystem();
 			ReplicationManager.log.info("Replicating to IRODS");
 
-			// wait for DSpace for submitting the item
-			// should not be needed with the new event listener - investigate!
-			Item item = waitForDspaceItem(context);
 			if (handle == null) {
 				handle = item.getHandle();
 			}
@@ -428,9 +537,7 @@ class ReplicationThread implements Runnable {
 
 			// AIP failure
 			if (!file.exists()) {
-				Exception e = new IOException(String.format("AIP package has not been created [%s]", file.getCanonicalPath()));
-				ReplicationManager.failed.put(handle, e);
-				throw e;
+				throw new IOException(String.format("AIP package has not been created [%s]", file.getCanonicalPath()));
 			}
 
 			// replicate
@@ -439,24 +546,25 @@ class ReplicationThread implements Runnable {
 				throw new RuntimeException("dc.identifier.uri is missing for item " + item.getHandle());
 			}
 			String itemUrl = mdURI[0].value;
-			Map<String, String> metadata = new HashMap<String, String>();
-			metadata.put(MANDATORY_METADATA.EUDAT_ROR.name(), itemUrl);
-			metadata.put(MANDATORY_METADATA.OTHER_From.name(), ReplicationManager.WHO);
-			metadata.put(MANDATORY_METADATA.OTHER_AckEmail.name(), ReplicationManager.NOTIFICATION_EMAIL);
-			
-			ReplicationManager.getReplicationSerice().replicate(file.getAbsolutePath(), metadata, force);
-			ReplicationManager.log.info("Replication finished: " + handle);
-			ReplicationManager.inProgress.remove(handle);			
-		} catch (Exception e) {			
+            DataObject one_do = new DataObject();
+            one_do.setRor(itemUrl);
+            one_do.setLocalFilePath(file.getAbsolutePath());
+            one_do.setFileName(file.getName());
+            one_do.setRemoteDirPath(ReplicationManager.replicadirectory);
+            one_do.setRemoteDirPathIsAbsolute(false);			
+            ReplicationManager.getReplicationService().replicateOneDO(one_do);
+            ReplicationManager.log.info("Replication finished: " + handle);
+			ReplicationManager.inProgress.remove(handle);	            
+		} catch (Exception e) {
 			ReplicationManager.log.error(String.format("Could not replicate [%s] [%s]", this.handle, e.toString()), e);
 			ReplicationManager.inProgress.remove(handle);
-			ReplicationManager.failed.put(handle, e);
+			ReplicationManager.failed.put(handle, e);			
 		}
 
 		try {
 			if (context != null) {
 				context.restoreAuthSystemState();
-				context.commit();
+				context.complete();
 			}
 		} catch (SQLException e) {
 		}
@@ -474,20 +582,11 @@ class ReplicationThread implements Runnable {
 	}
 }
 
-
 class ReplicateAllBackgroundThread extends Thread {
 
 	private static ReplicateAllBackgroundThread currentThread = null;	
 	
-	private Context context = null;
-	
 	private ReplicateAllBackgroundThread() {
-		try {
-			this.context = new Context();
-			this.context.setCurrentUser(EPerson.find(context, 1));
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	public static void initiate() {
@@ -519,8 +618,7 @@ class ReplicateAllBackgroundThread extends Thread {
 				String handle = ReplicationManager.replicationQueue.remove(0);
 				
 				if(ReplicationManager.failed.containsKey(handle) || ReplicationManager.inProgress.contains(handle)) continue;
-				DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-				ReplicationManager.replicate(context, handle, (Item) dso);
+				ReplicationManager.replicate(handle);
 				
 				try {
 					//wait for few seconds before starting next item 
@@ -540,15 +638,8 @@ class ReplicateAllBackgroundThread extends Thread {
 				ReplicationManager.log.error(e);
 			}
 		}
-		
-		try {
-			context.complete();
-		} catch (SQLException e) {
-			ReplicationManager.log.error(e);
-		}
-		currentThread = null;		
+		currentThread = null;
 		ReplicationManager.setReplicateAll(false);
 		
 	}
-	
 }

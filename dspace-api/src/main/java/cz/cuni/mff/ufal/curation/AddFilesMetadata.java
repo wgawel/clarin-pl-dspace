@@ -1,13 +1,13 @@
 /* Created for LINDAT/CLARIN */
 package cz.cuni.mff.ufal.curation;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.curate.AbstractCurationTask;
 import org.dspace.curate.Curator;
+
+import java.io.IOException;
 
 public class AddFilesMetadata extends AbstractCurationTask {
 

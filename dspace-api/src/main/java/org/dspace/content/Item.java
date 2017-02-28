@@ -25,25 +25,26 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.IndexBrowse;
+import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.ChoiceAuthorityManager;
-import org.dspace.event.Event;
 import org.dspace.embargo.EmbargoManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
 import org.dspace.identifier.IdentifierException;
 import org.dspace.identifier.IdentifierService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.VersioningService;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Class representing an item in DSpace.
@@ -270,7 +271,7 @@ public class Item extends DSpaceObject
         }
 
         String query = "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' " +
-                "AND item.item_id = metadatavalue.resource_id AND metadata_field_id = ?";
+                "AND item.item_id = metadatavalue.resource_id AND metadatavalue.resource_type_id=2 AND metadata_field_id = ?";
         TableRowIterator rows = null;
         if (Item.ANY.equals(authority)) {
             rows = DatabaseManager.queryTable(context, "item", query, mdf.getFieldID());
@@ -550,6 +551,47 @@ public class Item extends DSpaceObject
         }
         modified = true;
     }
+    
+    /**
+     * Change the e-person.
+     * This is a public method since it is handled by the WorkspaceItem class
+     * in the ingest package. <code>update</code> must be called to write
+     * the change to the database.
+     *
+     * @param sub
+     *            the submitter
+     */
+    public void changeSubmitter(EPerson sub) throws SQLException, AuthorizeException
+    {
+        submitter = sub;
+
+        if (submitter != null)
+        {
+            itemRow.setColumn("submitter_id", submitter.getID());
+        }
+        else
+        {
+            itemRow.setColumnNull("submitter_id");
+        }
+        
+        
+        // changing policies to new owner
+        List<ResourcePolicy> oldPolicies = AuthorizeManager.getPolicies(ourContext, this);
+        for(Bundle bundle : this.getBundles()){
+            oldPolicies.addAll(AuthorizeManager.getPolicies(ourContext, bundle));
+            for(Bitstream bitstream : bundle.getBitstreams()){
+                oldPolicies.addAll(AuthorizeManager.getPolicies(ourContext, bitstream));
+            }
+        }
+        for(ResourcePolicy policy : oldPolicies) {
+        	if(policy.getEPerson()!=null) {
+        		policy.setEPerson(submitter);
+        		policy.update();
+        	}
+        }        
+                
+        modified = true;
+    }    
 
     /**
      * See whether this Item is contained by a given Collection.
@@ -1074,7 +1116,7 @@ public class Item extends DSpaceObject
     {
         // Check authorisation
         // only do write authorization if user is not an editor
-        if (!canEdit())
+        if (!canEdit() && !canEditMetadata())
         {
             AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
         }
@@ -1119,21 +1161,31 @@ public class Item extends DSpaceObject
             }
         }
         
+        int totalNumberOfFiles = 0;
+        long totalSizeofFiles = 0;
+        
         /* Add local.has.files metadata */
         boolean hasFiles = false;
         Bundle[] origs = getBundles("ORIGINAL");
         for(Bundle orig : origs) {
         	if(orig.getBitstreams().length > 0) {
         		hasFiles = true;
-        		break;
+        	}        	
+        	for(Bitstream bit : orig.getBitstreams()) {
+        		totalNumberOfFiles ++;
+        		totalSizeofFiles += bit.getSize();
         	}
         }
         clearMetadata("local", "has", "files", Item.ANY);
+        clearMetadata("local", "files", "count", Item.ANY);
+        clearMetadata("local", "files", "size", Item.ANY);
         if(hasFiles) {
         	addMetadata("local", "has", "files", Item.ANY, "yes");
         } else {
         	addMetadata("local", "has", "files", Item.ANY, "no");
         }
+        addMetadata("local", "files", "count", Item.ANY, "" + totalNumberOfFiles);
+        addMetadata("local", "files", "size", Item.ANY, "" + totalSizeofFiles);
 
         if (modifiedMetadata || modified)
         {
@@ -1226,15 +1278,15 @@ public class Item extends DSpaceObject
 
         ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(),
                 "WITHDRAW", getIdentifiers(ourContext)));
-        
-		new DSpace().getEventService().fireEvent(
-				new UsageEvent(UsageEvent.Action.WITHDRAW, new DSpace()
-						.getRequestService().getCurrentRequest()
-						.getHttpServletRequest(), ourContext, this));
-			
 
-        // remove all authorization policies, saving the custom ones
-        AuthorizeManager.removeAllPoliciesByDSOAndTypeNotEqualsTo(ourContext, this, ResourcePolicy.TYPE_CUSTOM);
+        // switch all READ authorization policies to WITHDRAWN_READ
+		AuthorizeManager.switchPoliciesAction(ourContext, this, Constants.READ, Constants.WITHDRAWN_READ);
+		for (Bundle bnd : this.getBundles()) {
+			AuthorizeManager.switchPoliciesAction(ourContext, bnd, Constants.READ, Constants.WITHDRAWN_READ);
+			for (Bitstream bs : bnd.getBitstreams()) {
+				AuthorizeManager.switchPoliciesAction(ourContext, bs, Constants.READ, Constants.WITHDRAWN_READ);
+			}
+		}
 
         // Write log
         log.info(LogManager.getHeader(ourContext, "withdraw_item", "user="
@@ -1286,22 +1338,28 @@ public class Item extends DSpaceObject
         ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(),
                 "REINSTATE", getIdentifiers(ourContext)));
 
-		new DSpace().getEventService().fireEvent(
-				new UsageEvent(UsageEvent.Action.REINSTATE, new DSpace()
-						.getRequestService().getCurrentRequest()
-						.getHttpServletRequest(), ourContext, this));
-			
-
-        // authorization policies
-        if (colls.length > 0)
-        {
-            // FIXME: not multiple inclusion friendly - just apply access
-            // policies from first collection
-            // remove the item's policies and replace them with
-            // the defaults from the collection
-            inheritCollectionDefaultPolicies(colls[0]);
+        // restore all WITHDRAWN_READ authorization policies back to READ
+        for (Bundle bnd : this.getBundles()) {
+			AuthorizeManager.switchPoliciesAction(ourContext, bnd, Constants.WITHDRAWN_READ, Constants.READ);
+			for (Bitstream bs : bnd.getBitstreams()) {
+				AuthorizeManager.switchPoliciesAction(ourContext, bs, Constants.WITHDRAWN_READ, Constants.READ);
+			}
+		}
+        
+        // check if the item was withdrawn before the fix DS-3097
+        if (AuthorizeManager.getPoliciesActionFilter(ourContext, this, Constants.WITHDRAWN_READ).size() != 0) {
+        	AuthorizeManager.switchPoliciesAction(ourContext, this, Constants.WITHDRAWN_READ, Constants.READ);
         }
-
+        else {
+	        // authorization policies
+	        if (colls.length > 0)
+	        {
+	            // remove the item's policies and replace them with
+	            // the defaults from the collection
+	        	adjustItemPolicies(getOwningCollection());
+	        }
+        }
+        
         // Write log
         log.info(LogManager.getHeader(ourContext, "reinstate_item", "user="
                 + e.getEmail() + ",item_id=" + getID()));
@@ -1825,7 +1883,12 @@ public class Item extends DSpaceObject
         // is this collection not yet created, and an item template is created
         if (getOwningCollection() == null)
         {
-            return true;
+        	if (!isInProgressSubmission()) {
+        		return true;
+        	}
+        	else {
+        		return false;
+        	}
         }
 
         // is this person an COLLECTION_EDITOR for the owning collection?
@@ -1857,11 +1920,28 @@ public class Item extends DSpaceObject
 		EPerson e = this.ourContext.getCurrentUser();
 		boolean canEditOwn = e != null && e.canEditSubmissionMetadata();
 		boolean isOwner = this.getSubmitter().equals(e);
-		boolean epersonIsReviewer = this.getOwningCollection().epersonIsReviewer();
+		boolean epersonIsReviewer = false;
+        if(this.getOwningCollection() != null ){
+            epersonIsReviewer = this.getOwningCollection().epersonIsReviewer();
+        }
 
         return (((ownersCanEditCollection || canEditOwn) && isOwner) || epersonIsReviewer);
 	}
 
+    /**
+     * Check if the item is an inprogress submission
+     * @param context
+     * @param item
+     * @return <code>true</code> if the item is an inprogress submission, i.e. a WorkspaceItem or WorkflowItem
+     * @throws SQLException
+     */
+    public boolean isInProgressSubmission() throws SQLException {
+		return WorkspaceItem.findByItem(ourContext, this) != null ||
+				((ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow")
+						&& XmlWorkflowItem.findByItem(ourContext, this) != null)
+						|| WorkflowItem.findByItem(ourContext, this) != null);
+    }
+    
     public String getName()
     {
         return getMetadataFirstValue(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
@@ -1902,7 +1982,7 @@ public class Item extends DSpaceObject
                     "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
         }
         
-        String query = "SELECT item.* FROM metadatavalue,item WHERE "+
+        String query = "SELECT distinct(item.*) FROM metadatavalue,item WHERE "+
                        "item.item_id = metadatavalue.resource_id AND metadata_field_id = ? AND resource_type_id = ?";
         if ( in_archive_only ) {
         	query += " AND item.in_archive='1'";
@@ -2198,3 +2278,4 @@ public class Item extends DSpaceObject
 		}
 	}
 }
+

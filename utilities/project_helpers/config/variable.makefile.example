@@ -9,7 +9,6 @@
 THEME_TEMPLATE=ClarinPlTheme
 HOME_THEME_TEMPLATE=ClarinPlHomeTheme
 LINDAT_COMMON_THEME_BRANCH=bootstrap3
-#LINDAT_COMMON_THEME_FETCH=git checkout -f bootstrap3 && git pull
 
 # tomcat
 TOMCAT_VERSION=6

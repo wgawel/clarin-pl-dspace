@@ -79,12 +79,9 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     private static final Message T_filter_authority = message("xmlui.Discovery.SimpleSearch.filter.authority");
     private static final Message T_filter_notauthority = message("xmlui.Discovery.SimpleSearch.filter.notauthority");
     private static final Message T_did_you_mean = message("xmlui.Discovery.SimpleSearch.did_you_mean");
-
-    private SearchService searchService = null;
+    private static final Message T_filter_notavailable = message("xmlui.Discovery.SimpleSearch.filter.notavailable");
 
     public SimpleSearch() {
-        DSpace dspace = new DSpace();
-        searchService = dspace.getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
     }
 
 
@@ -250,7 +247,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         typeSelect.addOption(StringUtils.equals(relationalOperator, "notcontains"), "notcontains", T_filter_notcontain);
         typeSelect.addOption(StringUtils.equals(relationalOperator, "notequals"), "notequals", T_filter_notequals);
         //typeSelect.addOption(StringUtils.equals(relationalOperator, "notauthority"), "notauthority", T_filter_notauthority);
-        typeSelect.addOption(StringUtils.equals(relationalOperator, "notavailable"), "notavailable", "Not Available");
+        typeSelect.addOption(StringUtils.equals(relationalOperator, "notavailable"), "notavailable", T_filter_notavailable);
          
 
 

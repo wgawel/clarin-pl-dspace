@@ -1,13 +1,12 @@
 /* Created for LINDAT/CLARIN */
 package cz.cuni.mff.ufal.checks;
 
+import cz.cuni.mff.ufal.dspace.IOUtils;
+
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import cz.cuni.mff.ufal.dspace.IOUtils;
 
 
 //

@@ -11,14 +11,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,13 +27,8 @@ import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.*;
 import org.dspace.content.Collection;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCPersonName;
-import org.dspace.content.DCSeriesNumber;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
-import org.dspace.content.Metadatum;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
 import org.dspace.content.authority.MetadataAuthorityManager;
@@ -313,6 +301,9 @@ public class DescribeStep extends AbstractProcessingStep
                 readText(request, item, schema, element, qualifier, inputs[j]
                         .getRepeatable(), LANGUAGE_QUALIFIER, inputs[j].getRepeatableParse());
             } else if(inputType.equals("complex")){
+            	if(buttonPressed.equals("submit_local_sponsor_delete")) {
+            		item.clearMetadata("dc", "relation", null, Item.ANY);
+            	}
                 readComplex(request, item, schema, element, qualifier, inputs[j]);
             }
             else
@@ -471,10 +462,28 @@ public class DescribeStep extends AbstractProcessingStep
         DCInput.ComplexDefinition definition = input.getComplexDefinition();
         java.util.Map<String, java.util.List<String>> fieldsValues = new HashMap<String, java.util.List<String>>();
         int valuesPerField = 0;
+        
+        String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
+    	if(buttonPressed.equals("submit_" + metadataField + "_delete")) {
+        	for(String name : definition.getSortedInputNames()){
+                Map<String, String> input_map = definition.getInput(name);
+                String mapped = input_map.get("mapped-to-if-not-default");
+                if(mapped != null && !mapped.isEmpty())  {
+                	String md[] = mapped.split("\\.");
+                	if(md.length==2) {
+                		item.clearMetadata(md[0], md[1], null, Item.ANY);
+                	}
+                	else if(md.length==3){
+                		item.clearMetadata(md[0], md[1], md[2], Item.ANY);
+                	}
+                }
+        	}    		
+    	}
+
 
         if (repeated)
         {
-        	for(String name : definition.getInputNames()){
+        	for(String name : definition.getSortedInputNames()){
         		List<String> list = getRepeatedParameter(request, metadataField, metadataField + "_" + name);
                 fieldsValues.put(name, list);
                 //assume the list are all the same size
@@ -484,7 +493,7 @@ public class DescribeStep extends AbstractProcessingStep
         }
         else
         {
-        	for(String name : definition.getInputNames()){
+        	for(String name : definition.getSortedInputNames()){
         		List<String> list = new ArrayList<String>();
         		String value = request.getParameter(metadataField + "_" + name);
         		if(value != null){
@@ -496,15 +505,16 @@ public class DescribeStep extends AbstractProcessingStep
         }
 
 
+        Map<String, String> mapped_to_list = new HashMap<>();
         boolean error = false;
         //for all values
         for(int i = 0; i < valuesPerField; i++){
         	StringBuilder complexValue = new StringBuilder();
-        	int emptyFields = 0;
         	//separator empty for first iter
         	String separator = "";
         	//in all fields
-        	for(String name : definition.getInputNames()){
+        	for(String name : definition.getSortedInputNames()){
+                Map<String, String> input_map = definition.getInput(name);
         		String value = fieldsValues.get(name).get(i);
         		if(value != null){
         			value = value.trim();
@@ -512,13 +522,24 @@ public class DescribeStep extends AbstractProcessingStep
         		} else{
         			value = "";
         		}
-        		if("".equals(value)){
-        			++emptyFields;
+        		
+        		boolean required = input_map.get("required")!=null && input_map.get("required").equalsIgnoreCase("true");
+        		
+        		if(value.isEmpty() && required){
+        			error = true;
         		}
-                String regex = definition.getInput(name).get("regexp");
-                if(!value.isEmpty() && !DCInput.isAllowedValue(value, regex)){
-                	error = true;
+                String regex = input_map.get("regexp");
+                if(!value.isEmpty() && !DCInput.isAllowedValue(value, regex)) {
+                    error = true;
                 }
+
+                // no error, not empty and mapped
+                if (!error && !value.isEmpty() && null != input_map.get("mapped-to-if-not-default")) {
+                    if ( !value.equals(input_map.get("value")) ) {
+                        mapped_to_list.put(input_map.get("mapped-to-if-not-default"), value);
+                    }
+                }
+
         		complexValue.append(separator).append(value);
         		//non empty separator for the remaining iterations;
         		separator = DCInput.ComplexDefinition.SEPARATOR;
@@ -526,15 +547,29 @@ public class DescribeStep extends AbstractProcessingStep
         	//required and all empty handled by doProcessing
         	//this checks whether one of the fields was empty
         	String finalValue = complexValue.toString();
-        	if( emptyFields > 0 && emptyFields < definition.inputsCount()){
-        		error = true;
-        	}
-        	if(error){
+        	boolean finalValueEmpty = finalValue.replace(separator, "").trim().isEmpty();
+        	
+        	if(error && !finalValueEmpty){
         		//incomplete as regex errors
         		addRegexError(request,metadataField,finalValue);
-        	}else if(emptyFields != definition.inputsCount()){
+        	}else if(!finalValueEmpty){
         		//add the final value only if it is not empty
         		item.addMetadata(schema, element, qualifier, null, finalValue);
+                // add mappings if not existing
+                for ( Map.Entry<String, String> mapping : mapped_to_list.entrySet() ) {
+                    boolean found = false;
+                    for (Metadatum m: item.getMetadataByMetadataString(mapping.getKey())) {
+                        if ( m.value.equals(mapping.getValue())) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        String[] elements = DSpaceObject.getElements(mapping.getKey());
+                        item.addMetadata( elements[0], elements[1], elements[2], Item.ANY,
+                            new String[] {mapping.getValue()});
+                    }
+                }
         	}
         }
 	}

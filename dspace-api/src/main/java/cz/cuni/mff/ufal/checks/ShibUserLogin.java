@@ -1,13 +1,13 @@
 /* Created for LINDAT/CLARIN */
 package cz.cuni.mff.ufal.checks;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang.StringUtils;
 
 public class ShibUserLogin 
 {

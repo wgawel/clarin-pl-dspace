@@ -27,17 +27,15 @@ public class HibernateUtil {
 	static Logger log = Logger.getLogger(HibernateUtil.class);
 
 	private static SessionFactory sessionFactory;
+	
+	private static boolean initialized = false;
 
 	private Session session = null;
 	private Transaction transaction = null;
 
-	static void init() {
-
-		if (Variables.databaseURL == null) {
-			log.error("The databaseURL is not set, are the Variables initialized?");
-			log.error("Initial SessionFactory creation failed.");
-			return;
-		}
+	public synchronized static void init(){
+		
+		if(initialized) return;
 
 		try {
 
@@ -49,6 +47,9 @@ public class HibernateUtil {
 					Variables.databasePassword);
 			cfg.setProperty("show_sql", "true");
 			sessionFactory = cfg.configure().buildSessionFactory();
+			HibernateUtil test = new HibernateUtil();
+			test.openSession();
+			initialized = true;
 
 		} catch (Exception e) {
 			log.error("Initial SessionFactory creation failed.", e);
@@ -61,9 +62,6 @@ public class HibernateUtil {
 
 	public static SessionFactory getSessionFactory() {
 		log.debug("Requesting Hibernate SessionFactory");
-		if (sessionFactory == null) {
-			init();
-		}
 		return sessionFactory;
 	}
 
@@ -354,6 +352,53 @@ public class HibernateUtil {
 		}
 	}
 
+	public List findByCriterieWithLimits(Class clazz, int first, int limit, Object ... criterion) {
+		log.debug("finding " + clazz.getSimpleName() + " instance by criteria");
+		try {
+			startTransaction();
+			Criteria criteria = session.createCriteria(clazz);
+
+			ArrayList<Criterion> ct = new ArrayList<Criterion>();
+			ArrayList<Order> od = new ArrayList<Order>();
+			ProjectionList pj = Projections.projectionList();
+
+			for (Object o : criterion) {
+				if (o instanceof Criterion) {
+					ct.add((Criterion) o);
+				} else if (o instanceof Order) {
+					od.add((Order) o);
+				} else if (o instanceof Projection) {
+					pj.add((Projection) o);
+				}
+			}
+
+			for (Criterion c : ct) {
+				criteria.add(c);
+			}
+
+			for (Order o : od) {
+				criteria.addOrder(o);
+			}
+
+			if (pj.getLength() != 0)
+				criteria.setProjection(pj);
+
+			criteria.setFirstResult(first);
+			criteria.setMaxResults(limit);
+			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+
+			List results = criteria.list();
+			endTransaction();
+			return results;
+		} catch (RuntimeException re) {
+			log.error("find by criteria with limits failed", re);
+			transaction.rollback();
+			closeSession();
+
+			throw re;
+		}
+	}
+
 	public List findByQuery(String query, Hashtable<String, Object> params) {
 		log.debug("finding by query " + query);
 		try {
@@ -409,5 +454,7 @@ public class HibernateUtil {
 	}
 
 }
+
+
 
 

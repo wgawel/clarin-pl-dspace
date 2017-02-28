@@ -7,16 +7,12 @@
  */
 package org.dspace.app.xmlui.aspect.eperson;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Map;
-
+import cz.cuni.mff.ufal.DSpaceApi;
+import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseDefinition;
+import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseResourceUserAllowance;
+import cz.cuni.mff.ufal.lindat.utilities.hibernate.UserMetadata;
+import cz.cuni.mff.ufal.lindat.utilities.hibernate.UserRegistration;
+import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -28,18 +24,8 @@ import org.dspace.app.util.CollectionDropDown;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
-import org.dspace.app.xmlui.wing.element.Cell;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.Field;
-import org.dspace.app.xmlui.wing.element.Item;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.Row;
-import org.dspace.app.xmlui.wing.element.Select;
-import org.dspace.app.xmlui.wing.element.Table;
-import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
@@ -50,13 +36,11 @@ import org.dspace.eperson.Group;
 import org.dspace.eperson.Subscribe;
 import org.xml.sax.SAXException;
 
-import cz.cuni.mff.ufal.DSpaceApi;
-import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseDefinition;
-import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseResourceUserAllowance;
-import cz.cuni.mff.ufal.lindat.utilities.hibernate.UserMetadata;
-import cz.cuni.mff.ufal.lindat.utilities.hibernate.UserRegistration;
-import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.util.*;
+
 import static org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
 
 /**
@@ -159,11 +143,18 @@ public class EditProfile extends AbstractDSpaceTransformer
 
     private static final Message T_select_collection =
         message("xmlui.EPerson.EditProfile.select_collection");
- 
-    private static final Message T_head_auth =
-        message("xmlui.EPerson.EditProfile.head_auth");
-    
-    //private static final Message T_head_identify =
+
+	private static final Message T_head_auth =
+		message("xmlui.EPerson.EditProfile.head_auth");
+
+	private static final Message T_invalid_item =
+		message("xmlui.EPerson.EditProfile.invalid_item");
+
+	private static final Message T_signed_licenses =
+			message("xmlui.EPerson.EditProfile.signed_licenses");
+
+
+	//private static final Message T_head_identify =
     //    message("xmlui.EPerson.EditProfile.head_identify");
     
     private static final Message T_head_security =
@@ -494,29 +485,37 @@ public class EditProfile extends AbstractDSpaceTransformer
 
 	                Bitstream bitstream = Bitstream.find(context, bitstreamID);
 	                org.dspace.content.Item item = (org.dspace.content.Item)bitstream.getParentObject();
+					String base = ConfigurationManager.getProperty("dspace.url");
 
-	                String base = ConfigurationManager.getProperty("dspace.url");
-	    			StringBuffer itemLink = new StringBuffer().append(base)
-							  .append(base.endsWith("/") ? "" : "/")
-							  .append("/handle/")
-							  .append(item.getHandle());
+					if ( null != item ) {
+						StringBuffer itemLink = new StringBuffer().append(base)
+							.append(base.endsWith("/") ? "" : "/")
+							.append("/handle/")
+							.append(item.getHandle());
 
-	                r.addCell().addXref(itemLink.toString(), "" + item.getID());
+						r.addCell().addXref(itemLink.toString(), "" + item.getID());
 
-	    			StringBuffer bitstreamLink = new StringBuffer().append(base)
-								  .append(base.endsWith("/") ? "" : "/")
-								  .append("bitstream/handle/")
-								  .append(item.getHandle())
-								  .append("/")
-								  .append(URLEncoder.encode(bitstream.getName(), "UTF8"))
-								  .append("?sequence=").append(bitstream.getSequenceID());
-	                r.addCell().addXref(bitstreamLink.toString(), "" + bitstream.getID());
+						StringBuffer bitstreamLink = new StringBuffer().append(base)
+							.append(base.endsWith("/") ? "" : "/")
+							.append("bitstream/handle/")
+							.append(item.getHandle())
+							.append("/")
+							.append(URLEncoder.encode(bitstream.getName(), "UTF8"))
+							.append("?sequence=").append(bitstream.getSequenceID());
+						r.addCell().addXref(bitstreamLink.toString(), "" + bitstream.getID());
+
+					}else {
+						// something can go wrong
+						r.addCell().addContent( T_invalid_item );
+						r.addCell().addContent( T_invalid_item );
+					}
+
 
 	                Cell c = r.addCell();
 	                java.util.List<UserMetadata> extraMetaData = functionalityManager.getUserMetadata_License(ur.getEpersonId(), license.getTransactionId());
 	                for(UserMetadata metadata : extraMetaData) {
 	                	c.addHighlight("label label-info font_smaller").addContent(metadata.getMetadataKey() + ": " +metadata.getMetadataValue());
-           }
+           			}
            }
            
 			} else {
@@ -661,14 +660,14 @@ public class EditProfile extends AbstractDSpaceTransformer
 			add_list_of_groups(profile);
        }
 
+
 		// Licences
 		//
 		if (!registering) {
-                    Division signed = profile.addDivision("signed-licenses", "well well-light");
-                    signed.setHead("Licenses you signed");
-                    add_signed_licenses(signed);
-                }
-
+			Division signed = profile.addDivision("signed-licenses", "well well-light");
+			signed.setHead(T_signed_licenses);
+			add_signed_licenses(signed);
+		}
 		//
 		profile.addHidden("eperson-continue").setValue(knot.getId());
    }

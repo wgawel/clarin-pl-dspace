@@ -39,11 +39,9 @@ public class ItemModifyConsumer implements Consumer {
 
 	public void initialize() throws Exception {
 		if(ReplicationManager.isReplicationOn()) {
-			try {
-				ReplicationManager.initialize();
-			} catch(Exception e) {
-				log.error(e);
-			}
+				if(!ReplicationManager.initialize()) {
+					log.error("Failed to initialize ReplicationManager.");
+				}
 		}
 	}
 
@@ -55,15 +53,8 @@ public class ItemModifyConsumer implements Consumer {
 		}
 		
 		// if not initialized try to initialize 
-		if(!ReplicationManager.isInitialized()) {
-			try {
-				boolean test = ReplicationManager.initialize();
-				if(!test) {
-					throw new Exception("Unable to initialize Replication Service.");
-				}
-			} catch(Exception e) {
-				log.error(e);
-			}
+		if(!ReplicationManager.initialize()) {
+            log.error("Unable to initialize Replication Service.");
 		}
 		
 		int subjectType = event.getSubjectType();
@@ -96,7 +87,7 @@ public class ItemModifyConsumer implements Consumer {
 						// testing again just to be sure
 						if (ReplicationManager.isInitialized() && ReplicationManager.isReplicationOn()) {
 							// force overwrite
-							ReplicationManager.replicate(context, handle, item, true);
+							ReplicationManager.replicate(handle, true);
 						}
 
 					} catch (Exception e) {

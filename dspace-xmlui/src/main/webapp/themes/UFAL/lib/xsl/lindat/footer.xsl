@@ -18,8 +18,9 @@
         xmlns:mods="http://www.loc.gov/mods/v3"
         xmlns:dc="http://purl.org/dc/elements/1.1/"
         xmlns:confman="org.dspace.core.ConfigurationManager"
+        xmlns:file="java.io.File"
         xmlns="http://www.w3.org/1999/xhtml"
-        exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
+        exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman file">
 
     
 
@@ -32,7 +33,17 @@
                     <xsl:text>&#160;</xsl:text>
                 </a>
 
-      <xsl:copy-of select="document('../../lindat/footer.htm')" />
+      <xsl:variable name="currentLocale" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
+      <xsl:variable name="localizedDiskPath" select="concat($theme-path-on-disk,'/lib/lindat/',$currentLocale,'/footer.htm')" />
+      <xsl:variable name="path" select="file:new($localizedDiskPath)"/>
+      <xsl:choose>
+          <xsl:when test="file:isFile($path)">
+              <xsl:copy-of select="document($localizedDiskPath)" />
+          </xsl:when>
+          <xsl:otherwise>
+              <xsl:copy-of select="document('../../lindat/footer.htm')" />
+          </xsl:otherwise>
+      </xsl:choose>
     </xsl:template>
 
 

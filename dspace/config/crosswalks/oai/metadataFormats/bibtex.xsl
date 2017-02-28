@@ -5,9 +5,13 @@
     xmlns:doc="http://www.lyncode.com/xoai" 
     xmlns:bib="http://clarin-pl.eu/ns/experimental/bibtex"
     xmlns:util="cz.cuni.mff.ufal.utils.BibtexUtil"
-    exclude-result-prefixes="doc util"
+    xmlns:confman="org.dspace.core.ConfigurationManager"
+    exclude-result-prefixes="doc util confman"
     version="1.0">
     
+    <!-- repository name -->
+    <xsl:variable name="dspace.name" select="confman:getProperty('dspace.name')"/>
+
     <xsl:output omit-xml-declaration="yes" method="xml" indent="yes" cdata-section-elements="bib:bibtex"/>
     
     <xsl:template match="/">
@@ -15,12 +19,10 @@
         @misc{<xsl:value-of select="doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text()"/>,
             <xsl:variable name="title"><xsl:call-template name="title"/></xsl:variable>
             <xsl:variable name="author"><xsl:call-template name="author"/></xsl:variable>
-            <xsl:variable name="abstract"><xsl:call-template name="abstract"/></xsl:variable>
             <xsl:variable name="url"><xsl:call-template name="url"/></xsl:variable>
             <xsl:variable name="institution"><xsl:call-template name="institution"/></xsl:variable>
             <xsl:variable name="keywords"><xsl:call-template name="keywords"/></xsl:variable>
             <xsl:variable name="copyright"><xsl:call-template name="copyright"/></xsl:variable>
-            <xsl:variable name="language"><xsl:call-template name="language"/></xsl:variable>
             <xsl:variable name="year"><xsl:call-template name="year"/></xsl:variable>
             <xsl:if test="$title != ''">
                     <xsl:value-of select="util:format($title)"/>
@@ -28,13 +30,10 @@
             <xsl:if test="$author != ''">
                     <xsl:value-of select="util:format($author)"/>
             </xsl:if>
-            <xsl:if test="$abstract != ''">
-                    <xsl:value-of select="util:format($abstract)"/>
-            </xsl:if>
             <xsl:if test="$url != ''">
                     <xsl:value-of select="util:format($url)"/>
             </xsl:if>
-            <xsl:if test="institution != ''">
+            <xsl:if test="$institution != ''">
                     <xsl:value-of select="util:format($institution)"/>
             </xsl:if>
             <xsl:if test="$copyright != ''">
@@ -42,9 +41,6 @@
             <xsl:value-of select="util:format($keywords)"/>
             -->
                     <xsl:value-of select="util:format($copyright)"/>
-            </xsl:if>
-            <xsl:if test="$language != ''">
-                    <xsl:value-of select="util:format($language)"/>
             </xsl:if>
             <xsl:if test="$year != ''">
                     <xsl:value-of select="util:format($year)"/>}
@@ -59,26 +55,20 @@
     </xsl:template>
     
     <xsl:template name="author">
-            <xsl:if test="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element[@name='author']/doc:element/doc:field[@name='value']">
-                author = {<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element[@name='author']/doc:element/doc:field[@name='value']">
-                                            <xsl:value-of select="util:bibtexify(.)"/>
-                                            <xsl:if test="position() != last()"> and  </xsl:if>
-                          </xsl:for-each>},
-            </xsl:if>
-    </xsl:template>
-    
-    <xsl:template name="abstract">
-        <xsl:choose>
-            <xsl:when test="doc:metadata/doc:element[@name='dc']/doc:element[@name='description']/doc:element/doc:field[@name='value']">
-                abstract = {<xsl:value-of select="util:bibtexify(doc:metadata/doc:element[@name='dc']/doc:element[@name='description']/doc:element/doc:field[@name='value'])"/>},
-            </xsl:when>
-            <xsl:when test="doc:metadata/doc:element[@name='dc']/doc:element[@name='abstract']/doc:element/doc:field[@name='value']">
-                abstract = {<xsl:value-of select="util:bibtexify(doc:metadata/doc:element[@name='dc']/doc:element[@name='abstract']/doc:element/doc:field[@name='value'])"/>},
-            </xsl:when>
-            <xsl:when test="doc:metadata/doc:element[@name='dc']/doc:element[@name='description']/doc:element[@name='abstract']/doc:element/doc:field[@name='value']">
-                abstract = {<xsl:value-of select="util:bibtexify(doc:metadata/doc:element[@name='dc']/doc:element[@name='description']/doc:element[@name='abstract']/doc:element/doc:field[@name='value'])"/>},
-            </xsl:when>
-        </xsl:choose>
+            <xsl:choose>
+                    <xsl:when test="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element[@name='author']/doc:element/doc:field[@name='value']">
+                        author = {<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element[@name='author']/doc:element/doc:field[@name='value']">
+                                                    <xsl:value-of select="util:bibtexify(.)"/>
+                                                    <xsl:if test="position() != last()"> and  </xsl:if>
+                                  </xsl:for-each>},
+                    </xsl:when>
+                    <xsl:when test="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element[@name='other']/doc:element/doc:field[@name='value']">
+                        author = {<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='contributor']/doc:element[@name='other']/doc:element/doc:field[@name='value']">
+                                                    <xsl:value-of select="util:bibtexify(.)"/>
+                                                    <xsl:if test="position() != last()"> and  </xsl:if>
+                                  </xsl:for-each>},
+                    </xsl:when>
+            </xsl:choose>
     </xsl:template>
     
     <!-- Do not escape -->
@@ -89,9 +79,7 @@
     </xsl:template>
     
     <xsl:template name="institution">
-        <xsl:if test="doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ContactInfo#PersonInfo#OrganizationInfo']/doc:element[@name='organizationName']/doc:element/doc:field[@name='value']">
-                institution = {<xsl:value-of select="util:bibtexify(doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ContactInfo#PersonInfo#OrganizationInfo']/doc:element[@name='organizationName']/doc:element/doc:field[@name='value'])"/>},
-        </xsl:if>
+	note = {<xsl:value-of select="util:bibtexify($dspace.name)"/>},
     </xsl:template>
     
     <!-- was mapped to dc.keywords but that does not exist -->
@@ -107,14 +95,6 @@
                         copyright = {<xsl:value-of select="util:bibtexify(doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#DistributionInfo#LicenseInfo']/doc:element[@name='license']/doc:element/doc:field[@name='value'])"/>},
                 </xsl:when>
         </xsl:choose>
-    </xsl:template>
-    
-    <xsl:template name="language">
-            <xsl:if test="doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']/doc:element/doc:field[@name='value']">
-                    language = {<xsl:for-each select="doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']/doc:element/doc:field[@name='value']">
-                                    <xsl:value-of select="util:bibtexify(.)" />,
-                                </xsl:for-each>},
-            </xsl:if>
     </xsl:template>
     
     <xsl:template name="year">

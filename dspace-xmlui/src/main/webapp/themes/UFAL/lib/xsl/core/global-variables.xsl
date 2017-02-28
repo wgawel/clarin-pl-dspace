@@ -52,19 +52,35 @@
 	
 	<xsl:variable name="query-string" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='queryString']" />
 
-	<xsl:variable name="oai-url" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='OAIURL']" />
-	<xsl:variable name="oai-handle"	select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='OAIHANDLE']" />
+	<xsl:variable name="oai-url" select="confman:getProperty('oai', 'dspace.oai.url')" />
 
 	<!-- dynamically select the static html file based on requested page name -->
     <xsl:variable name="static-page-name">
     	<xsl:if test="starts-with($request-uri, 'page/')">
     		<xsl:choose>
     		<xsl:when test="document(concat('../../html/', substring-after($request-uri, 'page/'), '.xml'))">
-	    		<xsl:copy-of select="substring-after($request-uri, 'page/')" />
+				<xsl:variable name="active-locale" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
+				<xsl:choose>
+					<xsl:when test="$active-locale!='en'">
+						<xsl:choose>
+							<xsl:when test="document(concat('../../html/', $active-locale, '/', substring-after($request-uri, 'page/'), '.xml'))">
+								<xsl:copy-of select="concat($active-locale, '/', substring-after($request-uri, 'page/'))" />
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:copy-of select="concat($active-locale, '/','dummy')" />
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:copy-of select="substring-after($request-uri, 'page/')" />
+					</xsl:otherwise>
+				</xsl:choose>
     		</xsl:when>
     		</xsl:choose>    		
     	</xsl:if>
     </xsl:variable>
-        
+
+	<xsl:variable name="theme-path-on-disk" select="concat(confman:getProperty('dspace.dir'),'/webapps/xmlui/themes/UFAL')" />
+
 
 </xsl:stylesheet>

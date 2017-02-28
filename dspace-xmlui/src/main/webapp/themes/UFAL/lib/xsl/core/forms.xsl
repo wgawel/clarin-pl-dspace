@@ -266,7 +266,7 @@
 		</div>
 	</xsl:template>
 
-	<!-- The hadling of the special case of instanced composite fields under "form" lists -->
+	<!-- The handling of the special case of instanced composite fields under "form" lists -->
 	<xsl:template match="dri:field[@type='composite'][dri:field/dri:instance | dri:params/@operations]" mode="formComposite" priority="2">
 		<xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')" />
 		<div class="form-group">
@@ -276,7 +276,7 @@
 			<xsl:if test="contains(dri:params/@operations,'add')">
 				<!-- Add buttons should be named "submit_[field]_add" so that we can 
 					ignore errors from required fields when simply adding new values -->
-				<input type="submit" value="Add" name="{concat('submit_',@n,'_add')}" class="btn btn-repository">
+				<input type="submit" value="xmlui.UFAL.forms.buttons.add" i18n:attr="value" name="{concat('submit_',@n,'_add')}" class="btn btn-repository">
 					<!-- Make invisible if we have choice-lookup operation that provides  its own Add. -->
 					<xsl:if test="dri:params/@choicesPresentation = 'lookup'">
 						<xsl:attribute name="style">
@@ -322,7 +322,7 @@
 					<xsl:if test="contains(dri:params/@operations,'delete') and (dri:instance or dri:field/dri:instance)">
 						<!-- Delete buttons should be named "submit_[field]_delete" so that 
 							we can ignore errors from required fields when simply removing values -->
-						<input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="btn btn-link btn-small" />
+						<input type="submit" value="xmlui.UFAL.forms.buttons.remove_selected" i18n:attr="value" name="{concat('submit_',@n,'_delete')}" class="btn btn-link btn-small" />
 					</xsl:if>
 					<xsl:for-each select="dri:field">
 						<xsl:apply-templates select="dri:instance" mode="hiddenInterpreter" />
@@ -351,7 +351,7 @@
 		<xsl:if test="contains(dri:params/@operations,'add')">
 			<!-- Add buttons should be named "submit_[field]_add" so that we can ignore 
 				errors from required fields when simply adding new values -->
-			<input type="submit" value="Add" name="{concat('submit_',@n,'_add')}"
+			<input type="submit" value="xmlui.UFAL.forms.buttons.add" i18n:attr="value" name="{concat('submit_',@n,'_add')}"
 				class="btn btn-repository">
 				<!-- Make invisible if we have choice-lookup popup that provides its 
 					own Add. -->
@@ -377,7 +377,7 @@
 				<xsl:if test="contains(dri:params/@operations,'delete') and dri:instance">
 					<!-- Delete buttons should be named "submit_[field]_delete" so that 
 						we can ignore errors from required fields when simply removing values -->
-					<input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}"
+					<input type="submit" value="xmlui.UFAL.forms.buttons.remove_selected" i18n:attr="value" name="{concat('submit_',@n,'_delete')}"
 						class="btn btn-link btn-small" />
 				</xsl:if>
 				<!-- Behind the scenes, add hidden fields for every instance set. This 
@@ -484,7 +484,7 @@
 		<xsl:if test="contains(dri:params/@operations,'add')">
 			<!-- Add buttons should be named "submit_[field]_add" so that we can ignore 
 				errors from required fields when simply adding new values -->
-			<input type="submit" value="Add" name="{concat('submit_',@n,'_add')}"
+			<input type="submit" value="xmlui.UFAL.forms.buttons.add" i18n:attr="value" name="{concat('submit_',@n,'_add')}"
 				class="btn btn-repository">
 				<!-- Make invisible if we have choice-lookup popup that provides its 
 					own Add. -->
@@ -542,7 +542,7 @@
 					test="contains(dri:params/@operations,'delete') and (dri:instance or dri:field/dri:instance)">
 					<!-- Delete buttons should be named "submit_[field]_delete" so that 
 						we can ignore errors from required fields when simply removing values -->
-					<input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}"
+					<input type="submit" value="xmlui.UFAL.forms.buttons.remove_selected" i18n:attr="value" name="{concat('submit_',@n,'_delete')}"
 						class="btn btn-link btn-small" />
 				</xsl:if>
 				<xsl:for-each select="dri:field">
@@ -986,7 +986,7 @@
 						<xsl:attribute name="type">submit</xsl:attribute>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:attribute name="class">form-control <xsl:if test="contains(@rend,'autocomplete')"> autocomplete</xsl:if></xsl:attribute>
+						<xsl:attribute name="class">form-control <xsl:value-of select="./@rend" /></xsl:attribute>
 					</xsl:otherwise>
 					</xsl:choose>
 					<xsl:attribute name="value">
@@ -1085,6 +1085,10 @@
 		<xsl:if test="@type= 'textarea'">
 			<xsl:attribute name="onfocus">javascript:tFocus(this);</xsl:attribute>
 		</xsl:if>
+        <xsl:if test="dri:params/@placeholder">
+			<xsl:attribute name="i18n:attr">placeholder</xsl:attribute>
+            <xsl:attribute name="placeholder"><xsl:value-of select="dri:params/@placeholder"/></xsl:attribute>
+        </xsl:if>
 	</xsl:template>
 
 	<!-- Since the field element contains only the type attribute, all other 
@@ -1204,54 +1208,8 @@
 						var ufal_help_mail = "]]><xsl:value-of select="$lr.help.mail" /><![CDATA[";
 					]]>
 					</script>
-					<input type="file" name="file">
-						<xsl:call-template name="fieldAttributes" />
-						<xsl:if test="dri:value/i18n:text">
-							<xsl:attribute name="i18n:attr">value</xsl:attribute>
-						</xsl:if>
-						<xsl:attribute name="value">
-                            <xsl:choose>
-                                <xsl:when test="./dri:value[@type='raw']">
-                                    <xsl:value-of
-							select="./dri:value[@type='raw']" />
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:value-of
-							select="./dri:value[@type='default']" />
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </xsl:attribute>
-						<xsl:if test="dri:value/i18n:text">
-							<xsl:attribute name="i18n:attr">value</xsl:attribute>
-						</xsl:if>
-						<xsl:apply-templates />
-					</input>
-					<button>
-						<i18n:text>xmlui.UFAL.dragndrop.upload.button.text</i18n:text>
-					</button>
-					<div>
-						<i18n:text>xmlui.UFAL.dragndrop.upload.label</i18n:text>
-					</div>
 				</div>
 			</span>
-
-			<!-- ui-dialog -->
-			<div id="file_upload_no_desc_dialog" style="display:none"
-				i18n:attr="title" title="xmlui.UFAL.dragndrop.nodescription.title">
-
-				<label>
-					<i18n:text>xmlui.UFAL.dragndrop.nodescription.label</i18n:text>
-					<span id="fileNameDesc" />
-				</label>
-				<input type="text" value="" style="margin-top:10px; margin-bottom:10px;">
-				</input>
-				<div class="field-help">
-					<i18n:text>xmlui.UFAL.dragndrop.nodescription.help</i18n:text>
-				</div>
-
-			</div>
-
-			<table id="files">&#160;</table>
 		</xsl:if>
 	</xsl:template>
 
@@ -1347,7 +1305,7 @@
         </xsl:template>
         
         <xsl:template match="dri:field[@id='aspect.submission.StepTransformer.field.decision']" priority="10">        	
-                <input type="checkbox" data-toggle="toggle" data-on="Accepted" data-off="Click to accept" data-onstyle="success" data-offstyle="danger" data-width="130" data-height="30">
+                <input type="checkbox" data-toggle="toggle" data-on="xmlui.UFAL.forms.licenseStep.accepted" data-off="xmlui.UFAL.forms.licenseStep.click" data-onstyle="success" data-offstyle="danger" data-width="130" data-height="30" i18n:attr="data-on data-off">
                         <xsl:call-template name="standardAttributes" />
                         <xsl:attribute name="name"><xsl:value-of select="@n"/></xsl:attribute>
                         <xsl:attribute name="value"><xsl:value-of select="dri:option/@returnValue"/></xsl:attribute>
@@ -1357,5 +1315,22 @@
                 </input>
         </xsl:template>
         
+        <xsl:template match="dri:list[@id='aspect.submission.StepTransformer.list.license-list']" priority="10">
+        	<ul>
+        		<xsl:call-template name="standardAttributes" />
+        		<xsl:for-each select="dri:item">
+		        	<li>
+		        		<a>
+		        			<xsl:attribute name="name"><xsl:value-of select="dri:xref/@n"/></xsl:attribute>
+		        			<xsl:attribute name="target"><xsl:value-of select="_blank"/></xsl:attribute>
+		        			<xsl:attribute name="href"><xsl:value-of select="dri:xref/@target"/></xsl:attribute>
+		        			<xsl:attribute name="license-label"><xsl:value-of select="dri:hi/@rend"/></xsl:attribute>
+		        			<xsl:attribute name="license-label-text"><xsl:value-of select="dri:hi/node()"/></xsl:attribute>
+		        			<xsl:value-of select="dri:xref/node()" />
+		        		</a>
+		        	</li>
+	        	</xsl:for-each>
+        	</ul>
+        </xsl:template>
         
 </xsl:stylesheet>

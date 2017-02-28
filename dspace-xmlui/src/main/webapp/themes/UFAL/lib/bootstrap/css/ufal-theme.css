@@ -1370,3 +1370,59 @@ div.modal-scrollbar {
     line-height: 1.4em;
     color: #525558;	
 }
+
+#cz_cuni_mff_ufal_dspace_app_xmlui_aspect_statistics_PiwikStatisticsTransformer_div_stats:before{
+  content: "beta";
+  position: absolute;
+  width: 60px;
+  height: 20px;
+  background: #d9534f;
+  top: 15px;
+  left: 15px;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: #fff;
+  -webkit-border-radius: 8px 0 8px 0;
+  -moz-border-radius: 8px 0 8px 0;
+  border-radius: 8px 0 8px 0;
+}
+
+#aspect_submission_StepTransformer_list_controls .licenseselector {
+	margin: 10px 0px 10px 0px;
+}
+
+/* this overrides the box-sizing in bootstrap.min.css selector.css depends on the default value */
+.license-selector * {
+    box-sizing: content-box;
+}
+
+.refbox {
+	margin-bottom: 10px;
+}
+.treeview,
+.treeview ul,
+.treeview li
+{
+    padding: 0px 0px 0px 8px;
+    margin: 0;
+    list-style: none;
+}
+
+.treeview .foldername:before {
+        font-family: FontAwesome;
+        content: '\f07b';
+        margin-right: 5px;
+        color: #A0A0A0;
+}
+
+.treeview .filename:before {
+        font-family: FontAwesome;
+        content: '\f016';
+        margin-right: 5px;
+        color: #A0A0A0;
+}
+
+.filebutton {
+        font-size: 12px;
+}

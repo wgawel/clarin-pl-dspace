@@ -1,15 +1,15 @@
 package cz.cuni.mff.ufal.dspace.runnable;
 
-import java.io.Console;
-import java.sql.SQLException;
-
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Metadatum;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.Metadatum;
 import org.dspace.core.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Console;
+import java.sql.SQLException;
 
 public class FixDuplicatedDemoUrl {
 	private static Logger log = LoggerFactory

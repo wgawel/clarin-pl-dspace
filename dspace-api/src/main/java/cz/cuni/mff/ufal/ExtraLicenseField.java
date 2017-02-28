@@ -2,6 +2,7 @@
 package cz.cuni.mff.ufal;
 
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,8 +41,10 @@ public enum ExtraLicenseField {
 	ADDRESS (new RequiredValidator(), true, "Address is required."),
 	COUNTRY (new RequiredValidator(), true, "Country is required."),
 	EXTRA_EMAIL (new EmailValidator(), true, "Please enter a valid email address.", null),
-	ORGANIZATION (null, true, "Please enter organization.");
-	
+	ORGANIZATION (new LengthValidator(), true, "Please enter organization."),
+	REQUIRED_ORGANIZATION (new RequiredValidator(), true, "Organization is required."),
+	INTENDED_USE (new LengthValidator(), true, "Please state your intended use of this item.");
+
 	private Validator validator = null;
 	private Action action = null;
 	private boolean metadata = true;
@@ -120,8 +123,15 @@ class SendEmailAction implements Action {
 		String ip = (String)objectModel.get("ip");
 		Map<String, String> extraMetadata = (Map<String, String>)objectModel.get("extraMetadata");
         boolean allzip = (Boolean)objectModel.get("allzip");
+		String token = (String)objectModel.get("token");
 		
+        int epersonID = 0;
+        String email = "";
 		EPerson eperson = context.getCurrentUser();
+		if(eperson!=null) {
+			epersonID = eperson.getID();
+			email = eperson.getEmail();
+		}
         Locale locale = context.getCurrentLocale();
 		Bitstream bitstream = null;
 		if(allzip) {
@@ -138,12 +148,6 @@ class SendEmailAction implements Action {
 			bitstream = Bitstream.find(context, bitID);
 		}
         
-        String token = null;
-        
-        IFunctionalities manager = DSpaceApi.getFunctionalityManager();
-        manager.openSession();
-        token = manager.getToken(eperson.getID(), bitstream.getID());
-
         String base = ConfigurationManager.getProperty("dspace.url");
 		StringBuffer link = null;
 		if(allzip) {
@@ -164,10 +168,12 @@ class SendEmailAction implements Action {
 		}
 
 		Email email2User = Email.getEmail(I18nUtil.getEmailFilename(locale, "download_link"));
-        email2User.addRecipient(eperson.getEmail());
+		if(email!=null && !email.isEmpty()) {
+			email2User.addRecipient(email);
+		}
         if(extraMetadata.containsKey(ExtraLicenseField.EXTRA_EMAIL.toString())) {
         	String exEmail = extraMetadata.get(ExtraLicenseField.EXTRA_EMAIL.toString());
-        	if(exEmail!=null && !exEmail.isEmpty() && !exEmail.equals(eperson.getEmail())) {
+        	if(exEmail!=null && !exEmail.isEmpty() && !exEmail.equals(email)) {
         		email2User.addRecipient(exEmail);
         	}
         }
@@ -177,15 +183,34 @@ class SendEmailAction implements Action {
         	email2User.addArgument(bitstream.getName());
         }
 		email2User.addArgument(link.toString() + "dtoken=" + token);
+		IFunctionalities manager = DSpaceApi.getFunctionalityManager();
+		manager.openSession();
         List<LicenseDefinition> licenses = manager.getLicensesToAgree(-1, bitstream.getID());
+		List<String> ccEmails = new ArrayList<>();
 		for(LicenseDefinition license : licenses) {
 			email2User.addArgument(license.getDefinition());
-		}		
+			//check config if we need to cc somebody else
+			String name = license.getName().trim().replace(" ", "_").toLowerCase();
+			String ccProp = ConfigurationManager.getProperty("lr","lr.download.email.cc."+name);
+			if(ccProp != null && !ccProp.isEmpty()){
+				String[] ccs = ccProp.split(",");
+				for(String cc : ccs){
+					if(!cc.isEmpty()){
+						ccEmails.add(cc.trim());
+					}
+				}
+			}
+		}
 		
     	Email email2Admin = Email.getEmail(I18nUtil.getEmailFilename(locale, "download_link_admin"));        
         String ccAdmin = ConfigurationManager.getProperty("lr", "lr.download.email.cc");
-        if(ccAdmin != null && !ccAdmin.isEmpty()){
-        	email2Admin.addRecipient(ccAdmin);
+		if(ccAdmin != null && !ccAdmin.isEmpty()) {
+			ccEmails.add(ccAdmin);
+		}
+		if(!ccEmails.isEmpty()){
+			for(String cc : ccEmails) {
+				email2Admin.addRecipient(cc);
+			}
             if(allzip) {
             	email2Admin.addArgument("all files requested");
             } else {
@@ -195,9 +220,14 @@ class SendEmailAction implements Action {
         	email2Admin.addArgument(link.toString());
     		for(LicenseDefinition license : licenses) {
     			email2Admin.addArgument(license.getDefinition());
-    		}        	
-        	email2Admin.addArgument(eperson.getFullName());
-        	email2Admin.addArgument(eperson.getEmail());
+    		}
+			if(eperson != null) {
+				email2Admin.addArgument(eperson.getFullName());
+				email2Admin.addArgument(eperson.getEmail());
+			}else{
+				email2Admin.addArgument("Anonymous user");
+				email2Admin.addArgument("Anonymous user");
+			}
         	StringBuffer exdata = new StringBuffer();
         	for(String key : extraMetadata.keySet()) {
         		exdata.append(key).append(": ").append(extraMetadata.get(key).toString());
@@ -236,12 +266,21 @@ class EmailValidator implements Validator {
 	
 }
 
+class LengthValidator implements Validator{
+
+	@Override
+	public boolean validate(String value){
+		return value.length() < 255;
+	}
+}
+
 
 class RequiredValidator implements Validator {
 
 	@Override
 	public boolean validate(String value) {
-		if(value==null || value.trim().isEmpty()) {
+		Validator length = new LengthValidator();
+		if(value==null || value.trim().isEmpty() || !length.validate(value)) {
 			return false;
 		}
 		return true;

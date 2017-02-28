@@ -56,10 +56,6 @@ public class CreateStatReport {
 	/**User context*/
 	private static Context context;
 	
-	static {
-		DSpaceApi.load_dspace();
-	}
-
     /** the config file from which to configure the analyser */
     private static String configFile = ConfigurationManager.getProperty("dspace.dir") +
                             File.separator + "config" + File.separator +
@@ -99,7 +95,7 @@ public class CreateStatReport {
         
         // create context as super user
         context = new Context();
-        context.setIgnoreAuthorization(true);
+        context.turnOffAuthorisationSystem();
         
         //get paths to directories
         outputLogDirectory = ConfigurationManager.getProperty("log.dir") + File.separator;

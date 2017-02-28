@@ -22,14 +22,16 @@ index 0000000..286f0fa
 +import org.dspace.app.xmlui.wing.element.Row;
 +import org.dspace.app.xmlui.wing.element.Table;
 +import org.dspace.app.xmlui.wing.element.Text;
++import org.dspace.app.xmlui.wing.element.Cell;
 +import org.dspace.content.Item;
 +import org.dspace.content.ItemIterator;
 +import org.dspace.core.ConfigurationManager;
 +import org.dspace.core.Context;
 +import org.dspace.handle.HandleManager;
 +
-+import cz.cuni.mff.ufal.b2safe.ReplicationServiceIRODSImpl.CONFIGURATION;
++
 +import cz.cuni.mff.ufal.dspace.b2safe.ReplicationManager;
++import fr.cines.eudat.repopack.b2safe_rp_core.DataObject;
 +
 +public class ControlPanelReplicationTabHelper {
 +	
@@ -82,25 +84,21 @@ index 0000000..286f0fa
 +	
 +			Properties config = ReplicationManager.getConfiguration();
 +	
-+			for (CONFIGURATION configElement : CONFIGURATION.values()) {
-+				if (configElement.equals(CONFIGURATION.PASSWORD))
++            java.util.Enumeration e = config.propertyNames();
++
++            while (e.hasMoreElements()) {
++                  String key = (String) e.nextElement();
++                  if ( key.toLowerCase().contains("password") ) {
 +					continue;
++                  }
 +				Row row = table.addRow(Row.ROLE_DATA);
-+				row.addCellContent(configElement.name());
-+				String value = config.getProperty(configElement.name());
++				row.addCellContent(key);
++				String value = config.getProperty(key);
 +				if (value == null) {
 +					value = "N/A";
 +				}
 +				row.addCellContent(value);
 +			}
-+	
-+			/*
-+			 * jargon specific for ( String s : new String[] {
-+			 * "lr.replication.jargon.numThreads" }) { Row row =
-+			 * table.addRow(Row.ROLE_DATA); row.addCellContent(s);
-+			 * row.addCellContent(String.format("%s", System.getProperty("jargon." +
-+			 * s))); }
-+			 */
 +		}
 +	}
 +	
@@ -157,7 +155,7 @@ index 0000000..286f0fa
 +		if (request.getParameter("submit_repl_list_home") != null) {
 +			message = "Files in home directory:\n\n";
 +			try {
-+				for (String f : ReplicationManager.list()) {
++				for (String f : ReplicationManager.listFilenames()) {
 +					message += f + "\n";
 +				}
 +			} catch (Exception e) {
@@ -335,12 +333,9 @@ index 0000000..286f0fa
 +
 +	public static String listReplicas(Division div, Request request, Context context) throws Exception {
 +		String message = null;
-+		java.util.List<String> list = null;
++		java.util.List<DataObject> dos = null;
 +		try {
-+			//Map<String, String> metadata = new HashMap<String, String>();
-+			//metadata.put(ReplicationManager.MANDATORY_METADATA.EUDAT_ROR.name(), null);
-+			//list = ReplicationManager.search(metadata);
-+			list = ReplicationManager.list(true);
++			dos = ReplicationManager.list();
 +		} catch (Exception e) {
 +			message = e.getLocalizedMessage();
 +			return message;
@@ -358,14 +353,18 @@ index 0000000..286f0fa
 +		int pos = 0;
 +		long all_file_size = 0;
 +
-+		for (String name : list) {
++		for (DataObject one_do : dos) {
 +
 +			Row row = table.addRow(Row.ROLE_DATA);
 +			row.addCellContent(String.valueOf(pos + 1));
 +							
-+			Map<String, String> metadata = ReplicationManager.getMetadataOfDataObject(name);
-+				
++            // eudat stores the file path here
++            String name = one_do.getFileName();
++            if ( null == name ) {
++                name = one_do.getRemoteDirPath();
++            }
 +			
++			Map<String, String> metadata = ReplicationManager.getMetadataMap(one_do);
 +			String adminStatus = metadata.get("ADMIN_Status");
 +			
 +			String rend_status = "notok";
@@ -377,25 +376,33 @@ index 0000000..286f0fa
 +			
 +			row.addCell("status", Row.ROLE_DATA, "replica_status " + rend_status).addContent(adminStatus);
 +			
-+			String eudatPID = metadata.get("EUDAT_PID");
-+			if (eudatPID!=null) {
-+				eudatPID = "http://hdl.handle.net" + eudatPID;
++			String eudatPID = one_do.getEudatPid();
++            if ( null == eudatPID ) {
++                eudatPID = metadata.get("EUDAT_PID");
++            }
++			if ( null != eudatPID ) {
++				eudatPID = "http://hdl.handle.net/" + eudatPID;
 +			}
 +
 +			row.addCell().addXref(eudatPID, name);
 +			
 +			// check md5 too
-+			String md5 = metadata.get("INFO_Checksum");
 +			String original_md5 = metadata.get("OTHER_original_checksum");
++			String md5 = one_do.getChecksum();
++            if ( null == md5 ) {
++                md5 = metadata.get("INFO_Checksum");
++            }
++			String itemHandle = one_do.getRor();
++            if ( null == itemHandle ) {
++                itemHandle = metadata.get("EUDAT_ROR");
++            }
++
 +			long orig_file_size = -1;
 +			try {
 +			 orig_file_size = Long.valueOf(metadata.get("OTHER_original_filesize"));
 +			} catch(NumberFormatException e) {
-+				
 +			}
 +			
-+			String itemHandle = metadata.get("EUDAT_ROR");
-+							
 +			String sizes = orig_file_size < 0 ? "N/A" : FileUtils.byteCountToDisplaySize(orig_file_size);
 +			all_file_size += orig_file_size;
 +
@@ -416,16 +423,15 @@ index 0000000..286f0fa
 +				rend_status = "notok";
 +			}
 +			
-+			row.addCell("data", Row.ROLE_DATA, rend_status).addContent(md5);
++            Cell c = row.addCell();
++            c.addHighlight(rend_status).addContent("MD5: " + md5);
 +			
 +			CheckBox r = row.addCell("todelete", Row.ROLE_DATA, null).addCheckBox(String.format("%s-%d", delete_prefix, pos+1));
 +			r.addOption(name);
-+			pos++;
-+
-+
++			++pos;
 +		}
 +
-+		div.setHead(String.format("Replicated files [#%s]", list.size(),
++		div.setHead(String.format("Replicated files [#%s] totalling [%s]", dos.size(),
 +				all_file_size < 0 ? "N/A" : FileUtils.byteCountToDisplaySize(all_file_size)));
 +		
 +		return message;

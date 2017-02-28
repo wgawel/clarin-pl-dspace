@@ -53,6 +53,7 @@ public class UFALLicenseStep extends LicenseStep {
 	protected static final Message T_distribution_license_head = message("xmlui.Submission.submit.LicenseStep.distribution_license_head");
 	protected static final Message T_distribution_license_head_link = message("xmlui.Submission.submit.LicenseStep.distribution_license_head_link");
 	protected static final Message T_resource_license_text = message("xmlui.Submission.submit.LicenseStep.resource_license_text");
+	protected static final Message T_resource_license_text2 = message("xmlui.Submission.submit.LicenseStep.resource_license_text2");	
 	protected static final Message T_license_selector_button = message("xmlui.Submission.submit.LicenseStep.license_selector_button");
 	protected static final Message T_license_list_alert = message("xmlui.Submission.submit.LicenseStep.license_list_alert");
 	protected static final Message T_license_list_alert_link = message("xmlui.Submission.submit.LicenseStep.license_list_alert_link");
@@ -66,6 +67,9 @@ public class UFALLicenseStep extends LicenseStep {
 	protected static final Message T_license_not_supported = message("xmlui.Submission.submit.UFALLicenseStep.license_not_supported");
 	protected static final Message T_review_msg= message("xmlui.Submission.submit.UFALLicenseStep.review_no_file");
 	protected static final Message T_review_license_error= message("xmlui.Submission.submit.UFALLicenseStep.review_license_error");
+	protected static final Message T_license_select_placeholder= message("xmlui.Submission.submit.UFALLicenseStep.option_placeholder");
+	protected static final Message T_license_select_head= message("xmlui.Submission.submit.UFALLicenseStep.select_head");
+	protected static final Message T_select_or_label = message("xmlui.Submission.submit.UFALLicenseStep.or_label");
 
 	
 	//
@@ -160,29 +164,30 @@ public class UFALLicenseStep extends LicenseStep {
 		info3.addHighlight("").addContent(T_info3);
 
 		List form = null;
+		Select license_select = null;
 
 		if (file_uploaded) {
 
 			form = controls.addList("submit-ufal-license", List.TYPE_FORM, "");
-			form.setHead("Select the resource license");
+			form.setHead(T_license_select_head);
 			
-			Item selectorLink = form.addItem();
-			selectorLink.addXref("#!", T_license_selector_button, "btn btn-default btn-sm licenseselector bold pull-right");
+			Item selectorLink = form.addItem("", "alert alert-info");
+			selectorLink.addHighlight("").addContent(T_resource_license_text);
+			selectorLink.addHighlight("").addContent(T_license_list_alert);
+			selectorLink.addHighlight("").addXref(contextPath + "/page/licenses", T_license_list_alert_link, "target_blank alert-link");
+			selectorLink.addHighlight("").addContent(".");			
+			selectorLink.addXref("#!", T_license_selector_button, "btn btn-repository licenseselector bold btn-block btn-lg");
 			
-			
-			Item helpText = form.addItem();
-						
-			helpText.addHighlight("license-resource-text").addContent(T_resource_license_text);
+			Item orLbl = form.addItem(null, "text-center");
+			orLbl.addContent(T_select_or_label);
 
+			Item helpText2 = form.addItem();
+			helpText2.addHighlight("license-resource-text").addContent(T_resource_license_text2);			
+						
 			Item notsupported = form.addItem("license-not-supported-message", "alert alert-danger alert-dismissible fade in hidden");
 			notsupported.addContent(T_license_not_supported);
 			
-			Select license_select = form.addItem().addSelect("license");
-			Item detailLicenseLink = form.addItem(null, "alert alert-info");
-			detailLicenseLink.addHighlight("fa fa-lg fa-question-circle").addContent(" ");
-			detailLicenseLink.addHighlight("").addContent(T_license_list_alert);
-			detailLicenseLink.addHighlight("").addXref(contextPath + "/page/licenses", T_license_list_alert_link, "target_blank alert-link");
-			detailLicenseLink.addHighlight("").addContent(".");
+			license_select = form.addItem().addSelect("license");
 
 			// add not available
 			license_select.setMultiple(false);
@@ -198,7 +203,7 @@ public class UFALLicenseStep extends LicenseStep {
 				
 		  		List help_licenses = help_list.addList("accordion-group.lic.1", List.TYPE_FORM, "hidden");
 		  		help_licenses.addItem("accordion-heading.lic.1", null).addHighlight("bold").addContent(T_license_detail);
-		  		List licenses = help_licenses.addList("accordion-body.lic.1").addList("bulleted-list", List.TYPE_BULLETED);				
+		  		List licenses = help_licenses.addList("accordion-body.lic.1").addList("license-list", List.TYPE_BULLETED);				
 
 				// get one bundle (all should have the same licenses)
 				// - select those ones which are already present
@@ -206,12 +211,17 @@ public class UFALLicenseStep extends LicenseStep {
 
 				final HttpServletRequest request = (HttpServletRequest) objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
 				String[] selected_license = request.getParameterValues("license");
+				if(selected_license!=null && selected_license[0].equals("")) selected_license = null;
 				int selectedId = (selected_license != null && selected_license.length > 0) ? Integer.parseInt(selected_license[0]) : -1;
 
+				license_select.addOption(true, "", T_license_select_placeholder);
+				
 				for (LicenseDefinition license_def : license_defs) {
 					boolean selected = license_def.getLicenseId() == selectedId;
 					license_select.addOption(selected, license_def.getLicenseId(), license_def.getName());
-					licenses.addItem().addXref(license_def.getDefinition(), license_def.getName(), "target_blank", "_" + license_def.getID());
+					Item li = licenses.addItem();
+					li.addHighlight(license_def.getLicenseLabel().getLabel()).addContent(license_def.getLicenseLabel().getTitle());
+					li.addXref(license_def.getDefinition(), license_def.getName(), "target_blank", "license_" + license_def.getID());
 				}
 
 				java.util.List<LicenseDefinition> present_licenses = licenseManager
@@ -248,6 +258,7 @@ public class UFALLicenseStep extends LicenseStep {
 		// If user did not select any license
 		if (this.errorFlag == cz.cuni.mff.ufal.dspace.submit.step.UFALLicenseStep.STATUS_LICENSE_NOT_SELECTED) {
 			controls.addItem().addHighlight("error").addContent(T_select_error);
+			license_select.addError(T_select_error);
 			log.info(LogManager.getHeader(context, "notselect_license",
 					submissionInfo.getSubmissionLogInfo()));
 		}
@@ -342,4 +353,5 @@ public class UFALLicenseStep extends LicenseStep {
 	}
 
 }
+
 

@@ -7,16 +7,7 @@
  */
 package cz.cuni.mff.ufal.dspace.app;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.app.bulkedit.DSpaceCSVLine;
@@ -28,6 +19,10 @@ import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
 
 /* Created for LINDAT/CLARIN */
 /**

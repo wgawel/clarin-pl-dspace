@@ -1,18 +1,15 @@
 package cz.cuni.mff.ufal.dspace.runnable;
 
+import org.apache.commons.cli.*;
+import org.dspace.core.ConfigurationManager;
+
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
-import org.dspace.core.ConfigurationManager;
 import static org.apache.commons.lang.StringUtils.isEmpty;
 
 public class DumpConfig {
