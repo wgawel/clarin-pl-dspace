@@ -450,7 +450,7 @@ public class ItemsResource extends Resource
         try
         {
             context = createContext(getUser(headers));
-            org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
+            org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.ADD);
 
             writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
 
@@ -494,7 +494,10 @@ public class ItemsResource extends Resource
                 dspaceBitstream.setDescription(description);
             }
 
+            //or we would need to add/remove ResourcePolicy (as in WorkspaceItem...AuthorizeManager.addPolicy(c, i, Constants.WRITE, e, ResourcePolicy.TYPE_SUBMISSION);)
+            context.turnOffAuthorisationSystem();
             dspaceBitstream.update();
+            context.restoreAuthSystemState();
 
             // Create policy for bitstream
             if (groupId != null)
