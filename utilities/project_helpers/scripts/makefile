@@ -69,7 +69,7 @@ LOCAL_CONF              :=$(DIR_SOURCE)/local.properties
 DATABASE_NAME           :=$(shell cd $(BASE) && python setup.lindat.py --get="lr.database" --from="$(LOCAL_CONF)")
 UTILITIES_DATABASE_NAME :=$(shell cd $(BASE) && python setup.lindat.py --get="lr.utilities.database" --from="$(LOCAL_CONF)")
 DB_PORT			:=$(shell cd $(BASE) && python setup.lindat.py --get="lr.database.port" --from="$(LOCAL_CONF)")
-DIR_INSTALLATION        :=$(shell cd $(BASE) && python setup.lindat.py --get="dspace.install.dir" --from="$(LOCAL_CONF)")
+DIR_INSTALLATION        :=$(shell cd $(BASE) && python setup.lindat.py --get="lr.dspace.install.dir" --from="$(LOCAL_CONF)")
 
 DIR_DATABASE_BACKUP         :=$(DIR_INSTALLATION)/../database_backup
 
@@ -195,7 +195,7 @@ install_guru:   print_message \
                 install_dspace
 
 install_dspace: 
-	@if test -L $(DIR_LINDAT_THEME_IN_WEBAPPS); then unlink $(DIR_LINDAT_THEME_IN_WEBAPPS); fi
+# @if test -L $(DIR_LINDAT_THEME_IN_WEBAPPS); then unlink $(DIR_LINDAT_THEME_IN_WEBAPPS); fi
 	@echo "DEPLOYING CLARIN-PL DSpace ..."
 	@cd $(DIR_BUILD) &&  $(ANT_WITH_CONF) update 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log
 	@$(MAKE) clean_installation

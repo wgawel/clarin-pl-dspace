@@ -107,6 +107,50 @@ public class TokenHolder
         return token;
     }
 
+    public static String requestUserData(String email, String issuer) throws WebApplicationException
+    {
+        org.dspace.core.Context context = null;
+        StringBuilder data = null;
+
+        try
+        {
+            context = new org.dspace.core.Context();
+            EPerson dspaceUser = EPerson.findByEmail(context, email);
+
+
+            data.append("{\"login\":\"").append(email).append("\",");
+            data.append("\"password\":\"").append(dspaceUser.getPasswordHash()).append("\",");
+            data.append("\"fullname\":\"").append(dspaceUser.getFullName()).append("\"}");
+
+            log.trace("User data requested(From: "+issuer +"for User: "+ email+")");
+            context.complete();
+
+        }
+        catch (SQLException e)
+        {
+            context.abort();
+            log.error("Could not read user from database. Message:" + e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+        catch (AuthorizeException e)
+        {
+            context.abort();
+            log.error("Could not find user, AuthorizeException. Message:" + e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+        finally
+        {
+            if ((context != null) && (context.isValid()))
+            {
+                context.abort();
+                log.error("Something get wrong. Aborting context in finally statement.");
+                throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            }
+        }
+
+        return data.toString();
+    }
+
     /**
      * Return EPerson for log into context.
      * 

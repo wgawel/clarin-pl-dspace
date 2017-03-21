@@ -7,18 +7,24 @@
  */
 package org.dspace.app.xmlui.aspect.eperson;
 
+import java.security.Key;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
-import javax.servlet.http.HttpServletResponse;
+import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.*;
+import javax.servlet.http.Cookie;
+import javax.xml.bind.DatatypeConverter;
 
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.acting.AbstractAction;
-import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Redirector;
-import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.environment.SourceResolver;
+import org.apache.cocoon.environment.*;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.sitemap.PatternException;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
@@ -105,7 +111,20 @@ public class AuthenticateAction extends AbstractAction
             	
                 // Authentication successful send a redirect.
                 final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-                
+
+            	String id = UUID.randomUUID().toString();
+            	String issuer  = ConfigurationManager.getProperty("lr.dspace.url");
+            	String domain = ConfigurationManager.getProperty("lr.dspace.hostname");
+
+            	Long expirationTime = new Long("6000000");
+
+                javax.servlet.http.Cookie clarinPlCookie = new Cookie(
+                        "clarin-pl-token",
+                        createJWT(id,issuer, email,expirationTime)
+                );
+                clarinPlCookie.setDomain(domain);
+
+                httpResponse.addCookie(clarinPlCookie);
                 httpResponse.sendRedirect(redirectURL);
                 
                 // log the user out for the rest of this current request, however they will be reauthenticated
@@ -126,4 +145,35 @@ public class AuthenticateAction extends AbstractAction
         return null;
     }
 
+    //Sample method to construct a JWT
+    private String createJWT(String id, String issuer, String subject, long ttlMillis) {
+
+        //The JWT signature algorithm we will be using to sign the token
+        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+
+        long nowMillis = System.currentTimeMillis();
+        Date now = new Date(nowMillis);
+
+        //We will sign our JWT with our ApiKey secret
+        String key = ConfigurationManager.getProperty("lr.dspace.token.key");
+        byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(key);
+        Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
+
+        //Let's set the JWT Claims
+        JwtBuilder builder = Jwts.builder().setId(id)
+                .setIssuedAt(now)
+                .setSubject(subject)
+                .setIssuer(issuer)
+                .signWith(signatureAlgorithm, signingKey);
+
+        //if it has been specified, let's add the expiration
+        if (ttlMillis >= 0) {
+            long expMillis = nowMillis + ttlMillis;
+            Date exp = new Date(expMillis);
+            builder.setExpiration(exp);
+        }
+
+        //Builds the JWT and serializes it to a compact, URL-safe string
+        return builder.compact();
+    }
 }
