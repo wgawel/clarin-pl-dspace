@@ -494,7 +494,10 @@ public class ItemsResource extends Resource
                 dspaceBitstream.setDescription(description);
             }
 
+            //or we would need to add/remove ResourcePolicy (as in WorkspaceItem...AuthorizeManager.addPolicy(c, i, Constants.WRITE, e, ResourcePolicy.TYPE_SUBMISSION);)
+            context.turnOffAuthorisationSystem();
             dspaceBitstream.update();
+            context.restoreAuthSystemState();
 
             // Create policy for bitstream
             if (groupId != null)
