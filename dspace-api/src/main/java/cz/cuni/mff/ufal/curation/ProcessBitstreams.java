@@ -74,7 +74,7 @@ public class ProcessBitstreams extends AbstractCurationTask implements Consumer 
 
 	boolean processItem(Item item) throws SQLException, AuthorizeException {
         int processed = 0;
-        for ( Bundle bundle : item.getBundles() ) {
+        for ( Bundle bundle : item.getBundles("ORIGIN") ) {
             for ( Bitstream b : bundle.getBitstreams() ) {
                 if (OK == processBitstream(b)) {
                     processed += 1;
