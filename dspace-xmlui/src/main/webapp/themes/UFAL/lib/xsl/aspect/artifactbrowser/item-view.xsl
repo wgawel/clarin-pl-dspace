@@ -916,78 +916,81 @@
                         <i18n:param><xsl:copy-of select="$formatted-file-size"/></i18n:param>
                     </i18n:translate>
 				</a>
-				<xsl:if test="mets:Local/mets:file">
-					<a class="filebutton label label-info" role="button" data-toggle="collapse">
-						<xsl:attribute name="href">
-							<xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
-						</xsl:attribute>					
-                    	<i class="fa fa-eye">&#160;</i>
-						<i18n:text>xmlui.UFAL.artifactbrowser.item_view.preview</i18n:text>
-					</a>
-					<div class="collapse">
-						<xsl:attribute name="id">
-							<xsl:text>file_</xsl:text><xsl:value-of select="@ID" />
-						</xsl:attribute>
-  						<div class="panel panel-info" style="margin: 5px 1px 1px 1px;">
-							<div class="bold panel-heading text-center" style="height: auto; padding: 0px;">
-								<i class="fa fa-eye">&#160;</i>
-								<i18n:text>xmlui.UFAL.artifactbrowser.item_view.file_preview</i18n:text>
-								<a role="button" data-toggle="collapse" class="pull-right">
-									<xsl:attribute name="href">
-										<xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
-									</xsl:attribute>								
-									<i class="fa fa-remove">&#160;</i>
-								</a>
-							</div>  						
-  							<div class="panel-body" style="max-height: 200px; overflow: scroll;">
-								<xsl:variable name="files">
-									<xsl:copy-of select="mets:Local/mets:file"/>
-								</xsl:variable>  						  							
-  								<xsl:choose>
-  									<xsl:when test="@MIMETYPE='text/plain'">
-			  							<xsl:value-of select="$files" disable-output-escaping="yes" /> . . . 			  							
-		  							</xsl:when>
-									<xsl:otherwise>
-										<xsl:value-of select="ft:parse($files)" disable-output-escaping="yes" />
-									</xsl:otherwise>
-	  							</xsl:choose>
-  							</div>
-						</div>
-					</div>					
-				</xsl:if>
-				<xsl:if test="@MIMETYPE='text/html'" >
-					<a class="filebutton label label-info" role="button" data-toggle="collapse">
-						<xsl:attribute name="href">
-							<xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
-						</xsl:attribute>					
-                    	<i class="fa fa-eye">&#160;</i>
-						<i18n:text>xmlui.UFAL.artifactbrowser.item_view.preview</i18n:text>
-					</a>
-					<div class="collapse">
-						<xsl:attribute name="id">
-							<xsl:text>file_</xsl:text><xsl:value-of select="@ID" />
-						</xsl:attribute>
-  						<div class="panel panel-info" style="margin: 5px 1px 1px 1px;">
-							<div class="bold panel-heading text-center" style="height: auto; padding: 0px;">
-								<i class="fa fa-eye">&#160;</i>
-								<i18n:text>xmlui.UFAL.artifactbrowser.item_view.file_preview</i18n:text>
-								<a role="button" data-toggle="collapse" class="pull-right">
-									<xsl:attribute name="href">
-										<xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
-									</xsl:attribute>								
-									<i class="fa fa-remove">&#160;</i>
-								</a>
-							</div>  						
-  							<div class="panel-body" style="max-height: 500px; overflow: hidden; padding: 0px;">
-  								 <iframe frameborder="0" scrolling="yes" height="500" width="100%">
-  								 	<xsl:attribute name="src">
-  								 		<xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
-  								 	</xsl:attribute>
-  								 	&#160;
-  								 </iframe>
-  							</div>
-						</div>
-					</div>									
+				<!-- previews -->
+				<xsl:if test="/mets:METS/mets:amdSec/mets:rightsMD/mets:mdWrap/mets:xmlData/license/@label='PUB'">
+                    <xsl:if test="mets:Local/mets:file">
+                        <a class="filebutton label label-info" role="button" data-toggle="collapse">
+                            <xsl:attribute name="href">
+                                <xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
+                            </xsl:attribute>
+                            <i class="fa fa-eye">&#160;</i>
+                            <i18n:text>xmlui.UFAL.artifactbrowser.item_view.preview</i18n:text>
+                        </a>
+                        <div class="collapse">
+                            <xsl:attribute name="id">
+                                <xsl:text>file_</xsl:text><xsl:value-of select="@ID" />
+                            </xsl:attribute>
+                            <div class="panel panel-info" style="margin: 5px 1px 1px 1px;">
+                                <div class="bold panel-heading text-center" style="height: auto; padding: 0px;">
+                                    <i class="fa fa-eye">&#160;</i>
+                                    <i18n:text>xmlui.UFAL.artifactbrowser.item_view.file_preview</i18n:text>
+                                    <a role="button" data-toggle="collapse" class="pull-right">
+                                        <xsl:attribute name="href">
+                                            <xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
+                                        </xsl:attribute>
+                                        <i class="fa fa-remove">&#160;</i>
+                                    </a>
+                                </div>
+                                <div class="panel-body" style="max-height: 200px; overflow: scroll;">
+                                    <xsl:variable name="files">
+                                        <xsl:copy-of select="mets:Local/mets:file"/>
+                                    </xsl:variable>
+                                    <xsl:choose>
+                                        <xsl:when test="@MIMETYPE='text/plain'">
+                                            <xsl:value-of select="$files" disable-output-escaping="yes" /> . . .
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="ft:parse($files)" disable-output-escaping="yes" />
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </div>
+                            </div>
+                        </div>
+                    </xsl:if>
+                    <xsl:if test="@MIMETYPE='text/html'" >
+                        <a class="filebutton label label-info" role="button" data-toggle="collapse">
+                            <xsl:attribute name="href">
+                                <xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
+                            </xsl:attribute>
+                            <i class="fa fa-eye">&#160;</i>
+                            <i18n:text>xmlui.UFAL.artifactbrowser.item_view.preview</i18n:text>
+                        </a>
+                        <div class="collapse">
+                            <xsl:attribute name="id">
+                                <xsl:text>file_</xsl:text><xsl:value-of select="@ID" />
+                            </xsl:attribute>
+                            <div class="panel panel-info" style="margin: 5px 1px 1px 1px;">
+                                <div class="bold panel-heading text-center" style="height: auto; padding: 0px;">
+                                    <i class="fa fa-eye">&#160;</i>
+                                    <i18n:text>xmlui.UFAL.artifactbrowser.item_view.file_preview</i18n:text>
+                                    <a role="button" data-toggle="collapse" class="pull-right">
+                                        <xsl:attribute name="href">
+                                            <xsl:text>#file_</xsl:text><xsl:value-of select="@ID" />
+                                        </xsl:attribute>
+                                        <i class="fa fa-remove">&#160;</i>
+                                    </a>
+                                </div>
+                                <div class="panel-body" style="max-height: 500px; overflow: hidden; padding: 0px;">
+                                     <iframe frameborder="0" scrolling="yes" height="500" width="100%">
+                                        <xsl:attribute name="src">
+                                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
+                                        </xsl:attribute>
+                                        &#160;
+                                     </iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </xsl:if>
 				</xsl:if>
 			</div>			
 	</xsl:template>
