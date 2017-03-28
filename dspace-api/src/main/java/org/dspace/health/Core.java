@@ -107,7 +107,7 @@ public class Core {
         StringBuilder ret = new StringBuilder();
         Map<String, Map<String, Integer>> table = new HashMap<>();
         Set<String> colnames = new HashSet<>();
-        int lenColname = 0;
+        int lenColname = 1;
         Context context = new Context();
         TableRowIterator rows = DatabaseManager.query(context,
                 "SELECT text_value AS type, colname, count(text_value) AS count FROM item JOIN metadatavalue ON item_id=resource_id " +
