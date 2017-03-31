@@ -114,7 +114,7 @@ public class AuthenticateAction extends AbstractAction
 
             	String id = UUID.randomUUID().toString();
             	String issuer  = ConfigurationManager.getProperty("dspace.url");
-            	String domain = "."+ConfigurationManager.getProperty("dspace.hostname");
+            	String domain = ConfigurationManager.getProperty("dspace.hostname");
 
             	Long expirationTime = new Long("6000");
 
@@ -130,6 +130,7 @@ public class AuthenticateAction extends AbstractAction
                 );
                 clarinPlCookie.setDomain(domain);
                 clarinPlCookie.setMaxAge(60*60);
+                clarinPlCookie.setPath("/");
 
                 httpResponse.addCookie(clarinPlCookie);
                 httpResponse.sendRedirect(redirectURL);
