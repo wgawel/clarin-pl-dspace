@@ -113,14 +113,20 @@ public class AuthenticateAction extends AbstractAction
                 final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 
             	String id = UUID.randomUUID().toString();
-            	String issuer  = ConfigurationManager.getProperty("lr.dspace.url");
-            	String domain = ConfigurationManager.getProperty("lr.dspace.hostname");
+            	String issuer  = ConfigurationManager.getProperty("dspace.url");
+            	String domain = ConfigurationManager.getProperty("dspace.hostname");
 
-            	Long expirationTime = new Long("6000000");
+            	Long expirationTime = new Long("6000");
+
+                StringBuilder data = new StringBuilder();
+                data.append("{\"login\":\"").append(email).append("\",");
+                data.append("\"password\":\"").append(password).append("\",");
+                data.append("\"fullname\":\"").append(eperson.getFullName()).append("\"}");
+
 
                 javax.servlet.http.Cookie clarinPlCookie = new Cookie(
                         "clarin-pl-token",
-                        createJWT(id,issuer, email,expirationTime)
+                        createJWT(id,issuer, data.toString(), expirationTime)
                 );
                 clarinPlCookie.setDomain(domain);
 
@@ -155,7 +161,7 @@ public class AuthenticateAction extends AbstractAction
         Date now = new Date(nowMillis);
 
         //We will sign our JWT with our ApiKey secret
-        String key = ConfigurationManager.getProperty("lr.dspace.token.key");
+        String key = ConfigurationManager.getProperty("dspace.token.key");
         byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(key);
         Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
 

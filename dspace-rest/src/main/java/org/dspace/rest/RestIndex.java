@@ -178,27 +178,27 @@ public class RestIndex {
     @POST
     @Path("/validate-token/{token}")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response validateToken(@PathParam("token") String token)
-    {
+    public Response validateToken(@PathParam("token") String token) {
         try {
             String t = parseJWT(token);
             return Response.ok(t, "text/plain").build();
-        } catch ( UntrustedSourceException ex){
+        } catch ( UntrustedSourceException ex) {
             log.error("Error : ", ex);
-            Response.status(Response.Status.FORBIDDEN).build();
+            return Response.status(Response.Status.FORBIDDEN).build();
+        //} catch (Exception x){
         } catch (Exception ee){
             log.error("Error : ", ee);
+            return Response
+                    .status(Response.Status.BAD_REQUEST).header("Error", ee.getMessage()).build();
         }
-
-       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
-    List<String> trustedDomains = Arrays.asList("dspace-t.clarin-pl.eu/dspace","nextcloud.clarin-pl.eu","inforex.clarin-pl.eu");
+    List<String> trustedDomains = Arrays.asList("localhost","clarin-pl.eu/dspace","dspace-t.clarin-pl.eu/dspace","nextcloud.clarin-pl.eu","inforex.clarin-pl.eu");
 
     private String parseJWT(String jwt) throws UntrustedSourceException {
 
         //This line will throw an exception if it is not a signed JWS (as expected)
-        String key = ConfigurationManager.getProperty("lr.dspace.token.key");
+        String key = ConfigurationManager.getProperty("dspace.token.key");
 
         Claims claims = Jwts.parser()
                 .setSigningKey(DatatypeConverter.parseBase64Binary(key))
@@ -211,7 +211,7 @@ public class RestIndex {
         }
 
         try {
-            payload = TokenHolder.requestUserData(claims.getSubject(), claims.getIssuer());
+            payload = claims.getSubject();
         } catch (Exception e){
             log.error("Error : ", e);
         }
@@ -238,7 +238,7 @@ public class RestIndex {
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
 
-        String key = ConfigurationManager.getProperty("lr.dspace.token.key");
+        String key = ConfigurationManager.getProperty("dspace.token.key");
 
         //We will sign our JWT with our ApiKey secret
         byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(key);
