@@ -193,7 +193,7 @@ public class RestIndex {
         }
     }
 
-    List<String> trustedDomains = Arrays.asList("localhost","clarin-pl.eu/dspace","dspace-t.clarin-pl.eu/dspace","nextcloud.clarin-pl.eu","inforex.clarin-pl.eu");
+    private static List<String> trustedDomains = Arrays.asList("clarin-pl.eu/dspace", "ws.clarin-pl.eu", "nextcloud.clarin-pl.eu","inforex.clarin-pl.eu");
 
     private String parseJWT(String jwt) throws UntrustedSourceException {
 
