@@ -59,7 +59,7 @@ public class ProcessItems extends ItemsResource {
     public static final String inforexURL = ConfigurationManager.getProperty("dspace.inforex.export.url");
     public static final String oaiUrl = ConfigurationManager.getProperty("oai.context")+"cite?metadataPrefix=cmdi&handle=";
 
-    @javax.ws.rs.core.Context public static ServletContext servletContext;
+    @javax.ws.rs.core.Context public ServletContext servletContext;
 
     @GET
     @Path("/{prefix}/{suffix}/start")
