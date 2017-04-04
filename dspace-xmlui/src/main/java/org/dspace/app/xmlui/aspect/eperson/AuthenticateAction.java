@@ -116,7 +116,7 @@ public class AuthenticateAction extends AbstractAction
             	String issuer  = ConfigurationManager.getProperty("dspace.url");
             	String domain = ConfigurationManager.getProperty("dspace.hostname");
 
-            	Long expirationTime = new Long("6000");
+            	Long expirationTime = new Long("600000");
 
                 StringBuilder data = new StringBuilder();
                 data.append("{\"login\":\"").append(email).append("\",");
