@@ -548,6 +548,8 @@
   <message key="xmlui.EPerson.FailedAuthentication.title">Authentication Failed</message>
   <message key="xmlui.EPerson.FailedAuthentication.trail">Failed Authentication</message>
   <message key="xmlui.EPerson.FailedAuthentication.h1">Authentication Failed</message>
+  <!-- cz.cuni.mff.ufal.dspace.authenticate.shibboleth.ShibEPerson -->
+  <message key="xmlui.ShibEPerson.locked_email">Your email ({0}) is already associated with a different user. It is also possible that you used a different identity provider to login before. For more information please contact our <a class="helpdesk-tolink">Help Desk</a>.</message>
   <!-- Login xml files -->
   <message key="xmlui.eperson.noAuthMethod.head">No Authentication Method Found</message>
   <message key="xmlui.eperson.noAuthMethod.p1">No authentication method was found. Please contact the <a class="helpdesk-tolink">Help Desk</a>.</message>

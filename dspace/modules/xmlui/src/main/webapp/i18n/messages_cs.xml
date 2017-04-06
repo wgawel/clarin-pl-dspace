@@ -655,7 +655,10 @@
 	<message key="xmlui.EPerson.FailedAuthentication.title">Autentifikace se nezdařila</message>
 	<message key="xmlui.EPerson.FailedAuthentication.trail">Nezdařená autentifikace</message>
 	<message key="xmlui.EPerson.FailedAuthentication.h1">Autentifikace se nezdařila</message>
-	
+
+	<!-- cz.cuni.mff.ufal.dspace.authenticate.shibboleth.ShibEPerson -->
+	<message key="xmlui.ShibEPerson.locked_email">Váš email ({0}) již používá jiný uživatel. Je také možné, že se přihlašujete přes jinou instituci než minule. Pro více informací prosím kontaktujte <a class="helpdesk-tolink">poradnu</a>.</message>
+
 	<!-- Login xml files -->
 	<message key="xmlui.eperson.noAuthMethod.head">Metoda autentifikace nebyla nalezena</message>
 	<message key="xmlui.eperson.noAuthMethod.p1">Nebyla nalezena žádná metoda autentifikace. Prosím kontaktujte <a class="helpdesk-tolink">poradnu</a>.</message>
