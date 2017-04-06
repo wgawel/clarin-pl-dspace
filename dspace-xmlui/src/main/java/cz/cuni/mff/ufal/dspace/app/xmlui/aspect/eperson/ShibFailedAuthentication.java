@@ -50,6 +50,7 @@ public class ShibFailedAuthentication extends FailedAuthentication {
 
 		HttpServletResponse response = (HttpServletResponse)objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 		Division div = body.addDivision("shib_failed_login");
+		div.setHead(T_h1);
 		String redirectTo = ConfigurationManager.getProperty("dspace.url");
 
 		String ourEntityId = ConfigurationManager.getProperty("authentication-shibboleth","spEntityId");
@@ -70,7 +71,7 @@ public class ShibFailedAuthentication extends FailedAuthentication {
 			response.sendRedirect(response.encodeRedirectURL(redirectTo));
 
 		}else if(isNotBlank(DSpaceApi.getFunctionalityManager().getErrorMessage())){
-			//see ShibAuthentication#225 - DSpaceApi.getFunctionalityManager().setErrorMessage
+			//see cz.cuni.mff.ufal.dspace.authenticate.ShibAuthentication#225 - DSpaceApi.getFunctionalityManager().setErrorMessage
 			DSpaceXmluiApi.app_xmlui_aspect_eperson_postError(div);
 		}
 	}
