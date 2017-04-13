@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.aspect.eperson;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -65,7 +66,16 @@ public class UnAuthenticateAction extends AbstractAction
             (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 
         EPerson eperson = context.getCurrentUser();
-        
+
+        //Clarin token destroy
+        String domain = ConfigurationManager.getProperty("dspace.hostname");
+        javax.servlet.http.Cookie clarinCookie = new Cookie(
+                "clarin-pl-token", "");
+        clarinCookie.setDomain(domain);
+        clarinCookie.setMaxAge(0);
+        clarinCookie.setPath("/");
+        httpResponse.addCookie(clarinCookie);
+
         // Actually log the user out.
         AuthenticationUtil.logOut(context,httpRequest);
         
