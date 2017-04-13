@@ -149,17 +149,20 @@ public class AuthenticateAction extends AbstractAction
                 clarinPlCookie.setPath("/");
 
                 httpResponse.addCookie(clarinPlCookie);
+
                 for(Cookie c : Arrays.asList(request.getCookies())){
 
                     if("login-redirect".equals(c.getName())){
                         redirectTo = c.getValue();
-                        c.setMaxAge(0);
-                        httpResponse.addCookie(c);
+                        javax.servlet.http.Cookie redirectCookie = new Cookie(
+                                "login-redirect", "");
+                        redirectCookie.setMaxAge(0);
+                        httpResponse.addCookie(redirectCookie);
                     }
                 }
 
                 if(null != redirectTo && !"".equals(redirectTo)){
-                    redirectURL = "https://"+redirectTo+".clarin-pl.eu";
+                    redirectURL = "http://"+redirectTo+".clarin-pl.eu";
                 }
                 httpResponse.sendRedirect(redirectURL);
                 
