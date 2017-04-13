@@ -74,6 +74,10 @@ public class AuthenticateAction extends AbstractAction
         String password = request.getParameter("login_password");
         String realm = request.getParameter("login_realm");
 
+        String id = UUID.randomUUID().toString();
+        String issuer  = ConfigurationManager.getProperty("dspace.url");
+        String domain = ConfigurationManager.getProperty("dspace.hostname");
+
         // Protect against NPE errors inside the authentication
         // class.
         if ((email == null) || (password == null))
@@ -88,6 +92,7 @@ public class AuthenticateAction extends AbstractAction
             if(null != redirectTo && !"".equals(redirectTo)){
                 javax.servlet.http.Cookie redirectCookie = new Cookie(
                         "login-redirect", redirectTo);
+                redirectCookie.setDomain(domain);
                 redirectCookie.setPath("/");
                 httpResponse.addCookie(redirectCookie);
                 httpResponse.sendRedirect(redirectURL);
@@ -128,15 +133,12 @@ public class AuthenticateAction extends AbstractAction
                 // Authentication successful send a redirect.
                 final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 
-            	String id = UUID.randomUUID().toString();
-            	String issuer  = ConfigurationManager.getProperty("dspace.url");
-            	String domain = ConfigurationManager.getProperty("dspace.hostname");
+
 
             	Long expirationTime = new Long("600000");
 
                 StringBuilder data = new StringBuilder();
                 data.append("{\"login\":\"").append(email).append("\",");
-                data.append("\"password\":\"").append(password).append("\",");
                 data.append("\"fullname\":\"").append(eperson.getFullName()).append("\"}");
 
 
@@ -156,7 +158,9 @@ public class AuthenticateAction extends AbstractAction
                         redirectTo = c.getValue();
                         javax.servlet.http.Cookie redirectCookie = new Cookie(
                                 "login-redirect", "");
+                        redirectCookie.setDomain(domain);
                         redirectCookie.setMaxAge(0);
+                        redirectCookie.setPath("/");
                         httpResponse.addCookie(redirectCookie);
                     }
                 }
