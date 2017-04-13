@@ -84,7 +84,7 @@ public class AuthenticateAction extends AbstractAction
             }
 
             final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-            log.warn("LOGIN REDIR ="+redirectURL);
+
             if(null != redirectTo && !"".equals(redirectTo)){
                 javax.servlet.http.Cookie redirectCookie = new Cookie(
                         "login-redirect", redirectTo);
@@ -150,19 +150,17 @@ public class AuthenticateAction extends AbstractAction
 
                 httpResponse.addCookie(clarinPlCookie);
                 for(Cookie c : Arrays.asList(request.getCookies())){
-                    log.warn("COOKIE =" + c.getName() +" VALUE=" +c.getValue());
+
                     if("login-redirect".equals(c.getName())){
                         redirectTo = c.getValue();
                         c.setMaxAge(0);
                         httpResponse.addCookie(c);
                     }
                 }
-                log.warn("BEFORE REDIR =" + redirectTo);
+
                 if(null != redirectTo && !"".equals(redirectTo)){
-                    redirectURL = "https:/"+redirectTo+".clarin-pl.eu";
-                    log.warn("Redirect URL =" + redirectURL);
+                    redirectURL = "https://"+redirectTo+".clarin-pl.eu";
                 }
-                log.warn("REDIRECT =" + redirectURL);
                 httpResponse.sendRedirect(redirectURL);
                 
                 // log the user out for the rest of this current request, however they will be reauthenticated
