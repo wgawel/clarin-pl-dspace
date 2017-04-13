@@ -9,10 +9,7 @@ package org.dspace.app.xmlui.aspect.eperson;
 
 import java.security.Key;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.*;
@@ -27,9 +24,12 @@ import org.apache.cocoon.acting.AbstractAction;
 import org.apache.cocoon.environment.*;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.sitemap.PatternException;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
+import org.dspace.authenticate.LDAPAuthentication;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -59,6 +59,7 @@ import org.dspace.eperson.EPerson;
 public class AuthenticateAction extends AbstractAction
 {
 
+    private static Logger log = Logger.getLogger( AuthenticateAction.class);
     /**
      * Attempt to authenticate the user. 
      */
@@ -68,6 +69,7 @@ public class AuthenticateAction extends AbstractAction
         // First check if we are performing a new login
         Request request = ObjectModelHelper.getRequest(objectModel);
 
+        String redirectTo = request.getParameter("login_redirect");
         String email = request.getParameter("login_email");
         String password = request.getParameter("login_password");
         String realm = request.getParameter("login_realm");
@@ -76,7 +78,21 @@ public class AuthenticateAction extends AbstractAction
         // class.
         if ((email == null) || (password == null))
 		{
-			return null;
+            String redirectURL = request.getRequestURI();
+            if(redirectURL.contains("?")){
+                redirectURL = redirectURL.substring(0, redirectURL.indexOf("?"));
+            }
+
+            final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+            log.warn("LOGIN REDIR ="+redirectURL);
+            if(null != redirectTo && !"".equals(redirectTo)){
+                javax.servlet.http.Cookie redirectCookie = new Cookie(
+                        "login-redirect", redirectTo);
+                redirectCookie.setPath("/");
+                httpResponse.addCookie(redirectCookie);
+                httpResponse.sendRedirect(redirectURL);
+            }
+            return null;
 		}
         
         try
@@ -133,6 +149,20 @@ public class AuthenticateAction extends AbstractAction
                 clarinPlCookie.setPath("/");
 
                 httpResponse.addCookie(clarinPlCookie);
+                for(Cookie c : Arrays.asList(request.getCookies())){
+                    log.warn("COOKIE =" + c.getName() +" VALUE=" +c.getValue());
+                    if("login-redirect".equals(c.getName())){
+                        redirectTo = c.getValue();
+                        c.setMaxAge(0);
+                        httpResponse.addCookie(c);
+                    }
+                }
+                log.warn("BEFORE REDIR =" + redirectTo);
+                if(null != redirectTo && !"".equals(redirectTo)){
+                    redirectURL = "https:/"+redirectTo+".clarin-pl.eu";
+                    log.warn("Redirect URL =" + redirectURL);
+                }
+                log.warn("REDIRECT =" + redirectURL);
                 httpResponse.sendRedirect(redirectURL);
                 
                 // log the user out for the rest of this current request, however they will be reauthenticated
@@ -146,8 +176,7 @@ public class AuthenticateAction extends AbstractAction
         }
         catch (SQLException sqle)
         {
-            throw new PatternException("Unable to perform authentication",
-                    sqle);
+            throw new PatternException("Unable to perform authentication", sqle);
         }
         
         return null;
