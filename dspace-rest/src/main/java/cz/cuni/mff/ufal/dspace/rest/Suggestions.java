@@ -32,7 +32,6 @@ public class Suggestions extends Resource {
         Context context = null;
         try{
             context = new Context(Context.READ_ONLY);
-            //?q=*:*&rows=0&facet=on&wt=json&indent=true&facet.limit=-1&facet.field=$1
             JSONStream = searchService.searchJSON(context, queryArgs, null);
             context.complete();
         }catch (SearchServiceException | SQLException e){
