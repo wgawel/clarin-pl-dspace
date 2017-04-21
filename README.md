@@ -3,11 +3,25 @@
 
 * developed at: [Institute of Formal and Applied Linguistics, Charles University in Prague](http://ufal.mff.cuni.cz/)
 * primary deploy at: https://lindat.mff.cuni.cz/repository/xmlui/
-* contact: https://lindat.mff.cuni.cz/en/about-lindat-clarin or better clarin's slack https://clarineric.slack.com/ channel #dspace
+* contact: https://lindat.mff.cuni.cz/en/about-lindat-clarin or better clarin's slack https://clarineric.slack.com/messages/dspace/
 * wiki: https://github.com/ufal/lindat-dspace/wiki
 * release notes: [Release Notes](https://github.com/ufal/lindat-dspace/wiki/ReleaseNotes)
 
 # clarin-dspace deployments
+
+* LINDAT/CLARIN: https://lindat.mff.cuni.cz/repository/xmlui/
+* CLARINO: https://repo.clarino.uib.no/xmlui/
+* CLARIN.SI: https://www.clarin.si/repository/xmlui/
+* CLARIN-PL: https://clarin-pl.eu/dspace/
+* CLARIN-IT: https://dspace-clarin-it.ilc.cnr.it/repository/xmlui/
+* CLARIN-ES:
+* CLARIN-LT:
+* SWE-CLARIN:
+* University of Oxford - Oxford Text Archive:
+* RDA EU – ENVRI Summer School:
+* Centrum orální historie ÚSD AV ČR:
+
+There are several instances in other institutes which will join the list shortly.
 
 
 # Installation instructions
