@@ -21,7 +21,8 @@
 * RDA EU – ENVRI Summer School:
 * Centrum orální historie ÚSD AV ČR:
 
-There are several instances in other institutes which will join the list shortly.
+There are several instances in other institutes which will join the list shortly. 
+*If you are using or plan to use clarin-dspace, please get in touch.*
 
 
 # Installation instructions
