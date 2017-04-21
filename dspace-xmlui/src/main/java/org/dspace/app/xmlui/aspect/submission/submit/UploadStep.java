@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.commons.collections.CollectionUtils;
 import org.dspace.app.sherpa.SHERPAJournal;
@@ -47,7 +48,13 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.social.connect.NotConnectedException;
+import org.springframework.social.google.api.Google;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.xml.sax.SAXException;
 
 import cz.cuni.mff.ufal.DSpaceApi;
@@ -166,6 +173,11 @@ public class UploadStep extends AbstractSubmissionStep
 
     protected static final Message T_review_no_file = message("xmlui.Submission.submit.UploadStep.review.no_file");
 
+    protected static final Message T_LIST_DRIVE_FILES = message("xmlui.Submission.submit.UploadStep.social.drive.list_files");
+
+    public static final String RETURN_TO = "dspace.upload.returnto";
+    public static final String ITEM_ID = "dspace.upload.item_id";
+
     /**
      * Global reference to edit file page
      * (this is used when a user requests to edit a bitstream)
@@ -223,6 +235,7 @@ public class UploadStep extends AbstractSubmissionStep
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
+        ConfigurationService configurationService = new DSpace().getConfigurationService();
         // If we are actually editing information of an uploaded file,
         // then display that body instead!
         if(this.editFile!=null)
@@ -298,7 +311,32 @@ public class UploadStep extends AbstractSubmissionStep
 
             // UFAL/jmisutka
             upload.addItem(null, null).addHighlight("label label-warning").addContent(T_inform_about_licences);
-	        
+
+            if("true".equalsIgnoreCase(configurationService.getProperty("social.enabled"))) {
+                //spring-social
+                //remember where we came from in order to return after connecting
+                ObjectModelHelper.getRequest(objectModel).getSession().setAttribute(UploadStep.RETURN_TO, actionURL);
+                //remember what item are we working on
+                ObjectModelHelper.getRequest(objectModel).getSession().setAttribute(UploadStep.ITEM_ID, item.getID());
+                ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(new DSpace().getRequestService().getCurrentRequest().getHttpServletRequest().getSession(true).getServletContext());
+                Google google = null;
+                boolean googleAuthorized = false;
+                try {
+                    google = applicationContext.getBean(Google.class);
+                    googleAuthorized = google.isAuthorized();
+                } catch (BeanCreationException | NotConnectedException e) {
+                    google = null;
+                    googleAuthorized = false;
+                }
+                if (google == null || !googleAuthorized) {
+                    //show connect button if no valid connection, see socialproviders.js for the rest of the magic
+                    upload.addItem(null, null).addXref(contextPath + "/connect/google?scope=" + configurationService.getProperty("social.google.scope") + "&access_type=offline", " ", "turn_me_into_ajax_post_button google-drive");
+                } else {
+                    //or show link to list files
+                    upload.addItem(null, null).addXref(contextPath + "/drive/files", T_LIST_DRIVE_FILES, "social-provider-list-url");
+                }
+            }
+
             Button uploadSubmit = upload.addItem().addButton("submit_upload");
             uploadSubmit.setValue(T_submit_upload);
 	        

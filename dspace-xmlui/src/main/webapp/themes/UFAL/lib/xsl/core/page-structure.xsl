@@ -605,6 +605,7 @@
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='dragNdrop']">
             <script type="text/javascript" src="{$theme-path}/lib/js/dragndrop.js">&#160;</script>
             <script type="text/javascript" src="{$theme-path}/lib/js/fileupload.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/socialproviders.js">&#160;</script>
         </xsl:if>
 
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='extrametadata']">

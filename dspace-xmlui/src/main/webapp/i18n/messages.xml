@@ -1044,6 +1044,7 @@
 	<message key="xmlui.Submission.submit.UploadStep.column_checksum">Checksum</message>
 	<message key="xmlui.Submission.submit.UploadStep.column_order">Order</message>
 	<message key="xmlui.Submission.submit.UploadStep.review.no_file">You didn't upload any file.</message>
+	<message key="xmlui.Submission.submit.UploadStep.social.drive.list_files">Add files from your Drive <span class="google-drive">&#160;</span></message>
 
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Upload File(s)</message>
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file">File</message>

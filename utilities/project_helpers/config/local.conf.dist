@@ -392,4 +392,20 @@ lr.shortener.handle.prefix = 1234
 lr.XSendFileHeader =
 lr.XSendFilePathPrefix =
 
+####
+#
+# drive etc config
+#
+####
+#don't show anything in upload step
+social.enabled=false
+#id can't be null even when not configured
+social.google.clientId=fake_id
+#dto for secret
+social.google.clientSecret=fake_secret
+#neither password used to generate key to encrypt/decrypt user's tokens
+social.userconnection.encrypt.password=1234567890abcdef
+#salt must be hex encdoded string with length >= 8 bytes
+social.userconnection.encrypt.salt=1234abcd
+
 lr.compile.time=

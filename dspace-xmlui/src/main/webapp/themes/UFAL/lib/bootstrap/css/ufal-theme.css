@@ -1466,3 +1466,13 @@ div.modal-scrollbar {
   height: 15px;
   padding: 0 !important;
 }
+
+.google-drive {
+    background-image: url("https://www.google.com/drive/static/images/drive/logo-drive.png");
+    background-size: contain;
+    width: 32px;
+    height: 32px;
+    background-repeat: no-repeat;
+    background-color: azure;
+    display: block;
+}
