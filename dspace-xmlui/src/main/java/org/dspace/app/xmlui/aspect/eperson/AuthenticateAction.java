@@ -147,7 +147,7 @@ public class AuthenticateAction extends AbstractAction
                         createJWT(id,issuer, data.toString(), expirationTime)
                 );
                 clarinPlCookie.setDomain(domain);
-                clarinPlCookie.setMaxAge(60*60);
+                //clarinPlCookie.setMaxAge(60*60);
                 clarinPlCookie.setPath("/");
 
                 httpResponse.addCookie(clarinPlCookie);
