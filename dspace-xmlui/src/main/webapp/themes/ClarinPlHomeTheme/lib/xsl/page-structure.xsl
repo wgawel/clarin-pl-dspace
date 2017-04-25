@@ -298,11 +298,13 @@
 							</xsl:otherwise>
 						</xsl:choose>
 
+						<!--
 						<xsl:choose>
+
 							<xsl:when test="count(dri:div[@n='home']/dri:div[@n='stats']//dri:table[@n='list-table']/dri:row) > 1">
 								<xsl:call-template name="top-items" />
 							</xsl:when>
-						</xsl:choose>
+						</xsl:choose> -->
 					</div>
 					<!-- sidebar -->
 					<xsl:apply-templates select="/dri:document/dri:options" />
