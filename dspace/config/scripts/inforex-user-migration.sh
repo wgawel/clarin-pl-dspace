@@ -14,7 +14,7 @@ else
  fullname=$3
 fi
 
-db_host=inforex.clarin-pl.eu
+db_host=10.17.135.32
 db_user=inforex
 db_pass=inforex1qaz
 

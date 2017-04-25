@@ -296,6 +296,7 @@ public class ProcessItems extends ItemsResource {
 
         log.info("Reading item(handle=" + prefix + "/" + suffix + ").");
         org.dspace.core.Context context = null;
+
         Map<String, String> m = new HashMap<String, String>();
         m.put("redirect", null);
         m.put("error", null);
