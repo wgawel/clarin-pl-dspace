@@ -154,8 +154,6 @@
             <artifactId>commons-lang</artifactId>
         </dependency>
 
-
-
         <!-- because of event listeners-->
         <dependency>
             <groupId>cz.cuni.mff.ufal.dspace</groupId>
@@ -166,10 +164,6 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
             <classifier>classes</classifier>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
         </dependency>
 
     </dependencies>

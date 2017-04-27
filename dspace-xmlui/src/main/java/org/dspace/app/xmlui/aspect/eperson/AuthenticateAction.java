@@ -7,18 +7,12 @@
  */
 package org.dspace.app.xmlui.aspect.eperson;
 
-import java.security.Key;
 import java.sql.SQLException;
 import java.util.*;
 
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.*;
 import javax.servlet.http.Cookie;
-import javax.xml.bind.DatatypeConverter;
 
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.acting.AbstractAction;
 import org.apache.cocoon.environment.*;
@@ -26,10 +20,8 @@ import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.sitemap.PatternException;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
-import org.dspace.authenticate.LDAPAuthentication;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -74,8 +66,6 @@ public class AuthenticateAction extends AbstractAction
         String password = request.getParameter("login_password");
         String realm = request.getParameter("login_realm");
 
-        String id = UUID.randomUUID().toString();
-        String issuer  = ConfigurationManager.getProperty("dspace.url");
         String domain = ConfigurationManager.getProperty("dspace.hostname");
 
         // Protect against NPE errors inside the authentication
@@ -133,21 +123,13 @@ public class AuthenticateAction extends AbstractAction
                 // Authentication successful send a redirect.
                 final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 
-
-
-            	Long expirationTime = new Long("600000");
-
-                StringBuilder data = new StringBuilder();
-                data.append("{\"login\":\"").append(email).append("\",");
-                data.append("\"fullname\":\"").append(eperson.getFullName()).append("\"}");
-
+            	eperson.setClarinTokenId();
+            	eperson.update();
 
                 javax.servlet.http.Cookie clarinPlCookie = new Cookie(
                         "clarin-pl-token",
-                        createJWT(id,issuer, data.toString(), expirationTime)
-                );
+                        eperson.getClarinToken());
                 clarinPlCookie.setDomain(domain);
-                //clarinPlCookie.setMaxAge(60*60);
                 clarinPlCookie.setPath("/");
 
                 httpResponse.addCookie(clarinPlCookie);
@@ -187,35 +169,4 @@ public class AuthenticateAction extends AbstractAction
         return null;
     }
 
-    //Sample method to construct a JWT
-    private String createJWT(String id, String issuer, String subject, long ttlMillis) {
-
-        //The JWT signature algorithm we will be using to sign the token
-        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-
-        long nowMillis = System.currentTimeMillis();
-        Date now = new Date(nowMillis);
-
-        //We will sign our JWT with our ApiKey secret
-        String key = ConfigurationManager.getProperty("dspace.token.key");
-        byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(key);
-        Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
-
-        //Let's set the JWT Claims
-        JwtBuilder builder = Jwts.builder().setId(id)
-                .setIssuedAt(now)
-                .setSubject(subject)
-                .setIssuer(issuer)
-                .signWith(signatureAlgorithm, signingKey);
-
-        //if it has been specified, let's add the expiration
-        if (ttlMillis >= 0) {
-            long expMillis = nowMillis + ttlMillis;
-            Date exp = new Date(expMillis);
-            builder.setExpiration(exp);
-        }
-
-        //Builds the JWT and serializes it to a compact, URL-safe string
-        return builder.compact();
-    }
 }

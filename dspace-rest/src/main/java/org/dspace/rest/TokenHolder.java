@@ -107,35 +107,32 @@ public class TokenHolder
         return token;
     }
 
-    public static String requestUserData(String email, String issuer) throws WebApplicationException
+    public static String requestUserData(String token) throws WebApplicationException
     {
         org.dspace.core.Context context = null;
-        StringBuilder data = null;
+        StringBuilder data = new StringBuilder();
 
         try
         {
             context = new org.dspace.core.Context();
-            EPerson dspaceUser = EPerson.findByEmail(context, email);
-
-
-            data.append("{\"login\":\"").append(email).append("\",");
-            data.append("\"password\":\"").append(dspaceUser.getPasswordHash()).append("\",");
+            EPerson dspaceUser = EPerson.findByClarinTokenId(context, token);
+            log.warn(dspaceUser.getEmail());
+            data.append("{\"login\":\"").append(dspaceUser.getEmail()).append("\",");
             data.append("\"fullname\":\"").append(dspaceUser.getFullName()).append("\"}");
 
-            log.trace("User data requested(From: "+issuer +"for User: "+ email+")");
+            log.warn("User data requested(for User: "+ data.toString()+")");
             context.complete();
-
         }
         catch (SQLException e)
         {
             context.abort();
-            log.error("Could not read user from database. Message:" + e);
+            log.error("Could not read user from database. Message:", e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
         catch (AuthorizeException e)
         {
             context.abort();
-            log.error("Could not find user, AuthorizeException. Message:" + e);
+            log.error("Could not find user, AuthorizeException. Message:",e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
         finally

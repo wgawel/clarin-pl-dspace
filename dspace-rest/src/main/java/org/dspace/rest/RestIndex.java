@@ -8,33 +8,21 @@
 package org.dspace.rest;
 
 import java.io.UnsupportedEncodingException;
-import java.security.Key;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.DatatypeConverter;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.rest.common.Status;
 import org.dspace.rest.common.User;
 import org.dspace.rest.exceptions.ContextException;
-import org.dspace.rest.exceptions.UntrustedSourceException;
+
 
 /**
  * Root of RESTful api. It provides login and logout. Also have method for
@@ -179,90 +167,17 @@ public class RestIndex {
     @Path("/validate-token/{token}")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Response validateToken(@PathParam("token") String token) {
+        String   payload = "";
         try {
-            String t = parseJWT(token);
-            return Response.ok(t, "text/plain").build();
-        } catch ( UntrustedSourceException ex) {
-            log.error("Error : ", ex);
+            payload = TokenHolder.requestUserData(token);
+        } catch (WebApplicationException ex) {
             return Response.status(Response.Status.FORBIDDEN).build();
-        //} catch (Exception x){
-        } catch (Exception ee){
-            log.error("Error : ", ee);
-            return Response
-                    .status(Response.Status.BAD_REQUEST).header("Error", ee.getMessage()).build();
         }
+
+        return Response.ok(payload, "application/json").build();
     }
 
-    private static List<String> trustedDomains = Arrays.asList("clarin-pl.eu/dspace", "ws.clarin-pl.eu", "nextcloud.clarin-pl.eu","inforex.clarin-pl.eu");
-
-    private String parseJWT(String jwt) throws UntrustedSourceException {
-
-        //This line will throw an exception if it is not a signed JWS (as expected)
-        String key = ConfigurationManager.getProperty("dspace.token.key");
-
-        Claims claims = Jwts.parser()
-                .setSigningKey(DatatypeConverter.parseBase64Binary(key))
-                .parseClaimsJws(jwt).getBody();
-
-        String payload = "";
-
-        if(!trustedDomains.contains(claims.getIssuer())){
-            throw new UntrustedSourceException("Untrusted source: " + claims.getIssuer());
-        }
-
-        try {
-            payload = claims.getSubject();
-        } catch (Exception e){
-            log.error("Error : ", e);
-        }
-
-        String token = createJWT(claims.getId(), claims.getIssuer(), payload, 5000000l);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("ID: " + claims.getId()).append("\n");
-        sb.append("Subject: " + payload).append("\n");
-        sb.append("Issuer: " + claims.getIssuer()).append("\n");
-        sb.append("Payload: " + payload).append("\n");
-        sb.append("Expiration: " + claims.getExpiration()).append("\n");
-        log.info("TEST TOKEN : " + sb.toString());
-
-        return token;
-    }
-
-    //Sample method to construct a JWT
-    private String createJWT(String id, String issuer, String subject, long ttlMillis) {
-
-        //The JWT signature algorithm we will be using to sign the token
-        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-
-        long nowMillis = System.currentTimeMillis();
-        Date now = new Date(nowMillis);
-
-        String key = ConfigurationManager.getProperty("dspace.token.key");
-
-        //We will sign our JWT with our ApiKey secret
-        byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(key);
-        Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
-
-        //Let's set the JWT Claims
-        JwtBuilder builder = Jwts.builder().setId(id)
-                .setIssuedAt(now)
-                .setSubject(subject)
-                .setIssuer(issuer)
-                .signWith(signatureAlgorithm, signingKey);
-
-        //if it has been specified, let's add the expiration
-        if (ttlMillis >= 0) {
-            long expMillis = nowMillis + ttlMillis;
-            Date exp = new Date(expMillis);
-            builder.setExpiration(exp);
-        }
-
-        //Builds the JWT and serializes it to a compact, URL-safe string
-        return builder.compact();
-    }
-
-    /**
+  /**
      * Method to logout a user from DSpace REST API. Removes the token and user from
      * TokenHolder.
      * 

@@ -9,6 +9,8 @@ package org.dspace.eperson;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -205,6 +207,44 @@ public class EPerson extends DSpaceObject
         // All email addresses are stored as lowercase, so ensure that the email address is lowercased for the lookup 
         TableRow row = DatabaseManager.findByUnique(context, "eperson",
                 "email", email.toLowerCase());
+
+        if (row == null)
+        {
+            return null;
+        }
+        else
+        {
+            // First check the cache
+            EPerson fromCache = (EPerson) context.fromCache(EPerson.class, row
+                    .getIntColumn("eperson_id"));
+
+            if (fromCache != null)
+            {
+                return fromCache;
+            }
+            else
+            {
+                return new EPerson(context, row);
+            }
+        }
+    }
+
+    /**
+     * Find the eperson by their clarin session token.
+     *
+     * @return EPerson, or {@code null} if none such exists.
+     */
+    public static EPerson findByClarinTokenId(Context context, String token)
+            throws SQLException, AuthorizeException
+    {
+        if (token == null && "".equals(token))
+        {
+            return null;
+        }
+
+        // All email addresses are stored as lowercase, so ensure that the email address is lowercased for the lookup
+        TableRow row = DatabaseManager.findByUnique(context, "eperson",
+                "clarin_token_id", token);
 
         if (row == null)
         {
@@ -1109,6 +1149,22 @@ public class EPerson extends DSpaceObject
         }
 
         return answer;
+    }
+
+    public void setClarinTokenId(){
+        SecureRandom random = new SecureRandom();
+        String token = new BigInteger(640, random).toString(32);
+        myRow.setColumn("clarin_token_id", token);
+        modified = true;
+    }
+
+    public void clearClarinTokenId(){
+        myRow.setColumn("clarin_token_id", "");
+        modified = true;
+    }
+
+    public String getClarinToken(){
+        return myRow.getStringColumn("clarin_token_id");
     }
 
     /**
