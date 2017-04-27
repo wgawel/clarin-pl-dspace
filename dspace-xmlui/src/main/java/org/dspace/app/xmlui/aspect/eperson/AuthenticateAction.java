@@ -148,7 +148,7 @@ public class AuthenticateAction extends AbstractAction
                 }
 
                 if(null != redirectTo && !"".equals(redirectTo)){
-                    redirectURL = "http://"+redirectTo+".clarin-pl.eu";
+                    redirectURL = redirectTo;
                 }
                 httpResponse.sendRedirect(redirectURL);
                 
