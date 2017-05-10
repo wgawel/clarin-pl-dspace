@@ -13,7 +13,7 @@
 * CLARINO: https://repo.clarino.uib.no/xmlui/
 * CLARIN.SI: https://www.clarin.si/repository/xmlui/
 * CLARIN-PL: https://clarin-pl.eu/dspace/
-* CLARIN-IT: https://dspace-clarin-it.ilc.cnr.it/repository/xmlui/
+* ILC4CLARIN: https://dspace-clarin-it.ilc.cnr.it/repository/xmlui/
 * CLARIN-ES:
 * CLARIN-LT:
 * SWE-CLARIN:
