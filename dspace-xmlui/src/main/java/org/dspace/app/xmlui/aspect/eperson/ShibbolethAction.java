@@ -74,6 +74,7 @@ public class ShibbolethAction extends AbstractAction
             {
                 Request request = ObjectModelHelper.getRequest(objectModel);
             	// The user has successfully logged in
+                String redirectTo = request.getParameter("login_redirect");
             	String redirectURL = request.getContextPath();
             	
             	if (AuthenticationUtil.isInterupptedRequest(objectModel))
