@@ -10,7 +10,9 @@ package org.dspace.core;
 import java.util.List;
 
 import org.dspace.core.service.NewsService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class NewsServiceImpl implements NewsService {
 	private List<String> acceptableFilenames;
 	
