@@ -9,7 +9,7 @@ password=$2
 #Firstname + Lastname
 fullname=$3
 
-db_host=mewex.clarin-pl.eu
+db_host=156.17.135.36
 db_user=tnaskret
 db_pass=!tnaskret123##
 db_name=wielowyr
