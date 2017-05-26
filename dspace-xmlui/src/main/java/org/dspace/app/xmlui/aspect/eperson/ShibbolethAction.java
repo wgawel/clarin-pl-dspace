@@ -8,9 +8,11 @@
 package org.dspace.app.xmlui.aspect.eperson;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.avalon.framework.parameters.Parameters;
@@ -63,6 +65,7 @@ public class ShibbolethAction extends AbstractAction
         {
             // rely on implicit authN of Shib
             Context context = AuthenticationUtil.authenticate(objectModel, null, null, null);
+            String domain = ConfigurationManager.getProperty("dspace.hostname");
 
             EPerson eperson = null;
             if(context != null)
@@ -75,8 +78,24 @@ public class ShibbolethAction extends AbstractAction
                 Request request = ObjectModelHelper.getRequest(objectModel);
             	// The user has successfully logged in
                 String redirectTo = request.getParameter("login_redirect");
-            	String redirectURL = request.getContextPath();
-            	
+
+                String redirectURL = request.getRequestURI();
+                if(redirectURL.contains("?")){
+                    redirectURL = redirectURL.substring(0, redirectURL.indexOf("?"));
+                }
+
+                final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+
+                if(null != redirectTo && !"".equals(redirectTo)){
+                    javax.servlet.http.Cookie redirectCookie = new Cookie(
+                            "login-redirect", redirectTo);
+                    redirectCookie.setDomain(domain);
+                    redirectCookie.setPath("/");
+                    httpResponse.addCookie(redirectCookie);
+                    httpResponse.sendRedirect(redirectURL);
+                    return null;
+                }
+
             	if (AuthenticationUtil.isInterupptedRequest(objectModel))
             	{
             		// Resume the request and set the redirect target URL to
@@ -95,10 +114,7 @@ public class ShibbolethAction extends AbstractAction
             		}
             		redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "/";	
             	}
-            	
-                // Authentication successful - send a redirect.
-                final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-                
+
             	String email = eperson.getEmail();
             	if (email == null) {
             		redirectURL = request.getContextPath() + "/set-email";
@@ -111,7 +127,36 @@ public class ShibbolethAction extends AbstractAction
                     redirectURL = request.getContextPath() + "/welcome-message";
                     request.getSession().setAttribute("shib.welcome", request.getSession().getAttribute("shib.welcome"));
             	}
-                
+
+
+                eperson.setClarinTokenId();
+                eperson.update();
+
+                javax.servlet.http.Cookie clarinPlCookie = new Cookie(
+                        "clarin-pl-token",
+                        eperson.getClarinToken());
+                clarinPlCookie.setDomain(domain);
+                clarinPlCookie.setPath("/");
+
+                httpResponse.addCookie(clarinPlCookie);
+
+                for(Cookie c : Arrays.asList(request.getCookies())){
+
+                    if("login-redirect".equals(c.getName())){
+                        redirectTo = c.getValue();
+                        javax.servlet.http.Cookie redirectCookie = new Cookie(
+                                "login-redirect", "");
+                        redirectCookie.setDomain(domain);
+                        redirectCookie.setMaxAge(0);
+                        redirectCookie.setPath("/");
+                        httpResponse.addCookie(redirectCookie);
+                    }
+                }
+
+                if(null != redirectTo && !"".equals(redirectTo)){
+                    redirectURL = redirectTo;
+                }
+
                 httpResponse.sendRedirect(redirectURL);
                 
                 // log the user out for the rest of this current request, however they will be reauthenticated

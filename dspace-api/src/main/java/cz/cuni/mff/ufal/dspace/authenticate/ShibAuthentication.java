@@ -53,8 +53,7 @@ import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
  * modified for LINDAT/CLARIN
  * @version $Revision$
  */
-public class ShibAuthentication implements AuthenticationMethod
-{
+public class ShibAuthentication implements AuthenticationMethod {
     /** log4j category */
     private static Logger log = cz.cuni.mff.ufal.Logger.getLogger(ShibAuthentication.class);
 
