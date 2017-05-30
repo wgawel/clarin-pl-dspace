@@ -554,6 +554,8 @@ public class ItemsResource extends Resource
 
             dspaceBitstream = org.dspace.content.Bitstream.find(context, dspaceBitstream.getID());
             bitstream = new Bitstream(dspaceBitstream, "");
+            //trigger auto generated metadata on item
+            dspaceItem.update();
 
             context.complete();
 
