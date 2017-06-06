@@ -871,6 +871,7 @@
                 <xsl:with-param name="size" select="@SIZE" />
             </xsl:call-template>
         </xsl:variable>
+        <xsl:variable name="md5_checksum" select="@CHECKSUM"/>
 			<div class="thumbnail" style="margin-bottom: 10px;">
 				<a>
 					<xsl:attribute name="href">
@@ -938,6 +939,12 @@
 								 	<xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label" />
 						</dd>
 					</xsl:if>
+					<dt>
+						<i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-checksum</i18n:text>
+					</dt>
+					<dd>
+						<xsl:value-of select="$md5_checksum"/>
+					</dd>
 				</dl>
 				<a class="filebutton label label-info">
 					<xsl:attribute name="href">
