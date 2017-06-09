@@ -1072,7 +1072,7 @@
    		<xsl:if test="$file-count &gt; $lr.download.all.limit.min.file.count and $file-size &lt; $lr.download.all.limit.max.file.size">
             <!-- download all only under certain conditions (number and size of files) -->     
                                
-            <a id="download-all-button" class="label label-info pull-right">
+            <a id="download-all-button" class="label label-info">
                 <xsl:choose>
                     <xsl:when test="$file-size &gt; $lr.download.all.alert.min.file.size">
                         <!-- display alert before downloading large files -->
