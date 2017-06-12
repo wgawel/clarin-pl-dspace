@@ -284,6 +284,7 @@
 
             <script type="text/javascript" src="{$contextPath}/themes/UFAL/lib/bootstrap/js/bootstrap.min.js">&#160;</script>
             <script type="text/javascript" src="{$contextPath}/themes/UFAL/lib/bootstrap/js/ufal.min.js">&#160;</script>
+            <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js">&#160;</script>
 
             <!-- Add the title in -->
             <title>

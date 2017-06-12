@@ -727,6 +727,11 @@
 			</script>
 		</xsl:for-each>
 
+		<script type="text/javascript">
+			<xsl:attribute name="src">
+				<xsl:text>https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js</xsl:text>
+			</xsl:attribute>&#160;</script>
+
 		<!-- add "shared" javascript from static, path is relative to webapp root -->
 		<xsl:for-each
 			select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][@qualifier='static']">
