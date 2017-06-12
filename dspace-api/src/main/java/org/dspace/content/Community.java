@@ -20,9 +20,14 @@ import org.dspace.core.*;
 import org.dspace.eperson.Group;
 import org.dspace.event.Event;
 import org.dspace.handle.HandleManager;
+import org.dspace.identifier.Handle;
+import org.dspace.identifier.Identifier;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.IdentifierService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
+import org.dspace.utils.DSpace;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -190,11 +195,15 @@ public class Community extends DSpaceObject
         
         try
         {
-            c.handle = (handle == null) ?
-                       HandleManager.createHandle(context, c) :
-                       HandleManager.createHandle(context, c, handle);
+            IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
+            if(handle == null) {
+                       identifierService.register(context, c);
+            }else{
+                identifierService.register(context, c, handle);
+            }
+            c.handle = identifierService.lookup(context, c, Handle.class);
         }
-        catch(IllegalStateException ie)
+        catch(IllegalStateException | IdentifierException ie)
         {
             //If an IllegalStateException is thrown, then an existing object is already using this handle
             //Remove the community we just created -- as it is incomplete
@@ -207,7 +216,7 @@ public class Community extends DSpaceObject
             } catch(Exception e) { }
 
             //pass exception on up the chain
-            throw ie;
+            throw new IllegalStateException(ie);
         }
 
         if(parent != null)
