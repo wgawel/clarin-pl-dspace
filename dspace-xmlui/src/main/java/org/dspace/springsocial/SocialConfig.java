@@ -7,10 +7,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.utils.DSpace;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
@@ -66,6 +63,7 @@ import static org.springframework.security.crypto.util.EncodingUtils.subArray;
 @EnableSocial
 @EnableTransactionManagement
 @EnableAsync
+@Profile("drive-beta")
 public class SocialConfig implements SocialConfigurer, AsyncConfigurer {
 
     Logger log = Logger.getLogger(SocialConfig.class);

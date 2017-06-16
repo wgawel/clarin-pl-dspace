@@ -5,6 +5,7 @@ import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.ConnectionRepository;
@@ -25,6 +26,7 @@ import java.util.Map;
  * @see DriveController for interaction with one of the providers.
  */
 @Configuration
+@Profile("drive-beta")
 public class SocialMVCComponents {
 
     ConfigurationService configurationService = new DSpace().getConfigurationService();
