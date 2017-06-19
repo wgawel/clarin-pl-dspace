@@ -540,6 +540,11 @@
             </xsl:attribute>&#160;</script>
 
         <script type="text/javascript">
+            <xsl:attribute name="src">
+                <xsl:text>https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js</xsl:text>
+            </xsl:attribute>&#160;</script>
+
+        <script type="text/javascript">
             <xsl:variable name="currentLocale">
                 <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
             </xsl:variable>
