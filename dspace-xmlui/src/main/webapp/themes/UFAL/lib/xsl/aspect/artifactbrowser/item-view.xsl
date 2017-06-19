@@ -238,7 +238,7 @@
 				<dl id="item-pid" class="dl-horizontal" style="clear:both;">
                     <dt style="text-align: left">
                         <i class="fa fa-share">&#160;</i>
-                        <span><i18n:text>PID</i18n:text></span>
+                        <span><i18n:text>xmlui.dri2xhtml.METS-1.0.item-pid</i18n:text></span>
                     </dt>
                     <dd style="padding-right: 40px;">
                         <a id="item_pid">
