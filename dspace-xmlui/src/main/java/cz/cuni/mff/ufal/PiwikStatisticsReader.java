@@ -222,7 +222,7 @@ public class PiwikStatisticsReader extends AbstractReader {
 			} else 
 			if(PIWIK_API_MODE.equals("cached")) {
 				
-				String url = PIWIK_API_URL_CACHED + "/handle?h=" + item.getHandle() + "period=" + period;
+				String url = PIWIK_API_URL_CACHED + "handle?h=" + item.getHandle() + "&period=" + period;
 				
 				if(request.getParameter("date")!=null) {
 					String date = request.getParameter("date");
