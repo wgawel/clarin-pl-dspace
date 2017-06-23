@@ -80,9 +80,16 @@ plotViews = function (div, data, color, tf, ti, highlightString) {
 	var ticks = [];
 	
 	if(current_view == "year") {
-		ticks = Object.keys(data)
+		try{
+			ticks = Object.keys(data)
 	                .filter(function(e) { return e !== 'total' && !e.startsWith('nb') })
 	                .sort(function(a,b){return parseInt(a)-parseInt(b)});
+		}catch(e){
+			var cy = new Date().getFullYear();
+			for(var i=cy-5;i<=cy;i++) {
+				ticks.push("" + i);
+			}
+		}
 	}
 	else
 	if(current_view == "month") {
