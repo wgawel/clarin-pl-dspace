@@ -570,6 +570,7 @@
             <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.cursor.min.js">&#160;</script>
             <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.dateAxisRenderer.min.js">&#160;</script>
             <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.enhancedLegendRenderer.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.barRenderer.min.js">&#160;</script>            
             <script type="text/javascript" src="{$theme-path}/lib/js/piwik_charts.js">&#160;</script>
             <script type="text/javascript" src="{$theme-path}/lib/js/moment.min.js">&#160;</script>
             <script type="text/javascript" src="{$theme-path}/lib/js/daterangepicker.js">&#160;</script>

@@ -1,319 +1,386 @@
+var current_view  = "year";
+var current_year  = null;
+var current_month = null;
+var current_day   = null;
+var current_date  = null;
+var current_tab   = "views";
+var loaded_data = {};
+var already_loaded_dates = {};
+
+var monthNames = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
 jQuery(document).ready(function (){
 
-	var endDate = moment();
-	var startDate = moment().subtract(6, "days");
-
-	jQuery('input[name="daterange"]').daterangepicker(
-		{
-
-ranges: {
-           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-           'This Month': [moment().startOf('month'), moment()],
-           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-	   'This Year': [moment().startOf('year'), moment()]
-        },
-			locale: {
-				format: 'YYYY-MM-DD'
-			},
-			startDate: startDate,
-			endDate: endDate
-		},
-		function(start, end, label){
-			startDate = start;
-			endDate = end;
-			$('.nav-tabs a[href="#views"]').tab('show');
-			jQuery("#piwik-charts").each(loadContents)
-		}
-	);
-
-	jQuery("#piwik-charts").each(loadContents);
-
-	function loadContents() {
-		var targetDiv = jQuery(this);
-		var reportURL = targetDiv.attr("data-url");
-		var tickInterval = targetDiv.attr("interval");
-
-		var ticks = endDate.diff(startDate, "day");
-		if(ticks >= 6) {
-			tickInterval = "".concat(ticks / 6).concat(" day");
-		} else {
-			tickInterval = "".concat(1).concat(" day");
-		}
-
-		var visitsPlot;
-		var downloadPlot;
-
-		if(reportURL.indexOf("?")!=-1) {
-			reportURL = reportURL.concat("&date=", startDate.format("YYYY-MM-DD"), ",", endDate.format("YYYY-MM-DD"));
-		}else{
-			reportURL = reportURL.concat("?date=", startDate.format("YYYY-MM-DD"), ",", endDate.format("YYYY-MM-DD"));
-		}
-
-		jQuery.ajax(
-				{
-					url : reportURL,
-					dataType : 'json',
-					beforeSend: function() {
-					
-					jQuery('#visits_over_time_chart').html('<div id="piwik-loading" style="width: 100%; height: 100%; z-index=1; display: none;"><i class="fa fa-pulse fa-3x" >&#xf110;</i></div>');
-        				jQuery("#piwik-loading").css("display", "block");
-    				}
-				}
-			)
-			.done(
-					function(data) {
-
-						jQuery("#piwik-loading").css("display", "none");
-
-						var nb_views = [];
-						var nb_downloads = [];
-						var dates = Object.keys(data[0]);
-						dates.sort(dateSorter);
-						var total_views = 0;
-						var total_unique_views = 0;
-						var total_downloads = 0;
-						var total_unique_downloads = 0;
-						var total_visits = 0;
-						var total_unique_visits = 0;
-						for(var i=0;i<dates.length;i++) {
-                            var values0 = data[0][dates[i]];
-                            var values1 = data[1][dates[i]];
-                            nb_views[i] = [dates[i], values0['nb_pageviews']||0];
-                            nb_downloads[i] = [dates[i], values1['nb_pageviews']||0];
-                            total_views += nb_views[i][1];
-                            total_unique_views += values0['nb_uniq_pageviews']||0;
-                            total_downloads += nb_downloads[i][1];
-                            total_unique_downloads += values1['nb_uniq_pageviews']||0;
-                            total_visits += values0['nb_visits']||0;
-                            total_unique_visits += values0['nb_uniq_visitors']||0;
-						}
-						var values2 = mapBitstreamCounts(data[2]);						
-						var bitwiseDownloads = "<div class='container' style='margin-top: 20px;'>";
-						bitwiseDownloads += "<table class='table table-striped'><thead><tr><th colspan='2'>Filewise Statistics</th></tr></thead><tbody>"
-						if("allzip" in values2) {
-							bitwiseDownloads += "<tr class='text-info'><td class='col-md-2 text-right'><strong>" + values2["allzip"] + "</strong></td><td>Download All files as zip <i class='fa fa-file-archive-o'></i></td></tr>";
-							delete values2["allzip"];
-						}
-						values2Array = sortMapByValue(values2);
-						for(i in values2Array) {
-							bitwiseDownloads += "<tr><td class='col-md-2 text-right'><strong>" + values2Array[i][1] + "</strong></td><td>" + values2Array[i][0] + "</td></tr>";
-						}
-						bitwiseDownloads += "</tbody></table>";
-		jQuery('#visits_summary_report .views').html("<strong>" + total_views + "</strong> pageviews, <strong>" + total_unique_views + "</strong> unique pageviews.");
-		jQuery('#visits_summary_report .visits').html("<strong>" + total_visits + "</strong> visits, <strong>" + total_unique_visits + "</strong> unique visitors.");
-		jQuery('#visits_summary_report .downloads').html("<strong>" + total_downloads + "</strong> downloads, <strong>" + total_unique_downloads + "</strong> unique downloads.");
-		jQuery('#views_tab_count').html("<strong>" + total_views + "</strong>");
-		jQuery('#downloads_tab_count').html("<strong>" + total_downloads + "</strong>");
-		jQuery('#period').html(dates[0] + " to " + dates[dates.length-1]);
-
-                         visitsPlot = $.jqplot ('visits_over_time_chart', [nb_views, nb_views], {
-                        		axes:{
-                        			xaxis:{
-                        				renderer:$.jqplot.DateAxisRenderer,
-                        				tickOptions:{
-                        					formatString:'%Y %a %#d %b',
-								showGridline: false,
-                        				},
-                        				tickInterval: tickInterval,
-                        				min: dates[0],
-                        				max: dates[dates.length-1],
-                        			},
-
-                        			yaxis:{
-                        				min: 0,
-                        				numberTicks: 3
-                        			}
-                        		},
-
-                          		seriesDefaults: {
-                          			lineWidth:3,
-                          			shadow:false,
-                          			markerOptions: {
-                          				size: 6
-                          			},
-                          			highlighter: {formatString: "<div style='color: #FFFFFF;'>%s<BR/><strong style='font-size: 14px;'>%s</strong> Visits</div>"}
-                          		},
-
-                        		grid: {background: '#F0F0F0', borderWidth: 0, shadow: false},
-
-                        		seriesColors: [ "#bee89c", "#60a22a" ],
-
-					series: [
-					        {fill: [true, false]}
-					],
-
-                        		highlighter: {
-                        			show: true,
-                        			sizeAdjust: 7.5,
-                        			tooltipAxes: "both",
-                        		},
-
-                        });
-
-                        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-                        	  //e.target // newly activated tab
-                        	  //e.relatedTarget // previous active tab
-                        	  var target = e.target.getAttribute("aria-controls");
-                        	  if(target=='views') {
-					jQuery('#visits_over_time_chart').html("");
-                        		visitsPlot = $.jqplot ('visits_over_time_chart', [nb_views, nb_views], {
-                              		axes:{
-                              			xaxis:{
-                              				renderer:$.jqplot.DateAxisRenderer,
-                              				tickOptions:{
-                              					formatString:'%Y %a %#d %b',
-      								showGridline: false,
-                              				},
-                              				tickInterval: tickInterval,
-                              				min: dates[0],
-                              				max: dates[dates.length-1],
-                              			},
-
-                              			yaxis:{
-                              				min: 0,
-                              				numberTicks: 3
-                              			}
-                              		},
-
-                                		seriesDefaults: {
-                                			lineWidth:3,
-                                			shadow:false,
-                                			markerOptions: {
-                                				size: 6
-                                			},
-                                			highlighter: {formatString: "<div style='color: #FFFFFF;'>%s<BR/><strong style='font-size: 14px;'>%s</strong> Visits</div>"}
-                                		},
-
-                              		grid: {background: '#F0F0F0', borderWidth: 0, shadow: false},
-
-                              		seriesColors: [ "#bee89c", "#60a22a" ],
-
-      					series: [
-      					        {fill: [true, false]}
-      					],
-
-                              		highlighter: {
-                              			show: true,
-                              			sizeAdjust: 7.5,
-                              			tooltipAxes: "both",
-                              		},
-
-                              });
-                        	  } else
-                        	  if(target=='downloads'){
-				  jQuery('#downloads_over_time_chart').html("");
-                                  downloadPlot = $.jqplot ('downloads_over_time_chart', [nb_downloads, nb_downloads], {
-                              		axes:{
-                              			xaxis:{
-                              				renderer:$.jqplot.DateAxisRenderer,
-                              				tickOptions:{
-                              					formatString:'%Y %a %#d %b',
-      								showGridline: false,
-                              				},
-                              				tickInterval: tickInterval,
-                              				min: dates[0],
-                              				max: dates[dates.length-1],
-                              			},
-
-                              			yaxis:{
-                              				min: 0,
-                              				numberTicks: 3
-                              			}
-                              		},
-
-                              		seriesDefaults: {
-                              			lineWidth:3,
-                              			shadow:false,
-                              			markerOptions: {
-                              				size: 6
-                              			},
-                              			highlighter: {formatString: "<div style='color: #FFFFFF;'>%s<BR/><strong style='font-size: 14px;'>%s</strong> Downloads</div>"}
-                              		},
-
-                              		grid: {background: '#F0F0F0', borderWidth: 0, shadow: false},
-
-                              		seriesColors: ["#94c7ea", "#1f78b4"],
-
-      					series: [
-      						{fill: [true, false]}
-      					],
-
-                              		highlighter: {
-                              			show: true,
-                              			sizeAdjust: 7.5,
-                              			tooltipAxes: "both",
-                              		},
-
-                              });
-                                  
-                                  
-                                  var bitwiseDownloadsDiv = jQuery('#bitwiseDownloads');
-                                  if(bitwiseDownloadsDiv.html()==null) {
-                                	  jQuery('#downloads').append('<div id="bitwiseDownloads"></div>');
-                                  }                                  
-                                  jQuery('#bitwiseDownloads').html(bitwiseDownloads);
-                                  
-                        	  }
-                        })
-
-                        jQuery(window).resize(function(){
-				if(visitsPlot!=null) visitsPlot.replot();
-                        	if(downloadPlot!=null) downloadPlot.replot();
-                        });
-
-					}
-			)
-			.fail(
-					function(data) {
-					}
-			);
-	}
-
-	var dateRE = /^(\d{2})[\/\- ](\d{2})[\/\- ](\d{4})/;
-
-    function dateSorter(a, b) {
-        a = a.replace(dateRE, "$3$2$1");
-        b = b.replace(dateRE, "$3$2$1");
-        if (a > b) return 1;
-        if (a < b) return -1;
-        return 0;
-    };
-
-	jQuery(".jqplot-to-picture").click(function() {
-		var a = jQuery(this);
-		var t = jQuery(a.attr("target-div"));
-		var imgData = t.jqplotToImageStr({});
-		var imgElem = jQuery('#jqplot-save-as-picture img').attr('src',imgData);
-		imgElem.css('display', 'block');
-		jQuery("#jqplot-save-as-picture").modal();
+	$.jqplot.config.enablePlugins = true;
+	
+    already_loaded_dates = {"views":{}, "downloads":{}};
+    loaded_data = {"views":{}, "downloads":{}};
+	
+	loadContents();
+	
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+		current_tab = e.target.getAttribute("aria-controls");
+		loadContents();
 	});
 	
-	function mapBitstreamCounts(counts) {
-		var result = {};
-		for(var i=0;i<counts.length;i++) {
-			var key = getBitstreamFromURL(counts[i]["url"]);
-			var count = counts[i]["nb_hits"];
-			if(result[key]==null) {
-				result[key] = count;
-			} else {
-				result[key] += count;
-			}
+	$("#current_span_btn").click(function (){
+		if(current_view == "year") {
+			current_month = null;
+			current_year = null;
+			current_date = null;			
+		} else if(current_view == "month") {
+			current_view = "year";
+			current_month = null;
+			current_year = null;
+			current_date = null;
+		} else if(current_view == "day") {
+			current_view = "month";
+			current_date = current_year;
 		}
-		return result;
-	}
+		loadContents();
+	});            
 	
-	function getBitstreamFromURL(url) {
-		var l = document.createElement("a");
-		l.href = url;
-		return decodeURI(l.pathname.substr(l.pathname.lastIndexOf('/') + 1));
-	}
-	
-	function sortMapByValue(map){
-	    var tupleArray = [];
-	    for (var key in map) tupleArray.push([key, map[key]]);
-	    tupleArray.sort(function (a, b) { return b[1] - a[1] });
-	    return tupleArray;
-	}	
 
 });
+
+loadContents = function () {
+	
+	jQuery('#visits_over_time_chart').html('<div class="piwik-loading" style="width: 100%; height: 100%; z-index=1; display: none;"><i class="fa fa-pulse fa-3x" >&#xf110;</i></div>');
+	jQuery('#downloads_over_time_chart').html('<div class="piwik-loading" style="width: 100%; height: 100%; z-index=1; display: none;"><i class="fa fa-pulse fa-3x" >&#xf110;</i></div>');	
+	jQuery(".piwik-loading").css("display", "block");	
+
+	var targetDiv = jQuery("#piwik-charts");		
+    var reportURL = targetDiv.attr("data-url");
+    reportURL += "?period=" + current_view;
+    
+    if(current_date!=null) {
+    	reportURL += "&date=" + current_date;
+    }
+		
+	var visitsPlot;
+	var downloadPlot;			
+	
+    if(!(current_view in already_loaded_dates["views"] && current_date in already_loaded_dates["views"][current_view])) {
+    	$.getJSON(reportURL, function(data) {
+            loaded_data["views"] = $.extend(true, loaded_data["views"], data["response"]["views"]);
+            loaded_data["downloads"] = $.extend(true, loaded_data["downloads"], data["response"]["downloads"]);
+            if(!(current_view in already_loaded_dates["views"])) already_loaded_dates["views"][current_view] = {};
+            if(!(current_date in already_loaded_dates["views"][current_view])) already_loaded_dates["views"][current_view][current_date] = true;
+
+            plot();
+
+        })
+	} else {
+		plot();
+	}    	
+}	
+
+plotViews = function (div, data, color, tf, ti, highlightString) {
+
+	var ticks = [];
+	
+	if(current_view == "year") {
+		ticks = Object.keys(data)
+	                .filter(function(e) { return e !== 'total' && !e.startsWith('nb') })
+	                .sort(function(a,b){return parseInt(a)-parseInt(b)});
+	}
+	else
+	if(current_view == "month") {
+		ticks = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+	}
+	else
+	if(current_view == "day") {
+		for(i=1;i<=moment(current_date, "YYYY-M").daysInMonth();i++) {
+			ticks.push("" + i);
+		}
+	}
+	
+	var x = [];
+	var y = [];
+	var locations = {};
+	for(index in ticks) {
+		var tick = ticks[index];
+		if(current_view == "month") {
+			tick = current_year + "-" + tick;
+		} else
+		if(current_view == "day") {
+			tick = current_year + "-" + current_month + "-" + tick;
+		}
+		x.push(tick);
+		if(data != undefined && data[ticks[index]]) {
+			var v = data[ticks[index]]["nb_hits"];		
+			y.push([tick, v]);
+		} else {
+			y.push([tick, 0]);
+		}
+	}
+
+	$("#" + div).html("");
+
+	var xa = { 	renderer : $.jqplot.DateAxisRenderer,
+				tickOptions : {formatString:tf},
+				tickInterval : ti };
+
+	if(current_view == "year") {
+		xa["min"] = x[0];
+		xa["max"] = x[x.length-1];
+	} else if(current_view == "month") {
+		xa["min"] = current_year + "-01";
+		xa["max"] = current_year + "-12";
+	} else if(current_view == "day") {
+		xa["min"] = current_year + "-" + current_month + "-01";
+		xa["max"] = current_year + "-" + current_month + "-" + new Date(current_year, current_month, 0).getDate();
+	}
+
+	var p = $.jqplot(div, [ y, y ], {
+
+		axes : {
+			xaxis : xa,
+			yaxis : {
+				min : 0,
+				tickOptions : {
+					formatter : tickFormatter,
+				}
+			}
+		},
+
+		highlighter: {
+			show: true,
+			sizeAdjust: 7.5,
+  			tooltipAxes: "both",
+		},
+
+		cursor: {
+	        show: false,
+		},
+
+		seriesDefaults: {
+			lineWidth:4,
+  			shadow:false,
+  			markerOptions: {
+  				size: 7
+  			},			
+			highlighter: {formatString: highlightString},
+			pointLabels: { show:false },
+			breakOnNull: true
+	  	},
+	  	
+	  	grid: {background: '#F0F0F0', borderWidth: 0, shadow: false},
+	  	
+	    seriesColors: color,
+	    
+	    series: [{fill: [true, false]}],	    	  	
+
+	});
+
+	$('#' + div).unbind('jqplotDataClick');
+
+	$('#' + div).bind('jqplotDataClick',
+        function (ev, seriesIndex, pointIndex, d) {
+            if(current_view == "year") {
+            	current_view = "month";
+            	current_year = ticks[pointIndex];
+            	current_date = current_year;
+            } else if(current_view == "month") {
+            	current_view = "day";
+            	current_month = ticks[pointIndex];
+            	current_date = current_year + "-" + current_month;
+            }
+            
+            loadContents();
+        }
+	);
+	
+	return p;
+}
+
+
+tickFormatter = function (format, val) {
+    if (val >= 1000000) {
+        val = val / 1000000;
+    return val.toFixed(1)+"M";
+    }
+    if (val >= 1000) {
+        val = val / 1000;
+            if (val < 10) {
+                return val.toFixed(1)+"K";
+            }
+        return val.toFixed(1)+"K";
+    }
+    return val.toFixed(0);
+}
+
+plot = function () {
+	
+	var visitsPlot;
+	var downloadPlot;
+	
+    var views = loaded_data["views"]["total"];
+    var downloads = loaded_data["downloads"]["total"];
+    var tf  = "%Y";
+    var ti  = "1 year";
+    
+    if(current_view=="month") {
+    	try{
+    		views = loaded_data["views"]["total"][current_year];
+    	}catch(e){}
+    	try{
+    		downloads = loaded_data["downloads"]["total"][current_year];
+    	}catch(e){}
+        tf  = "%b";
+        ti  = "1 month";            	
+    }
+    
+    if(current_view=="day") {
+    	try{
+    		views = loaded_data["views"]["total"][current_year][current_month];
+    	}catch(e){}
+    	try{
+    		downloads = loaded_data["downloads"]["total"][current_year][current_month];
+		}catch(e){}
+        tf  = "%d";
+        ti  = "1 day";            	
+    }
+    
+    if(current_tab=="views") {
+    	visitsPlot = plotViews("visits_over_time_chart", views, ["#bee89c", "#60a22a"], tf, ti, "<div style='font-size: 110%; padding: 5px; color: #FFFFFF;'>%s<BR/><strong style='font-size: 14px;'>%s</strong> Views</div>");
+    } else {
+    	downloadPlot = plotViews("downloads_over_time_chart", downloads, ["#94c7ea", "#1f78b4"], tf, ti, "<div style='font-size: 110%; padding: 5px; color: #FFFFFF;'>%s<BR/><strong style='font-size: 14px;'>%s</strong> Downloads</div>");
+    	
+		if(current_view == 'year') {
+	    	var bitwiseDownloads = "<div class='container' style='margin-top: 20px;'>";
+			bitwiseDownloads += "<table class='table table-striped'><thead><tr><th colspan='2'>Filewise Statistics</th></tr></thead><tbody>";			
+			var years = Object.keys(loaded_data["downloads"]["total"]).sort().filter(function(e) { return !e.startsWith("nb") });
+			for(var year in years) {
+				
+				bitwiseDownloads += "<tr><td colspan='2'>" + years[year] + "</td></tr>";
+				
+				var temp = loaded_data["downloads"][years[year]];
+				temp = Object.keys(temp).filter(function(e){return e.length>2;}); 
+				
+				var map = {};			
+				for(var key in temp) {
+					map[temp[key]] = loaded_data["downloads"][years[year]][temp[key]]["nb_hits"]; 
+				}
+				map = sortMapByValue(map);
+				for(var index in map) {
+					bitwiseDownloads += "<tr><td class='col-md-2 text-right'><strong>" + map[index][1] + "</strong></td><td>" + getBitstreamFromURL(map[index][0]) + "</td></tr>";
+				}
+			}
+			bitwiseDownloads += "</tbody></table>";			
+		} else 
+		if(current_view == 'month') {
+	    	var bitwiseDownloads = "<div class='container' style='margin-top: 20px;'>";
+			bitwiseDownloads += "<table class='table table-striped'><thead><tr><th colspan='2'>Filewise Statistics</th></tr></thead><tbody>";			
+			
+			var temp = loaded_data["downloads"][current_year];
+			temp = Object.keys(temp).filter(function(e){return e.length>2;}); 
+			
+			var map = {};			
+			for(var key in temp) {
+				map[temp[key]] = loaded_data["downloads"][current_year][temp[key]]["nb_hits"]; 
+			}
+			map = sortMapByValue(map);
+			for(var index in map) {
+				bitwiseDownloads += "<tr><td class='col-md-2 text-right'><strong>" + map[index][1] + "</strong></td><td>" + getBitstreamFromURL(map[index][0]) + "</td></tr>";
+			}
+
+			
+			bitwiseDownloads += "</tbody></table>";						
+		} else
+		if(current_view == 'day') {
+	    	var bitwiseDownloads = "<div class='container' style='margin-top: 20px;'>";
+			bitwiseDownloads += "<table class='table table-striped'><thead><tr><th colspan='2'>Filewise Statistics</th></tr></thead><tbody>";			
+			
+			var temp = loaded_data["downloads"][current_year][current_month];
+			temp = Object.keys(temp).filter(function(e){return e.length>2;}); 
+			
+			var map = {};			
+			for(var key in temp) {
+				map[temp[key]] = loaded_data["downloads"][current_year][current_month][temp[key]]["nb_hits"]; 
+			}
+			map = sortMapByValue(map);
+			for(var index in map) {
+				bitwiseDownloads += "<tr><td class='col-md-2 text-right'><strong>" + map[index][1] + "</strong></td><td>" + getBitstreamFromURL(map[index][0]) + "</td></tr>";
+			}
+
+			
+			bitwiseDownloads += "</tbody></table>";						
+			
+		}
+        
+    	var bitwiseDownloadsDiv = jQuery('#bitwiseDownloads');
+        if(bitwiseDownloadsDiv.html()==null) {
+      	  jQuery('#downloads').append('<div id="bitwiseDownloads"></div>');
+        }                                  
+        jQuery('#bitwiseDownloads').html(bitwiseDownloads);    	
+    }
+    
+    var t = 0;
+    var d = 0;
+    
+    if(current_view=="year") {
+    	try {
+    		t = loaded_data["views"]["total"]["nb_hits"];
+    	}catch(e) {}
+    	try {
+    		d = loaded_data["downloads"]["total"]["nb_hits"];
+    	}catch(e) {}
+    	jQuery('#views_tab_count').html("<strong>" + t + "</strong>");
+    	jQuery('#downloads_tab_count').html("<strong>" + d + "</strong>");
+    } else 
+    if(current_view=="month") {
+    	try {
+    		t = loaded_data["views"]["total"][current_year]["nb_hits"];
+    	}catch(e) {}
+    	try {
+    		d = loaded_data["downloads"]["total"][current_year]["nb_hits"];
+		}catch(e) {}
+    	jQuery('#views_tab_count').html("<strong>" + t + "</strong>");
+    	jQuery('#downloads_tab_count').html("<strong>" + d + "</strong>");            	
+    } else
+    if(current_view=="day") {
+    	try {
+    		t = loaded_data["views"]["total"][current_year][current_month]["nb_hits"];
+    	}catch(e) {}
+    	try {
+    		d = loaded_data["downloads"]["total"][current_year][current_month]["nb_hits"];
+    	}catch(e) {}
+    	jQuery('#views_tab_count').html("<strong>" + t + "</strong>");
+    	jQuery('#downloads_tab_count').html("<strong>" + d + "</strong>");            	
+    }
+    
+    if(current_view == "year") {
+        var years = Object.keys(loaded_data[current_tab=="views"?"views":"downloads"]["total"]).sort().filter(function(e) { return !e.startsWith("nb") });
+        $(".current_span").html("Statistics for years " + years[0] + " to " + years[years.length-1]);
+        $("#current_span_btn").hide();
+    } else if(current_view == "month") {
+        $(".current_span").html("Statistics for the year " + current_year);
+        $("#current_span_btn").show();
+    } else if(current_view == "day") {
+        $(".current_span").html("Statistics for " + monthNames[parseInt(current_month)] + ", " + current_year);
+        $("#current_span_btn").show();
+    }
+    
+    jQuery(window).resize(function(){
+		if(visitsPlot!=null) visitsPlot.replot();
+		if(downloadPlot!=null) downloadPlot.replot();
+    });    
+    
+    jQuery(".piwik-loading").css("display", "none");
+    	
+}
+
+
+sortMapByValue = function (map){
+    var tupleArray = [];
+    for (var key in map) tupleArray.push([key, map[key]]);
+    tupleArray.sort(function (a, b) { return b[1] - a[1] });
+    return tupleArray;
+}
+
+getBitstreamFromURL = function (url) {
+	var l = document.createElement("a");
+	l.href = url;
+	return decodeURI(l.pathname.substr(l.pathname.lastIndexOf('/') + 1));
+}
