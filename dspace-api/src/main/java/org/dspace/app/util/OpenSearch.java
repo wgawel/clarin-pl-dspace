@@ -111,7 +111,7 @@ public class OpenSearch
      */
     public static String getContentType(String format)
     {
-    	return "html".equals(format) ? "text/html" : 
+    	return "html".equals(format) ? "text/html; charset=UTF-8" :
     									"application/" + format + "+xml; charset=UTF-8";
     }
     

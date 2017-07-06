@@ -194,6 +194,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         {
             this.request = ObjectModelHelper.getRequest(objectModel);
             this.response = ObjectModelHelper.getResponse(objectModel);
+
             // Check to see if a context already exists or not. We may
             // have been aggregated into an http request by the XSL document
             // pulling in an XML-based bitstream. In this case the context has
@@ -370,7 +371,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 this.bitstreamSize = bitstream.getSize();
             }
 
-            this.bitstreamMimeType = bitstream.getFormat().getMIMEType();
+            this.bitstreamMimeType = bitstream.getFormat().getMIMEType().contains("charset") ? bitstream.getFormat().getMIMEType() : bitstream.getFormat().getMIMEType()+ ";charset=utf-8";
             this.bitstreamName = bitstream.getName();
             this.bitstreamID = bitstream.getID();
             if (context.getCurrentUser() == null)

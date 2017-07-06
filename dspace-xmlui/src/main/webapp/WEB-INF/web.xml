@@ -322,12 +322,12 @@
 
     <mime-mapping>
         <extension>ent</extension>
-        <mime-type>text/plain</mime-type>
+        <mime-type>text/plain;charset=UTF-8</mime-type>
     </mime-mapping>
 
     <mime-mapping>
         <extension>grm</extension>
-        <mime-type>text/plain</mime-type>
+        <mime-type>text/plain;charset=UTF-8</mime-type>
     </mime-mapping>
 
     <mime-mapping>
