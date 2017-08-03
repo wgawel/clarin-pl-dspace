@@ -88,7 +88,7 @@
         <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
         <init-param>
             <param-name>cors.allowed.origins</param-name>
-            <param-value>ctj.clarin-pl.eu</param-value>
+            <param-value>clarin-pl.eu, ctj.clarin-pl.eu</param-value>
         </init-param>
         <init-param>
             <param-name>cors.allowed.methods</param-name>
