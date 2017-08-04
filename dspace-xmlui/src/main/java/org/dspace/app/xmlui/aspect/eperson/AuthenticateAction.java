@@ -134,16 +134,18 @@ public class AuthenticateAction extends AbstractAction
 
                 httpResponse.addCookie(clarinPlCookie);
 
-                for(Cookie c : Arrays.asList(request.getCookies())){
+                if(request.getCookies() != null) {
+                    for (Cookie c : Arrays.asList(request.getCookies())) {
 
-                    if("login-redirect".equals(c.getName())){
-                        redirectTo = c.getValue();
-                        javax.servlet.http.Cookie redirectCookie = new Cookie(
-                                "login-redirect", "");
-                        redirectCookie.setDomain(domain);
-                        redirectCookie.setMaxAge(0);
-                        redirectCookie.setPath("/");
-                        httpResponse.addCookie(redirectCookie);
+                        if ("login-redirect".equals(c.getName())) {
+                            redirectTo = c.getValue();
+                            javax.servlet.http.Cookie redirectCookie = new Cookie(
+                                    "login-redirect", "");
+                            redirectCookie.setDomain(domain);
+                            redirectCookie.setMaxAge(0);
+                            redirectCookie.setPath("/");
+                            httpResponse.addCookie(redirectCookie);
+                        }
                     }
                 }
 
