@@ -117,7 +117,7 @@ public class CurrentActivityAction extends AbstractAction
         }, 12, 12, TimeUnit.MINUTES);
 	}
 
-	
+
     /**
      * Record this current event.
      */
@@ -126,6 +126,8 @@ public class CurrentActivityAction extends AbstractAction
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
         Context context = ContextUtil.obtainContext(objectModel);
+        final int limit = new DSpace().getConfigurationService().getPropertyAsType(
+        		"currentActivityAction.too_many_accesses.limit", 30);
 
         // Ensure only one thread is manipulating the events queue at a time.
         synchronized (events) {
@@ -150,7 +152,7 @@ public class CurrentActivityAction extends AbstractAction
                         bitAccessCounter.put(event.getURL(), timestamps);
                     }
                     timestamps.add(event.getTimeStamp());
-                    if(timestamps.size() > LIMIT){
+                    if(timestamps.size() > limit){
                         //yell as this bitstream was accessed more than LIMIT times in the last 10 mins.
 
 						Email email = new Email();
