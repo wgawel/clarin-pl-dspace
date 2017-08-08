@@ -33,7 +33,8 @@ messages = {
     "login-email-send": "Send Email",
     "login-email-to": "To",
     "login-email-subject": "Subject",
-    "login-email-body": "Body"
+    "login-email-body": "Body",
+    "download-all-cmdline": "Download instructions for command line"
 };
 
 jQuery.i18n.load('en', messages);
