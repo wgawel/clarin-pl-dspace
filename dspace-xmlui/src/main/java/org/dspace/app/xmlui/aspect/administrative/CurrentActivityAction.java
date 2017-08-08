@@ -98,16 +98,12 @@ public class CurrentActivityAction extends AbstractAction
 		executor.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
-                long old = System.currentTimeMillis() - 600_000; //now -> 10mins ago
+                long old = getOldTimestamp();
                 synchronized (bitAccessCounter) {
                     for (Map.Entry<String, LinkedList<Long>> access : bitAccessCounter.entrySet()) {
                         String url = access.getKey();
                         LinkedList<Long> timestamps = access.getValue();
-                        for (long timestamp : timestamps) {
-                            if (timestamp < old) {
-                                timestamps.remove(timestamp);
-                            }
-                        }
+                        removeOldTimestamps(timestamps, old);
                         if (timestamps.isEmpty()) {
                             bitAccessCounter.remove(url);
                         }
@@ -136,17 +132,13 @@ public class CurrentActivityAction extends AbstractAction
 
 	        //something we are interested in
 	        if(event.getURL().contains("bitstream")){
-				long old = System.currentTimeMillis() - 600_000; //now -> 10mins ago
+				long old = getOldTimestamp();
 
 				synchronized (bitAccessCounter){
                     LinkedList<Long> timestamps = bitAccessCounter.get(event.getURL());
                     //remove old timestamps from the list
                     if(timestamps != null){
-                        for (long timestamp : timestamps) {
-                            if (timestamp < old) {
-                                timestamps.remove(timestamp);
-                            }
-                        }
+                        removeOldTimestamps(timestamps, old);
                     }else {
                         timestamps = new LinkedList<>();
                         bitAccessCounter.put(event.getURL(), timestamps);
@@ -565,6 +557,19 @@ public class CurrentActivityAction extends AbstractAction
     		return userAgent.length() == 0 ? "Unknown" : escapeHtml( userAgent.substring( 0, Math.min(20, userAgent.length()) ) );
     	}  
     }
+
+    private static void removeOldTimestamps(List<Long> timestamps, Long old){
+        for(Iterator<Long> i = timestamps.iterator(); i.hasNext();){
+			Long timestamp = i.next();
+			if (timestamp < old) {
+				i.remove();
+			}
+		}
+	}
+
+	private static Long getOldTimestamp(){
+    	return System.currentTimeMillis() - 600_000; //now -> 10mins ago
+	}
     
     
     
