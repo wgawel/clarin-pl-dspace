@@ -135,6 +135,14 @@
         </step>
     </command>
     <command>
+        <name>extendedimport</name>
+        <description>Import items with bitstream metadata into DSpace</description>
+        <step>
+            <class>cz.cuni.mff.ufal.dspace.app.itemimport.ItemImport</class>
+            <argument>-xcz.cuni.mff.ufal.dspace.app.itemimport.ItemImport</argument>
+        </step>
+    </command>
+    <command>
         <name>index-authority</name>
         <description>Indexes all metadata fields that use solr authority</description>
         <step>
