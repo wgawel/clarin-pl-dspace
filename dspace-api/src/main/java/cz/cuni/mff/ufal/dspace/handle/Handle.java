@@ -208,21 +208,18 @@ public class Handle extends DSpaceObject implements Identifier
     {
     	Handle h = null;
     	
-    	if(canCreate(context)) {
-    		
-    		if(dso == null) {
-    			h = new Handle(context, DatabaseManager.create(context, "handle"));    			
-    		}
-    		else {
-    			String handle = HandleManager.createHandle(context, dso);    			        
-    			h = Handle.findByHandle(context, handle);
-    		}    		    		
-	        
-	        log.info(LogManager.getHeader(context, "create_handle",
-	                "handle_id=" + h.getID())
-	                + ",handle=" + h.getHandle());
-    	}
-	
+        if(dso == null) {
+            h = new Handle(context, DatabaseManager.create(context, "handle"));
+        }
+        else {
+            String handle = HandleManager.createHandle(context, dso);
+            h = Handle.findByHandle(context, handle);
+        }
+
+        log.info(LogManager.getHeader(context, "create_handle",
+                "handle_id=" + h.getID())
+                + ",handle=" + h.getHandle());
+
         return h;
     }
 
@@ -242,24 +239,21 @@ public class Handle extends DSpaceObject implements Identifier
             throws SQLException, AuthorizeException
     {    
     	Handle h = null;
-    	
-    	if(canCreate(context)) {
-    		
-    		if(dso == null) {
-    			h = new Handle(context, DatabaseManager.create(context, "handle"));
-    			h.setHandle(handle);
-    		}
-    		else {
-    			String returnedHandle = HandleManager.createHandle(context, dso, handle);    			        
-    			h = Handle.findByHandle(context, returnedHandle);
-    		}
+
+        if(dso == null) {
+            h = new Handle(context, DatabaseManager.create(context, "handle"));
+            h.setHandle(handle);
+        }
+        else {
+            String returnedHandle = HandleManager.createHandle(context, dso, handle);
+            h = Handle.findByHandle(context, returnedHandle);
+        }
+
+        log.info(LogManager.getHeader(context, "create_handle",
+                "handle_id=" + h.getID())
+                + ",handle=" + h.getHandle());
 	        
-	        log.info(LogManager.getHeader(context, "create_handle",
-	                "handle_id=" + h.getID())
-	                + ",handle=" + h.getHandle());	        	        
-	        
-    	}
-	
+
         return h;
     }
     
@@ -387,12 +381,6 @@ public class Handle extends DSpaceObject implements Identifier
         }
 
         return (getID() == ((Handle) other).getID());
-    }        
-    
-    public static boolean canCreate(Context context) throws AuthorizeException, SQLException
-    {        
-    	
-        return AuthorizeManager.isAdmin(context);
     }
 
     public boolean canEdit() throws AuthorizeException, SQLException
