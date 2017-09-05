@@ -287,7 +287,6 @@ public class ProcessItems extends ItemsResource {
         return m;
     }
 
-
     @GET
     @Path("/{prefix}/{suffix}/export/inforex")
     @Produces(MediaType.APPLICATION_JSON)
@@ -347,7 +346,7 @@ public class ProcessItems extends ItemsResource {
         status.setHandle(item.getHandle());
         String token = item.getNLPEngineToken();
         String currentItemStatus = item.getProcessStatus();
-        Map<String, Object> engineStatus = new HashMap<String, Object>();
+        Map<String, Object> engineStatus = new HashMap<>();
 
         if (token != null && !"".equals(token)) {
             try {
@@ -368,6 +367,10 @@ public class ProcessItems extends ItemsResource {
                     case DONE:
                         status.setProgress("1");
                         break;
+                    case NOTEXISTING:
+                        status.setError(String.format("Error message recived from engine: %s", (String) engineStatus.get("value")));
+                        break;
+                    case QUEUE:
                     case READY:
                     default:
                         break;
@@ -640,6 +643,6 @@ public class ProcessItems extends ItemsResource {
 
 
     public enum ProcessStatus {
-        READY, PROCESSING, ERROR, DONE
+        READY, QUEUE, PROCESSING, ERROR, DONE,NOTEXISTING
     }
 }
