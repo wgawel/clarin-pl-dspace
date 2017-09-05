@@ -217,16 +217,21 @@ public class RestIndex {
     @GET
     @Path("/clarin-logout")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response calrinLogout(@CookieParam("clarin-pl-token") Cookie cookie){
+    public Response clarinLogout(@CookieParam("clarin-pl-token") Cookie cookie){
         if(cookie == null){
+            log.info("Clarin Logout: Cookie Not found");
             return Response.serverError().entity("ERROR").build();
+
         } else {
+
             org.dspace.core.Context context = null;
 
             try {
                 String domain = ConfigurationManager.getProperty("dspace.hostname");
                 context = new org.dspace.core.Context();
-                EPerson ePerson = EPerson.findByClarinTokenId(context, cookie.getValue());
+                String token = cookie.getValue();
+                log.info("Logout user with token: "+ token);
+                EPerson ePerson = EPerson.findByClarinTokenId(context, token);
                 if(ePerson != null){
 
                     ePerson.clearClarinTokenId();
