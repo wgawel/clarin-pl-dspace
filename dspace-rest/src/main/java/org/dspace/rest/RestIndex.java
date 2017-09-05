@@ -215,7 +215,7 @@ public class RestIndex {
     }
 
     @GET
-    @Path("/calrin-logout")
+    @Path("/clarin-logout")
     @Produces(MediaType.TEXT_PLAIN)
     public Response calrinLogout(@CookieParam("clarin-pl-token") Cookie cookie){
         if(cookie == null){
