@@ -11,13 +11,14 @@ import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.List;
 import javax.servlet.ServletContext;
+import javax.servlet.http.*;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Cookie;
+
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.rest.common.Status;
 import org.dspace.rest.common.User;
@@ -211,6 +212,34 @@ public class RestIndex {
             log.info("REST Logout: " + ePerson.getEmail());
         }
         return Response.ok().build();
+    }
+
+    @GET
+    @Path("/calrin-logout")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response calrinLogout(@CookieParam("clarin-pl-token") Cookie cookie){
+        if(cookie == null){
+            return Response.serverError().entity("ERROR").build();
+        } else {
+            org.dspace.core.Context context = null;
+
+            try {
+                String domain = ConfigurationManager.getProperty("dspace.hostname");
+                context = new org.dspace.core.Context();
+                EPerson ePerson = EPerson.findByClarinTokenId(context, cookie.getValue());
+                if(ePerson != null){
+
+                    ePerson.clearClarinTokenId();
+                    Cookie clarinPlCookie = new Cookie("clarin-pl-token", "","/", domain);
+                    return Response.ok("OK").cookie(new NewCookie(clarinPlCookie,"", 0, false)).build();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } catch (AuthorizeException e) {
+                e.printStackTrace();
+            }
+        }
+        return Response.serverError().entity("ERROR").build();
     }
 
     /**
