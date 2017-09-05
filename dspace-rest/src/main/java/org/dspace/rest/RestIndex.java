@@ -235,6 +235,7 @@ public class RestIndex {
                 if(ePerson != null){
 
                     ePerson.clearClarinTokenId();
+
                     Cookie clarinPlCookie = new Cookie("clarin-pl-token", "","/", domain);
                     return Response.ok("OK").cookie(new NewCookie(clarinPlCookie,"", 0, false)).build();
                 }

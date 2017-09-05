@@ -16,6 +16,7 @@ import org.dspace.core.Constants;
 import org.dspace.handle.HandleManager;
 import org.dspace.rest.common.clarinpl.*;
 import org.dspace.rest.exceptions.ContextException;
+import org.json.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -83,14 +84,14 @@ public class ProcessItems extends ItemsResource {
 
                 String handle = prefix +"/"+suffix;
 
-                String xml = getEngineXml(bitstreams, bitstreamUrl, prefix.toString(), suffix.toString(), user_email);
-                log.info(xml);
+                String json = getEngineJSON(bitstreams, bitstreamUrl, prefix.toString(), suffix.toString(), user_email);
+                log.info(json);
                 if ("READY".equals(dspaceItem.getProcessStatus())
                         || "ERROR".equals(dspaceItem.getProcessStatus())) {
 
                     if (bitstreams.size() > 0) {
                         saveMetaFile(handle);
-                        String nlpengineToken = callEngineService(xml);
+                        String nlpengineToken = callEngineService(json);
                         log.info(nlpengineToken);
                         if (nlpengineToken != null && !nlpengineToken.isEmpty()) {
                             dspaceItem.setNLPEngineToken(nlpengineToken);
@@ -106,6 +107,8 @@ public class ProcessItems extends ItemsResource {
             processException("Could not read item(handle=" + prefix + "/" + suffix + "), ContextException. Message: " + e.getMessage(), context);
         } catch (SQLException e) {
             processException("Could not read item(handle=" + prefix + "/" + suffix + "), ContextException. Message: " + e.getMessage(), context);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return "Fail to start process";
     }
@@ -470,6 +473,46 @@ public class ProcessItems extends ItemsResource {
         return sw.toString();
     }
 
+    private static final String lpmnString="any2txt|wcrft2({\"morfeusz2\":false})|liner2|wsd|dir|makezip";
+
+    public String getEngineJSON(List<Bitstream> files, String bitstreamUrl, String prefix, String suffix, String username) {
+
+        JSONObject request = new JSONObject();
+        request.put("user", username);
+
+        String lpmn = "urls(";
+
+        Set<String> names = new HashSet<>();
+        JSONArray urls = new JSONArray();
+        for (Bitstream stream : files) {
+
+            try {
+                URI uri = new URI(bitstreamUrl + stream.getID() + "/retrieve");
+                String resultFile = "";
+                if (names.contains(stream.getName())) {
+                    resultFile = stream.getName().substring(0, stream.getName().lastIndexOf(".")) + "." + stream.getSequenceID() + ".ccl";
+                } else {
+                    resultFile = stream.getName().substring(0, stream.getName().lastIndexOf(".")) + ".ccl";
+                    names.add(stream.getName());
+                }
+                JSONObject el = new JSONObject();
+                el.put("name", resultFile);
+                el.put("url", uri.toURL().toString());
+                urls.put(el);
+
+            } catch (URISyntaxException e) {
+                log.error("Bad file url", e);
+            } catch (MalformedURLException e) {
+                log.error("Bad file url", e);
+            }
+        }
+        lpmn += urls.toString();
+        lpmn += ")|"+lpmnString+"|todspace(/" + prefix + "/" + suffix + "/)";
+        request.put("lpmn", lpmn);
+
+        return request.toString();
+    }
+
     public List<Bitstream> getBitStreamsByItemId( org.dspace.content.Item dspaceItem, org.dspace.core.Context context){
         List<Bitstream> files = new ArrayList<Bitstream>();
 
@@ -535,7 +578,7 @@ public class ProcessItems extends ItemsResource {
 
     }
 
-    public String callEngineService(String xml) {
+    public String callEngineServiceXML(String xml) {
 
         HttpClient client = new DefaultHttpClient();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(nlengineTaskStartURL);
@@ -564,6 +607,37 @@ public class ProcessItems extends ItemsResource {
         }
         return null;
     }
+
+    public String callEngineService(String json) throws IOException {
+
+        HttpClient client = new DefaultHttpClient();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(nlengineTaskStartURL);
+        try {
+
+            HttpPost post = new HttpPost(builder.build().toUri());
+            StringEntity entity = new StringEntity(json, "UTF-8");
+            entity.setChunked(true);
+            entity.setContentType("application/json");
+
+            post.setEntity(entity);
+            post.setHeader("Content-Type", "application/json; charset=UTF-8");
+
+            HttpResponse response = client.execute(post);
+
+            BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+            return rd.readLine();
+        } catch (UnsupportedEncodingException e) {
+            log.error("Bad encoding ", e);
+        } catch (ClientProtocolException e) {
+            log.error(e);
+        } catch (IOException e) {
+            log.error(e);
+        } finally {
+            client.getConnectionManager().shutdown();
+        }
+        return null;
+    }
+
 
     public enum ProcessStatus {
         READY, PROCESSING, ERROR, DONE
