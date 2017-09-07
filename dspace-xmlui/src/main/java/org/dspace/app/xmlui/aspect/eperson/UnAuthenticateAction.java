@@ -69,6 +69,7 @@ public class UnAuthenticateAction extends AbstractAction
 
         //Clarin token destroy
         String domain = ConfigurationManager.getProperty("dspace.hostname");
+        eperson.clearClarinTokenId();
         javax.servlet.http.Cookie clarinCookie = new Cookie(
                 "clarin-pl-token", "");
         clarinCookie.setDomain(domain);
