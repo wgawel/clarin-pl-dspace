@@ -181,8 +181,13 @@ public class ContainerAdapter extends AbstractAdapter
     protected boolean isInLongTermArchive() throws WingException {
         return false;
     }
-    
-    
+
+    @Override
+    protected boolean isInKontext() throws WingException {
+        return false;
+    }
+
+
     /**
      * 
      * 

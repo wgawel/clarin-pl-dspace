@@ -2960,6 +2960,8 @@
   <message key="xmlui.UFAL.artifactbrowser.item-export-to-wielowyr">Export to MeWeX</message>
   <message key="xmlui.UFAL.artifactbrowser.item-add-to-archive">Add to Archive</message>
   <message key="xmlui.UFAL.artifactbrowser.item-go-to-archive">Go to Archive</message>
+  <message key="xmlui.UFAL.artifactbrowser.item-add-to-kontext">Add to Kontext</message>
+  <message key="xmlui.UFAL.artifactbrowser.item-go-to-kontext">Go to Kontext</message>
   <message key="xmlui.UFAL.artifactbrowser.item-goto-freq-lists">Make sense frequency list</message>
 
   <message key="xmlui.UFAL.artifactbrowser.acknowledgement">Acknowledgement</message>

@@ -190,6 +190,43 @@ public class ProcessItems extends ItemsResource {
     }
 
     @GET
+    @Path("/{prefix}/{suffix}/add/kontext")
+    public String addToKontext( @PathParam("prefix") Integer prefix, @PathParam("suffix") Integer suffix, @QueryParam("expand") String expand,
+                                @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+                                @QueryParam("userEmail") String user_email,
+                                @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request){
+
+        log.info("Reading item(handle=" + prefix + "/" + suffix + ").");
+        org.dspace.core.Context context = null;
+
+        try {
+            context = createContext(getUser(headers));
+            org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
+
+            if(dso.getType() == Constants.ITEM) {
+                org.dspace.content.Item dspaceItem = (Item) dso;
+
+                String handle = prefix +"/"+suffix;
+
+                String json = callKontextService(handle,dspaceItem.getName(),user_email, "", "");
+                log.info(json);
+                String job = callEngineService(json);
+                dspaceItem.setInKontextTermArchive(true);
+                log.info(job);
+                context.complete();
+                return "Export to Kontext started job: " + job;
+            }
+        } catch (ContextException e) {
+            processException("Could not read item(handle=" + prefix + "/" + suffix + "), ContextException. Message: " + e.getMessage(), context);
+        } catch (SQLException e) {
+            processException("Could not read item(handle=" + prefix + "/" + suffix + "), ContextException. Message: " + e.getMessage(), context);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "Fail to start process";
+    }
+
+    @GET
     @Path("/{prefix}/{suffix}/add/archive")
     public String addToArchive(
             @PathParam("prefix") Integer prefix, @PathParam("suffix") Integer suffix, @QueryParam("expand") String expand,
@@ -482,6 +519,7 @@ public class ProcessItems extends ItemsResource {
 
         JSONObject request = new JSONObject();
         request.put("user", username);
+        request.put("application", "dspace");
 
         String lpmn = "urls(";
 
@@ -557,7 +595,28 @@ public class ProcessItems extends ItemsResource {
 
     }
 
-    private Map callMewexService(String handle, String itemName, String userEmail){
+    private String callKontextService(String handle, String itemName, String userName, String language, String info){
+
+        JSONObject request = new JSONObject();
+        request.put("user", userName);
+
+        StringBuilder  lpmn = new StringBuilder();
+        lpmn.append("\"dspacezip(/")
+               .append(handle)
+               .append("/)|dir|ccl2vert|comcorp(")
+               .append("{\"add_to_kontext\": true,")
+               .append("\"user_email\":\"").append(userName).append("\",")
+               .append("\"corpus_data\": {")
+               .append("\"id\": \"").append(handle.replace("/","_")).append("\",")
+               .append("\"name\": \"").append(itemName).append("\",")
+               .append("\"info\": \"").append(info).append("\",")
+               .append("\"encoding\": \"UTF-8\",")
+               .append("\"lang\": \"").append(language).append("\" }})\"");
+        request.put("lpmn", lpmn);
+        return request.toString();
+    }
+
+        private Map callMewexService(String handle, String itemName, String userEmail){
         RestTemplate template = new RestTemplate();
 
         String nfs_file = String.format("%s%s/%s", nfs, handle, zip_name);
@@ -643,6 +702,6 @@ public class ProcessItems extends ItemsResource {
 
 
     public enum ProcessStatus {
-        READY, QUEUE, PROCESSING, ERROR, DONE,NOTEXISTING
+        READY, QUEUE, PROCESSING, ERROR, DONE, NOTEXISTING
     }
 }

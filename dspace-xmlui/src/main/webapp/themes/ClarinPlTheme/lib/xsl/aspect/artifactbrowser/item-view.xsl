@@ -856,6 +856,11 @@
 					        <xsl:call-template name="download-all">
 						        <xsl:with-param name="download-all-url" select="$download-all-url" />
 					        </xsl:call-template>
+							<xsl:if test="$AUTH = 'yes'">
+							<xsl:call-template name="add-to-kontext">
+								<xsl:with-param name="user-email" select="$user_email" />
+							</xsl:call-template>
+							</xsl:if>
 							<xsl:if test="/mets:METS/mets:structMap[@ADM='yes']">
 								<xsl:call-template name="add-to-archive">
 									<xsl:with-param name="add-to-archive" select="$add-to-archive" />
@@ -1145,6 +1150,37 @@
 					<i class="fa fa-exchange">&#160;</i>
 					<i18n:translate>
 						<i18n:text>xmlui.UFAL.artifactbrowser.item-go-to-archive</i18n:text>
+					</i18n:translate>
+				</a>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template name="add-to-kontext">
+		<xsl:param name="user-email" />
+		<xsl:variable name="go-to-kontext" select="concat(confman:getProperty('dspace.kontext.url'), java:replaceAll(substring-after(/mets:METS/@ID,'hdl:'),'/', '_'))" />
+		<xsl:variable name="rest-url" select="concat(confman:getProperty('dspace.baseUrl'),'/rest/process/items/handle/', substring-after(/mets:METS/@ID,'hdl:'),'/add/kontext')" />
+
+		<xsl:choose>
+			<xsl:when test="/mets:METS/@IN_KONTEXT='no'">
+				<a id="add-to-kontext" class="label label-info pull-right" style="margin-right:5px;">
+					<xsl:attribute name="href">javascript:{}</xsl:attribute>
+					<xsl:attribute name="onclick">javascript:
+						exportKontext('<xsl:value-of select="$rest-url" />','<xsl:value-of select="$user-email" />');
+					</xsl:attribute>
+
+					<i class="fa fa-exchange">&#160;</i>
+					<i18n:translate>
+						<i18n:text>xmlui.UFAL.artifactbrowser.item-add-to-kontext</i18n:text>
+					</i18n:translate>
+				</a>
+			</xsl:when>
+			<xsl:otherwise>
+				<a id="go-to-kontext" class="label label-info pull-right" style="margin-right:5px;">
+					<xsl:attribute name="href"><xsl:value-of select="$go-to-kontext" /></xsl:attribute>
+					<i class="fa fa-exchange">&#160;</i>
+					<i18n:translate>
+						<i18n:text>xmlui.UFAL.artifactbrowser.item-go-to-kontext</i18n:text>
 					</i18n:translate>
 				</a>
 			</xsl:otherwise>

@@ -177,6 +177,10 @@ public class ItemAdapter extends AbstractAdapter
         return item.isInLongTermArchive();
     }
 
+    protected boolean isInKontext() throws WingException {
+        return item.isInKontext();
+    }
+
     /**
      * Return a unique id for a bitstream.
      */

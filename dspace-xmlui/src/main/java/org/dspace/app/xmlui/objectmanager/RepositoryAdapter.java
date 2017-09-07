@@ -126,6 +126,9 @@ public class RepositoryAdapter extends AbstractAdapter
     protected boolean isInLongTermArchive() throws WingException {
         return false;
     }
+    protected boolean isInKontext() throws WingException {
+        return false;
+    }
 
     /**
      * 

@@ -416,6 +416,17 @@ public class Item extends DSpaceObject
             log.error("Unable to update long ter archive status", e);
         }
     }
+
+    public boolean isInKontext(){return itemRow.getBooleanColumn("in_kontext");}
+
+    public void setInKontextTermArchive(boolean value){
+        itemRow.setColumn("in_kontext", value);
+        try {
+            DatabaseManager.update(ourContext, itemRow);
+        } catch (SQLException e) {
+            log.error("Unable to export to kontext", e);
+        }
+    }
     /**
      * Find out if the item is discoverable
      *

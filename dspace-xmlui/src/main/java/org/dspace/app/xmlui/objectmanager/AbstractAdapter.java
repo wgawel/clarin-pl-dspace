@@ -292,6 +292,8 @@ public abstract class AbstractAdapter
 
     protected abstract boolean isInLongTermArchive() throws WingException;
 
+    protected abstract boolean isInKontext() throws WingException;
+
 	/**
 	 * Render the complete METS document.
 	 */
@@ -319,6 +321,7 @@ public abstract class AbstractAdapter
     		attributes.put("PROFILE", getMETSProfile());
     		attributes.put("LABEL", getMETSLabel());
             attributes.put("IN_PERMA_ARCHIVE", isInLongTermArchive());
+            attributes.put("IN_KONTEXT", isInKontext());
 
     		String objid = getMETSOBJID();
     		if (objid != null)
@@ -672,11 +675,7 @@ public abstract class AbstractAdapter
      * @param elementNamespace
      *            SAX Helper class to keep track of namespaces able to determine
      *            the correct prefix for a given namespace URI.
-     * @param attributes
-     *            An existing SAX AttributesImpl object to add attributes to.
-     *            If the value is null then a new attributes object will be
-     *            created to house the attributes.
-     * @param attributeMap
+     * @param attributeMaps
      *            A map of attributes and values.
      * @return
      */
