@@ -595,13 +595,13 @@ public class ProcessItems extends ItemsResource {
 
     }
 
-    private String callKontextService(String handle, String itemName, String userName, String language, String info){
+    protected String callKontextService(String handle, String itemName, String userName, String language, String info){
 
         JSONObject request = new JSONObject();
         request.put("user", userName);
 
         StringBuilder  lpmn = new StringBuilder();
-        lpmn.append("\"dspacezip(/")
+        lpmn.append("dspacezip(/")
                .append(handle)
                .append("/)|dir|ccl2vert|comcorp(")
                .append("{\"add_to_kontext\": true,")
@@ -611,8 +611,8 @@ public class ProcessItems extends ItemsResource {
                .append("\"name\": \"").append(itemName).append("\",")
                .append("\"info\": \"").append(info).append("\",")
                .append("\"encoding\": \"UTF-8\",")
-               .append("\"lang\": \"").append(language).append("\" }})\"");
-        request.put("lpmn", lpmn);
+               .append("\"lang\": \"").append(language).append("\" }})");
+        request.put("lpmn", lpmn.toString());
         return request.toString();
     }
 
