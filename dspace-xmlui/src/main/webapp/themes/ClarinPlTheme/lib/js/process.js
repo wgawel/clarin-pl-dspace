@@ -89,6 +89,5 @@ function exportArchive(link,rest,item, arch){
 
 function exportKontext(link, email, redirect){
 	$.getJSON(link+"?userEmail="+email);
-	await sleep(2000);
 	window.location.replace(redirect);
 }
