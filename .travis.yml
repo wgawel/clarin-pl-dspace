@@ -16,6 +16,9 @@ before_install:
   - mvn help:system
   - export FS=`pwd`
   - rm -rf /tmp/dspace
+  # oraclejdk7 no longer working, openjdk needs crypto libraries
+  - cd $JAVA_HOME/jre/lib/ext && sudo wget https://www.bouncycastle.org/download/bcprov-jdk15on-158.jar
+  - sudo cp $FS/utilities/project_helpers/bits/java.security /etc/java-7-openjdk/security/java.security
 
 # see https://github.com/travis-ci/travis-ci/issues/1066 for the && signs
 # yaml format: "When a string contains line breaks, you can use the literal style, indicated by the pipe (|), to indicate that the string will span several lines. In literals, newlines are preserved" (might not be necessary)
