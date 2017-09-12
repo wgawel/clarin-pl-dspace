@@ -179,6 +179,7 @@ compile: deploy_logs
 	@echo "COMPILING SOURCE ..."
 	@echo "Updating lr.compile.time..."
 	@if grep -q "lr\.compile\.time" $(LOCAL_CONF);then sed --follow-symlinks -i'' "s/^lr\.compile\.time=.*/lr.compile.time=`date`/" $(LOCAL_CONF); else echo -e "$(RED)Compile time not updated$(NORMAL)";fi
+	@sed --follow-symlinks -i'' '/lr.description.currentAsOf/d' $(LOCAL_CONF) && echo "lr.description.currentAsOf=`date +%Y-%m-%d`" >> $(LOCAL_CONF)
 	@cd $(DIR_SOURCE) && mvn clean package $(MVN_OPTS) 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log
 	@echo ""
 	@if grep -q "BUILD FAILURE" $(DIR_DEPLOY_LOGS)/compile.log; then \
