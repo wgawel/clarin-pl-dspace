@@ -828,13 +828,13 @@
 			<h4>
 				<i class="fa fa-paperclip">&#160;</i>
 				<i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text>			
+			</h4>				
 				<xsl:if test="/mets:METS/@OBJID">							
 					<xsl:variable name="download-all-url"><xsl:value-of select="concat(/mets:METS/@OBJID,'/allzip')" /></xsl:variable>
 					<xsl:call-template name="download-all">
 						<xsl:with-param name="download-all-url" select="$download-all-url" />
 					</xsl:call-template>
 				</xsl:if>						   			
-			</h4>				
 					
 			<!-- Generate UFAL licenses -->
 			<xsl:apply-templates select="//mets:mdWrap[@OTHERMDTYPE='UFAL_LICENSES']/mets:xmlData/license" />
@@ -1072,7 +1072,7 @@
    		<xsl:if test="$file-count &gt; $lr.download.all.limit.min.file.count and $file-size &lt; $lr.download.all.limit.max.file.size">
             <!-- download all only under certain conditions (number and size of files) -->     
                                
-            <a id="download-all-button" class="label label-info pull-right">
+            <a id="download-all-button" class="btn btn-primary">
                 <xsl:choose>
                     <xsl:when test="$file-size &gt; $lr.download.all.alert.min.file.size">
                         <!-- display alert before downloading large files -->
@@ -1084,7 +1084,7 @@
                         <xsl:attribute name="data-href"><xsl:value-of select="$download-all-url" /></xsl:attribute>
                     </xsl:otherwise>
                 </xsl:choose>
-                <i class="fa fa-download">&#160;</i>
+                <i class="fa fa-download fa-3x" style="display:block;">&#160;</i>
                 <i18n:translate>                
                     <i18n:text>xmlui.UFAL.artifactbrowser.item-download-all-files</i18n:text>
                     <i18n:param><xsl:copy-of select="$formatted-file-size" /></i18n:param>

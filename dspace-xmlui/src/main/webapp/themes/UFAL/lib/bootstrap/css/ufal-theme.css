@@ -1467,6 +1467,21 @@ div.modal-scrollbar {
   padding: 0 !important;
 }
 
+#command-div {
+  display:none;
+}
+
+#command-div .repo-copy-btn {
+  opacity: 0;
+  -webkit-transition: opacity 0.3s ease-in-out;
+  -o-transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out;
+}
+
+#command-div:hover .repo-copy-btn, #command-div .repo-copy-btn:focus {
+  opacity: 1;
+}
+
 .google-drive {
     background-image: url("https://www.google.com/drive/static/images/drive/logo-drive.png");
     background-size: contain;

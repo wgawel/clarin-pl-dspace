@@ -33,7 +33,8 @@ messages = {
     "login-email-send": "Poslat e-mail",
     "login-email-to": "Na adresu",
     "login-email-subject": "Předmět",
-    "login-email-body": "Zpráva"
+    "login-email-body": "Zpráva",
+    "download-all-cmdline": "Instrukce pro stažení z příkazové řádky"
 };
 
 jQuery.i18n.load('cs', messages);
