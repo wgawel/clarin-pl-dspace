@@ -2645,6 +2645,7 @@
 
     <message key="xmlui.ufal.METS-1.0.item-collections">Collection(s)</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-isreferencedby">Referenced by</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-pid">Item identifier</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>
     <message key="xmlui.dri2xhtml.METS-1.0.size-kilobytes">KB</message>

@@ -2662,6 +2662,7 @@
 
 	<message key="xmlui.ufal.METS-1.0.item-collections">Kolekce</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-isreferencedby">Odkaz na záznam&#160;v</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-pid">Identifikátor</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">{0} bajtů</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.size-kilobytes">KB</message>
