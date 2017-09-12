@@ -43,16 +43,27 @@ public class SolrServiceTweaksPlugin implements SolrServiceIndexPlugin,
     public void additionalSearchParameters(Context context,
             DiscoverQuery discoveryQuery, SolrQuery solrQuery)
     {
-        String query = discoveryQuery.getQuery();
-        // follows previous impl, but is it correct?
-        if (query == null)
-        {
-            query = "*:*";
-        }
-        String q = solrQuery.getQuery() + " OR title:(" + query + ")^5";
-        q = q + " OR ((" + q + ") AND -dc.relation.isreplacedby:*)^5 OR ((" + q + ") AND dc.relation.replaces:*)^15";
-        solrQuery.setQuery(q);
+    	// This method is called from SolrServiceImpl.resolveToSolrQuery
+    	// at this point the solrQuery object should already have the required query and parameters coming from discoveryQuery
+    	
+    	// get the current query
+        String query = solrQuery.getQuery();
+        
+        // the query terms must occur in the search results
+    	query  = "+(" + query + ")";  
 
+    	// if the query terms are in the title increase the significance of search result
+    	query += " OR title:(" + query + ")^2";
+
+    	// if a new version of item available increase the significance of newer item (as the newer version should contain dc.relation.replaces)
+    	query += " OR dc.relation.replaces:[* TO *]^2";
+
+    	// if more than one version of the item is available increase the significance of the newest
+    	// (should contain dc.relation.replaces but should not contain dc.relation.isreplacedby)
+    	query += " OR (dc.relation.replaces:[* TO *] AND -dc.relation.isreplacedby:[* TO *])^2";
+
+    	// set the updated query back to solrQuery
+    	solrQuery.setQuery(query);    
     }
 
     @Override
