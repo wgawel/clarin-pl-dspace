@@ -18,6 +18,9 @@
     <properties>
         <!-- This is the path to the root [dspace-src] directory. -->
         <root.basedir>${basedir}/..</root.basedir>
+        <org.springframework.social-version>1.1.4.RELEASE</org.springframework.social-version>
+        <org.springframework.social.google-version>1.0.0.RELEASE</org.springframework.social.google-version>
+        <org.springframework.security.crypto-version>3.2.9.RELEASE</org.springframework.security.crypto-version>
     </properties>
 
     <build>
@@ -116,6 +119,26 @@
             </dependencies>
         </profile>
     </profiles>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.social</groupId>
+                <artifactId>spring-social-core</artifactId>
+                <version>${org.springframework.social-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.social</groupId>
+                <artifactId>spring-social-web</artifactId>
+                <version>${org.springframework.social-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-crypto</artifactId>
+                <version>${org.springframework.security.crypto-version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -228,6 +251,11 @@
         </dependency>
 
         <dependency>
+            <artifactId>spring-context-support</artifactId>
+            <groupId>org.springframework</groupId>
+        </dependency>
+
+        <dependency>
             <artifactId>spring-tx</artifactId>
             <groupId>org.springframework</groupId>
         </dependency>
@@ -245,6 +273,35 @@
         <dependency>
             <artifactId>spring-webmvc</artifactId>
             <groupId>org.springframework</groupId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.social</groupId>
+            <artifactId>spring-social-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.social</groupId>
+            <artifactId>spring-social-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+        <!--
+        <dependency>
+            <groupId>org.springframework.social</groupId>
+            <artifactId>spring-social-google</artifactId>
+            <version>${org.springframework.social.google-version}</version>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>com.github.kosarko</groupId>
+            <artifactId>spring-social-google</artifactId>
+            <version>882a982462</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
         </dependency>
 
         <dependency>

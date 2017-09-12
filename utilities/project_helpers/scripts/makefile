@@ -73,6 +73,8 @@ DIR_INSTALLATION        :=$(shell cd $(BASE) && python setup.lindat.py --get="ds
 DIR_LINDAT_THEME_IN_WEBAPPS :=$(DIR_INSTALLATION)/webapps/xmlui/themes/UFAL/lib/lindat
 DIR_DATABASE_BACKUP         :=$(DIR_INSTALLATION)/../database_backup
 
+SOCIAL_ENABLED          :=$(shell cd $(BASE) && python setup.lindat.py --get="social.enabled" --from="$(LOCAL_CONF)")
+
 
 # Dspace Configuration
 
@@ -202,6 +204,8 @@ install_dspace:
 	@echo "INSTALLATION SUCCESSFUL ..."
 
 postinstall: 
+	# spring-social gdrive is experimental and enabled with this hack only if configured
+	@if [ "$(SOCIAL_ENABLED)" = "true" ];then sed -ie 's#.*</web-app>.*#<context-param>\n<param-name>spring.profiles.active</param-name>\n<param-value>drive-beta</param-value>\n</context-param>\n</web-app>#' "$(DIR_INSTALLATION)/webapps/xmlui/WEB-INF/web.xml";fi
 	@$(MAKE) update_lindat_common
 	@$(MAKE) grant_rights
 	@if [[ -f $@.sh ]]; then echo "Running customised $@"; bash $@.sh; fi 
