@@ -395,13 +395,10 @@
                     <label>input_forms.field.dc.relation.replaces.label</label>
                     <input-type>onebox</input-type>
                     <hint>input_forms.field.dc.relation.replaces.hint</hint>
-                    <autocomplete>solr-handle</autocomplete>
+                    <autocomplete>solr-handle_title_ac</autocomplete>
                     <required/>
                     <component-label> </component-label>
                     <collapsible>Special fields</collapsible>
-                    <acl>
-                        policy=deny,action=read,grantee-type=user,grantee-id=*
-                    </acl>
                 </field>
 
                 <!-- DC.Relation.IsReplacedBy -->
@@ -413,7 +410,7 @@
                     <label>input_forms.field.dc.relation.isreplacedby.label</label>
                     <input-type>onebox</input-type>
                     <hint>input_forms.field.dc.relation.isreplacedby.hint</hint>
-                    <autocomplete>solr-handle</autocomplete>
+                    <autocomplete>solr-handle_title_ac</autocomplete>
                     <required/>
                     <component-label> </component-label>
                     <acl>

@@ -1054,6 +1054,7 @@
 	<message key="xmlui.Submission.submit.UploadStep.checksum">Kontrolní součet souboru:</message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_remove">Odstranit vybrané soubory</message>
 	<message key="xmlui.Submission.submit.UploadStep.review.no_file">Žádný soubor nebyl nahrán.</message>
+	<message key="xmlui.Submission.submit.UploadStep.social.drive.list_files">Přidat soubory z vašeho Disku <span class="google-drive">&#160;</span></message>
 
 
 

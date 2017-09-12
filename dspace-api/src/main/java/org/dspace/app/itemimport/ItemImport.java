@@ -209,6 +209,8 @@ public class ItemImport
 
             options.addOption("h", "help", false, "help");
 
+            options.addOption("x", "extending-class", true, "Class name to use in main. Leave empty if you don't know what it is.");
+
             CommandLine line = parser.parse(options, argv);
 
             String command = null; // add replace remove, etc
@@ -434,7 +436,13 @@ public class ItemImport
                 System.exit(1);
             }
 
-            ItemImport myloader = new ItemImport();
+            ItemImport myloader;
+            if(line.hasOption("x")){
+                String name = line.getOptionValue("x", "org.dspace.app.itemimport.ItemImport");
+                myloader = (ItemImport) Class.forName(name).newInstance();
+            }else{
+                myloader = new ItemImport();
+            }
 
             // create a context
             Context c = new Context();
@@ -883,7 +891,7 @@ public class ItemImport
      * @param itemname handle - non-null means we have a pre-defined handle already
      * @param mapOut - mapfile we're writing
      */
-    private Item addItem(Context c, Collection[] mycollections, String path,
+    protected Item addItem(Context c, Collection[] mycollections, String path,
             String itemname, PrintWriter mapOut, boolean template) throws Exception
     {
         String mapOutputString = null;
@@ -1108,7 +1116,7 @@ public class ItemImport
         }
     }
 
-    private void loadDublinCore(Context c, Item myitem, String filename)
+    protected void loadDublinCore(Context c, DSpaceObject myitem, String filename)
             throws SQLException, IOException, ParserConfigurationException,
             SAXException, TransformerException, AuthorizeException
     {
@@ -1147,7 +1155,7 @@ public class ItemImport
         }
     }
 
-    private void addDCValue(Context c, Item i, String schema, Node n) throws TransformerException, SQLException, AuthorizeException
+    private void addDCValue(Context c, DSpaceObject i, String schema, Node n) throws TransformerException, SQLException, AuthorizeException
     {
         String value = getStringValue(n); //n.getNodeValue();
         // compensate for empty value getting read as "null", which won't display
