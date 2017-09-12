@@ -16,7 +16,6 @@ jQuery(document).ready(function() {
 
 	var aagregatorUrl = "https://clarin-aa.ms.mff.cuni.cz/aaggreg/v1/";
 	var idpDetail = aagregatorUrl + "entity/?entityID=";
-	var attributesDetail = aagregatorUrl + "list?rows=1&q=idpsp:";
 	var idpEntityId = getUrlParameter("idpEntityId");
 	var ourEntityId = getUrlParameter("ourEntityId");
 	var cc = getUrlParameter("cc");
@@ -44,9 +43,8 @@ jQuery(document).ready(function() {
 		+ ' The SP implements data protection code of conduct'
 		+ ' (http://geant3plus.archive.geant.net/uri/dataprotection-code-of-conduct/V1/Pages/default.aspx),'
 		+ ' is a member of the REFEDS Research and Scholarship Entity Category and a member of the CLARIN infrastructure'
-		+ ' (http://clarin.eu and https://www.clarin.eu/content/service-provider-federation)\n'
-		+ 'The released attributes are listed below:\n'
-		
+		+ ' (http://clarin.eu and https://www.clarin.eu/content/service-provider-federation).\n'
+
 	var subject = 'Attributes not released by ' + idpEntityId;
 
 	jQuery(".aai-error").each(function() {
@@ -55,14 +53,10 @@ jQuery(document).ready(function() {
 		
 		if (idpEntityId && ourEntityId) {
 			jQuery
-				.when(
-					jQuery.getJSON(idpDetail + idpEntityId),
-					jQuery.getJSON(attributesDetail + '"' + idpEntityId + "|" + ourEntityId + '"'))
+				.when(jQuery.getJSON(idpDetail + idpEntityId))
 				.done(
-					function(idp, attrs) {
-						var data = idp[0];
-						var attr_data = attrs[0];
-						if (!data.ok || data.result.length < 1 || attr_data.result.length < 1) {
+					function(data) {
+						if (!data.ok || data.result.length < 1) {
 							error();
 							return;
 						}
@@ -71,8 +65,6 @@ jQuery(document).ready(function() {
 						var idp_display_name = data.result[0]["displayName_en"] || idpEntityId;
 
 						if (contact && messageBody && subject && cc && ourEntityId) {
-							
-							messageBody += attr_data.result[0].attributes.join('\n');
 							
 							var heading = jQuery(".error-heading", div);
 							var details = jQuery(".error-details", div);
