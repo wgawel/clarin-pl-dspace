@@ -240,6 +240,11 @@ public class SolrServiceTweaksPlugin implements SolrServiceIndexPlugin,
                 }
             	document.addField(field + "_comp", value);
             }
+
+            //create handle_title_ac field
+            String title = item.getName();
+            String handle = item.getHandle();
+            document.addField("handle_title_ac", handle + ":" + title);
         }
     }
 }
