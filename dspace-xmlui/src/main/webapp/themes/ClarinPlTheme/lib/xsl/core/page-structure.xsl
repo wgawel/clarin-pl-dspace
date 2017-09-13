@@ -279,7 +279,7 @@
         
                 var runAfterJSImports = new FnArray();
             </script>
-            
+
             <!-- Add the title in -->
             <xsl:variable name="page_title" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']" />
             <title>
@@ -399,9 +399,10 @@
         templates of the body's child elements (which consists entirely of dri:div tags).
     -->
     <xsl:template match="dri:body">
-        
+        <!--
         <xsl:call-template name="userbox" />
-        
+        -->
+
         <div class="container-fluid">
             
             <div class="container">
@@ -482,8 +483,6 @@
             <xsl:value-of select="$localJQuerySrc" />
             <xsl:text disable-output-escaping="yes">"&gt;&#160;&lt;\/script&gt;')</xsl:text>
         </script>
-
-
 
         <!-- Add theme javascipt  -->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)]">
@@ -575,6 +574,7 @@
                 <xsl:text>/lib/js/process.js</xsl:text>
             </xsl:attribute>&#160;
         </script>
+
         <!-- UFAL additional libraries
         -->
         
@@ -636,6 +636,28 @@
             <script type="text/javascript" src="{$theme-path}/lib/js/ufal-submission.js">&#160;</script>
         </xsl:if>
 
+        <script type="text/javascript" src ="https://ctj.clarin-pl.eu/clarin_bar/script.js">&#160;</script>
+        <script type="text/javascript">
+            window.onload = function() {
+            var c = new ClarinModule({
+            offset:{
+            'top': 0,
+            'right': 0,
+            'bottom': null,
+            'left': null,
+            },
+            arrow:{
+            'initial-orientation': "left",// up || down || right || left
+            'rotation-hover': -180
+            },
+            horizontal: false,
+            themeColor: '#7d6ba9'
+            });
+            c.hookFunctionTo('logout', function(){
+            console.log('logout hook!!!');
+            });
+            };
+        </script>
         <script type="text/javascript">
             runAfterJSImports.execute();
         </script>

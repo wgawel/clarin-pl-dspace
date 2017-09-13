@@ -100,7 +100,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_login =
         message("xmlui.EPerson.Navigation.login");
 
-    private static final Message T_context_head 				= message("xmlui.administrative.Navigation.context_head");
+    private static final Message T_context_head = message("xmlui.administrative.Navigation.context_head");
 
 	/** Cached validity object */
 	private SourceValidity validity;
@@ -217,14 +217,14 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         if (eperson != null)
         {
             String fullName = eperson.getFullName();
-            account.addItemXref(contextPath+"/logout",T_logout);
+            //account.addItemXref(contextPath+"/logout",T_logout);
             //account.addItemXref(contextPath+"/profile",T_profile.parameterize(fullName));
             account.addItemXref(contextPath+"/profile",T_profile);
         } 
         else 
         {
 
-            account.addItem().addXref(contextPath+"/password-login",T_login,"signon_default");
+            //account.addItem().addXref(contextPath+"/password-login",T_login,"signon_default");
 
             // UFAL
             //account.addItem().addXref(contextPath + "/login", T_discojuice_login, "signon");

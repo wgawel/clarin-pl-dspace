@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.utils;
 import java.sql.SQLException;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -381,8 +382,7 @@ public class AuthenticationUtil
     	    	return;
     	    }
         }
-        
-        // Otherwise, just log the person out as normal.
+
         context.setCurrentUser(null);
         session.removeAttribute(EFFECTIVE_USER_ID);
         session.removeAttribute(AUTHENTICATED_USER_ID);

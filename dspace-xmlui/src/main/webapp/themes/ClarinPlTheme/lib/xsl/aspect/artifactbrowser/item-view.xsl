@@ -1109,7 +1109,8 @@
 		</div>
 
 		<a id="export-to-wielowyr" class="label label-info" style="display:none;">
-			<xsl:attribute name="href">javascript:{}</xsl:attribute>
+			<xsl:attribute name="target">_blank</xsl:attribute>
+			<xsl:attribute name="href">http://mewex.clarin-pl.eu/homepage</xsl:attribute>
 			<xsl:attribute name="onclick">javascript:
 				exportMewex('<xsl:value-of select="$export-to-wielowyr" />','<xsl:value-of select="$user-email" />');
 			</xsl:attribute>
@@ -1158,12 +1159,14 @@
 
 	<xsl:template name="add-to-kontext">
 		<xsl:param name="user-email" />
-		<xsl:variable name="go-to-kontext" select="concat(confman:getProperty('dspace.kontext.url'), java:replaceAll(substring-after(/mets:METS/@ID,'hdl:'),'/', '_'))" />
+		<xsl:variable name="kontext-check" select="confman:getProperty('dspace.kontext.verify.url')" />
+		<xsl:variable name="kontext-handle" select="java:replaceAll(substring-after(/mets:METS/@ID,'hdl:'),'/', '_')" />
 		<xsl:variable name="rest-url" select="concat(confman:getProperty('dspace.baseUrl'),'/rest/process/items/handle/', substring-after(/mets:METS/@ID,'hdl:'),'/add/kontext')" />
 				<a id="add-to-kontext" class="label label-info pull-right" style="margin-right:5px;">
-					<xsl:attribute name="href">javascript:{}</xsl:attribute>
-					<xsl:attribute name="onclick">javascript:
-						exportKontext('<xsl:value-of select="$rest-url" />','<xsl:value-of select="$user-email" />', '<xsl:value-of select="$go-to-kontext" />');
+					<xsl:attribute name="target">_blank</xsl:attribute>
+					<xsl:attribute name="href">https://kontext.clarin-pl.eu/kontext/run.cgi/first_form</xsl:attribute>
+					<xsl:attribute name="onclick">
+						return exportKontext('<xsl:value-of select="$rest-url" />','<xsl:value-of select="$user-email" />','<xsl:value-of select="$kontext-check" />','<xsl:value-of select="$kontext-handle" />');
 					</xsl:attribute>
 
 					<i class="fa fa-exchange">&#160;</i>

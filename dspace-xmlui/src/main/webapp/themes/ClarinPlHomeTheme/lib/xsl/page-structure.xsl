@@ -252,9 +252,11 @@
 
 
 	<xsl:template match="dri:body">
+		<!--
     	<xsl:if test="/dri:document/dri:meta/dri:userMeta[@authenticated = 'yes']">
     		<xsl:call-template name="userbox" />
-    	</xsl:if>	
+    	</xsl:if>
+    	-->
 		<div class="container-fluid">
 
 			<div class="container">
@@ -808,6 +810,29 @@
 		</script>
 		<xsl:text disable-output-escaping="yes">&lt;![endif]--&gt;</xsl:text>
 
+		<script type="text/javascript" src ="https://ctj.clarin-pl.eu/clarin_bar/script.js">&#160;</script>
+		<script type="text/javascript">
+			window.onload = function() {
+			var c = new ClarinModule({
+			offset:{
+			'top': 0,
+			'right': 0,
+			'bottom': null,
+			'left': null,
+			},
+			arrow:{
+			'initial-orientation': "left",// up || down || right || left
+			'rotation-hover': -180
+			},
+			horizontal: false,
+			themeColor: '#7d6ba9'
+			});
+			c.hookFunctionTo('logout', function(){
+				$.get("");
+			console.log('logout hook!!!');
+			});
+			};
+		</script>
 		<script type="text/javascript">
 			runAfterJSImports.execute();
 		</script>

@@ -74,9 +74,12 @@ function exportMewex(link,email){
 			$( "#wielowyr-loading" ).hide();
     	}
     	if(j.redirect !== null){
-    		window.open(j.redirect, '_newtab');
+    	    if(!window.open(j.redirect, '_newtab')){
+    	        window.location = j.redirect;
+    	    }
     		$( "#wielowyr-loading" ).hide();
     		$( "#export-to-wielowyr" ).show();
+    		return false;
     	}
 	});
 }
@@ -87,7 +90,18 @@ function exportArchive(link,rest,item, arch){
 	window.location.href = arch;
 }
 
-function exportKontext(link, email, redirect){
-	$.getJSON(link+"?userEmail="+email);
-	window.location.replace(redirect);
-}
+function exportKontext(link, email, verify_url, handle){
+    $.getJSON(verify_url+"corpus_id="+handle+"&user_email="+email, function(j) {
+
+        if(j.error !== false && j.exists === false){
+            $.getJSON(link+handle+"?userEmail="+email);
+
+        } else {
+            if(!window.open(j.href, '_newtab')){
+                    window.location = j.href;
+            }
+            return false;
+        }
+    });
+    return false;
+ }

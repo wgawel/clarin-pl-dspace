@@ -129,10 +129,6 @@ public class HibernateUtil {
 		return -1;
 	}
 
-	// public
-	//
-	//
-
 	public void persist(Class clazz, GenericEntity transientInstance) {
 		log.debug("persisting " + clazz.getSimpleName() + " instance");
 		try {

@@ -16,6 +16,12 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Cookie;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
@@ -23,6 +29,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.rest.common.Status;
 import org.dspace.rest.common.User;
 import org.dspace.rest.exceptions.ContextException;
+import org.springframework.web.util.UriComponentsBuilder;
 
 
 /**
@@ -235,7 +242,7 @@ public class RestIndex {
                 if(ePerson != null){
 
                     ePerson.clearClarinTokenId();
-
+                    logoutFromDspace();
                     Cookie clarinPlCookie = new Cookie("clarin-pl-token", "","/", domain);
                     return Response.ok("OK").cookie(new NewCookie(clarinPlCookie,"", 0, false)).build();
                 }
@@ -246,6 +253,20 @@ public class RestIndex {
             }
         }
         return Response.serverError().entity("ERROR").build();
+    }
+
+    private void logoutFromDspace(){
+
+        String domain = ConfigurationManager.getProperty("dspace.url");
+        HttpClient client = new DefaultHttpClient();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(domain+"/logout");
+
+        try{
+            HttpGet get = new HttpGet(builder.build().toUri());
+            HttpResponse response = client.execute(get);
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     /**
