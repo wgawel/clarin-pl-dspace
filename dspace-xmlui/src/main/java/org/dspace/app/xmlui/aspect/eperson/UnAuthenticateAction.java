@@ -68,15 +68,16 @@ public class UnAuthenticateAction extends AbstractAction
         EPerson eperson = context.getCurrentUser();
 
         //Clarin token destroy
-        String domain = ConfigurationManager.getProperty("dspace.hostname");
-        eperson.clearClarinTokenId();
-        javax.servlet.http.Cookie clarinCookie = new Cookie(
-                "clarin-pl-token", "");
-        clarinCookie.setDomain(domain);
-        clarinCookie.setMaxAge(0);
-        clarinCookie.setPath("/");
-        httpResponse.addCookie(clarinCookie);
-
+        if(eperson != null) {
+            String domain = ConfigurationManager.getProperty("dspace.hostname");
+            eperson.clearClarinTokenId();
+            javax.servlet.http.Cookie clarinCookie = new Cookie(
+                    "clarin-pl-token", "");
+            clarinCookie.setDomain(domain);
+            clarinCookie.setMaxAge(0);
+            clarinCookie.setPath("/");
+            httpResponse.addCookie(clarinCookie);
+        }
         // Actually log the user out.
         AuthenticationUtil.logOut(context,httpRequest);
         

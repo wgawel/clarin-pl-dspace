@@ -23,6 +23,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
@@ -239,16 +240,14 @@ public class RestIndex {
                 String token = cookie.getValue();
                 log.info("Logout user with token: "+ token);
                 EPerson ePerson = EPerson.findByClarinTokenId(context, token);
+                logoutFromDspace();
                 if(ePerson != null){
 
                     ePerson.clearClarinTokenId();
-                    logoutFromDspace();
                     Cookie clarinPlCookie = new Cookie("clarin-pl-token", "","/", domain);
                     return Response.ok("OK").cookie(new NewCookie(clarinPlCookie,"", 0, false)).build();
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (AuthorizeException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -264,6 +263,7 @@ public class RestIndex {
         try{
             HttpGet get = new HttpGet(builder.build().toUri());
             HttpResponse response = client.execute(get);
+            log.info(response);
         } catch (Exception ex){
             ex.printStackTrace();
         }
