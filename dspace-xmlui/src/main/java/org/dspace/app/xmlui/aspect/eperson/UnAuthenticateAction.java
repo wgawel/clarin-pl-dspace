@@ -84,17 +84,7 @@ public class UnAuthenticateAction extends AbstractAction
         
         // Set the user as logged in for the rest of this request so that the cache does not get spoiled.
         context.setCurrentUser(eperson);
-        
-        // Forward the user to the home page.
-        if((ConfigurationManager.getBooleanProperty("xmlui.public.logout")) && (httpRequest.isSecure())) {
-				StringBuffer location = new StringBuffer("http://");
-				location.append(ConfigurationManager.getProperty("dspace.hostname")).append(
-						httpRequest.getContextPath());
-				httpResponse.sendRedirect(location.toString());
-		}
-        else {
-        	httpResponse.sendRedirect(httpRequest.getContextPath());
-        }
+      	httpResponse.sendRedirect(httpRequest.getContextPath());
 
         return new HashMap();
     }
