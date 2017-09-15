@@ -235,7 +235,7 @@ public class RestIndex {
             org.dspace.core.Context context = null;
 
             try {
-                String domain = ConfigurationManager.getProperty("dspace.hostname");
+                //String domain = ConfigurationManager.getProperty("dspace.hostname");
                 context = new org.dspace.core.Context();
                 String token = cookie.getValue();
                 log.info("Logout user with token: "+ token);
@@ -244,8 +244,12 @@ public class RestIndex {
                 if(ePerson != null){
 
                     ePerson.clearClarinTokenId();
-                    Cookie clarinPlCookie = new Cookie("clarin-pl-token", "","/", domain);
-                    return Response.ok("OK").cookie(new NewCookie(clarinPlCookie,"", 0, false)).build();
+                    String host = ConfigurationManager.getProperty("dspace.url");
+                    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(host+"/logout");
+
+                    return Response.temporaryRedirect(builder.build().toUri()).build();
+                   // Cookie clarinPlCookie = new Cookie("clarin-pl-token", "","/", domain);
+                   // return Response.ok("OK").cookie(new NewCookie(clarinPlCookie,"", 0, false)).build();
                 }
             } catch (Exception e) {
                 e.printStackTrace();

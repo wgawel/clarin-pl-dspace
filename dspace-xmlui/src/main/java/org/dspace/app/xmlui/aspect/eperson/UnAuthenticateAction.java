@@ -45,6 +45,7 @@ import org.dspace.eperson.EPerson;
 public class UnAuthenticateAction extends AbstractAction
 {
 
+
     /**
      * Logout the current user.
      * 
@@ -79,7 +80,7 @@ public class UnAuthenticateAction extends AbstractAction
             httpResponse.addCookie(clarinCookie);
         }
         // Actually log the user out.
-        AuthenticationUtil.logOut(context,httpRequest);
+        AuthenticationUtil.logOut(context, httpRequest);
         
         // Set the user as logged in for the rest of this request so that the cache does not get spoiled.
         context.setCurrentUser(eperson);
@@ -92,8 +93,9 @@ public class UnAuthenticateAction extends AbstractAction
 				httpResponse.sendRedirect(location.toString());
 			
 		}
-        else{
-        	httpResponse.sendRedirect(httpRequest.getContextPath());
+
+        else {
+        	httpResponse.sendRedirect("https:\\ctj.clarin-pl.eu/auth");
         }
         
         return new HashMap();
