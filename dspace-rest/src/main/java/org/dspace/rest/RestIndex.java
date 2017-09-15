@@ -226,51 +226,34 @@ public class RestIndex {
     @Path("/clarin-logout")
     @Produces(MediaType.TEXT_PLAIN)
     public Response clarinLogout(@CookieParam("clarin-pl-token") Cookie cookie){
+
+        String host = ConfigurationManager.getProperty("dspace.url");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(host+"/logout");
+
         if(cookie == null){
             log.info("Clarin Logout: Cookie Not found");
-            return Response.serverError().entity("ERROR").build();
-
         } else {
-
-            org.dspace.core.Context context = null;
 
             try {
                 //String domain = ConfigurationManager.getProperty("dspace.hostname");
-                context = new org.dspace.core.Context();
+                org.dspace.core.Context context = new org.dspace.core.Context();
                 String token = cookie.getValue();
                 log.info("Logout user with token: "+ token);
                 EPerson ePerson = EPerson.findByClarinTokenId(context, token);
-                logoutFromDspace();
+
                 if(ePerson != null){
 
                     ePerson.clearClarinTokenId();
-                    String host = ConfigurationManager.getProperty("dspace.url");
-                    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(host+"/logout");
 
-                    return Response.temporaryRedirect(builder.build().toUri()).build();
                    // Cookie clarinPlCookie = new Cookie("clarin-pl-token", "","/", domain);
                    // return Response.ok("OK").cookie(new NewCookie(clarinPlCookie,"", 0, false)).build();
                 }
+                return Response.temporaryRedirect(builder.build().toUri()).build();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        return Response.serverError().entity("ERROR").build();
-    }
-
-    private void logoutFromDspace(){
-
-        String domain = ConfigurationManager.getProperty("dspace.url");
-        HttpClient client = new DefaultHttpClient();
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(domain+"/logout");
-
-        try{
-            HttpGet get = new HttpGet(builder.build().toUri());
-            HttpResponse response = client.execute(get);
-            log.info(response);
-        } catch (Exception ex){
-            ex.printStackTrace();
-        }
+        return Response.temporaryRedirect(builder.build().toUri()).build();
     }
 
     /**
