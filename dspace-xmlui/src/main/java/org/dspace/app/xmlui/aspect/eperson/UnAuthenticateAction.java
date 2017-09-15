@@ -84,7 +84,7 @@ public class UnAuthenticateAction extends AbstractAction
         
         // Set the user as logged in for the rest of this request so that the cache does not get spoiled.
         context.setCurrentUser(eperson);
-      	httpResponse.sendRedirect(httpRequest.getContextPath());
+      	httpResponse.sendRedirect(ConfigurationManager.getProperty("dspace.url"));
 
         return new HashMap();
     }
