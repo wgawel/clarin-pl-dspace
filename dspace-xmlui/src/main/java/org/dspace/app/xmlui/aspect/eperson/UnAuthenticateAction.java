@@ -87,7 +87,7 @@ public class UnAuthenticateAction extends AbstractAction
 
         // Forward the user to the home page.
         if((ConfigurationManager.getBooleanProperty("xmlui.public.logout")) && (httpRequest.isSecure())) {
-				StringBuffer location = new StringBuffer("http://");
+				StringBuffer location = new StringBuffer("https://");
 				location.append(ConfigurationManager.getProperty("dspace.hostname")).append(
 						httpRequest.getContextPath());
 				httpResponse.sendRedirect(location.toString());
