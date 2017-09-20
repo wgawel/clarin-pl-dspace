@@ -94,7 +94,7 @@ function exportKontext(link, email, verify_url, handle){
     $.getJSON(verify_url+"corpus_id="+handle+"&user_email="+email, function(j) {
 
         if(j.error !== false && j.exists === false){
-            $.getJSON(link+handle+"?userEmail="+email);
+            $.getJSON(link+"?userEmail="+email);
 
         } else {
             if(!window.open(j.href, '_newtab')){

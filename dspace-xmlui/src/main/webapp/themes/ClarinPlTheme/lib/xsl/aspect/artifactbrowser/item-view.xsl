@@ -1161,7 +1161,7 @@
 		<xsl:param name="user-email" />
 		<xsl:variable name="kontext-check" select="confman:getProperty('dspace.kontext.verify.url')" />
 		<xsl:variable name="kontext-handle" select="java:replaceAll(substring-after(/mets:METS/@ID,'hdl:'),'/', '_')" />
-		<xsl:variable name="rest-url" select="concat(confman:getProperty('dspace.baseUrl'),'/rest/process/items/handle/', substring-after(/mets:METS/@ID,'hdl:'),'/add/kontext/')" />
+		<xsl:variable name="rest-url" select="concat(confman:getProperty('dspace.baseUrl'),'/rest/process/items/handle/', substring-after(/mets:METS/@ID,'hdl:'),'/add/kontext')" />
 				<a id="add-to-kontext" class="label label-info pull-right" style="margin-right:5px;">
 					<xsl:attribute name="target">_blank</xsl:attribute>
 					<xsl:attribute name="href">https://kontext.clarin-pl.eu/kontext/run.cgi/first_form</xsl:attribute>
