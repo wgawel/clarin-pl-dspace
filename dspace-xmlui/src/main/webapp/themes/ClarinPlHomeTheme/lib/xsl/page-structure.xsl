@@ -816,12 +816,12 @@
 			var c = new ClarinModule({
 			offset:{
 			'top': 0,
-			'right': 0,
+			'right': null,
 			'bottom': null,
-			'left': null,
+			'left': 0,
 			},
 			arrow:{
-			'initial-orientation': "left",// up || down || right || left
+			'initial-orientation': "right",// up || down || right || left
 			'rotation-hover': -180
 			},
 			horizontal: false,
