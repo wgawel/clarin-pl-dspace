@@ -88,14 +88,15 @@ public class UnAuthenticateAction extends AbstractAction
 
         // Forward the user to the home page.
         if(httpRequest.isSecure()) {
+
             StringBuffer location = new StringBuffer("https://");
 				location.append(ConfigurationManager.getProperty("dspace.hostname")).append(
 						httpRequest.getContextPath());
-				httpResponse.sendRedirect("https://ctj.clarin-pl.eu/auth/");
+				httpResponse.sendRedirect(location.toString());
 
 		}
         else{
-        	httpResponse.sendRedirect("https://ctj.clarin-pl.eu/auth/");
+        	httpResponse.sendRedirect(httpRequest.getContextPath());
         }
 
         return new HashMap();
