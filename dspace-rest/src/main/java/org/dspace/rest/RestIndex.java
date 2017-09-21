@@ -235,20 +235,17 @@ public class RestIndex {
         } else {
 
             try {
-                //String domain = ConfigurationManager.getProperty("dspace.hostname");
+                String domain = ConfigurationManager.getProperty("dspace.hostname");
                 org.dspace.core.Context context = new org.dspace.core.Context();
                 String token = cookie.getValue();
                 log.info("Logout user with token: "+ token);
                 EPerson ePerson = EPerson.findByClarinTokenId(context, token);
 
                 if(ePerson != null){
-
                     ePerson.clearClarinTokenId();
-
-                   // Cookie clarinPlCookie = new Cookie("clarin-pl-token", "","/", domain);
-                   // return Response.ok("OK").cookie(new NewCookie(clarinPlCookie,"", 0, false)).build();
                 }
-                return Response.temporaryRedirect(builder.build().toUri()).build();
+                Cookie clarinPlCookie = new Cookie("clarin-pl-token", "","/", domain);
+                return Response.temporaryRedirect(builder.build().toUri()).cookie(new NewCookie(clarinPlCookie,"", 0, false)).build();
             } catch (Exception e) {
                 e.printStackTrace();
             }

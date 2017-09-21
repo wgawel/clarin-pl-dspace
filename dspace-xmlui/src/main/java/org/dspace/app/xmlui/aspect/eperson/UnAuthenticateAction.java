@@ -19,6 +19,7 @@ import org.apache.cocoon.acting.AbstractAction;
 import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.ConfigurationManager;
@@ -45,6 +46,7 @@ import org.dspace.eperson.EPerson;
 public class UnAuthenticateAction extends AbstractAction
 {
 
+    private static Logger log = Logger.getLogger(UnAuthenticateAction.class);
 
     /**
      * Logout the current user.
@@ -57,9 +59,8 @@ public class UnAuthenticateAction extends AbstractAction
      * @param parameters
      */
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
-            String source, Parameters parameters) throws Exception
-    {
-        
+            String source, Parameters parameters) throws Exception {
+
         Context context = ContextUtil.obtainContext(objectModel);
         final HttpServletRequest httpRequest = 
             (HttpServletRequest) objectModel.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
@@ -87,16 +88,14 @@ public class UnAuthenticateAction extends AbstractAction
 
         // Forward the user to the home page.
         if(httpRequest.isSecure()) {
-            System.out.println("------is Secure Logging OUT -------");
             StringBuffer location = new StringBuffer("https://");
 				location.append(ConfigurationManager.getProperty("dspace.hostname")).append(
 						httpRequest.getContextPath());
-				httpResponse.sendRedirect(location.toString());
+				httpResponse.sendRedirect("https://ctj.clarin-pl.eu/auth/");
 
 		}
         else{
-            System.out.println("------is NOT Secure Logging OUT -------");
-        	httpResponse.sendRedirect(httpRequest.getContextPath());
+        	httpResponse.sendRedirect("https://ctj.clarin-pl.eu/auth/");
         }
 
         return new HashMap();
