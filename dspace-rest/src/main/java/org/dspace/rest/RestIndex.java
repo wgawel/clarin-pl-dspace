@@ -225,11 +225,13 @@ public class RestIndex {
     @GET
     @Path("/clarin-logout")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response clarinLogout(@CookieParam("clarin-pl-token") Cookie cookie){
+    public Response clarinLogout(@CookieParam("clarin-pl-token") Cookie cookie,  @Context HttpServletRequest request){
 
         String host = ConfigurationManager.getProperty("ctj.auth");
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(host);
+        String ip = request.getRemoteHost() +"  ---  "+ request.getRemoteAddr()+" --- " +request.getRequestURI() + " --- " + request.getRemoteHost();
 
+        log.info("IP: "+ip);
         if(cookie == null){
             log.info("Clarin Logout: Cookie Not found");
         } else {
