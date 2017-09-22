@@ -225,13 +225,22 @@ public class RestIndex {
     @GET
     @Path("/clarin-logout")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response clarinLogout(@CookieParam("clarin-pl-token") Cookie cookie,  @Context HttpServletRequest request){
+    public Response clarinLogout(@CookieParam("clarin-pl-token") Cookie cookie,
+                                 @QueryParam("redirect") String redirect,
+                                 @Context HttpServletRequest request){
+        try {
+            redirect =  java.net.URLDecoder.decode(redirect, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            redirect = ConfigurationManager.getProperty("ctj.auth");
+        }
+        
+        if("".equals(redirect)) {
+            redirect = ConfigurationManager.getProperty("ctj.auth");
+        }
 
-        String host = ConfigurationManager.getProperty("ctj.auth");
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(host);
-        String ip = request.getRemoteHost() +"  ---  "+ request.getRemoteAddr()+" --- " +request.getRequestURI() + " --- " + request.getRemoteHost();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(redirect);
 
-        log.info("IP: "+ip);
         if(cookie == null){
             log.info("Clarin Logout: Cookie Not found");
         } else {
