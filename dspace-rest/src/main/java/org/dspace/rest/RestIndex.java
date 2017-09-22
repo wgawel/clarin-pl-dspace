@@ -227,8 +227,8 @@ public class RestIndex {
     @Produces(MediaType.TEXT_PLAIN)
     public Response clarinLogout(@CookieParam("clarin-pl-token") Cookie cookie){
 
-        String host = ConfigurationManager.getProperty("dspace.url");
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(host+"/logout");
+        String host = ConfigurationManager.getProperty("ctj.auth");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(host);
 
         if(cookie == null){
             log.info("Clarin Logout: Cookie Not found");
@@ -245,7 +245,10 @@ public class RestIndex {
                     ePerson.clearClarinTokenId();
                 }
                 Cookie clarinPlCookie = new Cookie("clarin-pl-token", "","/", domain);
-                return Response.temporaryRedirect(builder.build().toUri()).cookie(new NewCookie(clarinPlCookie,"", 0, false)).build();
+                Cookie dspaceSessionCookie = new Cookie("JSESSIONID", "","/dspace/", domain);
+                NewCookie dspaceNew = new NewCookie(dspaceSessionCookie,"", 0, false);
+                NewCookie clarinNew = new NewCookie(clarinPlCookie,"", 0, false);
+                return Response.temporaryRedirect(builder.build().toUri()).cookie(clarinNew,dspaceNew).build();
             } catch (Exception e) {
                 e.printStackTrace();
             }
