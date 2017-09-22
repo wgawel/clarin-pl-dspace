@@ -23,8 +23,9 @@ public class ClarinPLLoginAction extends AbstractAction {
     public Map act(Redirector redirector, SourceResolver sourceResolver, Map objectModel, String s, Parameters parameters) throws Exception {
 
         Request request = ObjectModelHelper.getRequest(objectModel);
+        String redirectURL = request.getRequestURI();
 
-        if(request.getCookies() != null) {
+        if(request.getCookies() != null && !redirectURL.contains("password-login")) {
             for (Cookie c : Arrays.asList(request.getCookies())) {
 
                 if ("clarin-pl-token".equals(c.getName())) {
@@ -40,8 +41,6 @@ public class ClarinPLLoginAction extends AbstractAction {
 
                             AuthenticationUtil.logIn(objectModel, ePerson);
                             log.info("Clarin Trying Login: " + ePerson.getEmail());
-                            String redirectURL = request.getRequestURI();
-
                             final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
                             httpResponse.sendRedirect(redirectURL);
                         }
