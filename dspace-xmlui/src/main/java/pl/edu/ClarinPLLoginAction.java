@@ -13,6 +13,7 @@ import org.dspace.eperson.EPerson;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ClarinPLLoginAction extends AbstractAction {
@@ -24,35 +25,44 @@ public class ClarinPLLoginAction extends AbstractAction {
 
         Request request = ObjectModelHelper.getRequest(objectModel);
         String redirectURL = request.getRequestURI();
+        org.dspace.core.Context context = new org.dspace.core.Context();
+        final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 
-        if(request.getCookies() != null && !redirectURL.contains("password-login")) {
+        log.info("Login checking url: " + redirectURL);
+
+        String token = findToken(request);
+        log.info("Login cookie token: " + token);
+
+        EPerson ePerson = EPerson.findByClarinTokenId(context, token);
+
+        if(AuthenticationUtil.isLoggedIn(request)) {
+
+            if (ePerson == null) {
+                AuthenticationUtil.logOut(context, request);
+                log.info("Clarin Trying Login: IsLogged, but no eperson");
+                httpResponse.sendRedirect(redirectURL);
+            }
+
+        } else {
+
+            if(ePerson != null) {
+                AuthenticationUtil.logIn(objectModel, ePerson);
+                log.info("Clarin Trying Login: " + ePerson.getEmail());
+                httpResponse.sendRedirect(redirectURL);
+            }
+
+        }
+        return new HashMap();
+    }
+
+    private String findToken(Request request){
+        if(request.getCookies() != null) {
             for (Cookie c : Arrays.asList(request.getCookies())) {
-
                 if ("clarin-pl-token".equals(c.getName())) {
-
-                    String token = c.getValue();
-
-                    org.dspace.core.Context context = new org.dspace.core.Context();
-                    EPerson ePerson = EPerson.findByClarinTokenId(context, token);
-
-                    if(token != null && "".equals(token)) {
-
-                        if(!AuthenticationUtil.isLoggedIn(request) && ePerson != null) {
-
-                            AuthenticationUtil.logIn(objectModel, ePerson);
-                            log.info("Clarin Trying Login: " + ePerson.getEmail());
-                            final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-                            httpResponse.sendRedirect(redirectURL);
-                        }
-
-                    } else {
-                        if(AuthenticationUtil.isLoggedIn(request)){
-                            AuthenticationUtil.logOut(context,request);
-                        }
-                    }
+                    return c.getValue();
                 }
             }
         }
-        return null;
+        return "";
     }
 }
