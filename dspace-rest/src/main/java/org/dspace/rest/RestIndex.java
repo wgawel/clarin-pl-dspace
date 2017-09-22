@@ -234,7 +234,7 @@ public class RestIndex {
             e.printStackTrace();
             redirect = ConfigurationManager.getProperty("ctj.auth");
         }
-        
+
         if("".equals(redirect)) {
             redirect = ConfigurationManager.getProperty("ctj.auth");
         }
@@ -256,10 +256,8 @@ public class RestIndex {
                     ePerson.clearClarinTokenId();
                 }
                 Cookie clarinPlCookie = new Cookie("clarin-pl-token", "","/", domain);
-                Cookie dspaceSessionCookie = new Cookie("JSESSIONID", "","/dspace/", domain);
-                NewCookie dspaceNew = new NewCookie(dspaceSessionCookie,"", 0, false);
                 NewCookie clarinNew = new NewCookie(clarinPlCookie,"", 0, false);
-                return Response.temporaryRedirect(builder.build().toUri()).cookie(clarinNew,dspaceNew).build();
+                return Response.temporaryRedirect(builder.build().toUri()).cookie(clarinNew).build();
             } catch (Exception e) {
                 e.printStackTrace();
             }

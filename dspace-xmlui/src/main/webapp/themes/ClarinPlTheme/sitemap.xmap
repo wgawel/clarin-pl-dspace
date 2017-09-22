@@ -14,6 +14,9 @@
         <map:readers>
             <map:reader name="ConcatenationReader" src="org.dspace.app.xmlui.cocoon.ConcatenationReader"/>
         </map:readers>
+        <map:actions>
+             <map:action name="ClarinPLLoginAction" src="pl.edu.ClarinPLLoginAction" />
+        </map:actions>
     </map:components>
 
     <map:pipelines>
@@ -115,6 +118,8 @@
 
 			-->
 			<map:match pattern="**">
+
+                <map:act type="ClarinPLLoginAction"/>
 
 				<!-- Step 1: Generate the DRI page -->
 				<map:generate type="file" src="cocoon://DRI/{1}"/>

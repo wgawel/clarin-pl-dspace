@@ -90,8 +90,7 @@ public class AuthenticateAction extends AbstractAction
             return null;
 		}
         
-        try
-        {
+        try {
             Context context = AuthenticationUtil.authenticate(objectModel, email,password, realm);
 
             EPerson eperson = context.getCurrentUser();
@@ -101,14 +100,12 @@ public class AuthenticateAction extends AbstractAction
             	// The user has successfully logged in
             	String redirectURL = request.getContextPath();
             	
-            	if (AuthenticationUtil.isInterupptedRequest(objectModel))
-            	{
+            	if (AuthenticationUtil.isInterupptedRequest(objectModel)){
             		// Resume the request and set the redirect target URL to
             		// that of the originally interrupted request.
             		redirectURL += AuthenticationUtil.resumeInterruptedRequest(objectModel);
             	}
-            	else
-            	{
+            	else {
             		// Otherwise direct the user to the specified 'loginredirect' page (or homepage by default)
             		String loginRedirect = ConfigurationManager.getProperty("xmlui.user.loginredirect");
             		if(loginRedirect==null) {
