@@ -530,16 +530,15 @@ public class DatabaseManager
      */
     public static TableRow findByUnique(Context context, String table,
         String column, Object value) throws SQLException {
+
         String ctable = canonicalize(table);
 
         try {
-            if ( ! DB_SAFE_NAME.matcher(ctable).matches())
-            {
+            if ( ! DB_SAFE_NAME.matcher(ctable).matches()){
                     throw new SQLException("Unable to execute select query because table name (" + ctable + ") contains non alphanumeric characters.");
             }
 
-            if ( ! DB_SAFE_NAME.matcher(column).matches())
-            {
+            if ( ! DB_SAFE_NAME.matcher(column).matches()){
                 throw new SQLException("Unable to execute select query because column name (" + column + ") contains non alphanumeric characters.");
             }
             StringBuilder sql = new StringBuilder("select * from ").append(ctable).append(" where ").append(column).append(" = ? ");

@@ -33,7 +33,14 @@ public class ClarinPLLoginAction extends AbstractAction {
         String token = findToken(request);
         log.info("Login cookie token: " + token);
 
-        EPerson ePerson = EPerson.findByClarinTokenId(context, token);
+        EPerson ePerson = null;
+        try {
+
+            ePerson = EPerson.findByClarinTokenId(context, token);
+
+        } catch (Exception ex){
+            log.error("SQL Error ",ex);
+        }
 
         if(AuthenticationUtil.isLoggedIn(request)) {
 
