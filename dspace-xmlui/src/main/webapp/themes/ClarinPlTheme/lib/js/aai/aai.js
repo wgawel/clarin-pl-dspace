@@ -41,13 +41,13 @@
 	djc.textHelpMore = opts.textHelpMore;
 
         djc.inlinemetadata = typeof opts.inlinemetadata === 'object' ? opts.inlinemetadata : [];
-        djc.inlinemetadata.push({
+/*        djc.inlinemetadata.push({
           'country': '_all_',
           'entityID': 'https://idp.clarin.eu',
           'geo': {'lat': 51.833298, 'lon': 5.866699},
           'title': 'Clarin.eu website account',
           'weight': 1000
-        });
+        });*/
 
         if(opts.localauth) {
 
