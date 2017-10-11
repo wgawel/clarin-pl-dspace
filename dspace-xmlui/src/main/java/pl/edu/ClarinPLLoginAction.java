@@ -9,6 +9,8 @@ import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
+import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -25,7 +27,9 @@ public class ClarinPLLoginAction extends AbstractAction {
 
         Request request = ObjectModelHelper.getRequest(objectModel);
         String redirectURL = request.getRequestURI();
-        org.dspace.core.Context context = new org.dspace.core.Context();
+
+        Context context = ContextUtil.obtainContext(objectModel);
+
         final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 
         log.info("Login checking url: " + redirectURL);
@@ -39,7 +43,7 @@ public class ClarinPLLoginAction extends AbstractAction {
             ePerson = EPerson.findByClarinTokenId(context, token);
 
         } catch (Exception ex){
-            log.error("SQL Error ",ex);
+            log.error(" ClarinPLLoginAction SQL Error ",ex);
         }
 
         if(AuthenticationUtil.isLoggedIn(request)) {
