@@ -15,8 +15,8 @@ jQuery(document).ready(function (){
 	
     already_loaded_dates = {"views":{}, "downloads":{}};
     loaded_data = {"views":{}, "downloads":{}};
-	
-	loadContents();
+			
+	loadContents();	
 	
 	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		current_tab = e.target.getAttribute("aria-controls");
@@ -67,7 +67,14 @@ loadContents = function () {
             if(!(current_view in already_loaded_dates["views"])) already_loaded_dates["views"][current_view] = {};
             if(!(current_date in already_loaded_dates["views"][current_view])) already_loaded_dates["views"][current_view][current_date] = true;
 
-            plot();
+        	if(loaded_data == null || loaded_data["views"] == null || Object.keys(loaded_data["views"]).length <= 1) {
+        		$("#piwik-charts-msg").html("<div class='alert alert-info'><strong>No statistics available for this item yet.</strong></div>");
+        		$("#piwik-charts").addClass("hide");		
+        		$("#piwik-charts-msg").removeClass("hide");
+        		return;
+        	} else {
+        		plot();
+        	}
 
         })
 	} else {
@@ -90,6 +97,13 @@ plotViews = function (div, data, color, tf, ti, highlightString) {
 				ticks.push("" + i);
 			}
 		}
+		if(ticks.length==1) {
+            current_view = "month";
+            current_year = ticks[0];
+            current_date = current_year;
+            loadContents();
+            return;
+		}		
 	}
 	else
 	if(current_view == "month") {
