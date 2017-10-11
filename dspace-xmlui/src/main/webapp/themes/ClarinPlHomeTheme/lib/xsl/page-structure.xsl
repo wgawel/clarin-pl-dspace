@@ -812,7 +812,7 @@
 
 		<script type="text/javascript" src ="https://ctj.clarin-pl.eu/clarin_bar/script.js">&#160;</script>
 		<script type="text/javascript">
-			window.onload = function() {
+			$(document).ready(function() {
 			var c = new ClarinModule({
 			offset:{
 			'top': 0,
@@ -827,11 +827,7 @@
 			horizontal: false,
 			themeColor: '#7d6ba9'
 			});
-			c.hookFunctionTo('logout', function(){
-				$.get("");
-			console.log('logout hook!!!');
 			});
-			};
 		</script>
 		<script type="text/javascript">
 			runAfterJSImports.execute();
