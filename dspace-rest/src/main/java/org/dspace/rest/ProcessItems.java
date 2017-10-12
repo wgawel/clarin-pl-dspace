@@ -599,6 +599,7 @@ public class ProcessItems extends ItemsResource {
 
         JSONObject request = new JSONObject();
         request.put("user", userName);
+        request.put("application", "dspace");
 
         StringBuilder  lpmn = new StringBuilder();
         lpmn.append("dspacezip(/")
