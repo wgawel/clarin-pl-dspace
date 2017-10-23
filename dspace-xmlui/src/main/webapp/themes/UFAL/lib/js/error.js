@@ -16,7 +16,6 @@ jQuery(document).ready(function() {
 
 	var aagregatorUrl = "https://clarin-aa.ms.mff.cuni.cz/aaggreg/v1/";
 	var idpDetail = aagregatorUrl + "entity/?entityID=";
-	var attributesDetail = aagregatorUrl + "list?rows=1&q=idpsp:";
 	var idpEntityId = getUrlParameter("idpEntityId");
 	var ourEntityId = getUrlParameter("ourEntityId");
 	var cc = getUrlParameter("cc");
@@ -27,8 +26,8 @@ jQuery(document).ready(function() {
 			var div = jQuery(this);
 			var heading = jQuery(".error-heading", div);
 			var details = jQuery(".error-details", div);
-			heading.html('<i class="fa fa-warning fa-lg ">&#160;</i>' + jQuery.i18n._('Error'));
-			details.html('<div class="text-center" style="font-size: 130%;">' + jQuery.i18n._("The login process can\'t continue because your home institution (%s) did not send the required information. Please click the button and send us an email. You\'ll be also helping your colleagues.", idpEntityId) + '<br><a class="btn btn-sm btn-danger" style="margin: 10px;" href="' + jQuery('.helpdesk').attr('href') + '">' + jQuery.i18n._('Please contact our helpdesk') + '</a></div>');
+			heading.html('<i class="fa fa-warning fa-lg ">&#160;</i>' + jQuery.i18n._('login-error'));
+			details.html('<div class="text-center" style="font-size: 130%;">' + jQuery.i18n._('login-missing-info-send-us', idpEntityId) + '<br><a class="btn btn-sm btn-danger" style="margin: 10px;" href="' + jQuery('.helpdesk').attr('href') + '">' + jQuery.i18n._('login-contact-helpdesk') + '</a></div>');
 		});
 	};
 	
@@ -44,9 +43,8 @@ jQuery(document).ready(function() {
 		+ ' The SP implements data protection code of conduct'
 		+ ' (http://geant3plus.archive.geant.net/uri/dataprotection-code-of-conduct/V1/Pages/default.aspx),'
 		+ ' is a member of the REFEDS Research and Scholarship Entity Category and a member of the CLARIN infrastructure'
-		+ ' (http://clarin.eu and https://www.clarin.eu/content/service-provider-federation)\n'
-		+ 'The released attributes are listed below:\n'
-		
+		+ ' (http://clarin.eu and https://www.clarin.eu/content/service-provider-federation).\n'
+
 	var subject = 'Attributes not released by ' + idpEntityId;
 
 	jQuery(".aai-error").each(function() {
@@ -55,14 +53,10 @@ jQuery(document).ready(function() {
 		
 		if (idpEntityId && ourEntityId) {
 			jQuery
-				.when(
-					jQuery.getJSON(idpDetail + idpEntityId),
-					jQuery.getJSON(attributesDetail + '"' + idpEntityId + "|" + ourEntityId + '"'))
+				.when(jQuery.getJSON(idpDetail + idpEntityId))
 				.done(
-					function(idp, attrs) {
-						var data = idp[0];
-						var attr_data = attrs[0];
-						if (!data.ok || data.result.length < 1 || attr_data.result.length < 1) {
+					function(data) {
+						if (!data.ok || data.result.length < 1) {
 							error();
 							return;
 						}
@@ -72,38 +66,36 @@ jQuery(document).ready(function() {
 
 						if (contact && messageBody && subject && cc && ourEntityId) {
 							
-							messageBody += attr_data.result[0].attributes.join('\n');
-							
 							var heading = jQuery(".error-heading", div);
 							var details = jQuery(".error-details", div);
 
 							var href =  "mailto:" + contact + "?" + "cc=" + cc +
 							"&subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(messageBody.replace("\n", "\n\r"));	
 							
-							heading.html('<i class="fa fa-warning fa-lg ">&#160;</i>' + jQuery.i18n._("Cannot continue with authentication"));
+							heading.html('<i class="fa fa-warning fa-lg ">&#160;</i>' + jQuery.i18n._('login-cannot-continue'));
 							details.append('<div class="text-center" style="font-size: 130%;">' + 
-							jQuery.i18n._("The login process can\'t continue because your home institution (%s) did not send the required information. Please click the button and send the prepared email to the responsible person from your IT department. You\'ll be also helping your colleagues.", idp_display_name) +
+							jQuery.i18n._('login-missing-info-send-you', idp_display_name) +
 							'</div>');
 							
 							var mailContainer = jQuery('<dl />');
-							mailContainer.append('<div class="text-center"><a class="btn btn-sm btn-danger bold" style="margin: 10px;" href=' + href + '><i class="fa fa-envelope">&#160;</i> ' + jQuery.i18n._('Send Email') + '</a></div>');	
+							mailContainer.append('<div class="text-center"><a class="btn btn-sm btn-danger bold" style="margin: 10px;" href=' + href + '><i class="fa fa-envelope">&#160;</i> ' + jQuery.i18n._('login-email-send') + '</a></div>');	
 
 							// subject, body and cc contain user params, don't
 							// execute them in jQuery() or append() insert them using text()!
 														
 							var toItem = jQuery("<dd style='font-size: 90%; padding: 5px;' />");
 							toItem.text(contact + ', ' + cc);							
-							mailContainer.append("<dt>" + jQuery.i18n._('To') + "</dt>");
+							mailContainer.append("<dt>" + jQuery.i18n._('login-email-to') + "</dt>");
 							mailContainer.append(toItem);
 
 							var subjItem = jQuery("<dd style='font-size: 90%; padding: 5px;' />");
 							subjItem.text(subject);
-							mailContainer.append("<dt>" + jQuery.i18n._('Subject') + "</dt>");
+							mailContainer.append("<dt>" + jQuery.i18n._('login-email-subject') + "</dt>");
 							mailContainer.append(subjItem);
 							
 							var bodyItem = jQuery("<dd style='font-size: 90%; padding: 5px; white-space: pre-wrap; display: block;' />");
 							bodyItem.text(messageBody);
-							mailContainer.append("<dt>" + jQuery.i18n._('Body') + "</dt>");
+							mailContainer.append("<dt>" + jQuery.i18n._('login-email-body') + "</dt>");
 							mailContainer.append(bodyItem);
 														
 							details.append("<div class='alert alert-danger'>" + mailContainer.html() + "</div>")

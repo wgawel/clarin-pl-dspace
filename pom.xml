@@ -4,7 +4,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>5.7-SNAPSHOT</version>
+   <version>5.8-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
    <description>
    	DSpace open source software is a turnkey institutional repository application.
@@ -35,6 +35,8 @@
         <solr.version>4.10.2</solr.version>
         <jena.version>2.12.0</jena.version>
         <slf4j.version>1.6.1</slf4j.version>
+        <!-- need at least 3.2.2 for spring-social-google (StreamUtils, MappingJackson2HttpMessageConverter) -->
+        <spring.version>3.2.5.RELEASE</spring.version>
         <!-- 'root.basedir' is the path to the root [dspace-src] dir. It must be redefined by each child POM,
              as it is used to reference the LICENSE_HEADER and *.properties file(s) in that directory. -->
         <root.basedir>${basedir}</root.basedir>
@@ -748,89 +750,89 @@
          <dependency>
             <groupId>cz.cuni.mff.ufal.lindat</groupId>
             <artifactId>utilities</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
          </dependency>
 
          <!-- DSpace core and endorsed Addons -->
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace.modules</groupId>
             <artifactId>additions</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
          </dependency>
 
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-swordv2</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-swordv2</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-client</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
             <type>war</type>
          </dependency>
 	 <dependency>
@@ -841,51 +843,51 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-services</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
          </dependency>
          <dependency>
              <groupId>org.dspace</groupId>
              <artifactId>dspace-rdf</artifactId>
-             <version>5.7-SNAPSHOT</version>
+             <version>5.8-SNAPSHOT</version>
              <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-rest</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
             <type>jar</type>
              <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-rest</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-solr</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
             <type>jar</type>
             <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-solr</artifactId>
-            <version>5.7-SNAPSHOT</version>
+            <version>5.8-SNAPSHOT</version>
             <type>war</type>
             <classifier>skinny</classifier>
          </dependency>
@@ -913,49 +915,55 @@
         <dependency>
             <artifactId>spring-core</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-beans</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-aop</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-context</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
+
+          <dependency>
+              <artifactId>spring-context-support</artifactId>
+              <groupId>org.springframework</groupId>
+              <version>${spring.version}</version>
+          </dependency>
 
         <dependency>
             <artifactId>spring-tx</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-jdbc</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-web</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>spring-webmvc</artifactId>
             <groupId>org.springframework</groupId>
-            <version>3.1.1.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
 
          <dependency>
@@ -1017,7 +1025,7 @@
          <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
+            <version>3.2.2</version>
             <!-- <version>3.1</version> xmlui - wing -->
          </dependency>
          <dependency>
@@ -1655,6 +1663,11 @@
             <id>restlet</id>
             <name>restlet</name>
             <url>http://maven.restlet.org</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <name>jitpack</name>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 

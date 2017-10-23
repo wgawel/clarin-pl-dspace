@@ -74,17 +74,13 @@ public class PiwikStatisticsReader extends AbstractReader {
     
     
     /** Piwik configurations */
-    private static final String PIWIK_API_URL = ConfigurationManager.getProperty(
-		"lr", "lr.statistics.api.url");
-    private static final String PIWIK_AUTH_TOKEN = ConfigurationManager.getProperty(
-		"lr", "lr.statistics.api.auth.token");
-    private static final String PIWIK_SITE_ID = ConfigurationManager.getProperty(
-		"lr", "lr.statistics.api.site_id");
-	private static final String PIWIK_DOWNLOAD_SITE_ID = ConfigurationManager.getProperty(
-		"lr", "lr.tracker.bitstream.site_id");
-	
-	private static final int PIWIK_SHOW_LAST_N_DAYS = ConfigurationManager.getIntProperty(
-		"lr", "lr.statistics.show_last_n", 7);
+    private static final String PIWIK_API_MODE = ConfigurationManager.getProperty("lr", "lr.statistics.api.mode");
+    private static final String PIWIK_API_URL = ConfigurationManager.getProperty("lr", "lr.statistics.api.url");
+    private static final String PIWIK_API_URL_CACHED = ConfigurationManager.getProperty("lr", "lr.statistics.api.cached.url");
+    private static final String PIWIK_AUTH_TOKEN = ConfigurationManager.getProperty("lr", "lr.statistics.api.auth.token");
+    private static final String PIWIK_SITE_ID = ConfigurationManager.getProperty("lr", "lr.statistics.api.site_id");
+	private static final String PIWIK_DOWNLOAD_SITE_ID = ConfigurationManager.getProperty("lr", "lr.tracker.bitstream.site_id");	
+	//private static final int PIWIK_SHOW_LAST_N_DAYS = ConfigurationManager.getIntProperty("lr", "lr.statistics.show_last_n", 7);
 
     /**
      * Set up the PiwikStatisticsReader
@@ -136,98 +132,107 @@ public class PiwikStatisticsReader extends AbstractReader {
 
 	@Override
 	public void generate() throws IOException, SAXException, ProcessingException {
+		
 		try {
-			// should contain the period
-			String queryString = request.getQueryString();
-
-			String format = request.getParameter("format");
-			if(format==null || format.isEmpty()) {
-				format = "xml";
-			}
-			int last_n = PIWIK_SHOW_LAST_N_DAYS;
-			String last_n_param = request.getParameter("last_n");
-			if (null != last_n_param) {
-				last_n = Integer.parseInt(last_n_param);
-			}
-
-			Calendar cal = Calendar.getInstance();
-			Date startDate = cal.getTime();
-			cal.add(Calendar.DATE, -last_n);
-			Date endDate = cal.getTime();
+			
+			
+			String mergedResult = "";
 			
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");			
 			
-			if(request.getParameter("date")!=null) {
-				String dt[] = request.getParameter("date").split(",");
-				startDate = df.parse(dt[1]);
-				endDate = df.parse(dt[0]);
+			// should contain the period
+			String queryString = request.getQueryString();									
+			String period = request.getParameter("period");
+			
+			
+			if(PIWIK_API_MODE==null || PIWIK_API_MODE.equals("direct")) {
+				
+				Calendar cal = Calendar.getInstance();
+				// default start and end data
+				Date startDate = df.parse("2014-01-01");
+				Date endDate = cal.getTime();
+							
+				if(request.getParameter("date")!=null) {
+					String sdate = request.getParameter("date");
+					String edate = request.getParameter("date");
+					if(sdate.length()==4) {
+						sdate += "-01-01";
+						edate += "-12-31";
+					} else 
+					if(sdate.length()==7) {	
+						cal.set(Calendar.YEAR, Integer.parseInt(sdate.substring(0,4)));
+						cal.set(Calendar.MONTH, Integer.parseInt(sdate.substring(5,7))-1);
+						cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+						sdate += "-01";
+						edate = df.format(cal.getTime());
+					}
+					startDate = df.parse(sdate);
+					endDate = df.parse(edate);				
+				}
+							
+				String dspaceURL = ConfigurationManager.getProperty("dspace.url");
+	
+				String urlParams =
+					  "&date=" + df.format(startDate) + "," + df.format(endDate)
+					+ "&period=" + period
+					+ "&idSite=" + PIWIK_SITE_ID
+					+ "&token_auth=" + PIWIK_AUTH_TOKEN
+					+ "&segment=pageUrl=@" + dspaceURL + "/handle/" + item.getHandle()
+					+ "&showColumns=label,url,nb_visits,nb_hits";
+				String downloadUrlParams =
+					  "&date=" + df.format(startDate) + "," + df.format(endDate)
+					+ "&period=" + period
+					+ "&idSite=" + PIWIK_DOWNLOAD_SITE_ID
+					+ "&token_auth=" + PIWIK_AUTH_TOKEN
+					+ "&segment=pageUrl=@" + dspaceURL + "/bitstream/handle/" + item.getHandle()
+					+ "&showColumns=label,url,nb_visits,nb_hits";
+	
+	
+				final boolean multi_requests = false;
+				queryString += "&token_auth=" + PIWIK_AUTH_TOKEN + "&module=API";
+				String piwikApiGetQuery = "method=Actions.getPageUrls&expanded=1&flat=1";
+	
+				if ( multi_requests ) {
+	
+					String report = PiwikHelper.readFromURL(
+						PIWIK_API_URL + rest + "?" + queryString + "&" + piwikApiGetQuery + urlParams
+					);
+					String downloadReport = PiwikHelper.readFromURL(
+						PIWIK_API_URL + rest + "?" + queryString + "&" + piwikApiGetQuery + downloadUrlParams
+					);
+					mergedResult = PiwikHelper.mergeJSON(report, downloadReport);
+				}else {
+					String piwikBulkApiGetQuery = "module=API&method=API.getBulkRequest&format=JSON"
+							+ "&token_auth=" + PIWIK_AUTH_TOKEN;
+	
+					
+					String url0 = URLEncoder.encode(piwikApiGetQuery + urlParams, "UTF-8");
+					String url1 = URLEncoder.encode(piwikApiGetQuery + downloadUrlParams, "UTF-8");
+					String report = PiwikHelper.readFromURL(
+						PIWIK_API_URL + rest + "?"
+							+ piwikBulkApiGetQuery
+							+ "&urls[0]=" + url0
+							+ "&urls[1]=" + url1
+					);
+					//mergedResult = PiwikHelper.mergeJSONResults(report);
+					mergedResult = PiwikHelper.transformJSONResults(report);
+					//mergedResult = report;
+	
+				}
+			} else 
+			if(PIWIK_API_MODE.equals("cached")) {
+				
+				String url = PIWIK_API_URL_CACHED + "handle?h=" + item.getHandle() + "&period=" + period;
+				
+				if(request.getParameter("date")!=null) {
+					String date = request.getParameter("date");
+					url += "&date=" + date;
+				}
+				
+				mergedResult = PiwikHelper.readFromURL(url);
+				
 			}
 			
-			String period = request.getParameter("period");
-
-			String urlParams =
-				  "&date=" + df.format(endDate) + "," + df.format(startDate)
-				+ "&period=" + period
-				+ "&idSite=" + PIWIK_SITE_ID
-				+ "&token_auth=" + PIWIK_AUTH_TOKEN
-				+ "&segment=pageUrl=@" + item.getHandle()
-				+ "&columns=nb_pageviews,nb_uniq_pageviews,nb_uniq_visitors,nb_visits";
-			String downloadUrlParams =
-				  "&date=" + df.format(endDate) + "," + df.format(startDate)
-				+ "&period=" + period
-				+ "&idSite=" + PIWIK_DOWNLOAD_SITE_ID
-				+ "&token_auth=" + PIWIK_AUTH_TOKEN
-				+ "&segment=pageUrl=@" + item.getHandle()
-				+ "&columns=nb_pageviews,nb_uniq_pageviews";
-			String bitstreamWiseDownloadCount = "method=Actions.getPageUrls"
-				+ "&date=" + df.format(endDate) + "," + df.format(startDate)
-				+ "&period=range"
-				+ "&idSite=" + PIWIK_DOWNLOAD_SITE_ID
-				+ "&include_aggregate_rows=0"
-				+ "&flat=1"
-				+ "&token_auth=" + PIWIK_AUTH_TOKEN
-				+ "&showColumns=url,nb_hits"
-				+ "&segment=pageUrl=@" + item.getHandle();
-
-
-			final boolean multi_requests = false;
-			String mergedResult = "";
-			queryString += "&token_auth=" + PIWIK_AUTH_TOKEN + "&module=API";
-			String piwikApiGetQuery = "method=API.get";
-
-			if ( multi_requests ) {
-
-				String report = PiwikHelper.readFromURL(
-					PIWIK_API_URL + rest + "?" + queryString + "&" + piwikApiGetQuery + urlParams
-				);
-				String downloadReport = PiwikHelper.readFromURL(
-					PIWIK_API_URL + rest + "?" + queryString + "&" + piwikApiGetQuery + downloadUrlParams
-				);
-
-				if (format.equalsIgnoreCase("xml")) {
-					mergedResult = PiwikHelper.mergeXML(report, downloadReport);
-				} else if (format.equalsIgnoreCase("json")) {
-					mergedResult = PiwikHelper.mergeJSON(report, downloadReport);
-				}
-			}else {
-				String piwikBulkApiGetQuery = "module=API&method=API.getBulkRequest&format=JSON"
-						+ "&token_auth=" + PIWIK_AUTH_TOKEN;
-
-				String url0 = URLEncoder.encode(piwikApiGetQuery + urlParams, "UTF-8");
-				String url1 = URLEncoder.encode(piwikApiGetQuery + downloadUrlParams, "UTF-8");
-				String url2 = URLEncoder.encode(bitstreamWiseDownloadCount, "UTF-8");
-				String report = PiwikHelper.readFromURL(
-					PIWIK_API_URL + rest + "?"
-						+ piwikBulkApiGetQuery
-						+ "&urls[0]=" + url0
-						+ "&urls[1]=" + url1
-						+ "&urls[2]=" + url2
-				);
-				//mergedResult = PiwikHelper.mergeJSONResults(report);
-				mergedResult = report;
-
-			}
-
 			out.write(mergedResult.getBytes());
 			out.flush();
 			

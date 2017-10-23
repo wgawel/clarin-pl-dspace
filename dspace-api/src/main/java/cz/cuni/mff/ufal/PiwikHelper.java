@@ -116,7 +116,7 @@ public class PiwikHelper {
 		}
 		return reportJSON.toJSONString();
 	}
-
+	
 	public static String mergeJSONResults(String report) throws Exception {
 		JSONParser parser = new JSONParser();
 		JSONArray json = (JSONArray)parser.parse(report);
@@ -142,6 +142,259 @@ public class PiwikHelper {
 		}
 		return result.toJSONString();
 	}
+	
+	public static String transformJSONResults(String report) throws Exception {
+		JSONParser parser = new JSONParser();
+		JSONArray json = (JSONArray)parser.parse(report);
+		JSONObject views = (JSONObject)json.get(0);
+		JSONObject downloads = (JSONObject)json.get(1);
+		JSONObject response = new JSONObject();
+		JSONObject result = new JSONObject();		
+		response.put("response", result);		
+		
+		result.put("views", transformJSON(views));
+		result.put("downloads", transformJSON(downloads));
+		
+		return response.toJSONString().replace("\\/", "/");
+	}
+	
+	
+	public static JSONObject transformJSON(JSONObject views) {
+		JSONObject result = new JSONObject();
+		JSONObject total = new JSONObject();		
+		for(Object key : views.keySet()) {
+			JSONArray view_data = (JSONArray) views.get(key);
+			
+			if(view_data.size()==0) continue;
+			
+			String dmy[] = key.toString().split("-");
+			if(dmy.length==1) {
+				int y = Integer.parseInt(dmy[0]);
+				JSONObject year = null;
+				if(!result.containsKey(y)) {
+					year = new JSONObject();
+					result.put(y, year);
+				} else {
+					year = (JSONObject)result.get(y);
+				}
+				for (int i = 0 ; i < view_data.size(); i++) {
+					JSONObject row = (JSONObject)view_data.get(i);
+					String url = row.get("label").toString();
+					url = url.split("\\?|@")[0];					
+					JSONObject v = null;
+					int nb_visits = 0;
+					int nb_hits = 0;
+					if(year.containsKey(url)) {
+						v = (JSONObject)year.get(url);						
+						nb_visits = Integer.parseInt(v.get("nb_visits").toString());
+						nb_hits = Integer.parseInt(v.get("nb_hits").toString());
+					}
+					v = new JSONObject();	
+					nb_visits = nb_visits + Integer.parseInt(row.get("nb_visits").toString());
+					nb_hits = nb_hits + Integer.parseInt(row.get("nb_hits").toString());
+					v.put("nb_hits", "" +  nb_hits);
+					v.put("nb_visits", "" + nb_visits);					
+					year.put(url, v);
+					
+					int total_nb_visits = 0;
+					int total_nb_hits = 0;					
+					
+					if(total.containsKey(y)) {
+						v = (JSONObject)total.get(y);						
+						total_nb_visits = Integer.parseInt(v.get("nb_visits").toString());
+						total_nb_hits = Integer.parseInt(v.get("nb_hits").toString());
+					}
+					v = new JSONObject();	
+					total_nb_visits = total_nb_visits + Integer.parseInt(row.get("nb_visits").toString());
+					total_nb_hits = total_nb_hits + Integer.parseInt(row.get("nb_hits").toString());
+					v.put("nb_hits", "" +  total_nb_hits);
+					v.put("nb_visits", "" + total_nb_visits);					
+					total.put(y, v);
+					
+					total_nb_visits = 0;
+					total_nb_hits = 0;					
+					
+					if(total.containsKey("nb_visits")) {
+						total_nb_visits = Integer.parseInt(total.get("nb_visits").toString());
+					}
+					
+					if(total.containsKey("nb_hits")) {
+						total_nb_hits = Integer.parseInt(total.get("nb_hits").toString());						
+					}
+					total_nb_visits = total_nb_visits + Integer.parseInt(row.get("nb_visits").toString());
+					total_nb_hits = total_nb_hits + Integer.parseInt(row.get("nb_hits").toString());					
+					
+					total.put("nb_hits", total_nb_hits);
+					total.put("nb_visits", total_nb_visits);
+					
+				}
+			} else if(dmy.length==2) {
+				JSONObject year = null;
+				int y = Integer.parseInt(dmy[0]);
+				if(!result.containsKey(y)) {
+					year = new JSONObject();
+					result.put(y, year);
+				} else {
+					year = (JSONObject)result.get(y);
+				}
+				int m = Integer.parseInt(dmy[1]);
+				JSONObject month = null;
+				if(!year.containsKey(m)) {
+					month = new JSONObject();
+					year.put(m, month);
+				} else {
+					month = (JSONObject)year.get(m);
+				}
+				for (int i = 0 ; i < view_data.size(); i++) {
+					JSONObject row = (JSONObject)view_data.get(i);
+					String url = row.get("label").toString();
+					url = url.split("\\?|@")[0];					
+					JSONObject v = null;
+					int nb_visits = 0;
+					int nb_hits = 0;
+					if(month.containsKey(url)) {
+						v = (JSONObject)month.get(url);						
+						nb_visits = Integer.parseInt(v.get("nb_visits").toString());
+						nb_hits = Integer.parseInt(v.get("nb_hits").toString());
+					}
+					v = new JSONObject();	
+					nb_visits = nb_visits + Integer.parseInt(row.get("nb_visits").toString());
+					nb_hits = nb_hits + Integer.parseInt(row.get("nb_hits").toString());
+					v.put("nb_hits", "" +  nb_hits);
+					v.put("nb_visits", "" + nb_visits);					
+					month.put(url, v);
+					
+					JSONObject tyear = null;
+					
+					if(total.containsKey(y)) {
+						tyear = (JSONObject)total.get(y);						
+					} else {
+						tyear = new JSONObject();
+						total.put(y, tyear);
+					}
+					
+					JSONObject tmonth = null;
+								
+					if(tyear.containsKey(m)) {
+						tmonth = (JSONObject)tyear.get(m);
+					} else {
+						tmonth = new JSONObject();
+						tyear.put(m, tmonth);
+					}
+					
+					int total_nb_visits = 0;
+					int total_nb_hits = 0;			
+					
+					if(tmonth.containsKey("nb_visits")) {
+						total_nb_visits = Integer.parseInt(tmonth.get("nb_visits").toString());
+					}
+					if(tmonth.containsKey("nb_hits")) {
+						total_nb_hits = Integer.parseInt(tmonth.get("nb_hits").toString());
+					}
+
+					v = new JSONObject();	
+					total_nb_visits = total_nb_visits + Integer.parseInt(row.get("nb_visits").toString());
+					total_nb_hits = total_nb_hits + Integer.parseInt(row.get("nb_hits").toString());
+					v.put("nb_hits", "" +  total_nb_hits);
+					v.put("nb_visits", "" + total_nb_visits);					
+					tyear.put(m, v);					
+					
+				}				
+			} else if(dmy.length==3) {
+				JSONObject year = null;
+				int y = Integer.parseInt(dmy[0]);
+				if(!result.containsKey(y)) {
+					year = new JSONObject();
+					result.put(y, year);
+				} else {
+					year = (JSONObject)result.get(y);
+				}
+				int m = Integer.parseInt(dmy[1]);
+				JSONObject month = null;
+				if(!year.containsKey(m)) {
+					month = new JSONObject();
+					year.put(m, month);
+				} else {
+					month = (JSONObject)year.get(m);
+				}
+				int d = Integer.parseInt(dmy[2]);
+				JSONObject day = null;
+				if(!month.containsKey(d)) {
+					day = new JSONObject();
+					month.put(d, day);
+				} else {
+					day = (JSONObject)month.get(d);
+				}
+	
+				for (int i = 0 ; i < view_data.size(); i++) {
+					JSONObject row = (JSONObject)view_data.get(i);
+					String url = row.get("label").toString();
+					url = url.split("\\?|@")[0];					
+					JSONObject v = null;
+					int nb_visits = 0;
+					int nb_hits = 0;
+					if(day.containsKey(url)) {
+						v = (JSONObject)day.get(url);						
+						nb_visits = Integer.parseInt(v.get("nb_visits").toString());
+						nb_hits = Integer.parseInt(v.get("nb_hits").toString());
+					}
+					v = new JSONObject();	
+					nb_visits = nb_visits + Integer.parseInt(row.get("nb_visits").toString());
+					nb_hits = nb_hits + Integer.parseInt(row.get("nb_hits").toString());
+					v.put("nb_hits", "" +  nb_hits);
+					v.put("nb_visits", "" + nb_visits);					
+					day.put(url, v);
+					JSONObject tyear = null;
+					
+					if(total.containsKey(y)) {
+						tyear = (JSONObject)total.get(y);						
+					} else {
+						tyear = new JSONObject();
+						total.put(y, tyear);
+					}
+					
+					JSONObject tmonth = null;
+								
+					if(tyear.containsKey(m)) {
+						tmonth = (JSONObject)tyear.get(m);
+					} else {
+						tmonth = new JSONObject();
+						tyear.put(m, tmonth);
+					}
+
+					JSONObject tday = null;
+					
+					if(tmonth.containsKey(d)) {
+						tday = (JSONObject)tmonth.get(d);
+					} else {
+						tday = new JSONObject();
+						tmonth.put(d, tday);
+					}
+					
+					int total_nb_visits = 0;
+					int total_nb_hits = 0;			
+					
+					if(tday.containsKey("nb_visits")) {
+						total_nb_visits = Integer.parseInt(tday.get("nb_visits").toString());
+					}
+					if(tday.containsKey("nb_hits")) {
+						total_nb_hits = Integer.parseInt(tday.get("nb_hits").toString());
+					}
+				
+					v = new JSONObject();	
+					total_nb_visits = total_nb_visits + Integer.parseInt(row.get("nb_visits").toString());
+					total_nb_hits = total_nb_hits + Integer.parseInt(row.get("nb_hits").toString());
+					v.put("nb_hits", "" +  total_nb_hits);
+					v.put("nb_visits", "" + total_nb_visits);					
+					tmonth.put(d, v);					
+				}
+
+			}
+			result.put("total", total);			
+		}			
+		return result;
+	}
+	
 
 	public static String readFromURL(String url) throws IOException {
 		StringBuilder output = new StringBuilder();		

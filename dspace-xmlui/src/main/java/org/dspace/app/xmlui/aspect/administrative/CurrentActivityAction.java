@@ -7,12 +7,10 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
@@ -26,6 +24,7 @@ import org.apache.cocoon.environment.SourceResolver;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.core.Email;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
@@ -66,7 +65,7 @@ public class CurrentActivityAction extends AbstractAction
             "currentActivityAction.botStrings",
             new String[] { "google/", "msnbot/", "googlebot/", "webcrawler/",
                     "inktomi", "teoma", "baiduspider", "bot" });
-	
+
 	/**
 	 * Allow the DSpace.cfg to override our activity max and ip header.
 	 */
@@ -90,8 +89,31 @@ public class CurrentActivityAction extends AbstractAction
             IP_HEADER = "X-Forwarded-For";
         }
 	}
-	
-	
+
+	private static HashMap<String, LinkedList<Long>> bitAccessCounter = new HashMap<>(MAX_EVENTS);
+
+	private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+
+	static{
+		executor.scheduleWithFixedDelay(new Runnable() {
+            @Override
+            public void run() {
+                long old = getOldTimestamp();
+                synchronized (bitAccessCounter) {
+                    for (Map.Entry<String, LinkedList<Long>> access : bitAccessCounter.entrySet()) {
+                        String url = access.getKey();
+                        LinkedList<Long> timestamps = access.getValue();
+                        removeOldTimestamps(timestamps, old);
+                        if (timestamps.isEmpty()) {
+                            bitAccessCounter.remove(url);
+                        }
+                    }
+                }
+            }
+        }, 12, 12, TimeUnit.MINUTES);
+	}
+
+
     /**
      * Record this current event.
      */
@@ -100,12 +122,46 @@ public class CurrentActivityAction extends AbstractAction
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
         Context context = ContextUtil.obtainContext(objectModel);
-        
+        final int limit = new DSpace().getConfigurationService().getPropertyAsType(
+        		"currentActivityAction.too_many_accesses.limit", 30);
+
         // Ensure only one thread is manipulating the events queue at a time.
         synchronized (events) {
 	        // Create and store our events
 	        Event event = new Event(context,request);
-	        
+
+	        //something we are interested in
+	        if(event.getURL().contains("bitstream")){
+				long old = getOldTimestamp();
+
+				synchronized (bitAccessCounter){
+                    LinkedList<Long> timestamps = bitAccessCounter.get(event.getURL());
+                    //remove old timestamps from the list
+                    if(timestamps != null){
+                        removeOldTimestamps(timestamps, old);
+                    }else {
+                        timestamps = new LinkedList<>();
+                        bitAccessCounter.put(event.getURL(), timestamps);
+                    }
+                    timestamps.add(event.getTimeStamp());
+                    if(timestamps.size() > limit){
+                        //yell as this bitstream was accessed more than LIMIT times in the last 10 mins.
+
+						Email email = new Email();
+						String errors_to = ConfigurationManager.getProperty("lr", "lr.errors.email");
+						if ( errors_to != null)
+						{
+							email.setSubject( String.format("Too many accesses to bitstream") );
+							email.setContent(String.format("The url [%s] has been accessed %s times in last 10mins.",
+									event.getURL(), timestamps.size()));
+							email.setCharset( "UTF-8" );
+							email.addRecipient(errors_to);
+							email.send();
+						}
+                    }
+                }
+			}
+
 	        // Check if we should record the event
 	        boolean record = true;
 	        if (!recordAnonymousEvents && event.isAnonymous())
@@ -122,7 +178,7 @@ public class CurrentActivityAction extends AbstractAction
             {
 	        	events.add(event);
             }
-	        
+
 	        // Remove the oldest element from the list if we are over our max
 	        // number of elements.
 	        while (events.size() > MAX_EVENTS)
@@ -133,8 +189,8 @@ public class CurrentActivityAction extends AbstractAction
        
         return null;
     }
-    
-    /**
+
+	/**
      * @return a list of all current events.
      */
     public static List<Event> getEvents()
@@ -501,6 +557,19 @@ public class CurrentActivityAction extends AbstractAction
     		return userAgent.length() == 0 ? "Unknown" : escapeHtml( userAgent.substring( 0, Math.min(20, userAgent.length()) ) );
     	}  
     }
+
+    private static void removeOldTimestamps(List<Long> timestamps, Long old){
+        for(Iterator<Long> i = timestamps.iterator(); i.hasNext();){
+			Long timestamp = i.next();
+			if (timestamp < old) {
+				i.remove();
+			}
+		}
+	}
+
+	private static Long getOldTimestamp(){
+    	return System.currentTimeMillis() - 600_000; //now -> 10mins ago
+	}
     
     
     

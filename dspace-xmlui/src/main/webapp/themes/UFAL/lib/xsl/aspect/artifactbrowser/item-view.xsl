@@ -233,9 +233,32 @@
 				</xsl:call-template>
 			</xsl:when>
 
+			<!-- PID row -->
+			<xsl:when test="$clause = 4 and (dim:field[@element='identifier' and @qualifier='uri'])">
+				<dl id="item-pid" class="dl-horizontal" style="clear:both;">
+                    <dt style="text-align: left">
+                        <i class="fa fa-share">&#160;</i>
+                        <span><i18n:text>xmlui.dri2xhtml.METS-1.0.item-pid</i18n:text></span>
+                    </dt>
+                    <dd style="padding-right: 40px;">
+                        <a id="item_pid">
+                            <xsl:attribute name="href">
+                                <xsl:value-of select="dim:field[@element='identifier' and @qualifier='uri']" />
+                            </xsl:attribute>
+                            <xsl:value-of select="dim:field[@element='identifier' and @qualifier='uri']" />
+                        </a>
+                        <button class="repo-copy-btn pull-right" data-clipboard-target="#item_pid" />
+                    </dd>
+				</dl>
+				<xsl:call-template name="itemSummaryView-DIM-fields">
+					<xsl:with-param name="clause" select="($clause + 1)" />
+					<xsl:with-param name="phase" select="$otherPhase" />
+				</xsl:call-template>
+			</xsl:when>
+
 			<!-- Project URL(s) row -->
 			<xsl:when
-				test="$clause = 4 and dim:field[@element='source'][@qualifier='uri']">
+				test="$clause = 5 and dim:field[@element='source'][@qualifier='uri']">
 						<dl id="project-url" class="dl-horizontal">
 							<dt style="text-align: left">
 								<i class="fa fa-link">&#160;</i>
@@ -268,7 +291,7 @@
 
 			<!-- Demo URL(s) row -->
 			<xsl:when
-				test="$clause = 5 and dim:field[@mdschema='local' and @element='demo' and @qualifier='uri']">
+				test="$clause = 6 and dim:field[@mdschema='local' and @element='demo' and @qualifier='uri']">
 						<dl id="demo-url" class="dl-horizontal">
 							<dt style="text-align: left">
 								<i class="fa fa-external-link">&#160;</i>
@@ -301,7 +324,7 @@
 
 			<!-- referenced by -->
 			<xsl:when
-					test="$clause = 6 and dim:field[@element='relation'][@qualifier='isreferencedby']">
+					test="$clause = 7 and dim:field[@element='relation'][@qualifier='isreferencedby']">
 				<dl id="relation-isreferencedby" class="dl-horizontal">
 					<dt style="text-align: left">
 						<i class="fa fa-link">&#160;</i>
@@ -334,7 +357,7 @@
 
 			<!-- date.issued row -->
 			<xsl:when
-				test="$clause = 7 and (dim:field[@element='date' and @qualifier='issued'])">
+				test="$clause = 8 and (dim:field[@element='date' and @qualifier='issued'])">
 				<dl id="date-issued" class="dl-horizontal">
 					<dt style="text-align: left">
 						<i class="fa fa-calendar">&#160;</i>					
@@ -358,7 +381,7 @@
 
 			<!-- type row -->
 			<xsl:when
-				test="$clause = 8 and (dim:field[@element='type' and not(@qualifier)])">
+				test="$clause = 9 and (dim:field[@element='type' and not(@qualifier)])">
 					<dl id="item-type" class="dl-horizontal">
 					<dt style="text-align: left">
 						<i class="fa fa-tag">&#160;</i>
@@ -378,7 +401,7 @@
 			</xsl:when>				
 
 			<!-- size row -->
-			<xsl:when test="$clause = 9">
+			<xsl:when test="$clause = 10">
 					<xsl:variable name="sizeInfo">
 						<xsl:choose>
 							<xsl:when test="dim:field[@mdschema='local' and @element='size' and @qualifier='info'][1]/node()">
@@ -421,7 +444,7 @@
 
 			<!-- type languages -->
 			<xsl:when
-				test="$clause = 10 and (dim:field[@element='language' and @qualifier='iso'])">
+				test="$clause = 11 and (dim:field[@element='language' and @qualifier='iso'])">
 					<dl id="item-languages" class="dl-horizontal">
 					<dt style="text-align: left">
 						<i class="fa fa-flag ">&#160;</i>
@@ -500,7 +523,7 @@
 
 			<!-- Description row -->
 			<xsl:when
-				test="$clause = 11 and (dim:field[@element='description' and not(@qualifier)])">
+				test="$clause = 12 and (dim:field[@element='description' and not(@qualifier)])">
 				<dl id="item-description" class="dl-horizontal linkify">
 					<dt style="text-align: left">
 						<i class="fa fa-file-text-o">&#160;</i>
@@ -533,7 +556,7 @@
 			
 			<!-- Publisher row -->
 			<xsl:when
-				test="$clause = 12 and (dim:field[@element='publisher' and not(@qualifier)])">
+				test="$clause = 13 and (dim:field[@element='publisher' and not(@qualifier)])">
 				<dl id="item-publisher" class="dl-horizontal">
 					<dt style="text-align: left">
 						<i class="fa fa-copy">&#160;</i>
@@ -565,7 +588,7 @@
 
 			<!-- Sponsors row -->
 			<xsl:when
-				test="$clause = 13 and ((dim:field[@element='sponsor' and not(@qualifier)]) or (dim:field[@element='ResourceInfo#ResourceCreationInfo#FundingInfo#ProjectInfo'] and dim:field[@qualifier='projectName']))">
+				test="$clause = 14 and ((dim:field[@element='sponsor' and not(@qualifier)]) or (dim:field[@element='ResourceInfo#ResourceCreationInfo#FundingInfo#ProjectInfo'] and dim:field[@qualifier='projectName']))">
 				<dl id="item-sponsor" class="dl-horizontal">
 					<dt style="text-align: left">
 						<i class="fa fa-money">&#160;</i>
@@ -636,7 +659,7 @@
 			
 			<!-- Subject keywords -->
 			<xsl:when
-				test="$clause = 14 and (dim:field[@element='subject' and not(@qualifier)])">
+				test="$clause = 15 and (dim:field[@element='subject' and not(@qualifier)])">
 				<dl id="item-subject" class="dl-horizontal">
 					<dt style="text-align: left">
 						<i class="fa fa-tags">&#160;</i>
@@ -662,7 +685,7 @@
 			
 			<!-- Collections -->
   			<xsl:when
-				test="$clause = 15 and $ufal-collection-references">
+				test="$clause = 16 and $ufal-collection-references">
 				<dl id="item-subject" class="dl-horizontal">
 					<dt style="text-align: left">
 						<i class="fa fa-sitemap">&#160;</i>
@@ -687,7 +710,7 @@
 				</xsl:call-template>
 			</xsl:when>
 
-			<xsl:when test="$clause = 16 and $ds_item_view_toggle_url != ''">
+			<xsl:when test="$clause = 17 and $ds_item_view_toggle_url != ''">
 
                 <!-- replacedby info -->
                 <xsl:if test="count(dim:field[@element='relation' and @qualifier='isreplacedby' and @mdschema='dc']) &gt;= 1">
@@ -734,7 +757,7 @@
 			<!-- recurse without changing phase if we didn't output anything -->
 			<xsl:otherwise>
 				<!-- IMPORTANT: This test should be updated if clauses are added! -->
-				<xsl:if test="$clause &lt; 16">
+				<xsl:if test="$clause &lt; 17">
 					<xsl:call-template name="itemSummaryView-DIM-fields">
 						<xsl:with-param name="clause" select="($clause + 1)" />
 						<xsl:with-param name="phase" select="$phase" />
@@ -828,13 +851,13 @@
 			<h4>
 				<i class="fa fa-paperclip">&#160;</i>
 				<i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text>			
+			</h4>				
 				<xsl:if test="/mets:METS/@OBJID">							
 					<xsl:variable name="download-all-url"><xsl:value-of select="concat(/mets:METS/@OBJID,'/allzip')" /></xsl:variable>
 					<xsl:call-template name="download-all">
 						<xsl:with-param name="download-all-url" select="$download-all-url" />
 					</xsl:call-template>
 				</xsl:if>						   			
-			</h4>				
 					
 			<!-- Generate UFAL licenses -->
 			<xsl:apply-templates select="//mets:mdWrap[@OTHERMDTYPE='UFAL_LICENSES']/mets:xmlData/license" />
@@ -871,6 +894,7 @@
                 <xsl:with-param name="size" select="@SIZE" />
             </xsl:call-template>
         </xsl:variable>
+        <xsl:variable name="md5_checksum" select="@CHECKSUM"/>
 			<div class="thumbnail" style="margin-bottom: 10px;">
 				<a>
 					<xsl:attribute name="href">
@@ -938,6 +962,12 @@
 								 	<xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label" />
 						</dd>
 					</xsl:if>
+					<dt>
+						<i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-checksum</i18n:text>
+					</dt>
+					<dd>
+						<xsl:value-of select="$md5_checksum"/>
+					</dd>
 				</dl>
 				<a class="filebutton label label-info">
 					<xsl:attribute name="href">
@@ -1065,7 +1095,7 @@
    		<xsl:if test="$file-count &gt; $lr.download.all.limit.min.file.count and $file-size &lt; $lr.download.all.limit.max.file.size">
             <!-- download all only under certain conditions (number and size of files) -->     
                                
-            <a id="download-all-button" class="label label-info pull-right">
+            <a id="download-all-button" class="btn btn-primary">
                 <xsl:choose>
                     <xsl:when test="$file-size &gt; $lr.download.all.alert.min.file.size">
                         <!-- display alert before downloading large files -->
@@ -1077,7 +1107,7 @@
                         <xsl:attribute name="data-href"><xsl:value-of select="$download-all-url" /></xsl:attribute>
                     </xsl:otherwise>
                 </xsl:choose>
-                <i class="fa fa-download">&#160;</i>
+                <i class="fa fa-download fa-3x" style="display:block;">&#160;</i>
                 <i18n:translate>                
                     <i18n:text>xmlui.UFAL.artifactbrowser.item-download-all-files</i18n:text>
                     <i18n:param><xsl:copy-of select="$formatted-file-size" /></i18n:param>
@@ -1134,85 +1164,61 @@
     <xsl:template name="visits_over_time">
         <xsl:variable name="reportURL">
             <xsl:value-of select="concat($context-path, '/', substring-before($request-uri, '/piwik-statistics'))"/>
-            <xsl:text disable-output-escaping="yes">/piwik?period=day</xsl:text>
+            <xsl:text disable-output-escaping="yes">/piwik</xsl:text>
         </xsl:variable>
         
         
-<div id="piwik-charts" style="font-family: verdana;" interval='2 day'>
+		<div id="piwik-charts" style="font-family: verdana;" interval='2 day'>
+			<xsl:attribute name="data-url"><xsl:value-of select="$reportURL" /></xsl:attribute>
+			
+		 <div class="alert alert-info">
+		 	<i class="fa fa-info-circle">&#160;</i>Click on a data point to summarize by year / month.
+		 </div>
 
-	                                <xsl:attribute name="data-url">
-                                        <xsl:value-of select="$reportURL" />
-                                </xsl:attribute>
+		  <ul class="nav nav-tabs" role="tablist">
+		    <li role="presentation" class="active" style="min-width: 200px;">        
+		      <a href="#views" aria-controls="views" role="tab" data-toggle="tab" style="color: #60a22a;"  class="text-center">
+		        <div class="bold text-center"><i class="fa fa-eye fa-2x">&#160;</i></div>
+		        <div>
+		          Views
+		          <span class="bold text-center" id="views_tab_count">&#160;</span>
+		        </div>        
+		      </a>
+		    </li>
+		    <li role="presentation" class="text-center" style="min-width: 200px;">
+		      <a href="#downloads" aria-controls="downloads" role="tab" data-toggle="tab" style="color: #1f78b4;" class="text-center">
+		        <div class="bold text-center"><i class="fa fa-download fa-2x">&#160;</i></div>
+		        <div>
+		     	     Downloads
+					<span class="bold text-center" id="downloads_tab_count">&#160;</span>
+		        </div>
+		      </a>
+		    </li>
+		  </ul>
+		  
+		  <div>
+		  	<div class="pull-right" style="margin-top: 10px; margin-right: 10px;"><h4 style="display: inline"><span class="label label-info"><span id="current_span" class="current_span"></span></span></h4> <a id="current_span_btn" style="display: none; margin-left: 10px;" class="btn btn-xs btn-primary"><strong>Back</strong></a></div>
+		  </div>
 
+		  <!-- Tab panes -->
+		  <div class="tab-content">
+		    <div role="tabpanel" class="tab-pane active" id="views" style="padding: 40px;">
+		      <div id="visits_over_time_chart" class="jqplot-target">
+		        <div id="piwik-loading" style="width: 100%; height: 100%; display: none;">
+		          <i class="fa fa-pulse fa-3x" >&#xf110;</i>
+		        </div>            
+		      </div>
+		    </div>
+		    <div role="tabpanel" class="tab-pane" id="downloads" style="padding: 40px;">
+		      <div id="downloads_over_time_chart" class="jqplot-target">
+		        <div id="piwik-loading" style="width: 100%; height: 100%; display: none;">
+		          <i class="fa fa-pulse fa-3x" >&#xf110;</i>
+		        </div>            
+		      </div>      
+		    </div>
+		  </div>
 
-
-	<div class="row" style="margin-bottom: 20px;">
-	  <div class="col-md-offset-2 col-md-8">
-		<div class="input-group input-group-lg">
-		<span style="cursor: pointer;" class="input-group-addon" id="sizing-addon1" onclick="jQuery('input[name=\'daterange\']').click();"><span class="label label-primary">Period</span></span>
-		  <input type="text" name="daterange" class="form-control" value="" aria-describedby="sizing-addon1" />
-		  <span style="cursor: pointer;" class="input-group-addon" id="sizing-addon1" onclick="jQuery('input[name=\'daterange\']').click();"><i class="glyphicon glyphicon-calendar fa fa-calendar">&#160;</i></span>    
-		</div>
-	  </div>
-	</div>
-
-
-  <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active" style="min-width: 200px;">        
-      <a href="#views" aria-controls="views" role="tab" data-toggle="tab" style="color: #60a22a;"  class="text-center">
-        <div class="bold text-center"><i class="fa fa-eye fa-2x">&#160;</i></div>
-        <div>
-          Views
-          <span class="bold text-center" id="views_tab_count">&#160;</span>
-        </div>        
-      </a>
-    </li>
-    <li role="presentation" class="text-center" style="min-width: 200px;">
-      <a href="#downloads" aria-controls="downloads" role="tab" data-toggle="tab" style="color: #1f78b4;" class="text-center">
-        <div class="bold text-center"><i class="fa fa-download fa-2x">&#160;</i></div>
-        <div>
-     	     Downloads
-			<span class="bold text-center" id="downloads_tab_count">&#160;</span>
-        </div>
-      </a>
-    </li>
-    <li role="presentation" style="min-width: 200px;">
-      <a href="#summary" aria-controls="summary" role="tab" data-toggle="tab" style="color: #888888" class="text-center">
-        <div class="bold text-center"><i class="fa fa-info-circle fa-2x">&#160;</i></div>
-        <div>
-     	     Summary
-		<span class="bold">&#160;</span>
-        </div>
-      </a>
-    </li>
-  </ul>
-
-  <!-- Tab panes -->
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane active" id="views" style="padding: 40px;">
-      <div id="visits_over_time_chart" class="jqplot-target">
-        <div id="piwik-loading" style="width: 100%; height: 100%; display: none;">
-          <i class="fa fa-pulse fa-3x" >&#xf110;</i>
-        </div>            
-      </div>
-    </div>
-    <div role="tabpanel" class="tab-pane" id="downloads" style="padding: 40px;">
-      <div id="downloads_over_time_chart" class="jqplot-target">
-        <div id="piwik-loading" style="width: 100%; height: 100%; display: none;">
-          <i class="fa fa-pulse fa-3x" >&#xf110;</i>
-        </div>            
-      </div>      
-    </div>
-    <div role="tabpanel" class="tab-pane" id="summary" style="padding: 40px;">
-			<div id="visits_summary_report">
-				<div class="views">&#160;</div>
-				<div class="visits">&#160;</div>
-				<div class="downloads">&#160;</div>
-			</div>      
-    </div>
-  </div>
-
-</div>        
+	</div>        
 
                 <!-- div class="panel panel-default">
                         <div class="panel-heading bold"><i18n:text>xmlui.UFAL.artifactbrowser.piwik.views</i18n:text>

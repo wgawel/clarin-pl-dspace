@@ -1054,6 +1054,7 @@
 	<message key="xmlui.Submission.submit.UploadStep.checksum">Kontrolní součet souboru:</message>
 	<message key="xmlui.Submission.submit.UploadStep.submit_remove">Odstranit vybrané soubory</message>
 	<message key="xmlui.Submission.submit.UploadStep.review.no_file">Žádný soubor nebyl nahrán.</message>
+	<message key="xmlui.Submission.submit.UploadStep.social.drive.list_files">Přidat soubory z vašeho Disku <span class="google-drive">&#160;</span></message>
 
 
 
@@ -2657,9 +2658,11 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">Zobrazit/<wbr/>otevřít</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-access-rights">Přístup na čtení dostupný pro</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-no-files">K tomuto záznamu nejsou připojeny žádné soubory.</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-files-checksum">MD5</message>
 
 	<message key="xmlui.ufal.METS-1.0.item-collections">Kolekce</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-isreferencedby">Odkaz na záznam&#160;v</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-pid">Identifikátor</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">{0} bajtů</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.size-kilobytes">KB</message>

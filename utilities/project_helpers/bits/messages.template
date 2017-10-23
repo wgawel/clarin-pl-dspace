@@ -900,6 +900,7 @@
   <message key="xmlui.Submission.submit.UploadStep.checksum">File checksum:</message>
   <message key="xmlui.Submission.submit.UploadStep.submit_remove">Remove selected files</message>
   <message key="xmlui.Submission.submit.UploadStep.review.no_file">You didn't upload any file.</message>
+  <message key="xmlui.Submission.submit.UploadStep.social.drive.list_files">Add files from your Drive <span class="google-drive">&#160;</span></message>
   <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Upload File(s)</message>
   <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file">File</message>
   <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file_help">Please enter the full path of the file on your computer corresponding to your item. If you click "Browse...", a new window will allow you to select the file from your computer.</message>
@@ -2350,6 +2351,7 @@
   <message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">View/<wbr/>Open</message>
   <message key="xmlui.dri2xhtml.METS-1.0.item-files-access-rights">P&#x159;&#xED;stup na &#x10D;ten&#xED; dostupn&#xFD; pro</message>
   <message key="xmlui.dri2xhtml.METS-1.0.item-no-files">There are no files associated with this item.</message>
+  <message key="xmlui.dri2xhtml.METS-1.0.item-files-checksum">MD5</message>
   <message key="xmlui.ufal.METS-1.0.item-collections">Collection(s)</message>
   <message key="xmlui.dri2xhtml.METS-1.0.item-relation-isreferencedby">Referenced by</message>
   <message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>

@@ -42,6 +42,7 @@
                 <exclude>config/dspace.cfg</exclude>
                 <exclude>config/log4j.properties</exclude>
                 <exclude>config/modules/**</exclude>
+                <exclude>config/emails/**</exclude>
             </excludes>
         </fileSet>
         <fileSet>
@@ -51,6 +52,7 @@
                 <include>config/modules/**</include>
                 <include>config/dspace.cfg</include>
                 <include>config/log4j.properties</include>
+                <include>config/emails/**</include>
             </includes>
             <filtered>true</filtered>
         </fileSet>        
