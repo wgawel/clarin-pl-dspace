@@ -1023,7 +1023,7 @@
 	<!-- org.dspace.app.xmlui.Submission.submit.UploadStep -->
 	<message key="xmlui.Submission.submit.UploadStep.head">Nahrát soubory</message>
 	<message key="xmlui.Submission.submit.UploadStep.file">Soubor</message>
-	<message key="xmlui.Submission.submit.UploadStep.file_help">Prosím, zadejte plnou cestu k souboru na vašem počítači, která odpovídá vašemu záznamu. Po kliknutí na „Procházet...“ se zobrazí nové okno, které vám umožní vybrat soubor z vašeho počítače.</message>
+	<message key="xmlui.Submission.submit.UploadStep.file_help">Prosím, zadejte plnou cestu k souboru na vašem počítači, která odpovídá vašemu záznamu. Po kliknutí na „Procházet...“ se zobrazí nové okno, které vám umožní vybrat soubor z vašeho počítače. <div class='alert'>Pokud je to možné, snažte se poskytnout soubory v jednom z formátů doporučených v <a href='http://www.clarin.eu/sites/default/files/Standards%20for%20LRT-v6.pdf' target='_blank'>LRT Standards</a>.</div><div class='alert'> Nahrání souborů <strong>větších než {0} </strong> vyžaduje pomoc správců. V tomto případě kontaktujte <a class="helpdesk-tolink">Help Desk</a>. Děkujeme za pochopení.</div></message>
 	<message key="xmlui.Submission.submit.UploadStep.file_local_head">Přidat soubory z URI</message>
 	<message key="xmlui.Submission.submit.UploadStep.file_local_help">Zadejte cestu k souboru na serveru nebo na webu (http).</message>
 	<message key="xmlui.Submission.submit.UploadStep.file_error">Záznam musí obsahovat alespoň jeden soubor.</message>
