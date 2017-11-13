@@ -96,7 +96,7 @@ lr.dspace.version = lindat-dspace5
 dspace.install.dir = /opt/lindat-dspace/installation
 
 # A description of your dspace instance. It will be used as a description of your dspace instance for other services
-dspace.name = LINDAT/CLARIN digital library at Institute of Formal and Applied Linguistics, Charles University in Prague
+dspace.name = LINDAT/CLARIN digital library at Institute of Formal and Applied Linguistics, Charles University
 # Used in email templates
 lr.dspace.name.short = LINDAT/CLARIN
 

@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/ufal/clarin-dspace.svg?branch=lindat)](https://travis-ci.org/ufal/lindat-dspace)
 # clarin-dspace repository
 
-* developed at: [Institute of Formal and Applied Linguistics, Charles University in Prague](http://ufal.mff.cuni.cz/)
+* developed at: [Institute of Formal and Applied Linguistics, Charles University](http://ufal.mff.cuni.cz/)
 * primary deploy at: https://lindat.mff.cuni.cz/repository/xmlui/
 * contact: https://lindat.mff.cuni.cz/en/about-lindat-clarin or better clarin's slack https://clarineric.slack.com/messages/dspace/
 * wiki: https://github.com/ufal/lindat-dspace/wiki
