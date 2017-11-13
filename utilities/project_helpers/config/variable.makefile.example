@@ -7,7 +7,7 @@
 # lindat-common settings
 DIR_LINDAT_COMMON_THEME :=/opt/lindat-common
 URL_LINDAT_COMMON_GIT   :=https://github.com/ufal/lindat-common.git
-LINDAT_COMMON_THEME_FETCH=git fetch && git checkout -f releases && git pull
+LINDAT_COMMON_THEME_FETCH=git fetch && git checkout -f no-tracking-release && git pull
 
 # tomcat
 TOMCAT_VERSION=6
