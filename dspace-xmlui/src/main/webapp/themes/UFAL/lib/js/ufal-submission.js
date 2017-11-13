@@ -82,23 +82,6 @@ ufal.submissions = {
 
     },
 
-    handle_files: function () {
-        if (jQuery("#replaced_by_alert").length > 0) {
-            jQuery("#files_section").hide();
-            jQuery("#replaced_by_alert")
-                .append(
-                    '<span class="font_smaller" style="display: inline-block; margin-top: 1em;" id="show_files_info">' + $.i18n._("autocomplete-original-data-help") + '<a href="#show-files" id="show_files_link">' + $.i18n._('autocomplete-here') + '</a>.</span>');
-            jQuery("#show_files_link").on('click', function () {
-                jQuery("#show_files_info").hide();
-                jQuery("#files_section").show();
-                jQuery('html, body').delay(100).animate({
-                    scrollTop: jQuery("#files_section").offset().top
-                }, 200);
-            });
-        }
-    },
-
-
     autocomplete_solr: function (obj, url, updater_function) {
         ufal.submissions.configurable_autocomplete_solr(
             obj,
@@ -447,5 +430,4 @@ jQuery(document).ready(function () {
     ufal.submissions.fix_l10n();
     ufal.submissions.handle_submission_js();
     ufal.submissions.autocomplete();
-    ufal.submissions.handle_files();
 }); // ready
