@@ -19,6 +19,7 @@ import org.apache.cocoon.xml.dom.DOMStreamer;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
+import org.dspace.utils.DSpace;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -162,12 +163,62 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
         return map;
     }
 
+    private static JSONArray shrink(JSONArray jsonArray){
+        for(Object entityO : jsonArray){
+            JSONObject entity = (JSONObject) entityO;
+            // if there are DisplayNames only the first one will be used in title copy the rest
+            // to keywords
+            // copy any value in Keywords and Description to keywords
+            for(String key: new String[]{"DisplayNames", "Keywords", "Descriptions"}) {
+                if (entity.containsKey(key)) {
+                    JSONArray keyObjects = (JSONArray) entity.get(key);
+                    List<String> values = getValues(keyObjects);
+                    if (!values.isEmpty()) {
+                        if("DisplayNames".equals(key)){
+                            entity.put("title", values.remove(0));
+                            if(values.isEmpty()){
+                                continue;
+                            }
+                        }
+                        if (entity.containsKey("keywords")) {
+                            values.addAll((List<String>) entity.get("keywords"));
+                        }
+                        entity.put("keywords", values);
+                    }
+                }
+            }
+
+            // Logos (in contrast to icon) are currently unused by the fronted; they just eat bandwidth
+            // The same for InformationURLs, Descriptions, PrivacyStatementURLs
+            // Can be configured
+            String[] toRemove = new DSpace().getConfigurationService().getPropertyAsType("discojuice" +
+                    ".remove_from_shib_feed_object", new String[]{"Logos", "InformationURLs",
+                    "Descriptions", "PrivacyStatementURLs", "DisplayNames", "Keywords"});
+            for(String key : toRemove){
+                entity.remove(key);
+            }
+        }
+        return jsonArray;
+    }
+
+    private static List<String> getValues(JSONArray array){
+        ArrayList<String> res = new ArrayList<>(array.size());
+        for(Object obj : array){
+            JSONObject jObj = (JSONObject) obj;
+            if(jObj.containsKey("value")){
+                res.add((String)jObj.get("value"));
+            }
+
+        }
+        return res;
+    }
+
     public static String createFeedsContent(String feedsConfig, String shibbolethDiscoFeedUrl){
         String old_value = System.getProperty("jsse.enableSNIExtension");
         System.setProperty("jsse.enableSNIExtension", "false");
 
         //Obtain shibboleths discofeed
-        final Map<String,JSONObject> shibDiscoEntities = toMap(DiscoJuiceFeeds.downloadJSON(shibbolethDiscoFeedUrl));
+        final Map<String,JSONObject> shibDiscoEntities = toMap(shrink(DiscoJuiceFeeds.downloadJSON(shibbolethDiscoFeedUrl)));
 
         //true is the default http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html
         old_value = (old_value == null) ? "true" : old_value;
