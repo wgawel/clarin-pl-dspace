@@ -23,6 +23,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.*;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -42,6 +43,10 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.apache.log4j.Logger;
+import org.dspace.services.ConfigurationService;
+import org.dspace.utils.DSpace;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
  * Class representing an e-mail message, also used to send e-mails.
@@ -128,6 +133,57 @@ public class Email
     private String charset;
 
     private static final Logger log = Logger.getLogger(Email.class);
+
+    private static final DelayQueue<DelayedEmail> queue = new DelayQueue<>();
+
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    private static final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
+
+    static {
+        executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                DelayedEmail email;
+                try {
+                    while ((email = queue.take()) != null) {
+                        try {
+                            email.send();
+                            log.debug("Sent email, queue size " + queue.size());
+                        }catch (MessagingException | IOException e){
+                            log.error(e.getMessage());
+                        }
+                    }
+                }catch (InterruptedException e){
+                    log.error(e.getMessage());
+                }
+
+            }
+        });
+
+        scheduledExecutor.scheduleWithFixedDelay(new Runnable() {
+            @Override
+            public void run() {
+                ConfigurationService configurationService = new DSpace().getConfigurationService();
+                if(queue.size() > configurationService.getPropertyAsType("lr.email.queue.alert", 50)) {
+                    Email email = new Email();
+                    String errors_to = configurationService.getProperty("lr.lr.errors.email");
+                    if ( isNotBlank(errors_to))
+                    {
+                        email.setSubject( String.format("DSpace email queue") );
+                        email.setContent(String.format("There are currently %s emails in the queue.", queue.size()));
+                        email.setCharset( "UTF-8" );
+                        email.addRecipient(errors_to);
+                    }
+                    try {
+                        email.doSend();
+                    } catch (MessagingException | IOException e) {
+                        log.error(e.getMessage());
+                    }
+                }
+            }
+        }, 1, 30, TimeUnit.MINUTES);
+    }
 
     /**
      * Create a new email message.
@@ -232,12 +288,22 @@ public class Email
 
     /**
      * Sends the email.
+     */
+    public void send() throws MessagingException, IOException{
+        long confDelay = new DSpace().getConfigurationService().getPropertyAsType("lr.email.delay", 30_000L);
+        long delay =  confDelay * (queue.size() + 1);
+        log.debug("Delay " + delay + ", queue size " + queue.size());
+        queue.add(new DelayedEmail(this, delay));
+    }
+
+    /**
+     * Sends the email.
      *
      * @throws MessagingException
      *             if there was a problem sending the mail.
-     * @throws IOException 
+     * @throws IOException
      */
-    public void send() throws MessagingException, IOException
+    private void doSend() throws MessagingException, IOException
     {
         // Get the mail configuration properties
         String server = ConfigurationManager.getProperty("mail.server");
@@ -657,6 +723,33 @@ public class Email
         {
             return new PasswordAuthentication(name, password);
         }
+    }
+
+    private static class DelayedEmail implements Delayed{
+
+        private Email email;
+        private long startTime;
+
+        DelayedEmail(Email email, long delayInMillis){
+            this.email = email;
+            this.startTime = System.currentTimeMillis() + delayInMillis;
+        }
+
+        @Override
+        public long getDelay(TimeUnit unit) {
+            long diff = startTime - System.currentTimeMillis();
+            return unit.convert(diff, TimeUnit.MILLISECONDS);
+        }
+
+        @Override
+        public int compareTo(Delayed o) {
+            return Long.compare(startTime, ((DelayedEmail)o).startTime);
+        }
+
+        public void send() throws IOException, MessagingException {
+            email.doSend();
+        }
+
     }
 
 }
