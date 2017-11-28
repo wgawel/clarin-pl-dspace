@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -134,7 +135,11 @@ public class Email
 
     private static final Logger log = Logger.getLogger(Email.class);
 
-    private static final DelayQueue<DelayedEmail> queue = new DelayQueue<>();
+    private static final BurstDelayQueue queue;
+
+    static {
+        queue = new BurstDelayQueue(new DSpace().getConfigurationService().getPropertyAsType("lr.email.burst", 20));
+    }
 
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -627,6 +632,14 @@ public class Email
     }
 
     /**
+     * Use for tests only; hack around static initialization
+     */
+    public static void cleanup(int burstSize){
+        queue.clear();
+        queue.setBurstSize(burstSize);
+    }
+
+    /**
      * Utility struct class for handling file attachments.
      *
      * @author ojd20
@@ -664,7 +677,77 @@ public class Email
         String mimetype;
         String name;
     }
-    
+
+    private static class BurstDelayQueue extends DelayQueue<DelayedEmail> {
+
+        private boolean burst = true;
+        private int burstSize = 0;
+
+        private final transient ReentrantLock myLock = new ReentrantLock();
+
+        public BurstDelayQueue(int burstSize){
+            super();
+            this.burstSize = burstSize;
+        }
+
+        @Override
+        public boolean add(DelayedEmail e){
+            final ReentrantLock myLock = this.myLock;
+            myLock.lock();
+            try {
+                if(burst && this.size() + 1 > burstSize){
+                    burst = false;
+                }
+                if (burst) {
+                    try {
+                        e.send();
+                        e = new DelayedEmail(null, e.getDelay(TimeUnit.MILLISECONDS));
+                    } catch (IOException | MessagingException ex) {
+                        log.error(ex.getMessage());
+                    }
+                }
+            }finally {
+                myLock.unlock();
+            }
+            return super.add(e);
+        }
+
+        @Override
+        public DelayedEmail take() throws InterruptedException{
+            final ReentrantLock lock = this.myLock;
+            lock.lockInterruptibly();
+            try {
+                if (this.size() == 1) {
+                    burst = true;
+                }
+            } finally {
+                lock.unlock();
+            }
+            return super.take();
+        }
+
+        @Override
+        public void clear(){
+            final ReentrantLock lock = this.myLock;
+            lock.lock();
+            try {
+                burst = true;
+            } finally {
+                lock.unlock();
+            }
+            super.clear();
+        }
+
+        /**
+         * For tests only
+         * @param burstSize
+         */
+        private void setBurstSize(int burstSize){
+            this.burstSize = burstSize;
+        }
+
+    }
+
     /**
     *
     * @author arnaldo
@@ -699,7 +782,7 @@ public class Email
        
        public OutputStream getOutputStream() throws IOException {            
            throw new IOException("Cannot write to this read-only resource");        
-       }    
+       }
    }
 
 	/**
@@ -747,7 +830,9 @@ public class Email
         }
 
         public void send() throws IOException, MessagingException {
-            email.doSend();
+            if(email != null) {
+                email.doSend();
+            }
         }
 
     }
