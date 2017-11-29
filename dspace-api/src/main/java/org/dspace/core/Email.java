@@ -141,6 +141,8 @@ public class Email
         queue = new BurstDelayQueue(new DSpace().getConfigurationService().getPropertyAsType("lr.email.burst", 20));
     }
 
+    private static long lastAlert = 0;
+
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private static final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
@@ -169,6 +171,7 @@ public class Email
         scheduledExecutor.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
+                log.debug("Scheduled email queue check");
                 ConfigurationService configurationService = new DSpace().getConfigurationService();
                 if(queue.size() > configurationService.getPropertyAsType("lr.email.queue.alert", 50)) {
                     Email email = new Email();
@@ -181,13 +184,23 @@ public class Email
                         email.addRecipient(errors_to);
                     }
                     try {
-                        email.doSend();
+                        long timeElapsedSinceLastEmail;
+                        synchronized (scheduledExecutor){
+                            timeElapsedSinceLastEmail = System.currentTimeMillis() - lastAlert;
+                        }
+                        if(timeElapsedSinceLastEmail > TimeUnit.MINUTES.toMillis(30)) {
+                            email.doSend();
+                            synchronized (scheduledExecutor) {
+                                lastAlert = System.currentTimeMillis();
+                            }
+                            log.debug("Alert email sent.");
+                        }
                     } catch (MessagingException | IOException e) {
                         log.error(e.getMessage());
                     }
                 }
             }
-        }, 1, 30, TimeUnit.MINUTES);
+        }, 1, 1, TimeUnit.MINUTES);
     }
 
     /**
