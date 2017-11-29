@@ -1,7 +1,7 @@
 /* Created for LINDAT/CLARIN */
 package cz.cuni.mff.ufal.utils;
 
-import java.util.StringTokenizer;
+import java.util.*;
 
 
 /**
@@ -25,9 +25,18 @@ public class BibtexUtil {
 	}
 	
 	public static void main(String[] args){
-		System.out.println(bibtexify("Příliš žluťoučký kůň úpěl ďábelské ódy")); 
+	    System.out.println(bibtexify("Î"));
+	    System.out.println(bibtexify("ơ"));
+		System.out.println(bibtexify("PříÎliš žluťoučký kůň úpěl ďábelské ódy"));
 		System.out.println(bibtexify(""));
 		System.out.println(bibtexify("Add some \n\n\n\n new lines\n to the mix."));
+		//Lower
+		for(String ch : BibtexString.accents){
+			String actual_ch = ch.substring(0, 1);
+			System.out.println(actual_ch + " : " +bibtexify(actual_ch));
+
+		}
+		//Upper
 		for(String ch : BibtexString.accents){
 			String actual_ch = ch.substring(0, 1);
 			System.out.println(actual_ch.toUpperCase() + " : " +bibtexify(actual_ch.toUpperCase()));
@@ -94,25 +103,13 @@ class BibtexString {
 		s = news;
 
 		// change accents with uppercase too
-		for (String ch : accents) {
+		for (String ch : getAccentsWithUpper()) {
 			String to_find = ch.substring(0, 1);
 			String to_change_with = ch.substring(1).replaceAll("\\\\",
 					"\\\\\\\\");
 			s = s.replaceAll(to_find, to_change_with);
-			// uppercase only chars before } without space
-			int lbr_idx = to_change_with.length() -1 ;
-			for ( ; 0 < lbr_idx; --lbr_idx ) {
-				char c = to_change_with.charAt(lbr_idx);
-				if ( ' ' == c || '\\' == c ) {
-					break;
-				}
-			}
-			// or only the last char
-			String to_change_with_upper = to_change_with.substring(0, lbr_idx)
-				+ to_change_with.substring(lbr_idx).toUpperCase();
-			s = s.replaceAll(to_find.toUpperCase(), to_change_with_upper);
 		}
-		// change accents with uppercase too
+
 		for (String ch : symbols_final) {
 			String to_find = ch.substring(0, 1);
 			String to_change_with = ch.substring(1).replaceAll("\\\\",
@@ -123,25 +120,52 @@ class BibtexString {
 		return s;
 	}
 
+	private static List<String> getAccentsWithUpper() {
+	    List<String> accentsWithUpper = new ArrayList<String>(accents.length * 2);
+		for (String ch : accents) {
+		    accentsWithUpper.add(ch);
+			String to_find = ch.substring(0, 1);
+			String to_change_with = ch.substring(1).replaceAll("\\\\",
+					"\\\\\\\\");
+			// uppercase only chars before } without space
+			int lbr_idx = to_change_with.length() - 1;
+			for (; 0 < lbr_idx; --lbr_idx) {
+				char c = to_change_with.charAt(lbr_idx);
+				if (' ' == c || '\\' == c) {
+					break;
+				}
+			}
+			// or only the last char
+			String to_change_with_upper = to_change_with.substring(0, lbr_idx)
+					+ to_change_with.substring(lbr_idx).toUpperCase();
+			// we don't need/want certain upper case
+			// esp. in strings containing {\\"{\\I}} (or similar) don't replace the I with {\\I}
+			if(!blackListedUpperAccents.contains(to_find.toUpperCase())) {
+				accentsWithUpper.add(to_find.toUpperCase() + to_change_with_upper);
+			}
+		}
+		return accentsWithUpper;
+	}
+
 	//CZ - Příliš žluťoučký kůň úpěl ďábelské ódy 
 	// lower case, will do uppercase automatically
 	public static final String[] accents = new String[] {
 			//&aogon;               &aacute;   &acirc;                           &auml;     &abreve;
 			"ą{\\c a}", "à{\\`a}", "á{\\'a}", "â{\\^a}", "ã{\\~a}", "ā{\\=a}", "ä{\\\"a}", "ă{\\u a}",
-			//         acute                                       uml         caron       ogon
-			"è{\\`e}", "é{\\'e}", "ê{\\^e}", "ẽ{\\~e}", "ē{\\=e}", "ë{\\\"e}", "ě{\\v e}", "ȩ{\\c e}",
+			//         acute                                       uml         caron       ogon       ecircumflexgrave
+			"è{\\`e}", "é{\\'e}", "ê{\\^e}", "ẽ{\\~e}", "ē{\\=e}", "ë{\\\"e}", "ě{\\v e}", "ȩ{\\c e}", "ề{\\`{\\^e}}", "ễ{\\~{\\^e}}", "ė{\\.e}",
 			//         acute      circ
-			"ì{\\`i}", "í{\\'i}", "î{\\^i}", "ĩ{\\~i}", "ī{\\=i}", "ï{\\\"i}",
+			"ì{\\`{\\i}}", "í{\\'{\\i}}", "î{\\^{\\i}}", "ĩ{\\~{\\i}}", "ī{\\={\\i}}", "ï{\\\"{\\i}}", "ı{\\i}", "ị{\\d i}",
 			//         acute      circ                             uml                                           &odblac;
-			"ò{\\`o}", "ó{\\'o}", "ô{\\^o}", "õ{\\~o}", "ō{\\=o}", "ö{\\\"o}", "ø{\\o}", "ọ{\\d o}", "ŏ{\\v o}", "ő{\\H o}",
+			"ò{\\`o}", "ó{\\'o}", "ô{\\^o}", "õ{\\~o}", "ō{\\=o}", "ö{\\\"o}", "ø{\\o}", "ọ{\\d o}", "ŏ{\\v o}", "ő{\\H o}",  "ồ{\\`{\\^o}}", "ỗ{\\~{\\^o}}", "ȯ{\\.o}",
 			//&lacute; &lstrok;  &lcaron;
 			"ĺ{\\'l}", "ł{\\l}", "ľ{\\v l}",
 			//         acute                                       uml         uring       udblac
 			"ù{\\`u}", "ú{\\'u}", "û{\\^u}", "ũ{\\~u}", "ū{\\=u}", "ü{\\\"u}", "ů{\\r u}", "ű{\\H u}",
 			//acute
-			"ý{\\'y}", "ÿ{\\\"y}",
+			"ý{\\'y}", "ÿ{\\\"y}", "ỳ{\\`y}", "ŷ{\\^y}", "ỹ{\\~y}",
 			//         acute      caron
-			"ñ{\\~n}", "ń{\\'n}", "ň{\\v n}",
+			"ñ{\\~n}", "ń{\\'n}", "ň{\\v n}", "ņ{\\c n}",
 			//acute   caron       cedil
 			"ś{\\'s}", "š{\\v s}", "ş{\\c s}",
 			//caron     cedil
@@ -154,6 +178,10 @@ class BibtexString {
 			"ď{\\v d}", "đ{\\d}",
 			//caron     acute
 			"ř{\\v r}", "ŕ{\\'r}",
+            //
+			"ĵ{\\^{\\j}}",
+			//
+			"ğ{\\u g}",
 
 			"œ{\\oe}", "æ{\\ae}", "å{\\aa}",  "þ{\\t h}", };
 
@@ -165,6 +193,8 @@ class BibtexString {
 
 	public static final String[] to_escape = new String[] { "?", "&", "$", "{",
 			"}", "%", "_", "#", };
+
+	private static final Set<String> blackListedUpperAccents = new HashSet<>(Arrays.asList("I"));
 
 } // class BibtexString
 

@@ -368,6 +368,8 @@
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_claimed">Tento záznam najdete na následujících místech:</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.para2_item_claimed">Autoři tohoto záznamu nás požádali o jeho skrytí. <strong>Stále máme všechna data i metadata původního záznamu.</strong> K záznamu by mělo být přistupováno výhradně přes výše uvedené url. Pokud z nějakého důvodu potřebujete původní záznam, kontaktujte naši <a class="helpdesk-tolink">poradnu</a>.</message>
 
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_reason">Důvod odstranění:</message>
+
 	<message key="xmlui.administrative.item.ConfirmItemForm.withdraw_para_extraInfo">Můžete vyplnit informace navíc. Handle, pokud byl záznam přesunut jinam a/nebo důvod pro odstranění.</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.withdraw_help_extra_handle">Pokud toto vyplníte uživatel zobrazující tento záznam uvidí zprávu s odkazem na nové PID.</message>
 	<message key="xmlui.administrative.item.ConfirmItemForm.withdraw_label_extra_handle">Nové PID:</message>
@@ -383,7 +385,7 @@
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.unknown">neznámý</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.login">Pokračujte na přihlašovací obrazovku.</message>
 	
-        <message key="xmlui.ArtifactBrowser.RestrictedItem.head_item_withdrawn">Tento záznam byl vyřazen</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.head_item_withdrawn"><h4>Tento záznam byl vyřazen</h4></message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_withdrawn">Vybraný záznam byl vyřazen a není nadále dostupný.</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted_auth">Vybraný záznam je záznam s omezeným přístupem a pro jeho zobrazení musíte mít potřebná oprávnění. Prosím, pro zobrazení tohoto záznamu se přihlaste.</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted">Váš účet nemá potřebná oprávnění pro zobrazení tohoto záznamu. Jestli máte jakékoliv nejasnosti, obraťte se na <a class="helpdesk-tolink">poradnu</a>.</message>
@@ -1023,7 +1025,7 @@
 	<!-- org.dspace.app.xmlui.Submission.submit.UploadStep -->
 	<message key="xmlui.Submission.submit.UploadStep.head">Nahrát soubory</message>
 	<message key="xmlui.Submission.submit.UploadStep.file">Soubor</message>
-	<message key="xmlui.Submission.submit.UploadStep.file_help">Prosím, zadejte plnou cestu k souboru na vašem počítači, která odpovídá vašemu záznamu. Po kliknutí na „Procházet...“ se zobrazí nové okno, které vám umožní vybrat soubor z vašeho počítače.</message>
+	<message key="xmlui.Submission.submit.UploadStep.file_help">Prosím, zadejte plnou cestu k souboru na vašem počítači, která odpovídá vašemu záznamu. Po kliknutí na „Procházet...“ se zobrazí nové okno, které vám umožní vybrat soubor z vašeho počítače. <div class='alert'>Pokud je to možné, snažte se poskytnout soubory v jednom z formátů doporučených v <a href='http://www.clarin.eu/sites/default/files/Standards%20for%20LRT-v6.pdf' target='_blank'>LRT Standards</a>.</div><div class='alert'> Nahrání souborů <strong>větších než {0} </strong> vyžaduje pomoc správců. V tomto případě kontaktujte <a class="helpdesk-tolink">Help Desk</a>. Děkujeme za pochopení.</div></message>
 	<message key="xmlui.Submission.submit.UploadStep.file_local_head">Přidat soubory z URI</message>
 	<message key="xmlui.Submission.submit.UploadStep.file_local_help">Zadejte cestu k souboru na serveru nebo na webu (http).</message>
 	<message key="xmlui.Submission.submit.UploadStep.file_error">Záznam musí obsahovat alespoň jeden soubor.</message>

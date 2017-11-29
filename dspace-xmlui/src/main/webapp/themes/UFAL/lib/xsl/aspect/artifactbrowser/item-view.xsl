@@ -1218,7 +1218,10 @@
 		    </div>
 		  </div>
 
+	</div>
+	<div id="piwik-charts-msg" class="hide">
 	</div>        
+	
 
                 <!-- div class="panel panel-default">
                         <div class="panel-heading bold"><i18n:text>xmlui.UFAL.artifactbrowser.piwik.views</i18n:text>

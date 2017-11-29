@@ -8,6 +8,7 @@ import java.net.URLConnection;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -19,6 +20,7 @@ import org.apache.cocoon.xml.dom.DOMStreamer;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
+import org.dspace.utils.DSpace;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -50,15 +52,11 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
     private static String feedsContent;
     private static ReadWriteLock lock = new ReentrantReadWriteLock();
     private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    private static ScheduledFuture<?> future;
+    private static boolean aggressiveDelay = true;
 
     static{
-        executor.scheduleWithFixedDelay(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                DiscoJuiceFeeds.update();
-                                            }
-                                        }, 0,
-                ConfigurationManager.getLongProperty("discojuice", "refresh"), TimeUnit.HOURS);
+        future = executor.scheduleWithFixedDelay(new Updater(), 30, 60, TimeUnit.SECONDS);
     }
 
     private static final LookupService locationService;
@@ -96,7 +94,19 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
         log.info("DiscoJuiceFeeds::update called");
         lock.writeLock().lock();
         try{
-           feedsContent = createFeedsContent();
+            String newFeedsContent = createFeedsContent();
+            if(isNotBlank(newFeedsContent)) {
+                feedsContent = newFeedsContent;
+            }
+            if(aggressiveDelay && isNotBlank(feedsContent)){
+                // apply the configured refresh rate, when we've successfully obtained feeds
+                future.cancel(true);
+                future = executor.scheduleWithFixedDelay(new Updater(), 0,
+                        ConfigurationManager.getLongProperty("discojuice", "refresh"),
+                        TimeUnit.HOURS);
+                aggressiveDelay = false;
+            }
+
         }finally {
             lock.writeLock().unlock();
         }
@@ -121,7 +131,7 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
             Element root = doc.createElement("ignore_root");
             lock.readLock().lock();
             try {
-                if (feedsContent == null || feedsContent.isEmpty()) {
+                if (isBlank(feedsContent)) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to obtain feeds.");
                 } else {
                     boolean jsonp = isNotBlank(callback);
@@ -162,12 +172,62 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
         return map;
     }
 
+    private static JSONArray shrink(JSONArray jsonArray){
+        for(Object entityO : jsonArray){
+            JSONObject entity = (JSONObject) entityO;
+            // if there are DisplayNames only the first one will be used in title copy the rest
+            // to keywords
+            // copy any value in Keywords and Description to keywords
+            for(String key: new String[]{"DisplayNames", "Keywords", "Descriptions"}) {
+                if (entity.containsKey(key)) {
+                    JSONArray keyObjects = (JSONArray) entity.get(key);
+                    List<String> values = getValues(keyObjects);
+                    if (!values.isEmpty()) {
+                        if("DisplayNames".equals(key)){
+                            entity.put("title", values.remove(0));
+                            if(values.isEmpty()){
+                                continue;
+                            }
+                        }
+                        if (entity.containsKey("keywords")) {
+                            values.addAll((List<String>) entity.get("keywords"));
+                        }
+                        entity.put("keywords", values);
+                    }
+                }
+            }
+
+            // Logos (in contrast to icon) are currently unused by the fronted; they just eat bandwidth
+            // The same for InformationURLs, Descriptions, PrivacyStatementURLs
+            // Can be configured
+            String[] toRemove = new DSpace().getConfigurationService().getPropertyAsType("discojuice" +
+                    ".remove_from_shib_feed_object", new String[]{"Logos", "InformationURLs",
+                    "Descriptions", "PrivacyStatementURLs", "DisplayNames", "Keywords"});
+            for(String key : toRemove){
+                entity.remove(key);
+            }
+        }
+        return jsonArray;
+    }
+
+    private static List<String> getValues(JSONArray array){
+        ArrayList<String> res = new ArrayList<>(array.size());
+        for(Object obj : array){
+            JSONObject jObj = (JSONObject) obj;
+            if(jObj.containsKey("value")){
+                res.add((String)jObj.get("value"));
+            }
+
+        }
+        return res;
+    }
+
     public static String createFeedsContent(String feedsConfig, String shibbolethDiscoFeedUrl){
         String old_value = System.getProperty("jsse.enableSNIExtension");
         System.setProperty("jsse.enableSNIExtension", "false");
 
         //Obtain shibboleths discofeed
-        final Map<String,JSONObject> shibDiscoEntities = toMap(DiscoJuiceFeeds.downloadJSON(shibbolethDiscoFeedUrl));
+        final Map<String,JSONObject> shibDiscoEntities = toMap(shrink(DiscoJuiceFeeds.downloadJSON(shibbolethDiscoFeedUrl)));
 
         //true is the default http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html
         old_value = (old_value == null) ? "true" : old_value;
@@ -211,10 +271,14 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
                 log.info(String.format("For %s changed country from %s to %s", shibEntity.get("entityID"), old_country, new_country));
             }
         }
-        JSONArray ret = new JSONArray();
-        ret.addAll(shibDiscoEntities.values());
 
-        return ret.toJSONString();
+        if(shibDiscoEntities.isEmpty()){
+            return null;
+        }else {
+            JSONArray ret = new JSONArray();
+            ret.addAll(shibDiscoEntities.values());
+            return ret.toJSONString();
+        }
     }
 
     private static JSONArray downloadJSON(String url){
@@ -276,4 +340,10 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
         //System.out.println(feeds);
     }
 
+    private static class Updater implements Runnable {
+        @Override
+        public void run() {
+            DiscoJuiceFeeds.update();
+        }
+    }
 }

@@ -1,6 +1,6 @@
 /**
  * Institute of Formal and Applied Linguistics
- * Charles University in Prague, Czech Republic
+ * Charles University, Czech Republic
  * 
  * http://ufal.mff.cuni.cz
  * 
