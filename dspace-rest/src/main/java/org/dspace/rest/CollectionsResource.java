@@ -427,17 +427,14 @@ public class CollectionsResource extends Resource
         try
         {
             context = new org.dspace.core.Context();
-            EPerson dspaceUser = EPerson.findByClarinTokenId(context, item.getToken());
-
-            // EPerson.findByEmail(context, "naskret.tomasz@gmail.com");
+            EPerson dspaceUser = EPerson.findByEmail(context, "dspace@clarin-pl.eu");
 
             if (dspaceUser == null){
                 throw new AuthorizeException();
             }
 
             context = createContext(dspaceUser);
-            org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
-                    org.dspace.core.Constants.WRITE);
+            org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
