@@ -7,7 +7,7 @@
  */
 package org.dspace.rest;
 
-import java.io.IOException;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,14 +29,22 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseException;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Bundle;
 import org.dspace.content.service.ItemService;
+import org.dspace.eperson.EPerson;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Item;
+import org.dspace.rest.common.JsonReader;
 import org.dspace.rest.common.MetadataEntry;
+import org.dspace.rest.common.clarinpl.MetadataItem;
+import org.dspace.rest.common.clarinpl.NextCloudItem;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.usage.UsageEvent;
 
@@ -335,6 +343,7 @@ public class CollectionsResource extends Resource
         try
         {
             context = createContext(getUser(headers));
+
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.WRITE);
 
@@ -365,6 +374,108 @@ public class CollectionsResource extends Resource
             dspaceItem = org.dspace.content.InstallItem.installItem(context, workspaceItem);
 
             returnItem = new Item(dspaceItem, "", context);
+
+            context.complete();
+
+        }
+        catch (SQLException e)
+        {
+            processException("Could not add item into collection(id=" + collectionId + "), SQLException. Message: " + e, context);
+        }
+        catch (AuthorizeException e)
+        {
+            processException("Could not add item into collection(id=" + collectionId + "), AuthorizeException. Message: " + e,
+                    context);
+        }
+        catch (IOException e)
+        {
+            processException("Could not add item into collection(id=" + collectionId + "), IOException. Message: " + e, context);
+        }
+        catch (BrowseException e)
+        {
+            processException("Could not add item into browse index, BrowseException. Message: " + e, context);
+        }
+        catch (ContextException e)
+        {
+            processException(
+                    "Could not add item into collection(id=" + collectionId + "), ContextException. Message: " + e.getMessage(),
+                    context);
+        }
+        finally
+        {
+            processFinally(context);
+        }
+
+        log.info("Item successfully created in collection(id=" + collectionId + "). Item handle=" + returnItem.getHandle());
+        return returnItem;
+    }
+
+    @POST
+    @Path("/{collection_id}/nextcloud/items")
+    @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public Item addCollectionNextCloudItem(@PathParam("collection_id") Integer collectionId, NextCloudItem item,
+                                  @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+                                  @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            throws WebApplicationException
+    {
+
+        log.info("Create item in collection(id=" + collectionId + ").");
+        log.info("Create item in " + item );
+        org.dspace.core.Context context = null;
+        Item returnItem = null;
+
+        try
+        {
+            context = new org.dspace.core.Context();
+            EPerson dspaceUser = EPerson.findByClarinTokenId(context, item.getToken());
+
+            // EPerson.findByEmail(context, "naskret.tomasz@gmail.com");
+
+            if (dspaceUser == null){
+                throw new AuthorizeException();
+            }
+
+            context = createContext(dspaceUser);
+            org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
+                    org.dspace.core.Constants.WRITE);
+
+            writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
+                    headers, request, context);
+
+            log.trace("Creating item in collection(id=" + collectionId + ").");
+            org.dspace.content.WorkspaceItem workspaceItem = org.dspace.content.WorkspaceItem.create(context, dspaceCollection,
+                    false);
+            org.dspace.content.Item dspaceItem = workspaceItem.getItem();
+
+            log.trace("Adding metadata to item(id=" + dspaceItem.getID() + ").");
+            if (item.getMetadata() != null)
+            {
+                for (MetadataItem entry : item.getMetadata())
+                {
+                    String data[] = mySplit(entry.getName());
+                    dspaceItem.addMetadata(data[0], data[1], data[2], "en_US", entry.getValue());
+                }
+            }
+            workspaceItem.update();
+
+            // Index item to browse.
+            org.dspace.browse.IndexBrowse browse = new org.dspace.browse.IndexBrowse(context);
+            browse.indexItem(dspaceItem);
+
+            log.trace("Installing item to collection(id=" + collectionId + ").");
+            dspaceItem = org.dspace.content.InstallItem.installItem(context, workspaceItem);
+
+            returnItem = new Item(dspaceItem, "", context);
+
+            InputStream is = new ByteArrayInputStream("".getBytes());
+
+            org.dspace.content.Bitstream dspaceBitstream = dspaceItem.createSingleBitstream(is);
+
+            dspaceBitstream.setSource("Export from NextCloud");
+            dspaceBitstream.setName(item.getFilename());
+            dspaceBitstream.setExternalUrl(item.getLink());
+
+            dspaceBitstream.update();
 
             context.complete();
 

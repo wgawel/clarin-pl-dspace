@@ -9,6 +9,7 @@ package org.dspace.rest;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.http.*;
@@ -16,20 +17,20 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Cookie;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import cz.cuni.mff.ufal.DSpaceApi;
+import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseDefinition;
+import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseLabel;
+import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
 import org.apache.log4j.Logger;
-import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.rest.common.Status;
 import org.dspace.rest.common.User;
+import org.dspace.rest.common.clarinpl.License;
 import org.dspace.rest.exceptions.ContextException;
+import org.dspace.usage.UsageEvent;
+import org.jdom.Element;
 import org.springframework.web.util.UriComponentsBuilder;
 
 
@@ -308,5 +309,41 @@ public class RestIndex {
         return new Status();
     }
 
+    @GET
+    @Path("/licenses")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response licenses(@Context HttpHeaders headers) throws UnsupportedEncodingException {
 
+        List<License> result = new ArrayList<>();
+        IFunctionalities functionalityManager = DSpaceApi.getFunctionalityManager();
+
+        try {
+
+            functionalityManager.openSession();
+            List<LicenseDefinition> licenses = functionalityManager.getAllLicenses();
+
+            for (LicenseDefinition l : licenses) {
+                LicenseLabel label = l.getLicenseLabel();
+                result.add(new License(l.getName(), l.getDefinition(), label.getLabel()));
+            }
+
+
+        } catch (Exception ex){
+            log.info("Rest license error: ", ex);
+            return Response.status(Response.Status.BAD_REQUEST).build();
+
+        } finally {
+            functionalityManager.closeSession();
+        }
+        return Response
+                .status(200)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Credentials", "true")
+                .header("Access-Control-Allow-Headers",
+                        "origin, content-type, accept, authorization")
+                .header("Access-Control-Allow-Methods",
+                        "GET")
+                .entity(result)
+                .build();
+    }
 }

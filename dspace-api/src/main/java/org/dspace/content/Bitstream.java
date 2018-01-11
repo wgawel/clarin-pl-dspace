@@ -52,6 +52,8 @@ public class Bitstream extends DSpaceObject
 
     private int cmdiBitstreamId;
 
+    private String externalUrl;
+
     /** Flag set when data is modified, for events */
     private boolean modified;
 
@@ -826,6 +828,16 @@ public class Bitstream extends DSpaceObject
     public void setCmdiBitstreamId(int cmdiBitstreamId) {
         this.cmdiBitstreamId = cmdiBitstreamId;
         bRow.setColumn("cmdi_id", cmdiBitstreamId);
+        modifiedMetadata = true;
+    }
+
+    public String getExternalUrl() {
+        return bRow.getStringColumn("external_url");
+    }
+
+    public void setExternalUrl(String externalUrl) {
+        this.externalUrl = externalUrl;
+        bRow.setColumn("external_url", externalUrl);
         modifiedMetadata = true;
     }
 

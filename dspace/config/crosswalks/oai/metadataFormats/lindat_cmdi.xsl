@@ -2,16 +2,16 @@
 <!-- 
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:doc="http://www.lyncode.com/xoai" 
-    xmlns:itemUtil="cz.cuni.mff.ufal.utils.ItemUtil"
-    xmlns:isocodes="cz.cuni.mff.ufal.IsoLangCodes"
-    xmlns:xalan="http://xml.apache.org/xslt"
-    xmlns:configuration="org.dspace.core.ConfigurationManager"
-    xmlns:ms="http://www.ilsp.gr/META-XMLSchema"
-    xmlns:olac="http://experimental.loc/olac"
-    xmlns:cmd="http://www.clarin.eu/cmd/"
-    exclude-result-prefixes="doc xalan itemUtil isocodes configuration ms"
-    version="1.0">
+				xmlns:doc="http://www.lyncode.com/xoai"
+				xmlns:itemUtil="cz.cuni.mff.ufal.utils.ItemUtil"
+				xmlns:isocodes="cz.cuni.mff.ufal.IsoLangCodes"
+				xmlns:xalan="http://xml.apache.org/xslt"
+				xmlns:configuration="org.dspace.core.ConfigurationManager"
+				xmlns:ms="http://www.ilsp.gr/META-XMLSchema"
+				xmlns:olac="http://experimental.loc/olac"
+				xmlns:cmd="http://www.clarin.eu/cmd/" xmlns:xls="http://www.w3.org/1999/XSL/Transform"
+				exclude-result-prefixes="doc xalan itemUtil isocodes configuration ms"
+				version="1.0">
     <xsl:import href="metadataFormats/metasharev2.xsl"/>
     <xsl:import href="metadataFormats/olac-dcmiterms.xsl"/>
     
@@ -114,7 +114,16 @@
 		   <cmd:ResourceProxy>
 	                   <xsl:attribute name="id">r_<xsl:value-of select="./doc:field[@name='id']/text()"/></xsl:attribute>
                        <cmd:ResourceType><xsl:attribute name="mimetype"><xsl:value-of select="./doc:field[@name='format']/text()"/></xsl:attribute>Resource</cmd:ResourceType>
-                       <cmd:ResourceRef><xsl:value-of select="concat($dsURL,'/bitstream/handle/',$handle,'/',./doc:field[@name='name']/text(),'?sequence=',./doc:field[@name='sid']/text())"/></cmd:ResourceRef>
+                       <cmd:ResourceRef>
+						   <xsl:choose>
+							   <xsl:when test="./doc:field[@name='external_url']/text() != ''">
+								   <xsl:value-of select="./doc:field[@name='external_url']/text()"/>
+							   </xsl:when>
+							   <xls:otherwise>
+								   <xsl:value-of select="concat($dsURL,'/bitstream/handle/',$handle,'/',./doc:field[@name='name']/text(),'?sequence=',./doc:field[@name='sid']/text())"/>
+							   </xls:otherwise>
+						   </xsl:choose>
+					   </cmd:ResourceRef>
            </cmd:ResourceProxy>
 	   </xsl:for-each>
 	</xsl:template>

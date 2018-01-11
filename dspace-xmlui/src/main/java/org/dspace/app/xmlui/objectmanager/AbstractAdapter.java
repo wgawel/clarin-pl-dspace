@@ -532,7 +532,11 @@ public abstract class AbstractAdapter
         {
             attributesXLINK.put("label", description);
         }
-        attributesXLINK.put("href", url);
+        if(bitstream.getExternalUrl() != null && !bitstream.getExternalUrl().isEmpty()){
+            attributesXLINK.put("href", bitstream.getExternalUrl());
+        } else {
+            attributesXLINK.put("href", url);
+        }
         startElement(METS,"FLocat",attributes,attributesXLINK);
         
 

@@ -225,6 +225,7 @@ public class ItemUtils
                     String oname = bit.getSource();
                     String name = bit.getName();
                     int cmdi_id = bit.getCmdiBitstreamId();
+                    String external_url = bit.getExternalUrl();
                     String description = bit.getDescription();
 
                     if (name != null)
@@ -252,7 +253,7 @@ public class ItemUtils
                     bitstream.getField().add(
                     		createValue("id", bit.getID()+""));
                     bitstream.getField().add(createValue("cmdi_id", cmdi_id+""));
-
+                    bitstream.getField().add(createValue("external_url", external_url));
                     if(!restricted){
                         List<LicenseDefinition> lds = functionalityManager.getLicenses(bit.getID());
                         for(LicenseDefinition ld : lds){
