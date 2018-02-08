@@ -74,7 +74,7 @@ public class CuratorCheck extends Check {
                     }
 
                     if ( output_all ) {
-                        ret = StringUtils.join(results, "\n");
+                        ret += StringUtils.join(results, "\n");
                     }
                     c.complete();
                 } catch (Exception e) {
