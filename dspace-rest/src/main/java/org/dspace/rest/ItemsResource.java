@@ -9,11 +9,8 @@ package org.dspace.rest;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
+import java.util.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -37,8 +34,12 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
+import org.dspace.content.Collection;
 import org.dspace.content.service.ItemService;
 import org.dspace.eperson.Group;
+import org.dspace.identifier.IdentifierNotFoundException;
+import org.dspace.identifier.IdentifierNotResolvableException;
+import org.dspace.identifier.IdentifierService;
 import org.dspace.rest.common.Bitstream;
 import org.dspace.rest.common.Item;
 import org.dspace.rest.common.MetadataEntry;
@@ -46,6 +47,7 @@ import org.dspace.rest.exceptions.ContextException;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.usage.UsageEvent;
+import org.dspace.utils.DSpace;
 
 /**
  * Class which provide all CRUD methods over items.
@@ -1061,6 +1063,98 @@ public class ItemsResource extends Resource
         }
 
         return items.toArray(new Item[0]);
+    }
+
+    /**
+     * Returns the "versions" of this item. It's obtained by following the "isreplacedby" and "replaces" relations.
+     * If you have the following graph (where numbers are individual versions),
+     *
+     *   2-5
+     *  /
+     * 1-3-6-7-8
+     *  \  /
+     *   4
+     *
+     * versions of 1 are all the nodes, versions of 4 are just 1; 4 and 7, versions of 8 are all the nodes except 2
+     * and 5.
+     *
+     * @param itemId
+     * @param expand
+     * @param user_ip
+     * @param user_agent
+     * @param xforwardedfor
+     * @param headers
+     * @param request
+     * @return
+     * @throws WebApplicationException
+     */
+    @GET
+    @Path("/{item_id}/versions")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Item[] versions(@PathParam("item_id") Integer itemId, @QueryParam("expand") String expand,
+            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            throws WebApplicationException{
+
+        org.dspace.core.Context context = null;
+        Item[] items = new Item[]{};
+        Map<Item,Date> item2date = new HashMap<>();
+
+        try {
+            context = createContext(headers);
+            org.dspace.content.Item item = findItem(context, itemId, org.dspace.core.Constants
+                    .READ);
+            java.util.Collection<String> relations = item.getRelationChain("isreplacedby");
+            relations.add(item.getHandle());
+            relations.addAll(item.getRelationChain ("replaces"));
+
+
+            IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
+            for(String handleRelation : relations){
+                org.dspace.content.Item resolvedItem;
+                try {
+                    resolvedItem = (org.dspace.content.Item)identifierService.resolve(context, handleRelation);
+                }catch (IdentifierNotFoundException | IdentifierNotResolvableException e){
+                    resolvedItem = null;
+                }
+                if(resolvedItem == null) {
+                    Item fakeItem = new Item();
+                    fakeItem.setHandle(handleRelation);
+                    fakeItem.setName(handleRelation);
+                    item2date.put(fakeItem, DCDate.getCurrent().toDate());
+                }else {
+                    Date submitDate;
+                    Metadatum[] mds = resolvedItem.getMetadata("dc","date", "available",
+                            org.dspace.content.Item.ANY);
+                    if(mds != null && mds.length > 0){
+                        submitDate = new DCDate(mds[0].value).toDate();
+                    }else{
+                        submitDate = DCDate.getCurrent().toDate();
+                    }
+
+                    item2date.put(new Item(resolvedItem, expand, context), submitDate);
+                }
+            }
+            context.complete();
+            List<Map.Entry<Item,Date>> entries = new LinkedList<>(item2date.entrySet());
+            Collections.sort(entries, new Comparator<Map.Entry<Item, Date>>() {
+                @Override
+                public int compare(Map.Entry<Item, Date> o1, Map.Entry<Item, Date> o2) {
+                    return o2.getValue().compareTo(o1.getValue());
+                }
+            });
+            items = new Item[entries.size()];
+            int i = 0;
+            for(Map.Entry<Item, Date> entry : entries){
+               items[i++] = entry.getKey();
+            }
+        }catch (SQLException | ContextException e){
+            processException("Could not fetch versions(id=" + itemId + "), " + e.getClass().getName() +"." +
+                    " Message:" + e.getMessage(), context);
+        }finally {
+            processFinally(context);
+        }
+        return items;
     }
 
     /**

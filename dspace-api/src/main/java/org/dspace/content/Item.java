@@ -11,12 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -2246,5 +2242,59 @@ public class Item extends DSpaceObject
 			this.addMetadatum(md);
 		}
 	}
+
+    /**
+     * Follow the provided relation and record the visited handles
+     *
+     * @param relation - name of relation e.g. isreplacedby or replaces
+     * @return A list of handles that are in relation to this item
+     * @throws SQLException
+     */
+	public java.util.Collection<String> getRelationChain(String relation) throws SQLException {
+	    String handle = this.getHandle();
+        Set<String> relatedHandles = new HashSet<>();
+
+        // Are there relations for this item?
+        TableRow row = DatabaseManager.querySingle(ourContext, "select count(*) as relation_count from metadatavalue mv" +
+                        " natural join metadatafieldregistry join handle h on" +
+                        " h.resource_id = mv.resource_id and h.resource_type_id = mv.resource_type_id" +
+                        " where handle = ? and element = 'relation' and qualifier = ?;",
+                handle, relation);
+        if(row == null || row.getIntColumn("relation_count") < 1){
+            return relatedHandles;
+        }
+
+        //There are relations for this handle so fetch all relations and walk through them
+	    TableRowIterator rows = DatabaseManager.query(ourContext,
+                        "select concat('http://hdl.handle.net/', handle) as handle, text_value " +
+                        "as relation from metadatavalue mv natural join metadatafieldregistry join handle h on " +
+                                "h.resource_id = mv.resource_id and h.resource_type_id = mv.resource_type_id" +
+                                "  where element = 'relation' and qualifier=?;", relation);
+	    Map<String,List<String>> handle2relations = new HashMap<>();
+	    while(rows.hasNext()){
+	        row = rows.next(ourContext);
+	        String row_handle = row.getStringColumn("handle");
+	        List<String> relations = handle2relations.get(row_handle);
+	        if(relations == null){
+	            relations = new LinkedList<>();
+                handle2relations.put(row_handle, relations);
+            }
+            relations.add(row.getStringColumn("relation"));
+        }
+	    LinkedList<String> handlesToProcess = new LinkedList<>();
+	    handlesToProcess.add("http://hdl.handle.net/" + handle);
+        while(!handlesToProcess.isEmpty()){
+            List<String> relations = handle2relations.get(handlesToProcess.pop());
+            if(relations != null) {
+                for (String rel : relations) {
+                    if(!relatedHandles.contains(rel)) {
+                        relatedHandles.add(rel);
+                        handlesToProcess.push(rel);
+                    }
+                }
+            }
+        }
+        return relatedHandles;
+    }
 }
 
