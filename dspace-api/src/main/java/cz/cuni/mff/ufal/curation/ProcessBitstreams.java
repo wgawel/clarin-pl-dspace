@@ -1,23 +1,20 @@
 /* Created for LINDAT/CLARIN */
 package cz.cuni.mff.ufal.curation;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
-import java.util.Enumeration;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 import cz.cuni.mff.ufal.DSpaceApi;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorInputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
@@ -28,7 +25,6 @@ import org.dspace.event.Event;
 import org.dspace.core.Context;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Constants;
-import org.dspace.storage.bitstore.BitstreamStorageManager;
 
 
 public class ProcessBitstreams extends AbstractCurationTask implements Consumer {
@@ -76,7 +72,8 @@ public class ProcessBitstreams extends AbstractCurationTask implements Consumer 
 
 	boolean processItem(Item item) throws SQLException, AuthorizeException {
         int processed = 0;
-        for ( Bundle bundle : item.getBundles("ORIGINAL") ) {
+        // we filter for ORIGINAL later on
+        for ( Bundle bundle : item.getBundles() ) {
             for ( Bitstream b : bundle.getBitstreams() ) {
                 if (OK == processBitstream(b)) {
                     processed += 1;
@@ -108,7 +105,6 @@ public class ProcessBitstreams extends AbstractCurationTask implements Consumer 
         }
 
         DSpaceObject subject = event.getSubject(ctx);
-        DSpaceObject object = event.getObject(ctx);
         int et = event.getEventType();
         Bitstream b = (Bitstream)subject;
 
@@ -132,26 +128,52 @@ public class ProcessBitstreams extends AbstractCurationTask implements Consumer 
         return ret;
     }
 
-    static InputStream getIS(String mime, InputStream is) {
-        if ( mime.equals("application/zip") ) {
-            return new ZipArchiveInputStream(is);
+    static InputStream getIS(String mime, InputStream is) throws CompressorException, ArchiveException {
+
+	    is = new BufferedInputStream(is);
+	    InputStream ret = null;
+
+	    switch (mime){
+            case "application/x-gzip":
+            case "application/gzip":
+            case "application/x-xz":
+                try{
+                    CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(is);
+                    ret = new ArchiveStreamFactory().createArchiveInputStream(new BufferedInputStream(cis));
+                }catch (CompressorException e){
+                    log.error("Failed to extract known mime-type " + mime);
+                    log.error(e);
+                    throw e;
+                }catch (ArchiveException e){
+                    log.debug("Not a compressed archive (eg. .tgz)");
+                }
+                break;
+            case "application/zip":
+            case "application/x-tar":
+                try{
+                    ret = new ArchiveStreamFactory().createArchiveInputStream(is);
+                }catch (ArchiveException e){
+                    log.error("Failed to extract known archive mime-type=" + mime);
+                    log.error(e);
+                    throw e;
+                }
+                break;
+            default: break;
         }
-        else if ( mime.equals("application/x-gzip") ) {
+
+        if (ret == null && mime.startsWith("text/plain") ) {
+        	ret = is;
         }
-        else if ( mime.equals("application/gzip") ) {
-        }
-        else if ( mime.equals("application/x-tar") ) {
-            return new TarArchiveInputStream(is);
-        }
-        else if ( mime.equals("application/x-xz") ) {
-        }
-        else if ( mime.startsWith("text/plain") ) {
-        	return is;
-        }
-        return null;
+        return ret;
     }
 
     static int addBitstreamContent(Bitstream b) throws SQLException, AuthorizeException {
+
+	    // Clear on all bitstream no matter if PUB or what bundle they are in
+        // In particular clean LICENSE preview and preview on RES items
+        b.clearMetadata(schema, element, qualifier, Item.ANY);
+        b.update();
+
         Context context = new Context(Context.READ_ONLY);
         context.setCurrentUser(null);
         try {
@@ -164,7 +186,19 @@ public class ProcessBitstreams extends AbstractCurationTask implements Consumer 
             context.complete();
         }
 
-        b.clearMetadata(schema, element, qualifier, Item.ANY);
+        // Skip the non ORIGINAL bitstreams after we've cleared the bitstream metadata
+        // earlier versions generated previews for LICENSE and other bundles
+        // this ensures those are cleared when the item is curated again.
+        boolean original = false;
+        for(Bundle bundle : b.getBundles()){
+            if("ORIGINAL".equals(bundle.getName())){
+                original = true;
+            }
+        }
+        if(!original){
+            b.update();
+            return SKIPPED;
+        }
 
         //
         try {
@@ -176,11 +210,17 @@ public class ProcessBitstreams extends AbstractCurationTask implements Consumer 
             if(is instanceof ArchiveInputStream) {
             	ArchiveInputStream ais = (ArchiveInputStream)is;
 	            ArchiveEntry entry;
+	            int i = 0;
 	            while ((entry = ais.getNextEntry()) != null) {
 	                String content = String.format(
 	                    "%s|%d", entry.getName(), entry.getSize()
 	                );
 	                b.addMetadata( schema, element, qualifier, Item.ANY, content );
+	                //don't add more than 1000 files
+	                if(++i >= 1000){
+	                    b.addMetadata(schema, element, qualifier, Item.ANY, String.format("%s|%d", "...", 0));
+	                    break;
+                    }
 	            }
             } else {
             	InputStreamReader r = new InputStreamReader(is);
@@ -189,6 +229,7 @@ public class ProcessBitstreams extends AbstractCurationTask implements Consumer 
             	b.addMetadata( schema, element, qualifier, Item.ANY, new String(cbuf) );
             }
         } catch (Exception e) {
+            log.error("Error on bitstream " + b.getID());
             log.error(e);
             return ERROR;
         }

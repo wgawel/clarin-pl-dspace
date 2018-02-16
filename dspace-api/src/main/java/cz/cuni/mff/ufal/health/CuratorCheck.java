@@ -74,7 +74,7 @@ public class CuratorCheck extends Check {
                     }
 
                     if ( output_all ) {
-                        ret = StringUtils.join(results, "\n");
+                        ret += StringUtils.join(results, "\n") + "\n";
                     }
                     c.complete();
                 } catch (Exception e) {
@@ -95,7 +95,7 @@ public class CuratorCheck extends Check {
                 if (str.trim().endsWith("- OK")) {
                     continue;
                 } else if (str.trim().startsWith("Item:")) {
-                    last_item = str;
+                    last_item = str.substring(0, str.indexOf(']')+1);
                 } else {
                     if (last_item != null) {
                         ret += last_item + "\n";
