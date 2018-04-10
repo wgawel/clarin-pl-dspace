@@ -24,5 +24,5 @@ if [ $CHECK_EXISTS = 1 ]
 then
  mysql --host=$db_host -u $db_user -p$db_pass -e "UPDATE inforex.users set password=MD5('$password') where login='$email'"
 else
- mysql --host=$db_host -u $db_user -p$db_pass -e "INSERT INTO inforex.users (login,password,email,screename) VALUES('$email',MD5('$password'),'$email','$fullname')"
+ mysql --host=$db_host -u $db_user -p$db_pass -e "INSERT INTO inforex.users (login,password,email,screename, clarin_login) VALUES('$email',MD5('$password'),'$email','$fullname','$email')"
 fi
