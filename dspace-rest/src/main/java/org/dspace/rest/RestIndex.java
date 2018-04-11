@@ -177,7 +177,7 @@ public class RestIndex {
     @Path("/validate-token/{token}")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Response validateToken(@PathParam("token") String token) {
-        String   payload = "";
+        String  payload = "";
         try {
             payload = TokenHolder.requestUserData(token);
         } catch (WebApplicationException ex) {
@@ -200,7 +200,7 @@ public class RestIndex {
     @POST
     @Path("/logout")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response logout(@Context HttpHeaders headers)
+    public Response logout(@Context HttpHeaders headers,  @Context HttpServletRequest request)
     {
         List<String> list = headers.getRequestHeader(TokenHolder.TOKEN_HEADER);
         String token = null;
@@ -217,10 +217,14 @@ public class RestIndex {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
+         String domain = ConfigurationManager.getProperty("dspace.hostname");
+         Cookie clarinPlCookie = new Cookie("clarin-pl-token", "","/", domain);
+         NewCookie clarinNew = new NewCookie(clarinPlCookie,"", 0, false);
+
         if(ePerson != null) {
             log.info("REST Logout: " + ePerson.getEmail());
         }
-        return Response.ok().build();
+        return Response.ok().cookie(clarinNew).build();
     }
 
     @GET
@@ -232,7 +236,7 @@ public class RestIndex {
         try {
             redirect =  java.net.URLDecoder.decode(redirect, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.error("Redirect:", e);
             redirect = ConfigurationManager.getProperty("ctj.auth");
         }
 
@@ -260,7 +264,7 @@ public class RestIndex {
                 NewCookie clarinNew = new NewCookie(clarinPlCookie,"", 0, false);
                 return Response.temporaryRedirect(builder.build().toUri()).cookie(clarinNew).build();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Logout error:", e);
             }
         }
         return Response.temporaryRedirect(builder.build().toUri()).build();
