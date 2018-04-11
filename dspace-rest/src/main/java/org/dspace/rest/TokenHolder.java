@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
- * <p>
+ *
  * http://www.dspace.org/license/
  */
 package org.dspace.rest;
@@ -24,10 +24,11 @@ import org.dspace.rest.common.User;
  * This class provide token generation, token holding and logging user into rest
  * api. For login use method login with class org.dspace.rest.common.User. If
  * you want to be deleted from holder, use method for logout.
- *
+ * 
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
  */
-public class TokenHolder {
+public class TokenHolder
+{
 
     private static final Logger log = Logger.getLogger(TokenHolder.class);
 
@@ -39,7 +40,7 @@ public class TokenHolder {
 
     /**
      * Login user into rest api. It check user credentials if they are okay.
-     *
+     * 
      * @param user
      *            User which will be logged into rest api.
      * @return Returns generated token, which must be used in request header
@@ -50,21 +51,28 @@ public class TokenHolder {
      *             database. And by Authorization exception if context has not
      *             permission to read eperson.
      */
-    public static String login(User user) throws WebApplicationException {
+    public static String login(User user) throws WebApplicationException
+    {
         org.dspace.core.Context context = null;
         String token = null;
-        try {
+
+        try
+        {
             context = new org.dspace.core.Context();
             EPerson dspaceUser = EPerson.findByEmail(context, user.getEmail());
 
             synchronized (TokenHolder.class) {
-                if ((dspaceUser == null) || (!dspaceUser.checkPassword(user.getPassword()))) {
+                if ((dspaceUser == null) || (!dspaceUser.checkPassword(user.getPassword())))
+                {
                     token = null;
-                } else if (tokens.containsKey(user.getEmail())) {
+                }
+                else if (tokens.containsKey(user.getEmail()))
+                {
                     token = tokens.get(user.getEmail());
-                } else {
-                    dspaceUser.setClarinTokenId();
-                    token = dspaceUser.getClarinToken();
+                }
+                else
+                {
+                    token = generateToken();
                     persons.put(token, dspaceUser);
                     tokens.put(user.getEmail(), token);
                 }
@@ -73,16 +81,23 @@ public class TokenHolder {
             log.trace("User(" + user.getEmail() + ") has been logged.");
             context.complete();
 
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             context.abort();
             log.error("Could not read user from database. Message:" + e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        } catch (AuthorizeException e) {
+        }
+        catch (AuthorizeException e)
+        {
             context.abort();
             log.error("Could not find user, AuthorizeException. Message:" + e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        } finally {
-            if ((context != null) && (context.isValid())) {
+        }
+        finally
+        {
+            if ((context != null) && (context.isValid()))
+            {
                 context.abort();
                 log.error("Something get wrong. Aborting context in finally statement.");
                 throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -92,28 +107,38 @@ public class TokenHolder {
         return token;
     }
 
-    public static String requestUserData(String token) throws WebApplicationException {
+    public static String requestUserData(String token) throws WebApplicationException
+    {
         org.dspace.core.Context context = null;
         StringBuilder data = new StringBuilder();
 
-        try {
+        try
+        {
             context = new org.dspace.core.Context();
             EPerson dspaceUser = EPerson.findByClarinTokenId(context, token);
+            log.warn(dspaceUser.getEmail());
             data.append("{\"login\":\"").append(dspaceUser.getEmail()).append("\",");
             data.append("\"fullname\":\"").append(dspaceUser.getFullName()).append("\"}");
 
-            log.warn("User data requested(for User: " + data.toString() + ")");
+            log.warn("User data requested(for User: "+ data.toString()+")");
             context.complete();
-        } catch (SQLException e) {
+        }
+        catch (SQLException e)
+        {
             context.abort();
             log.error("Could not read user from database. Message:", e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        } catch (AuthorizeException e) {
+        }
+        catch (AuthorizeException e)
+        {
             context.abort();
-            log.error("Could not find user, AuthorizeException. Message:", e);
+            log.error("Could not find user, AuthorizeException. Message:",e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        } finally {
-            if ((context != null) && (context.isValid())) {
+        }
+        finally
+        {
+            if ((context != null) && (context.isValid()))
+            {
                 context.abort();
                 log.error("Something get wrong. Aborting context in finally statement.");
                 throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -125,43 +150,47 @@ public class TokenHolder {
 
     /**
      * Return EPerson for log into context.
-     *
+     * 
      * @param token
      *            Token under which is stored eperson.
      * @return Return instance of EPerson if is token right, otherwise it
      *         returns NULL.
      */
-    public static synchronized EPerson getEPerson(String token) {
+    public static synchronized EPerson getEPerson(String token)
+    {
         return persons.get(token);
     }
 
     /**
      * Logout user from rest api. It delete token and EPerson from TokenHolder.
-     *
+     * 
      * @param token
      *            Token under which is stored eperson.
      * @return Return true if was all okay, otherwise return false.
      */
-    public static synchronized boolean logout(String token) {
-        if ((token == null) || (persons.get(token) == null)) {
+    public static synchronized boolean logout(String token)
+    {
+        if ((token == null) || (persons.get(token) == null))
+        {
             return false;
         }
         String email = persons.get(token).getEmail();
         EPerson person = persons.remove(token);
-        if (person == null) {
+        if (person == null)
+        {
             return false;
         }
-        person.clearClarinTokenId();
         tokens.remove(email);
         return true;
     }
 
     /**
      * It generates unique token.
-     *
+     * 
      * @return String filled with unique token.
      */
-    private static String generateToken() {
+    private static String generateToken()
+    {
         return UUID.randomUUID().toString();
     }
 
