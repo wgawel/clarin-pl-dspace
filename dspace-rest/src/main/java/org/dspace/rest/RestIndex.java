@@ -163,13 +163,16 @@ public class RestIndex {
     public Response login(User user)
     {
         String token = TokenHolder.login(user);
+        String domain = ConfigurationManager.getProperty("dspace.hostname");
+        Cookie clarinPlCookie = new Cookie("clarin-pl-token", token,"/",domain);
+        NewCookie clarinNew = new NewCookie(clarinPlCookie,"", 9999, false);
         if (token == null)
         {
             log.info("REST Login Attempt failed for user: " + user.getEmail());
             return Response.status(Response.Status.FORBIDDEN).build();
         } else {
             log.info("REST Login Success for user: " + user.getEmail());
-            return Response.ok(token, "text/plain").build();
+            return Response.ok(token, "text/plain").cookie(clarinNew).build();
         }
     }
 
@@ -200,8 +203,21 @@ public class RestIndex {
     @POST
     @Path("/logout")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-    public Response logout(@Context HttpHeaders headers,  @Context HttpServletRequest request)
+    public Response logout(@Context HttpHeaders headers,  @Context HttpServletRequest request,  @QueryParam("redirect") String redirect)
     {
+        try {
+            redirect =  java.net.URLDecoder.decode(redirect, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            log.error("Redirect:", e);
+            redirect = ConfigurationManager.getProperty("ctj.auth");
+        }
+
+        if("".equals(redirect)) {
+            redirect = ConfigurationManager.getProperty("ctj.auth");
+        }
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(redirect);
+
         List<String> list = headers.getRequestHeader(TokenHolder.TOKEN_HEADER);
         String token = null;
         boolean logout = false;
@@ -224,7 +240,7 @@ public class RestIndex {
         if(ePerson != null) {
             log.info("REST Logout: " + ePerson.getEmail());
         }
-        return Response.ok().cookie(clarinNew).build();
+        return Response.temporaryRedirect(builder.build().toUri()).cookie(clarinNew).build();
     }
 
     @GET
