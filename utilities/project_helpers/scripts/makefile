@@ -213,8 +213,9 @@ fresh_install:
 
 # Grant rights to installation
 grant_rights:
-	chown -RL $(TOMCAT_USER):$(TOMCAT_GROUP) $(DIR_INSTALLATION)/
-	chmod -R g+w $(DIR_INSTALLATION)/
+	@echo "[CLARIN-PL(docker)] Skip 'grant_rights'"
+	# chown -RL $(TOMCAT_USER):$(TOMCAT_GROUP) $(DIR_INSTALLATION)/
+	# chmod -R g+w $(DIR_INSTALLATION)/
 	
 # maven uses prerequisites to check for mvn version
 # keep this here for non _guru builds
@@ -223,7 +224,6 @@ tools_version_check:
 	@cd $(BASE) && python setup.lindat.py --mvn-version=3.0
 
 user_prompt: tools_version_check
-	@echo ""
 	@echo -e "$(RED)Do you really wish to continue? (for Yes type Yes)$(NORMAL)"
 	@python -c 'import sys; sys.exit(-1) if raw_input() != "Yes" else None'
 
@@ -234,12 +234,16 @@ user_prompt: tools_version_check
 #
 
 test_dspace_database: 
-	@cd $(DIR_BUILD) && $(ANT_WITH_CONF) -logger org.apache.tools.ant.listener.AnsiColorLogger test_database | $(HIDE_PASSW)
+	@echo "[CLARIN-PL] Skip 'test_databases' (DB CONNECITON ONLY POSSIBLE WITH RUNNING DOCKER CONTAINER)"
+	# @cd $(DIR_BUILD) && $(ANT_WITH_CONF) -logger org.apache.tools.ant.listener.AnsiColorLogger test_database | $(HIDE_PASSW)
 
 test_utilities_database: 
-	@cd $(DIR_INSTALLATION)/bin && JAVA_OPTS="-Dlog4j.configuration=file:$(DIR_INSTALLATION)/config/log4j-console.properties -Xmx1024m -Dfile.encoding=UTF-8" ./dspace dsrun "cz.cuni.mff.ufal.lindat.utilities.HibernateFunctionalityManager" "$(DIR_INSTALLATION)"
+	@echo "[CLARIN-PL] Skip 'test_databases' (DB CONNECITON ONLY POSSIBLE WITH RUNNING DOCKER CONTAINER)"
+	# @cd $(DIR_INSTALLATION)/bin && JAVA_OPTS="-Dlog4j.configuration=file:$(DIR_INSTALLATION)/config/log4j-console.properties -Xmx1024m -Dfile.encoding=UTF-8" ./dspace dsrun "cz.cuni.mff.ufal.lindat.utilities.HibernateFunctionalityManager" "$(DIR_INSTALLATION)"
 
-test_databases: test_utilities_database test_dspace_database
+test_databases: 
+	@echo "[CLARIN-PL] Skip 'test_databases' (DB CONNECITON ONLY POSSIBLE WITH RUNNING DOCKER CONTAINER)"
+	# test_utilities_database test_dspace_database
 
 create_databases:
 ifeq ("${CI}", "true")

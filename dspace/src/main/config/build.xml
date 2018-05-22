@@ -798,7 +798,8 @@ Common usage:
 
     <!-- Test the connection to the database -->
     <target name="test_database">
-        <java classname="org.dspace.storage.rdbms.DatabaseUtils" classpathref="class.path" fork="yes" failonerror="yes">
+        <!-- docker-change- do not fail on error -->
+        <java classname="org.dspace.storage.rdbms.DatabaseUtils" classpathref="class.path" fork="yes" failonerror="no">
             <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
             <sysproperty key="dspace.log.init.disable" value="true" />
             <sysproperty key="dspace.configuration" value="${config}" />
