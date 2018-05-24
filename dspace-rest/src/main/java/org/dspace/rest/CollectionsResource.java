@@ -50,7 +50,7 @@ import org.dspace.usage.UsageEvent;
 
 /**
  * This class provides all CRUD operation over collections.
- * 
+ *
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
  */
 @Path("/collections")
@@ -61,7 +61,7 @@ public class CollectionsResource extends Resource
     /**
      * Return instance of collection with passed id. You can add more properties
      * through expand parameter.
-     * 
+     *
      * @param collectionId
      *            Id of collection in DSpace.
      * @param expand
@@ -135,7 +135,7 @@ public class CollectionsResource extends Resource
     /**
      * Return array of all collections in DSpace. You can add more properties
      * through expand parameter.
-     * 
+     *
      * @param expand
      *            String in which is what you want to add to returned instance
      *            of collection. Options are: "all", "parentCommunityList",
@@ -216,7 +216,7 @@ public class CollectionsResource extends Resource
     /**
      * Return array of items in collection. You can add more properties to items
      * with expand parameter.
-     * 
+     *
      * @param collectionId
      *            Id of collection in DSpace.
      * @param expand
@@ -305,7 +305,7 @@ public class CollectionsResource extends Resource
 
     /**
      * Create item in collection. Item can be without filled metadata.
-     * 
+     *
      * @param collectionId
      *            Id of collection in which will be item created.
      * @param item
@@ -325,7 +325,7 @@ public class CollectionsResource extends Resource
      *             collection or IOException or problem with index item into
      *             browse index. It is thrown by NOT_FOUND and UNATHORIZED
      *             status codes, too.
-     * 
+     *
      */
     @POST
     @Path("/{collection_id}/items")
@@ -427,7 +427,13 @@ public class CollectionsResource extends Resource
         try
         {
             context = new org.dspace.core.Context();
-            EPerson dspaceUser = EPerson.findByEmail(context, "dspace@clarin-pl.eu");
+
+            String adminAccount = System.getenv("ADMIN_EMAIL");
+            if(adminAccount == null){
+              adminAccount = "dspace@clarin-pl.eu";
+            }
+
+            EPerson dspaceUser = EPerson.findByEmail(context, adminAccount);
 
             if (dspaceUser == null){
                 throw new AuthorizeException();
@@ -511,7 +517,7 @@ public class CollectionsResource extends Resource
 
     /**
      * Update collection. It replace all properties.
-     * 
+     *
      * @param collectionId
      *            Id of collection in DSpace.
      * @param collection
@@ -585,7 +591,7 @@ public class CollectionsResource extends Resource
 
     /**
      * Delete collection.
-     * 
+     *
      * @param collectionId
      *            Id of collection which will be deleted.
      * @param headers
@@ -654,10 +660,10 @@ public class CollectionsResource extends Resource
 
     /**
      * Delete item in collection.
-     * 
+     *
      * @param collectionId
      *            Id of collection which will be deleted.
-     * 
+     *
      * @param itemId
      *            Id of item in colletion.
      * @return It returns status code: OK(200). NOT_FOUND(404) if item or
@@ -759,7 +765,7 @@ public class CollectionsResource extends Resource
 
     /**
      * Search for first collection with passed name.
-     * 
+     *
      * @param name
      *            Name of collection.
      * @param headers
@@ -832,7 +838,7 @@ public class CollectionsResource extends Resource
      * Find collection from DSpace database. It is encapsulation of method
      * org.dspace.content.Collection.find with checking if item exist and if
      * user logged into context has permission to do passed action.
-     * 
+     *
      * @param context
      *            Context of actual logged user.
      * @param id

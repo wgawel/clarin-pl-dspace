@@ -25,7 +25,7 @@
         <element>has</element>
         <qualifier>files</qualifier>
         <scope_note>True if the item contains any bitstreams</scope_note>
-    </dc-type>        
+    </dc-type>
     <dc-type>
         <schema>local</schema>
         <element>additional</element>
@@ -36,13 +36,13 @@
         <schema>local</schema>
         <element>branding</element>
         <scope_note>CLARIN-PL (Name of Community)</scope_note>
-    </dc-type>    
+    </dc-type>
     <dc-type>
         <schema>local</schema>
         <element>submission</element>
 	<qualifier>note</qualifier>
         <scope_note>A submitter's note for editor/reviewer</scope_note>
-    </dc-type>    
+    </dc-type>
     <dc-type>
         <schema>local</schema>
         <element>demo</element>
@@ -54,7 +54,7 @@
         <element>contact</element>
         <qualifier>person</qualifier>
         <scope_note>Contact person</scope_note>
-    </dc-type>   
+    </dc-type>
     <dc-type>
     	<schema>local</schema>
     	<element>sponsor</element>
@@ -80,7 +80,7 @@
         <element>files</element>
         <qualifier>count</qualifier>
         <scope_note>Count of files in the item</scope_note>
-    </dc-type>                            
+    </dc-type>
     <dc-type>
         <schema>local</schema>
         <element>featuredService</element>
@@ -111,6 +111,67 @@
         <qualifier>redirectToURL</qualifier>
         <scope_note>Get the bitstream from this URL.</scope_note>
     </dc-type>
+
+    <!-- newly added -->
+    <dc-type>
+        <schema>local</schema>
+        <element>country</element>
+        <scope_note>Creation Country</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>local</schema>
+        <element>modality</element>
+        <qualifier>info</qualifier>
+    </dc-type>
+
+    <dc-type>
+          <schema>local</schema>
+          <element>publication</element>
+          <qualifier>author</qualifier>
+          <scope_note>Publication</scope_note>
+    </dc-type>
+
+    <dc-type>
+          <schema>local</schema>
+          <element>publication</element>
+          <qualifier>date</qualifier>
+          <scope_note>Publication</scope_note>
+    </dc-type>
+
+    <dc-type>
+          <schema>local</schema>
+          <element>publication</element>
+          <qualifier>descriptions</qualifier>
+          <scope_note>Publication</scope_note>
+    </dc-type>
+
+    <dc-type>
+          <schema>local</schema>
+          <element>publication</element>
+          <qualifier>place</qualifier>
+          <scope_note>Publication</scope_note>
+    </dc-type>
+
+    <dc-type>
+          <schema>local</schema>
+          <element>publication</element>
+          <qualifier>title</qualifier>
+          <scope_note>Publication</scope_note>
+    </dc-type>
+
+    <dc-type>
+          <schema>local</schema>
+          <element>publication</element>
+          <qualifier>url</qualifier>
+          <scope_note>Publication</scope_note>
+    </dc-type>
+
+    <dc-type>
+          <schema>local</schema>
+          <element>subject</element>
+    </dc-type>
+
+    <!-- newly added end -->
+
 </dspace-dc-types>
-
-

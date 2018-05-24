@@ -37,9 +37,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 /**
  * Root of RESTful api. It provides login and logout. Also have method for
  * printing every method which is provides by RESTful api.
- * 
+ *
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
- * 
+ *
  */
 @Path("/")
 public class RestIndex {
@@ -50,12 +50,12 @@ public class RestIndex {
     /**
      * Return html page with information about REST api. It contains methods all
      * methods provide by REST api.
-     * 
+     *
      * @return HTML page which has information about all methods of REST api.
      */
     @GET
     @Produces(MediaType.TEXT_HTML)
-    public String sayHtmlHello() { 
+    public String sayHtmlHello() {
     	// TODO Better graphics, add arguments to all methods. (limit, offset, item and so on)
         return "<html><title>DSpace REST - index</title>" +
                 "<body>"
@@ -136,10 +136,10 @@ public class RestIndex {
                         "</ul>" +
                 "</body></html> ";
     }
-    
+
     /**
      * Method only for testing whether the REST API is running.
-     * 
+     *
      * @return String "REST api is running."
      */
     @GET
@@ -151,7 +151,7 @@ public class RestIndex {
 
     /**
      * Method to login a user into REST API.
-     * 
+     *
      * @param user
      *            User which will be logged in to REST API.
      * @return Returns response code OK and a token. Otherwise returns response
@@ -173,6 +173,22 @@ public class RestIndex {
         }
     }
 
+    @OPTIONS
+    @Path("/validate-token/{token}")
+    @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public Response validateTokenOptions(@PathParam("token") String token) {
+        return Response
+            .status(200)
+            .header("Content-Type", "application/json")
+            .header("Access-Control-Allow-Origin", "*")
+            .header("Access-Control-Allow-Credentials", "true")
+            .header("Access-Control-Allow-Headers", "origin,x-requested-with,access-control-request-headers,content-type,access-control-request-method,accept")
+            .header("Access-Control-Expose-Headers", "Access-Control-Allow-Origin,Access-Control-Allow-Credentials")
+            .header("Access-Control-Allow-Methods", "POST")
+            .build();
+    }
+
+
     @POST
     @Path("/validate-token/{token}")
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
@@ -181,16 +197,32 @@ public class RestIndex {
         try {
             payload = TokenHolder.requestUserData(token);
         } catch (WebApplicationException ex) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+            return Response.status(Response.Status.FORBIDDEN)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Credentials", "true")
+                .header("Access-Control-Allow-Headers", "origin,x-requested-with,access-control-request-headers,content-type,access-control-request-method,accept")
+                .header("Access-Control-Expose-Headers", "Access-Control-Allow-Origin,Access-Control-Allow-Credentials")
+                .header("Access-Control-Allow-Methods", "POST")
+                .build();
         }
 
-        return Response.ok(payload, "application/json").build();
+        return Response
+             .status(200)
+             .header("Content-Type", "application/json")
+             .header("Access-Control-Allow-Origin", "*")
+             .header("Access-Control-Allow-Credentials", "true")
+             .header("Access-Control-Allow-Headers", "origin,x-requested-with,access-control-request-headers,content-type,access-control-request-method,accept")
+             .header("Access-Control-Expose-Headers", "Access-Control-Allow-Origin,Access-Control-Allow-Credentials")
+             .header("Access-Control-Allow-Methods", "POST")
+             .entity(payload)
+             .build();
     }
+
 
   /**
      * Method to logout a user from DSpace REST API. Removes the token and user from
      * TokenHolder.
-     * 
+     *
      * @param headers
      *            Request header which contains the header named
      *            "rest-dspace-token" containing the token as value.
@@ -268,7 +300,7 @@ public class RestIndex {
 
     /**
      * Method to check current status of the service and logged in user.
-     * 
+     *
      * okay: true | false
      * authenticated: true | false
      * epersonEMAIL: user@example.com
