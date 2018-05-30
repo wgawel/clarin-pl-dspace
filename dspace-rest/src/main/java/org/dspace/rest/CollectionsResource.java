@@ -29,22 +29,17 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseException;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
 import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Item;
-import org.dspace.rest.common.JsonReader;
 import org.dspace.rest.common.MetadataEntry;
-import org.dspace.rest.common.clarinpl.MetadataItem;
-import org.dspace.rest.common.clarinpl.NextCloudItem;
+import org.dspace.rest.common.clarin.MetadataItem;
+import org.dspace.rest.common.clarin.NextCloudItem;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.usage.UsageEvent;
 

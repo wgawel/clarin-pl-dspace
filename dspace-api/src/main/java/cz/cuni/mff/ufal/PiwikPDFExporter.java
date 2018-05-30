@@ -375,7 +375,7 @@ public class PiwikPDFExporter  {
 	    FONT[7] = new Font(FontFamily.HELVETICA, 10, Font.BOLD);
 
 	    //TODO: Move logo image url to configuration
-        Image logo = Image.getInstance(new URL("https://clarin-pl.eu/dspace/themes/ClarinPlTheme/images/clarinpl/clarinpl-logo_2.png"));
+        Image logo = Image.getInstance(new URL("https://clarin-pl.eu/dspace/themes/ClarinTheme/images/clarin/clarin-logo_2.png"));
 	    //Image logo = Image.getInstance(LINDAT_LOGO);
 
 	    logo.scaleAbsolute(82, 48);

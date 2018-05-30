@@ -124,7 +124,7 @@ public class AuthenticateAction extends AbstractAction
             	eperson.update();
 
                 javax.servlet.http.Cookie clarinPlCookie = new Cookie(
-                        "clarin-pl-token",
+                        "clarin-token",
                         eperson.getClarinToken());
                 clarinPlCookie.setDomain(domain);
                 clarinPlCookie.setPath("/");

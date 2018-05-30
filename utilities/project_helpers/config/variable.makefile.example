@@ -1,13 +1,13 @@
 # Makefile for this project
 # by LINDAT/CLARIN dev team
-# modified by CLARIN-PL dev team
+# modified by CLARIN-PLdev team
 #
 # Note: If you want to change this file, copy it to project/config
 # 
 
 # template settings
-THEME_TEMPLATE=ClarinPlTheme
-HOME_THEME_TEMPLATE=ClarinPlHomeTheme
+THEME_TEMPLATE=ClarinTheme
+HOME_THEME_TEMPLATE=ClarinHomeTheme
 LINDAT_COMMON_THEME_BRANCH=bootstrap3
 
 # tomcat

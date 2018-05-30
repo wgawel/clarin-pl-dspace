@@ -205,11 +205,11 @@
         <!-- <theme name="UFAL Theme" regex=".*" path="UFAL/" /> -->
         
 
-    	<!-- CLARIN-PL Homepage -->
-    	<theme name="ClarinPl HomeTheme" regex="^$" path="ClarinPlHomeTheme/" />
+    	<!-- CLARIN Homepage -->
+    	<theme name="Clarin HomeTheme" regex="^$" path="ClarinHomeTheme/" />
     	
-    	<!-- CLARIN-PL theme -->
-        <theme name="ClarinPl Theme" regex=".*" path="ClarinPlTheme/" />
+    	<!-- CLARIN theme -->
+        <theme name="Clarin Theme" regex=".*" path="ClarinTheme/" />
 
     </themes>
 </xmlui>

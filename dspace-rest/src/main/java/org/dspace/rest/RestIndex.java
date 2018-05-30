@@ -27,10 +27,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.rest.common.Status;
 import org.dspace.rest.common.User;
-import org.dspace.rest.common.clarinpl.License;
+import org.dspace.rest.common.clarin.License;
 import org.dspace.rest.exceptions.ContextException;
-import org.dspace.usage.UsageEvent;
-import org.jdom.Element;
 import org.springframework.web.util.UriComponentsBuilder;
 
 
@@ -126,14 +124,6 @@ public class RestIndex {
                         "<li>GET /cmdi/profiles - Return list of aviable profiles.</li>" +
                         "<li>GET /cmdi/profiles/{profile_id}/form - Return specified profile partial html form.</li>" +
                     "</ul>" +
-                    "<h2>External services - processing </h2>" +
-                    "<ul>" +
-                        "<li>GET /process/items/handle/{prefix}/{sufix}/start - Start item processing by Engine service.</li>" +
-                        "<li>GET /process/items/handle/{prefix}/{sufix}/status - Returns current status of engine service processing </li>" +
-                        "<li>GET /process/items/handle/{prefix}/{sufix}/restart - Resets item status </li>" +
-                        "<li>GET /process/items/handle/{prefix}/{sufix}/export/mewex - Exports processed item files to mewex service </li>" +
-                        "<li>GET /process/items/handle/{prefix}/{sufix}/export/inforex - Exports processed item files to inforex service </li>" +
-                        "</ul>" +
                 "</body></html> ";
     }
 
@@ -258,7 +248,7 @@ public class RestIndex {
     @GET
     @Path("/clarin-logout")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response clarinLogout(@CookieParam("clarin-pl-token") Cookie cookie,
+    public Response clarinLogout(@CookieParam("clarin-token") Cookie cookie,
                                  @QueryParam("redirect") String redirect,
                                  @Context HttpServletRequest request){
         try {
@@ -288,7 +278,7 @@ public class RestIndex {
                 if(ePerson != null){
                     ePerson.clearClarinTokenId();
                 }
-                Cookie clarinPlCookie = new Cookie("clarin-pl-token", "","/", domain);
+                Cookie clarinPlCookie = new Cookie("clarin-token", "","/", domain);
                 NewCookie clarinNew = new NewCookie(clarinPlCookie,"", 0, false);
                 return Response.temporaryRedirect(builder.build().toUri()).cookie(clarinNew).build();
             } catch (Exception e) {

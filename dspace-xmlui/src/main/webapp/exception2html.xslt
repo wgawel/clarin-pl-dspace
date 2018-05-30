@@ -23,8 +23,8 @@
     xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:ex="http://apache.org/cocoon/exception/1.0" >
 
-	<xsl:include href="themes/ClarinPlTheme/lib/xsl/clarinpl/header.xsl" />
-	<xsl:include href="themes/ClarinPlTheme/lib/xsl/clarinpl/footer.xsl" />
+	<xsl:include href="themes/ClarinTheme/lib/xsl/clarin/header.xsl" />
+	<xsl:include href="themes/ClarinTheme/lib/xsl/clarin/footer.xsl" />
 	<xsl:include href="themes/UFAL/lib/xsl/core/global-variables.xsl" />
 
 	<xsl:param name="realPath" />
@@ -223,13 +223,13 @@
 			<link rel="shortcut icon">
 				<xsl:attribute name="href">
                         <xsl:value-of select="$contextPath" />
-                    <xsl:text>/themes/ClarinPlTheme/images/favicon.ico</xsl:text>
+                    <xsl:text>/themes/ClarinTheme/images/favicon.ico</xsl:text>
                 </xsl:attribute>
 			</link>
 			<link rel="apple-touch-icon">
 				<xsl:attribute name="href">
                         <xsl:value-of select="$contextPath" />
-                    <xsl:text>/themes/ClarinPlTheme/images/apple-touch-icon.png</xsl:text>
+                    <xsl:text>/themes/ClarinTheme/images/apple-touch-icon.png</xsl:text>
                 </xsl:attribute>
 			</link>
 
@@ -255,9 +255,9 @@
 	            </xsl:choose>
 	        </xsl:variable>
 	        <script type="text/javascript" src="{concat($protocol, 'ajax.googleapis.com/ajax/libs/jquery/', $jqueryVersion ,'/jquery.min.js')}">&#160;</script>
-	        <script type="text/javascript" src="{$contextPath}/themes/ClarinPlTheme/lib/js/jquery-ui.js">&#160;</script>
+	        <script type="text/javascript" src="{$contextPath}/themes/ClarinTheme/lib/js/jquery-ui.js">&#160;</script>
             <script type="text/javascript" src="{concat($aaiURL, '/discojuice/discojuice-3.0.pl_PL.min.js')}">&#160;</script>
-			<script type="text/javascript" src="{$contextPath}/themes/ClarinPlTheme/lib/js/jquery.i18n.js">&#160;</script>
+			<script type="text/javascript" src="{$contextPath}/themes/ClarinTheme/lib/js/jquery.i18n.js">&#160;</script>
             <script type="text/javascript" src="{concat($aaiURL, '/aai.js')}">&#160;</script>
 	
 	        <xsl:variable name="localJQuerySrc">
@@ -276,17 +276,17 @@
 			
 			
 			<!-- Bootstrap stylesheets -->
-			<link rel="stylesheet" href="{$contextPath}/themes/ClarinPlTheme/lib/bootstrap/css/bootstrap.min.css" />
-            <link rel="stylesheet" href="{$contextPath}/themes/ClarinPlTheme/lib/bootstrap/css/font-awesome.min.css" />
-            <link rel="stylesheet" href="{$contextPath}/themes/ClarinPlTheme/lib/bootstrap/css/clarinpl-theme.css" />
+			<link rel="stylesheet" href="{$contextPath}/themes/ClarinTheme/lib/bootstrap/css/bootstrap.min.css" />
+            <link rel="stylesheet" href="{$contextPath}/themes/ClarinTheme/lib/bootstrap/css/font-awesome.min.css" />
+            <link rel="stylesheet" href="{$contextPath}/themes/ClarinTheme/lib/bootstrap/css/clarin-theme.css" />
 			
 			<!-- Add CLARIN-PL stylesheet -->
 			<link rel="stylesheet" type="text/css"
-				href="{$contextPath}/themes/ClarinPlTheme/lib/clarinpl/public/css/clarinpl.css" />
+				href="{$contextPath}/themes/ClarinTheme/lib/clarin/public/css/clarin.css" />
 
 
-			<script type="text/javascript" src="{$contextPath}/themes/ClarinPlTheme/lib/bootstrap/js/bootstrap.min.js">&#160;</script>
-			<script type="text/javascript" src="{$contextPath}/themes/ClarinPlTheme/lib/bootstrap/js/clarinpl.min.js">&#160;</script>
+			<script type="text/javascript" src="{$contextPath}/themes/ClarinTheme/lib/bootstrap/js/bootstrap.min.js">&#160;</script>
+			<script type="text/javascript" src="{$contextPath}/themes/ClarinTheme/lib/bootstrap/js/clarin.min.js">&#160;</script>
 
 			<!-- Add the title in -->
 			<title>

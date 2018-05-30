@@ -106,8 +106,8 @@ dspace.install.dir = /opt/lindat-dspace/installation
 
 # A description of your dspace instance. It will be used as a description of your dspace instance for other services
 #lr.dspace.name = LINDAT/CLARIN digital library at Institute of Formal and Applied Linguistics, Charles University in Prague
-#lr.dspace.name = CLARIN-PL digital repository
-lr.dspace.name = 
+#lr.dspace.name = CLARIN digital repository
+lr.dspace.name = CLARIN digital repository
 
 # Used in email templates
 #lr.dspace.name.short = LINDAT/CLARIN
@@ -399,13 +399,13 @@ lr.link.checker.read.timeout = 3000
 # Templates
 #
 # Default template
-lr.template.default = ClarinPlTheme
+lr.template.default = ClarinTheme
 
 # Determine if new users should be allowed to register
 lr.user.registration = true
 
 # Home page template
-lr.template.home = ClarinPlHomeTheme
+lr.template.home = ClarinHomeTheme
 
 lr.default.language = en_US
 
