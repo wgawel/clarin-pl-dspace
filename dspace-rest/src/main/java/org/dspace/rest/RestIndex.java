@@ -248,7 +248,7 @@ public class RestIndex {
     @GET
     @Path("/clarin-logout")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response clarinLogout(@CookieParam("clarin-token") Cookie cookie,
+    public Response clarinLogout(@CookieParam("clarin-pl-token") Cookie cookie,
                                  @QueryParam("redirect") String redirect,
                                  @Context HttpServletRequest request){
         try {
@@ -278,7 +278,7 @@ public class RestIndex {
                 if(ePerson != null){
                     ePerson.clearClarinTokenId();
                 }
-                Cookie clarinPlCookie = new Cookie("clarin-token", "","/", domain);
+                Cookie clarinPlCookie = new Cookie("clarin-pl-token", "","/", domain);
                 NewCookie clarinNew = new NewCookie(clarinPlCookie,"", 0, false);
                 return Response.temporaryRedirect(builder.build().toUri()).cookie(clarinNew).build();
             } catch (Exception e) {

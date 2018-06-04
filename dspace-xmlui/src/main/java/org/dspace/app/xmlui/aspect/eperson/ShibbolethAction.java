@@ -133,7 +133,7 @@ public class ShibbolethAction extends AbstractAction
                 eperson.update();
 
                 javax.servlet.http.Cookie clarinPlCookie = new Cookie(
-                        "clarin-token",
+                        "clarin-pl-token",
                         eperson.getClarinToken());
                 clarinPlCookie.setDomain(domain);
                 clarinPlCookie.setPath("/");
