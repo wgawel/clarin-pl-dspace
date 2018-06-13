@@ -37,6 +37,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
+import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.rest.common.Bitstream;
 import org.dspace.rest.common.ResourcePolicy;
@@ -301,7 +302,10 @@ public class BitstreamResource extends Resource
         try
         {
             if(service) {
-                context = createContext(TokenHolder.getEPerson(TokenHolder.DSPACE_USER));
+                log.info(" ---- Loading service user. ---");
+                context = new org.dspace.core.Context();
+                EPerson dspaceServiceUser = EPerson.findByEmail(context, "dspace@clarin-pl.eu");
+                context = createContext(dspaceServiceUser);
             }else {
                 context = createContext(getUser(headers));
             }
