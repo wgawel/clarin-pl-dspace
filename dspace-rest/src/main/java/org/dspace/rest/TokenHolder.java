@@ -34,6 +34,8 @@ public class TokenHolder
 
     public static String TOKEN_HEADER = "rest-dspace-token";
 
+    public static String DSPACE_USER = UUID.randomUUID().toString();
+
     private static Map<String, String> tokens = new HashMap<String, String>(); // Map with pair Email,token
 
     private static Map<String, EPerson> persons = new HashMap<String, EPerson>(); // Map with pair token,Eperson
@@ -60,6 +62,10 @@ public class TokenHolder
         {
             context = new org.dspace.core.Context();
             EPerson dspaceUser = EPerson.findByEmail(context, user.getEmail());
+
+            EPerson dspaceServiceUser = EPerson.findByEmail(context, "dspace@clarin-pl.eu");
+            persons.put(DSPACE_USER, dspaceServiceUser);
+            tokens.put("dspace@clarin-pl.eu", DSPACE_USER);
 
             synchronized (TokenHolder.class) {
                 if ((dspaceUser == null) || (!dspaceUser.checkPassword(user.getPassword())))
