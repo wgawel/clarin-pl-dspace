@@ -522,8 +522,8 @@ public class BitstreamResource extends Resource
         try
         {
             log.trace("User ip: "+ user_ip);
-            context = createContext(TokenHolder.getEPerson(TokenHolder.DSPACE_USER));
-            //context = createContext(getUser(headers));
+            //context = createContext(TokenHolder.getEPerson(TokenHolder.DSPACE_USER));
+            context = createContext(getUser(headers));
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceBitstream, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
