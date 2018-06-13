@@ -288,6 +288,7 @@ public class BitstreamResource extends Resource
     {
 
         log.info("Reading data of bitstream(id=" + bitstreamId + ").");
+        log.info("---User ip----: "+ user_ip);
         org.dspace.core.Context context = null;
         InputStream inputStream = null;
         String type = null;
@@ -296,7 +297,7 @@ public class BitstreamResource extends Resource
         try
         {
             context = createContext(getUser(headers));
-            log.info("User ip: "+ user_ip);
+
             //context = createContext(TokenHolder.getEPerson(TokenHolder.DSPACE_USER));
 
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.READ);
