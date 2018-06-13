@@ -528,7 +528,7 @@ public class ProcessItems extends ItemsResource {
         for (Bitstream stream : files) {
 
             try {
-                URI uri = new URI(bitstreamUrl + stream.getID() + "/retrieve");
+                URI uri = new URI(bitstreamUrl + stream.getID() + "/retrieve?service=true");
                 String resultFile = "";
                 if (names.contains(stream.getName())) {
                     resultFile = stream.getName().substring(0, stream.getName().lastIndexOf(".")) + "." + stream.getSequenceID() + ".ccl";

@@ -87,7 +87,9 @@ public class BitstreamResource extends Resource
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public Bitstream getBitstream(@PathParam("bitstream_id") Integer bitstreamId, @QueryParam("expand") String expand,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor,
+            @Context HttpHeaders headers,
+            @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
@@ -283,12 +285,14 @@ public class BitstreamResource extends Resource
     @Path("/{bitstream_id}/retrieve")
     public javax.ws.rs.core.Response getBitstreamData(@PathParam("bitstream_id") Integer bitstreamId,
             @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
-            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            @QueryParam("xforwardedfor") String xforwardedfor,
+            @QueryParam("service") boolean service,
+            @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
 
         log.info("Reading data of bitstream(id=" + bitstreamId + ").");
-        log.info("---User ip----: "+ user_ip);
+
         org.dspace.core.Context context = null;
         InputStream inputStream = null;
         String type = null;
@@ -296,9 +300,11 @@ public class BitstreamResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
-
-            //context = createContext(TokenHolder.getEPerson(TokenHolder.DSPACE_USER));
+            if(service) {
+                context = createContext(TokenHolder.getEPerson(TokenHolder.DSPACE_USER));
+            }else {
+                context = createContext(getUser(headers));
+            }
 
             org.dspace.content.Bitstream dspaceBitstream = findBitstream(context, bitstreamId, org.dspace.core.Constants.READ);
 
