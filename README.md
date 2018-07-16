@@ -13,7 +13,9 @@
 * CLARINO: https://repo.clarino.uib.no/xmlui/
 * CLARIN.SI: https://www.clarin.si/repository/xmlui/
 * CLARIN-PL: https://clarin-pl.eu/dspace/
-* ILC4CLARIN: https://dspace-clarin-it.ilc.cnr.it/repository/xmlui/
+* CLARIN-IT
+    * ILC4CLARIN: https://dspace-clarin-it.ilc.cnr.it/repository/xmlui/
+    * ERCC: https://clarin.eurac.edu/repository/xmlui/
 * CLARIN-ES:
 * CLARIN-LT:
 * SWE-CLARIN:
@@ -23,7 +25,7 @@
 * Národní filmový archiv:
 * Ústav pro studium totalitních režimů:
 
-There are several instances in other institutes which will join the list shortly. 
+There are several instances in other institutes which will join the list shortly.
 *If you are using or plan to use clarin-dspace, please get in touch.*
 
 
