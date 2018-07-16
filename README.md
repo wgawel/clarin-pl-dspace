@@ -19,6 +19,7 @@
 * CLARIN-ES:
 * CLARIN-LT:
 * SWE-CLARIN:
+* CLARIN-DK: https://repository.clarin.dk/repository/xmlui/
 * University of Oxford - Oxford Text Archive:
 * RDA EU – ENVRI Summer School:
 * Centrum orální historie ÚSD AV ČR:
