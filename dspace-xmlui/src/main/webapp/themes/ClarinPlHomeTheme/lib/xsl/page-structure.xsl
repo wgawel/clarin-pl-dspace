@@ -825,7 +825,8 @@
 			'rotation-hover': -180
 			},
 			horizontal: false,
-			themeColor: '#7d6ba9'
+			themeColor: '#7d6ba9',
+			defaultLang:'en'
 			});
 			});
 		</script>
@@ -871,17 +872,20 @@
 	
 	<xsl:template name="top-banner">
 	    <div id="clarinpl-header-logo" class="row">
-
-
-			<div style="float: left; margin: 40px 10px 10px 25px;">
+			<div style="float: left; margin: 14px 10px 15px 10px;">
+				<a href="https://clarin.eu">
+					<img width="150" height="121" src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/clarin-eu-logo.png" class="logo" alt="CLARIN Eric logo" />
+				</a>
+			</div>
+			<div style="float: left; margin: 70px 10px 0px 10px;">
 				 <img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/typeB_middle.png" class="logo" width="200" height="50" alt="CLARIN-PL logo" />
 			</div>
-			<div style="float: left; margin: 14px 60px 14px 120px;">
+			<div style="float: left; margin: 30px 10px 15px 10px;">
 		        <a href="/dspace">
 	                <img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/clarinpl-logo_2.png" class="logo" alt="CLARIN-PL logo" />
                 </a>
 		    </div>
-			<div style="float: right; margin: 14px 15px 14px 120px;">
+			<div style="float: right; margin: 30px 10px 15px 5px;">
 				<a href="https://assessment.datasealofapproval.org/assessment_149/seal/html/">
 					<img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/DSA_2014_2017.jpg" class="logo" width="100" height="100" alt="CLARIN-PL logo" />
 				</a>
