@@ -473,7 +473,7 @@ function askForMail(){
         throw new AuthorizeException("User not authorized to set an email");
     }
 
-	if(eperson != null && eperson.getNetid()){
+	if(eperson != null && eperson.getNetid() != null){
 	 cocoon.log.error("token:"+token+", eperson:"+eperson+", email:"+eperson.getEmail()+ "netid:" +eperson.getNetid());
 	}
 
