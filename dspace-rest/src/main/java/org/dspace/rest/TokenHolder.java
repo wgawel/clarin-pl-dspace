@@ -116,9 +116,10 @@ public class TokenHolder
         {
             context = new org.dspace.core.Context();
             EPerson dspaceUser = EPerson.findByClarinTokenId(context, token);
+            String netid = dspaceUser.getNetid() != null ? dspaceUser.getNetid() : "";
             log.warn(dspaceUser.getEmail());
-            data.append("{\"login\":\"").append(dspaceUser.getEmail()).append("\",");
-            data.append("\"fullname\":\"").append(dspaceUser.getFullName()).append("\"}");
+            data.append("{\"login\":\"").append(dspaceUser.getEmail() !=null ? dspaceUser.getEmail() : netid).append("\",");
+            data.append("\"fullname\":\"").append(dspaceUser.getFullName() != null ? dspaceUser.getFullName() : netid).append("\"}");
 
             log.warn("User data requested(for User: "+ data.toString()+")");
             context.complete();
