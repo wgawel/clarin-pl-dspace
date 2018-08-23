@@ -466,13 +466,18 @@ function askForMail(){
     
 	var eperson = getEPerson();
 	cocoon.log.error("token:"+token+", eperson:"+eperson+", email:"+eperson.getEmail());
+
     if (token == null && (eperson == null || eperson.getEmail() != null))
     {
         // User should only have gotten here after shibboleth eperson was created without an email or with a token
         cocoon.log.error("token:"+token+", eperson:"+eperson+", email:"+eperson.getEmail());
         throw new AuthorizeException("User not authorized to set an email");
     }
-            
+
+	if(eperson != null && eperson.getNetid()){
+	 cocoon.log.error("token:"+token+", eperson:"+eperson+", email:"+eperson.getEmail()+ "netid:" +eperson.getNetid()), ;
+	}
+
     if (token == null) 
     {
         // We have no token, this is the initial form. First ask the user for their email address
