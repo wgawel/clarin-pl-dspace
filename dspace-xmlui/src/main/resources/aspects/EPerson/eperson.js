@@ -465,7 +465,6 @@ function askForMail(){
     var token = cocoon.request.get("token");
     
 	var eperson = getEPerson();
-	cocoon.log.error("token:"+token+", eperson:"+eperson+", email:"+eperson.getEmail());
 
     if (token == null && (eperson == null || eperson.getEmail() != null))
     {
@@ -475,7 +474,7 @@ function askForMail(){
     }
 
 	if(eperson != null && eperson.getNetid()){
-	 cocoon.log.error("token:"+token+", eperson:"+eperson+", email:"+eperson.getEmail()+ "netid:" +eperson.getNetid()), ;
+	 cocoon.log.error("token:"+token+", eperson:"+eperson+", email:"+eperson.getEmail()+ "netid:" +eperson.getNetid());
 	}
 
     if (token == null) 
