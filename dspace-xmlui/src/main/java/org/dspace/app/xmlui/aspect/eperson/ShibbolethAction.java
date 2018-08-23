@@ -117,7 +117,7 @@ public class ShibbolethAction extends AbstractAction
 
             	String email = eperson.getEmail();
             	if (email == null) {
-            		redirectURL = request.getContextPath() + "/set-email/start";
+            		redirectURL = request.getContextPath() + "/set-email";
 
             	} else if ( null == eperson.getWelcome() &&
             	        ConfigurationManager.getBooleanProperty("lr", "lr.login.welcome.message", false) ) 
