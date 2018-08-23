@@ -465,7 +465,7 @@ function askForMail(){
     var token = cocoon.request.get("token");
     
 	var eperson = getEPerson();
-    if (token == null && (eperson == null || eperson.getEmail() != null))
+    if (token == null && (eperson == null))
     {
         // User should only have gotten here after shibboleth eperson was created without an email or with a token
         throw new AuthorizeException("User not authorized to set an email");
