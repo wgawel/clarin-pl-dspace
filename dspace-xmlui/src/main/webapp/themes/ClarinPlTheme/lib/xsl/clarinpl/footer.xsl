@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
-    Document   : footer.xsl
-    Created on : April 14, 2012, 4:48 PM
-    Author     : sedlak
-    Description:
-        Purpose of transformation follows.
--->
-
 <xsl:stylesheet xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
         xmlns:dri="http://di.tamu.edu/DRI/1.0/"
         xmlns:mets="http://www.loc.gov/METS/"
