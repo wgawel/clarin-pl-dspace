@@ -55,7 +55,7 @@ import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
  */
 public class ShibAuthentication implements AuthenticationMethod {
     /** log4j category */
-    private static Logger log = cz.cuni.mff.ufal.Logger.getLogger(ShibAuthentication.class);
+    private static Logger log = Logger.getLogger(ShibAuthentication.class);
 
     /** Additional metadata mappings **/
     private static Map<String,String> metadataHeaderMap = null;

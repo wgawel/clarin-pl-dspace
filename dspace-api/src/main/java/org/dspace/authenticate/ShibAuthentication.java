@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,11 +35,9 @@ import org.dspace.content.MetadataSchema;
 import org.dspace.content.NonUniqueMetadataException;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.authenticate.AuthenticationManager;
-import org.dspace.authenticate.AuthenticationMethod;
+
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
-import org.dspace.storage.rdbms.DatabaseManager;
 
 /**
  * Shibboleth authentication for DSpace

@@ -44,7 +44,6 @@ public class ItemListReader extends AbstractReader{
 	}
 
 	private List<JsonItem> loadItems(HttpServletRequest request) throws SQLException {
-		
 		List<JsonItem> list = new ArrayList<JsonItem>();
 		Context context = ContextUtil.obtainContext(objectModel);
 		ItemIterator item = Item.findAll(context);
