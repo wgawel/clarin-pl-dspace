@@ -129,7 +129,9 @@ public class ShibbolethAction extends AbstractAction
                     // emails are provided
                     redirectURL = request.getContextPath() + "/welcome-message";
                     request.getSession().setAttribute("shib.welcome", request.getSession().getAttribute("shib.welcome"));
-            	}
+            	} else {
+                    redirectURL = request.getContextPath() + "/";
+                }
 
 
                 eperson.setClarinTokenId();
