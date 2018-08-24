@@ -23,6 +23,7 @@ import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.sitemap.PatternException;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -55,6 +56,7 @@ import org.dspace.eperson.EPerson;
 public class ShibbolethAction extends AbstractAction
 {
 
+    private static final Logger log = Logger.getLogger(ShibbolethAction.class);
     /**
      * Attempt to authenticate the user. 
      */
@@ -115,11 +117,11 @@ public class ShibbolethAction extends AbstractAction
             		redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "/";	
             	}
 
-            	String email = eperson.getEmail();
+            	//String email = eperson.getEmail();
             	//if (email == null) {
             		//redirectURL = request.getContextPath() + "/set-email";
+            	//} else
 
-            	//} else 
                 if ( null == eperson.getWelcome() &&
             	        ConfigurationManager.getBooleanProperty("lr", "lr.login.welcome.message", false) ) 
             	{
@@ -158,6 +160,7 @@ public class ShibbolethAction extends AbstractAction
                     redirectURL = redirectTo;
                 }
 
+                log.error("Redirect to: "+redirectURL);
                 httpResponse.sendRedirect(redirectURL);
                 
                 // log the user out for the rest of this current request, however they will be reauthenticated
