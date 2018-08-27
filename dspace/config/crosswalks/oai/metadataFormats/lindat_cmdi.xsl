@@ -131,11 +131,13 @@
 	<!-- Omit the special "ORE" bitstream and also the consent to publish the data -->
 	<xsl:template name="ProcessBitstreamsMetadata">
 		<xsl:for-each select="/doc:metadata/doc:element[@name='bundles']/doc:element[@name='bundle']/doc:field[@name='name' and text()!='ORE' and text()!='LICENSE']/../doc:element[@name='bitstreams']/doc:element[@name='bitstream']">
+			<xsl:if  test="./doc:field[@name='cmdi_id']/text() != '0'">
 				<cmd:ResourceProxy>
 					<xsl:attribute name="id">m_<xsl:value-of select="./doc:field[@name='id']/text()"/></xsl:attribute>
 					<cmd:ResourceType><xsl:attribute name="mimetype">text/xml</xsl:attribute>Metadata</cmd:ResourceType>
 					<cmd:ResourceRef><xsl:value-of select="concat($dsURL,'/bitstream/id/',./doc:field[@name='cmdi_id']/text(),'/')"/></cmd:ResourceRef>
 				</cmd:ResourceProxy>
+			</xsl:if>
 		</xsl:for-each>
 	</xsl:template>
 	
