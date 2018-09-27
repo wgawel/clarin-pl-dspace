@@ -163,7 +163,11 @@ public class DSpaceApi {
 	public static void updateFileDownloadStatistics(int userID, int resourceID) {	   
 	    IFunctionalities manager = DSpaceApi.getFunctionalityManager();	    
         manager.openSession();
-		manager.updateFileDownloadStatistics(userID, resourceID);
+        try {
+			manager.updateFileDownloadStatistics(userID, resourceID);
+		} catch (Exception ex){
+        	log.warn("Error while trying to update download stats userId:"+ userID + " resId:" +resourceID, ex);
+		}
         manager.close();
 	}	    		
 
