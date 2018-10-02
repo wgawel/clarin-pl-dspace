@@ -73,7 +73,7 @@ ufal.submissions = {
                 "thumbnail col-sm-3 alert-info");
         }
 
-        jQuery("#aspect_submission_StepTransformer_field_dc_date_issued")
+        jQuery("input.with-datepicker")
             .datepicker({
                 autoclose: true,
                 format: 'yyyy-mm-dd',
