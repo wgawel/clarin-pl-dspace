@@ -302,10 +302,11 @@ public class BitstreamResource extends Resource
         try
         {
             if(service) {
-                log.info(" ---- Loading service user. ---");
+                log.info(" ---- Starting loading service user. ---");
                 context = new org.dspace.core.Context();
                 EPerson dspaceServiceUser = EPerson.findByEmail(context, "dspace@clarin-pl.eu");
                 context.complete();
+                log.info(" ---- Done loading service user. ---");
                 context = createContext(dspaceServiceUser);
             } else {
                 context = createContext(getUser(headers));
