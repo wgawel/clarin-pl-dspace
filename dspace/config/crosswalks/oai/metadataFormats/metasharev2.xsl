@@ -372,7 +372,15 @@
         <xsl:param name="ns"/>
 	   <ms:resourceComponentType>
 	       <xsl:element name="ms:{$type}Info" namespace="{$ns}">
-	           <ms:resourceType><xsl:value-of select="$type"/></ms:resourceType>
+               <!-- easier to hack it like this than fix a typo in cmdi profile with inlined components :facepalm: -->
+               <xsl:choose>
+                   <xsl:when test="$type='languageDescription' and $ns='http://www.clarin.eu/cmd/'">
+                       <ms:resoureType><xsl:value-of select="$type"/></ms:resoureType>
+                   </xsl:when>
+                   <xsl:otherwise>
+                       <ms:resourceType><xsl:value-of select="$type"/></ms:resourceType>
+                   </xsl:otherwise>
+               </xsl:choose>
 	           <!-- Everything but corpus should have detailedType -->
 	           <xsl:if test="not($type='corpus')">
 	               <xsl:element name="ms:{$type}Type" namespace="{$ns}"><xsl:value-of select="$detailedType"/></xsl:element>
