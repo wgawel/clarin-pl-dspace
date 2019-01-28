@@ -423,7 +423,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             
             if(is_item_bitstream && ConfigurationManager.getBooleanProperty("lr", "lr.tracker.enabled") && IOUtils.requestRangeContainsStart(request)) {
                 // Track the download for analytics platform
-                TrackerFactory.createInstance(TrackingSite.BITSTREAM).trackPage(request,"Bitstream Download / Single File");
+                TrackerFactory.createInstance(TrackingSite.BITSTREAM, item.getOwningCollection()).trackPage(request,"Bitstream " +
+                        "Download / Single File");
             }
             
             

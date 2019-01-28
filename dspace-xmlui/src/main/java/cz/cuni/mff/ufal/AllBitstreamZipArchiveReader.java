@@ -182,7 +182,8 @@ public class AllBitstreamZipArchiveReader extends AbstractReader implements Recy
 
             if(ConfigurationManager.getBooleanProperty("lr", "lr.tracker.enabled")) {
                 // Track the download for analytics platform
-                TrackerFactory.createInstance(TrackingSite.BITSTREAM).trackPage(request, "Bitstream Download / Zip Archive");
+                TrackerFactory.createInstance(TrackingSite.BITSTREAM, item.getOwningCollection()).trackPage(request, "Bitstream " +
+                        "Download / Zip Archive");
             }
 
         }
