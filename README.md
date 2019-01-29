@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ufal/clarin-dspace.svg?branch=lindat)](https://travis-ci.org/ufal/lindat-dspace)
+[![Build Status](https://travis-ci.org/ufal/clarin-dspace.svg?branch=lindat)](https://travis-ci.org/ufal/clarin-dspace)
 # clarin-dspace repository
 
 * developed at: [Institute of Formal and Applied Linguistics, Charles University](http://ufal.mff.cuni.cz/)
