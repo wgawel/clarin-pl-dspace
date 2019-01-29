@@ -26,28 +26,20 @@ public class PiwikTrackerFactory
         }
     };
 
-    public static Tracker createInstance(TrackingSite site, Object... params)
-    {
-        switch(site) {
-            case OAI:
-                return new PiwikOAITracker();                
-            case BITSTREAM:
-                int defaultSiteId = configurationService.getPropertyAsType("lr.lr.tracker.bitstream.site_id", 0);
-                if(params.length == 1 && params[0] instanceof Collection){
-                    Collection col = (Collection)params[0];
-                    boolean disabled = configurationService.getPropertyAsType("lr.lr.tracker.collection."
-                            + col.getHandle() + ".disabled", false);
-                    if(disabled){
-                        return noopTracker;
-                    }else{
-                        int siteId = configurationService.getPropertyAsType(
-                                "lr.lr.tracker.bitstream.from." + col.getHandle() +".site_id", defaultSiteId);
-                        return new PiwikBitstreamTracker(siteId);
-                    }
-                }else{
-                    return new PiwikBitstreamTracker(defaultSiteId);
-                }
+    public static Tracker createOAITrackerInstance(){
+        return new PiwikOAITracker();
+    }
+
+    public static Tracker createBitstreamTrackerInstance(Collection col){
+        int defaultSiteId = configurationService.getPropertyAsType("lr.lr.tracker.bitstream.site_id", 0);
+        boolean disabled = configurationService.getPropertyAsType("lr.lr.tracker.collection."
+                + col.getHandle() + ".disabled", false);
+        if(disabled){
+            return noopTracker;
+        }else{
+            int siteId = configurationService.getPropertyAsType(
+                    "lr.lr.tracker.bitstream.from." + col.getHandle() +".site_id", defaultSiteId);
+            return new PiwikBitstreamTracker(siteId);
         }
-        throw new IllegalArgumentException("Unknown site: " + site);
     }
 }
