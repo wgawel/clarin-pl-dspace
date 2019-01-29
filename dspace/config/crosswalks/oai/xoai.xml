@@ -15,6 +15,7 @@
 
     <Contexts>
         <Context baseurl="request" name="Default Context">
+            <Filter ref="defaultFilter"/>
             <Format ref="oaidc"/>
             <Format ref="mets"/>
             <Format ref="dim"/>

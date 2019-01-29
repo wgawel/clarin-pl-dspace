@@ -299,8 +299,9 @@ public class XOAI {
     private boolean isPublic(Item item) {
         boolean pub = false;
         try {
-            //Check if READ access allowed on this Item
-            pub = AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ);
+            //Check if anonymous READ access allowed on this Item
+            pub = AuthorizeManager.isAnIdenticalPolicyAlreadyInPlace(context, item, org.dspace.eperson.Group.ANONYMOUS_ID,
+                    Constants.READ, -1);
         } catch (SQLException ex) {
             log.error(ex.getMessage());
         }
