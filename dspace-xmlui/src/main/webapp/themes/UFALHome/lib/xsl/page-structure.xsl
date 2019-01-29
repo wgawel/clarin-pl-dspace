@@ -298,8 +298,11 @@
 
 				<!-- Rest of the Body -->
 				<div class="row contents">
-				
-					<div id="main-contents" class="col-sm-9">																								
+
+					<!-- sidebar -->
+					<xsl:apply-templates select="/dri:document/dri:options" />
+
+					<div id="main-contents" class="col-sm-9">
 						<xsl:choose>
 							<xsl:when test="dri:div[@n='site-home']/dri:div[@n='site-recent-submission']/dri:referenceSet/dri:reference">
 								<xsl:call-template name="recent-submission" />
@@ -315,9 +318,6 @@
 							</xsl:when>
 						</xsl:choose>
 					</div>
-					<!-- sidebar -->
-					<xsl:apply-templates select="/dri:document/dri:options" />
-										
 				</div>
 			</div>
 		</div>
@@ -484,7 +484,7 @@
         	</div>
         </xsl:if>
 		
-		<img class="artifact-icon pull-right" alt="{dim:field[@element='type'][1]/node()}">
+		<img class="artifact-icon pull-right" alt="{dim:field[@element='type'][1]/node()}" onerror="this.src='{$theme-path}/images/mime/application-x-zerosize.png'">
 			<xsl:attribute name="src">
                                 <xsl:text>themes/UFALHome/lib/images/</xsl:text>
                                 <xsl:value-of
