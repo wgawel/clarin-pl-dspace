@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>5.9-SNAPSHOT</version>
+        <version>5.11-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -209,7 +209,7 @@
                             </execution>
                         </executions>
                     </plugin>
-                    
+
                     <!-- FileWeaver plugin is in charge of initializing & "weaving" together
                          the dspace.cfg file to be used by the Unit Testing environment.
                          It weaves two files, the default 'dspace.cfg' and 'dspace.cfg.more',
@@ -557,9 +557,9 @@
             <version>1.8</version>
         </dependency>
         <dependency>
-            <groupId>com.maxmind.geoip</groupId>
-            <artifactId>geoip-api</artifactId>
-            <version>1.2.11</version>
+            <groupId>com.maxmind.geoip2</groupId>
+            <artifactId>geoip2</artifactId>
+            <version>2.11.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ant</groupId>
@@ -598,10 +598,10 @@
 
 
         <dependency>
-            <groupId>postgresql</groupId>
+            <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
-		
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -619,7 +619,7 @@
             <artifactId>im4java</artifactId>
             <version>1.4.0</version>
         </dependency>
-        
+
         <!-- Flyway DB API (flywaydb.org) is used to manage DB upgrades automatically. -->
         <dependency>
             <groupId>org.flywaydb</groupId>
@@ -726,6 +726,17 @@
         <scope>test</scope>
     </dependency>
 
+        <!-- For ORCID v2 integration -->
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>orcid-jaxb-api</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20180130</version>
+        </dependency>
     </dependencies>
 
 </project>

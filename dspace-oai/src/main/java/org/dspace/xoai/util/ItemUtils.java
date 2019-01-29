@@ -26,6 +26,7 @@ import org.dspace.content.Metadatum;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.xoai.data.DSpaceItem;
 
@@ -69,7 +70,7 @@ public class ItemUtils
         e.setName(name);
         return e;
     }
-    public static Metadata retrieveMetadata (Item item) {
+    public static Metadata retrieveMetadata (Context context, Item item) {
         Metadata metadata;
         
         //DSpaceDatabaseItem dspaceItem = new DSpaceDatabaseItem(item);
@@ -90,6 +91,19 @@ public class ItemUtils
         }
         for (Metadatum val : vals)
         {
+            // Don't expose fields that are hidden by configuration
+            try {
+                if (MetadataExposure.isHidden(context,
+                        val.schema,
+                        val.element,
+                        val.qualifier))
+                {
+                    continue;
+                }
+            } catch(SQLException se) {
+                throw new RuntimeException(se);
+            }
+
             Element valueElem = null;
             Element schema = getElement(metadata.getElement(), val.schema);
             if (schema == null)
