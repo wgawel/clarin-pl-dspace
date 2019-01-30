@@ -305,7 +305,9 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
                 try{
                     CountryResponse countryResponse = locationService.country(InetAddress.getByName(new URL(informationURL).getHost()));
                     if(countryResponse != null && countryResponse.getCountry() != null && isNotBlank(countryResponse.getCountry().getIsoCode())){
-                        return countryResponse.getCountry().getIsoCode();
+                        String code = countryResponse.getCountry().getIsoCode();
+                        log.debug("Found code " + code + " for " + informationURL);
+                        return code;
                     }else{
                         log.info("Country or location is null for " + informationURL);
                     }
