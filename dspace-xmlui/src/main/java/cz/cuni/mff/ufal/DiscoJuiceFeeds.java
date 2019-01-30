@@ -2,9 +2,12 @@
 package cz.cuni.mff.ufal;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -14,6 +17,9 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.exception.GeoIp2Exception;
+import com.maxmind.geoip2.model.CountryResponse;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.generation.AbstractGenerator;
 import org.apache.cocoon.xml.dom.DOMStreamer;
@@ -26,8 +32,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import com.maxmind.geoip.Location;
-import com.maxmind.geoip.LookupService;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -59,7 +63,7 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
         future = executor.scheduleWithFixedDelay(new Updater(), 30, 60, TimeUnit.SECONDS);
     }
 
-    private static final LookupService locationService;
+    private static final DatabaseReader locationService;
     /**
      * contains entityIDs of idps we wish to set the country to something different than discojuice feeds suggests
      **/
@@ -67,13 +71,10 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
 
     static {
         String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
-        LookupService service = null;
+        DatabaseReader service = null;
         if (dbfile != null) {
             try {
-                service = new LookupService(dbfile,
-                        LookupService.GEOIP_STANDARD);
-            } catch (FileNotFoundException fe) {
-                log.error("The GeoLite Database file is missing (" + dbfile + ")! Solr Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
+                service = new DatabaseReader.Builder(new BufferedInputStream(Files.newInputStream(Paths.get(dbfile)))).build();
             } catch (IOException e) {
                 log.error("Unable to load GeoLite Database file (" + dbfile + ")! You may need to reinstall it. See the DSpace installation instructions for more details.", e);
             }
@@ -297,25 +298,24 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
     }
 
     private static String guessCountry(JSONObject entity){
-    	if(locationService != null && entity.containsKey("InformationURLs")){
-    		JSONArray informationURLs = (JSONArray)entity.get("InformationURLs");
-    		if(informationURLs.size() > 0){
-    			String informationURL = (String)((JSONObject)informationURLs.get(0)).get("value");
-    			try{
-    				Location location = locationService.getLocation(java.net.InetAddress.getByName(new URL(informationURL).getHost()));
-    				if(location != null && location.countryCode != null){
-    					return location.countryCode;
-    				}else{
-    					log.info("Country or location is null for " + informationURL);
-    				}
-    			}catch(MalformedURLException e){
-    				
-    			}catch(java.net.UnknownHostException e){
-    				
-    			}
-    		}
-    	}
-    	String entityID = (String)entity.get("entityID");
+        if(locationService != null && entity.containsKey("InformationURLs")){
+            JSONArray informationURLs = (JSONArray)entity.get("InformationURLs");
+            if(informationURLs.size() > 0){
+                String informationURL = (String)((JSONObject)informationURLs.get(0)).get("value");
+                try{
+                    CountryResponse countryResponse = locationService.country(InetAddress.getByName(new URL(informationURL).getHost()));
+                    if(countryResponse != null && countryResponse.getCountry() != null && isNotBlank(countryResponse.getCountry().getIsoCode())){
+                        return countryResponse.getCountry().getIsoCode();
+                    }else{
+                        log.info("Country or location is null for " + informationURL);
+                    }
+                }catch(IOException | GeoIp2Exception e){
+                    log.debug(e);
+                }
+
+            }
+        }
+        String entityID = (String)entity.get("entityID");
         //entityID not necessarily an URL
         try{
             URL url = new URL(entityID);
