@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
-import com.maxmind.geoip2.model.CountryResponse;
+import com.maxmind.geoip2.model.CityResponse;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.generation.AbstractGenerator;
 import org.apache.cocoon.xml.dom.DOMStreamer;
@@ -303,9 +303,9 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
             if(informationURLs.size() > 0){
                 String informationURL = (String)((JSONObject)informationURLs.get(0)).get("value");
                 try{
-                    CountryResponse countryResponse = locationService.country(InetAddress.getByName(new URL(informationURL).getHost()));
-                    if(countryResponse != null && countryResponse.getCountry() != null && isNotBlank(countryResponse.getCountry().getIsoCode())){
-                        String code = countryResponse.getCountry().getIsoCode();
+                    CityResponse cityResponse = locationService.city(InetAddress.getByName(new URL(informationURL).getHost()));
+                    if(cityResponse != null && cityResponse.getCountry() != null && isNotBlank(cityResponse.getCountry().getIsoCode())){
+                        String code = cityResponse.getCountry().getIsoCode();
                         log.debug("Found code " + code + " for " + informationURL);
                         return code;
                     }else{
