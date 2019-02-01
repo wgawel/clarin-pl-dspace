@@ -77,23 +77,13 @@ public class ItemUtils
         
         // read all metadata into Metadata Object
         metadata = new Metadata();
-        Metadatum[] allVals = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        List<Metadatum> vals = new LinkedList<>();
-        for(Metadatum md : allVals){
-            try {
-                //null for context - pretend we are not admins
-                if(!MetadataExposure.isHidden(null, md.schema, md.element, md.qualifier)){
-                    vals.add(md);
-                }
-            } catch (SQLException e) {
-                log.error(e.getMessage());
-            }
-        }
+        Metadatum[] vals = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         for (Metadatum val : vals)
         {
             // Don't expose fields that are hidden by configuration
             try {
-                if (MetadataExposure.isHidden(context,
+                //null for context - pretend we are not admins
+                if (MetadataExposure.isHidden(null,
                         val.schema,
                         val.element,
                         val.qualifier))
@@ -101,7 +91,7 @@ public class ItemUtils
                     continue;
                 }
             } catch(SQLException se) {
-                throw new RuntimeException(se);
+                log.error(se.getMessage());
             }
 
             Element valueElem = null;
