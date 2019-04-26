@@ -590,7 +590,7 @@
     <message key="xmlui.EPerson.Navigation.cite">Cite</message>
     <message key="xmlui.EPerson.Navigation.item-lifecycle">Submission Lifecycle</message>
     <message key="xmlui.EPerson.Navigation.faq">FAQ</message>
-    <message key="xmlui.EPerson.Navigation.about">About</message>
+    <message key="xmlui.EPerson.Navigation.about">About and Policies</message>
 
 	<!-- org.dspace.app.xmlui.eperson.PasswordLogin.java -->
 	<message key="xmlui.EPerson.PasswordLogin.title">Sign in</message>
