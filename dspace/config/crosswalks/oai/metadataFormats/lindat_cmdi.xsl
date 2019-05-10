@@ -7,11 +7,12 @@
     xmlns:isocodes="cz.cuni.mff.ufal.IsoLangCodes"
     xmlns:xalan="http://xml.apache.org/xslt"
     xmlns:configuration="org.dspace.core.ConfigurationManager"
+    xmlns:jstring="java.lang.String"
     xmlns:ms="http://www.ilsp.gr/META-XMLSchema"
     xmlns:olac="http://experimental.loc/olac"
     xmlns:cmd="http://www.clarin.eu/cmd/"
     xmlns:lindat="http://lindat.mff.cuni.cz/ns/experimental/cmdi"
-    exclude-result-prefixes="doc xalan itemUtil isocodes configuration ms"
+    exclude-result-prefixes="doc xalan itemUtil isocodes configuration ms jstring"
     version="1.0">
     <xsl:import href="metadataFormats/metasharev2.xsl"/>
     <xsl:import href="metadataFormats/olac-dcmiterms.xsl"/>
@@ -23,7 +24,8 @@
 
 
     <xsl:variable name="handle" select="/doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text()"/>
-    <xsl:variable name="dc_identifier_uri" select="/doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='uri']/doc:element/doc:field[@name='value']"/>
+    <xsl:variable name="dc_identifier_uri"
+				  select="jstring:replaceFirst(jstring:new(/doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='uri']/doc:element/doc:field[@name='value']), 'http://', 'https://')"/>
     <xsl:variable name="modifyDate" select="/doc:metadata/doc:element[@name='others']/doc:field[@name='lastModifyDate']/text()"/>
 	<xsl:variable name="dc_rights_uri" select="/doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element[@name='uri']/doc:element/doc:field[@name='value']" />
     <xsl:variable name="dsURL" select="configuration:getProperty('dspace.url')"/>

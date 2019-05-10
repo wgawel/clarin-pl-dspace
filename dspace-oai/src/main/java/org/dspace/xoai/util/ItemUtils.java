@@ -26,6 +26,7 @@ import org.dspace.content.Metadatum;
 import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.xoai.data.DSpaceItem;
 
@@ -69,27 +70,30 @@ public class ItemUtils
         e.setName(name);
         return e;
     }
-    public static Metadata retrieveMetadata (Item item) {
+    public static Metadata retrieveMetadata (Context context, Item item) {
         Metadata metadata;
         
         //DSpaceDatabaseItem dspaceItem = new DSpaceDatabaseItem(item);
         
         // read all metadata into Metadata Object
         metadata = new Metadata();
-        Metadatum[] allVals = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        List<Metadatum> vals = new LinkedList<>();
-        for(Metadatum md : allVals){
-            try {
-                //null for context - pretend we are not admins
-                if(!MetadataExposure.isHidden(null, md.schema, md.element, md.qualifier)){
-                    vals.add(md);
-                }
-            } catch (SQLException e) {
-                log.error(e.getMessage());
-            }
-        }
+        Metadatum[] vals = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
         for (Metadatum val : vals)
         {
+            // Don't expose fields that are hidden by configuration
+            try {
+                //null for context - pretend we are not admins
+                if (MetadataExposure.isHidden(null,
+                        val.schema,
+                        val.element,
+                        val.qualifier))
+                {
+                    continue;
+                }
+            } catch(SQLException se) {
+                log.error(se.getMessage());
+            }
+
             Element valueElem = null;
             Element schema = getElement(metadata.getElement(), val.schema);
             if (schema == null)

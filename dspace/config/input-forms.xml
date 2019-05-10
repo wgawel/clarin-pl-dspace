@@ -115,6 +115,7 @@
                     <input-type>FormattedDate</input-type>
                     <hint>input_forms.field.dc.date.issued.hint</hint>
                     <required>input_forms.field.dc.date.issued.required</required>
+                    <class>with-datepicker</class>
                 </field>
 
                 <field>

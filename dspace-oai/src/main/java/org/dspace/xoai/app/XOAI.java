@@ -278,10 +278,10 @@ public class XOAI {
         }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        XmlOutputContext context = XmlOutputContext.emptyContext(out, Second);
-        retrieveMetadata(item).write(context);
-        context.getWriter().flush();
-        context.getWriter().close();
+        XmlOutputContext xmlContext = XmlOutputContext.emptyContext(out, Second);
+        retrieveMetadata(context, item).write(xmlContext);
+        xmlContext.getWriter().flush();
+        xmlContext.getWriter().close();
         try {
             doc.addField("item.compile", out.toString("UTF-8"));
         } catch (UnsupportedEncodingException e) {
@@ -289,7 +289,8 @@ public class XOAI {
         }
 
         if (verbose) {
-            println("Item with handle " + handle + " indexed");
+            println(String.format("Item %d with handle %s indexed",
+                    item.getID(), handle));
         }
 
 
@@ -299,8 +300,9 @@ public class XOAI {
     private boolean isPublic(Item item) {
         boolean pub = false;
         try {
-            //Check if READ access allowed on this Item
-            pub = AuthorizeManager.authorizeActionBoolean(context, item, Constants.READ);
+            //Check if anonymous READ access allowed on this Item
+            pub = AuthorizeManager.isAnIdenticalPolicyAlreadyInPlace(context, item, org.dspace.eperson.Group.ANONYMOUS_ID,
+                    Constants.READ, -1);
         } catch (SQLException ex) {
             log.error(ex.getMessage());
         }
@@ -471,7 +473,7 @@ public class XOAI {
             while (iterator.hasNext()) {
                 Item item = iterator.next();
                 if (verbose) System.out.println("Compiling item with handle: " + item.getHandle());
-                xoaiItemCacheService.put(item, retrieveMetadata(item));
+                xoaiItemCacheService.put(item, retrieveMetadata(context, item));
                 context.clearCache();
             }
 

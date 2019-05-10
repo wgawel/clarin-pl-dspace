@@ -56,7 +56,6 @@ import cz.cuni.mff.ufal.DSpaceApi;
 import cz.cuni.mff.ufal.DownloadTokenExpiredException;
 import cz.cuni.mff.ufal.MissingLicenseAgreementException;
 import cz.cuni.mff.ufal.tracker.TrackerFactory;
-import cz.cuni.mff.ufal.tracker.TrackingSite;
 
 /**
  * The BitstreamReader will query DSpace for a particular bitstream and transmit
@@ -423,7 +422,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             
             if(is_item_bitstream && ConfigurationManager.getBooleanProperty("lr", "lr.tracker.enabled") && IOUtils.requestRangeContainsStart(request)) {
                 // Track the download for analytics platform
-                TrackerFactory.createInstance(TrackingSite.BITSTREAM).trackPage(request,"Bitstream Download / Single File");
+                TrackerFactory.createBitstreamTrackerInstance(item.getOwningCollection()).trackPage(request,
+                        "Bitstream Download / Single File");
             }
             
             
