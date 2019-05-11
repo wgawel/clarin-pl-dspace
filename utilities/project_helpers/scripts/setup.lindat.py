@@ -18,7 +18,7 @@ _settings = {
 
     "versions": {
         "ant": ("1.8", "ant -version", u"version ([\d\.]+) "),
-        "maven": ("3.0", "mvn -version", u"Apache Maven ([\d\.]+)\s"),
+        "maven": ("3.0", "mvn -version", u"Apache Maven ([\d\.]+)"),
     },
 
     "substitute": {
@@ -159,12 +159,14 @@ def check_version(key, expected_str=None):
         cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
     try:
         version = re.compile(regexp).search(stdout).group(1)
-    except:
-        print "CANNOT validate %s version, continuing..." % key
+    except Exception as e:
+        print "CANNOT validate %s version, %s, continuing..." % (key, e)
         return _OK
 
+    min_expected = min_expected.split('.')
+    version = version.split('.')
     for i in range(min(len(min_expected), len(version))):
-        if min_expected[i] > version[i]:
+        if int(min_expected[i]) > int(version[i]):
             fail(_NOT_OK, "%s version [%s] is *NOT* enough!", key, version)
     print "%s version %s meets requirements" % (key, version)
     return _OK
