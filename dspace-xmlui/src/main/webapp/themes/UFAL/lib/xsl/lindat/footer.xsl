@@ -36,6 +36,7 @@
 
       <xsl:variable name="currentLocale" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
       <xsl:variable name="localizedDiskPath" select="concat($theme-path-on-disk,'/lib/lindat/',$currentLocale,'/footer.htm')" />
+      <xsl:variable name="defaultDiskPath" select="concat($theme-path-on-disk,'/lib/lindat/','/footer.htm')" />
       <xsl:variable name="path" select="file:new($localizedDiskPath)"/>
       <xsl:variable name="collection"
                     select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='focus'][@qualifier='container']"/>
@@ -44,7 +45,7 @@
               <xsl:copy-of select="psu:readFooter($localizedDiskPath, $collection)" />
           </xsl:when>
           <xsl:otherwise>
-              <xsl:copy-of select="psu:readFooter('../../lindat/footer.htm', $collection)" />
+              <xsl:copy-of select="psu:readFooter($defaultDiskPath, $collection)" />
           </xsl:otherwise>
       </xsl:choose>
     </xsl:template>
