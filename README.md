@@ -52,7 +52,7 @@ Note: You should fork these projectbecause they will very likely require changes
 ## Projects somehow related to clarin-dspace repository
 
 * https://github.com/ufal/lindat-repository-vagrant
-* https://github.com/ufal/lindat-license-selector
+* https://github.com/ufal/public-license-selector
 * https://github.com/ufal/lr-b2safe-core
 * https://github.com/ufal/lr-b2safe-dspace
 * https://github.com/ufal/lindat-aai-info
