@@ -877,20 +877,27 @@
 					<img width="150" height="121" src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/clarin-eu-logo.png" class="logo" alt="CLARIN Eric logo" />
 				</a>
 			</div>
-			<div style="float: left; margin: 70px 10px 0px 10px;">
-				 <img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/typeB_middle.png" class="logo" width="200" height="50" alt="CLARIN-PL logo" />
-			</div>
-			<div style="float: left; margin: 30px 10px 15px 10px;">
-		        <a href="/dspace">
-	                <img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/clarinpl-logo_2.png" class="logo" alt="CLARIN-PL logo" />
-                </a>
-		    </div>
-			<div style="float: right; margin: 30px 10px 15px 5px;">
-				<a href="https://assessment.datasealofapproval.org/assessment_149/seal/html/">
-					<img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/DSA_2014_2017.jpg" class="logo" width="100" height="100" alt="CLARIN-PL logo" />
+			<div style="float: left; margin: 30px 10px 15px 5px;">
+				<a href="https://www.coretrustseal.org/wp-content/uploads/2019/12/CLARIN-PL-Language-Technology-Centre.pdf">
+					<img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/cts.png" class="logo" width="100" height="100" alt="CTS Logo" />
 				</a>
 			</div>
-	    </div>	
+			<div style="float: left; margin: 70px 10px 0px 10px;">
+				<a href="https://clarin-pl.eu">
+				 <img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/typeB_middle.png" class="logo" width="200" height="50" alt="CLARIN-PL logo" />
+				</a>
+			</div>
+			<div style="float: left; margin: 70px 10px 0px 10px;">
+				<a href="http://kcentre.clarin-pl.eu">
+				<img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/k-center.png" class="logo" width="200" height="50" alt="K-CENTER logo" />
+				</a>
+			</div>
+			<div style="float: left; margin: 60px 10px 15px 10px;">
+		        <a href="/dspace">
+	                <img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/clarinpl-logo_2.png" class="logo" style="width:60%" alt="CLARIN-PL logo" />
+                </a>
+		    </div>
+	    </div>
 	</xsl:template>
 </xsl:stylesheet>
 
