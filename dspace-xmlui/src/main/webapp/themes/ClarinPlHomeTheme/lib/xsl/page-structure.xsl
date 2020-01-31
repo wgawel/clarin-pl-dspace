@@ -883,8 +883,8 @@
 				</a>
 			</div>
 			<div style="float: left; margin: 70px 10px 0px 10px;">
-				<a href="https://clarin-pl.eu">
-				 <img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/typeB_middle.png" class="logo" width="200" height="50" alt="CLARIN-PL logo" />
+				<a href="https://clarin.eu/sites/default/files/b-centre_certificate_-_clarin-pl_language_technology_centre.pdf">
+				 <img src="{$context-path}/themes/ClarinPlTheme/images/clarinpl/Clarin_B_Centre.png" class="logo" width="200" height="50" alt="CLARIN-PL logo" />
 				</a>
 			</div>
 			<div style="float: left; margin: 70px 10px 0px 10px;">
