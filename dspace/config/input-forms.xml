@@ -374,14 +374,14 @@
 
                 <!-- TODO generic type TEXT/IMAGE/ETC -->
                 <field>
-                    <dc-schema>dc</dc-schema>
+                    <dc-schema>edm</dc-schema>
                     <dc-element>type</dc-element>
                     <dc-qualifier/>
                     <repeatable>false</repeatable>
-                    <label>input_forms.field.dc.type.label</label>
-                    <input-type value-pairs-name="common_types">dropdown</input-type>
-                    <hint>input_forms.field.dc.type.hint</hint>
-                    <required>input_forms.field.dc.type.required</required>
+                    <label>input_forms.field.edm.type.label</label>
+                    <input-type value-pairs-name="edm_types">dropdown</input-type>
+                    <hint>input_forms.field.edm.type.hint</hint>
+                    <required>input_forms.field.edm.type.required</required>
                 </field>
 
                 <field>
@@ -524,6 +524,16 @@
             </page>
 
             <page number="3">
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>input_forms.field.dc.type.label</label>
+                    <input-type>onebox</input-type>
+                    <hint>input_forms.field.dc.type.hint</hint>
+                    <required>input_forms.field.dc.type.required</required>
+                </field>
                 <!-- describe the resource -->
                 <field>
                     <dc-schema>dc</dc-schema>
@@ -730,6 +740,28 @@
             <!--<pair> <displayed-value>Evaluation package</displayed-value> <stored-value>evaluationPackage</stored-value>
               </pair> -->
 
+        </value-pairs>
+        <value-pairs value-pairs-name="edm_types" dc-term="edm.type">
+            <pair>
+            <displayed-value>TEXT</displayed-value>
+            <stored-value>TEXT</stored-value>
+            </pair>
+            <pair>
+            <displayed-value>VIDEO</displayed-value>
+            <stored-value>VIDEO</stored-value>
+            </pair>
+            <pair>
+            <displayed-value>SOUND</displayed-value>
+            <stored-value>SOUND</stored-value>
+            </pair>
+            <pair>
+            <displayed-value>IMAGE</displayed-value>
+            <stored-value>IMAGE</stored-value>
+            </pair>
+            <pair>
+            <displayed-value>3D</displayed-value>
+            <stored-value>3D</stored-value>
+            </pair>
         </value-pairs>
 
         <!-- default language order: (from dspace 1.2.1) langauges are in languages.js
