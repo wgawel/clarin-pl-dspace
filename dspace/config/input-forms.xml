@@ -13,6 +13,8 @@
 
     <form-map>
         <name-map collection-handle="default" form-name="traditional"/>
+        <!-- TODO real handle -->
+        <name-map collection-handle="123456789/2888" form-name="clariah_submissions"/>
     </form-map>
 
 
@@ -358,6 +360,227 @@
                     <required/>
                 </field>
             </page>
+        </form>
+
+        <form name="clariah_submissions">
+            <page number="1">
+
+                <!-- Basic info
+                        +type for type binds
+                        title
+                      demoUrl
+                        date
+                        +admin only fields-->
+
+                <!-- TODO generic type TEXT/IMAGE/ETC -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>type</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>input_forms.field.dc.type.label</label>
+                    <input-type value-pairs-name="common_types">dropdown</input-type>
+                    <hint>input_forms.field.dc.type.hint</hint>
+                    <required>input_forms.field.dc.type.required</required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>title</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>input_forms.field.dc.title.label</label>
+                    <input-type>onebox</input-type>
+                    <hint>input_forms.field.dc.title.hint</hint>
+                    <required>input_forms.field.dc.title.required</required>
+                </field>
+
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>demo</dc-element>
+                    <dc-qualifier>uri</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>input_forms.field.local.demo.uri.label</label>
+                    <input-type>onebox</input-type>
+                    <hint>input_forms.field.local.demo.uri.hint</hint>
+                    <required/>
+                    <regexp>http.*</regexp>
+                    <regexp-warning>input_forms.field.local.demo.uri.regexp-warning</regexp-warning>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>isreferencedby</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>input_forms.field.dc.relation.isreferencedby.label</label>
+                    <input-type>onebox</input-type>
+                    <hint>input_forms.field.dc.relation.isreferencedby.hint</hint>
+                    <required/>
+                    <regexp>http.*</regexp>
+                    <regexp-warning>input_forms.field.dc.relation.isreferencedby.regexp-warning</regexp-warning>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>date</dc-element>
+                    <dc-qualifier>issued</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>input_forms.field.dc.date.issued.label</label>
+                    <input-type>FormattedDate</input-type>
+                    <hint>input_forms.field.dc.date.issued.hint</hint>
+                    <required>input_forms.field.dc.date.issued.required</required>
+                    <class>with-datepicker</class>
+                </field>
+
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>hidden</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>input_forms.field.local.hidden.label</label>
+                    <input-type value-pairs-name="hidden_list">list</input-type>
+                    <hint>input_forms.field.local.hidden.hint</hint>
+                    <required/>
+                    <acl>
+                        policy=deny,action=read,grantee-type=user,grantee-id=*
+                    </acl>
+                </field>
+
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>hasMetadata</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>input_forms.field.local.hasMetadata.label</label>
+                    <input-type value-pairs-name="metashare_languageDependent">list</input-type>
+                    <!-- true/false value -->
+                    <hint>input_forms.field.local.hasMetadata.hint</hint>
+                    <required/>
+                    <acl>
+                        policy=deny,action=read,grantee-type=user,grantee-id=*
+                    </acl>
+                </field>
+
+            </page>
+
+            <page number="2">
+
+                <!-- who's involved
+                        authors
+                        publisher
+                        funding
+                        contact
+                -->
+
+
+                <!-- todo decide this -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>contributor</dc-element>
+                    <dc-qualifier>author</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>input_forms.field.dc.contributor.author.label</label>
+                    <input-type>name</input-type>
+                    <hint>input_forms.field.dc.contributor.author.hint</hint>
+                    <autocomplete>solr-author_ac-specific</autocomplete>
+                    <required>input_forms.field.dc.contributor.author.required</required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>publisher</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>true</repeatable>
+                    <label>input_forms.field.dc.publisher.label</label>
+                    <input-type>onebox</input-type>
+                    <hint>input_forms.field.dc.publisher.hint</hint>
+                    <autocomplete>solr-publisher_ac</autocomplete>
+                    <required>input_forms.field.dc.publisher.required</required>
+                </field>
+
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>contact</dc-element>
+                    <dc-qualifier>person</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>input_forms.field.local.contact.person.label</label>
+                    <input-type complex-definition-ref="contact_person">complex</input-type>
+                    <hint>input_forms.field.local.contact.person.hint</hint>
+                    <required>input_forms.field.local.contact.person.required</required>
+                </field>
+
+
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>sponsor</dc-element>
+                    <repeatable>true</repeatable>
+                    <label>input_forms.field.local.sponsor.label</label>
+                    <input-type complex-definition-ref="funding">complex</input-type>
+                    <hint>input_forms.field.local.sponsor.hint</hint>
+                </field>
+
+
+            </page>
+
+            <page number="3">
+                <!-- describe the resource -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>description</dc-element>
+                    <dc-qualifier/>
+                    <repeatable>false</repeatable>
+                    <label>input_forms.field.dc.description.label</label>
+                    <input-type>textarea</input-type>
+                    <hint>input_forms.field.dc.description.hint</hint>
+                    <required>input_forms.field.dc.description.required</required>
+                </field>
+
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier>iso</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>input_forms.field.dc.language.iso.label</label>
+                    <!-- todo inspect the typebind -->
+                    <type-bind>TEXT</type-bind>
+                    <input-type>onebox</input-type>
+                    <hint>input_forms.field.dc.language.iso.hint</hint>
+                    <autocomplete>json_static-iso_langs.json</autocomplete>
+                    <required>input_forms.field.dc.language.iso.required</required>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>language</dc-element>
+                    <dc-qualifier>iso</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>input_forms.field.dc.language.iso1.label</label>
+                    <!-- todo inspect the typebind -->
+                    <type-bind>toolService</type-bind>
+                    <input-type>onebox</input-type>
+                    <hint>input_forms.field.dc.language.iso1.hint</hint>
+                    <autocomplete>json_static-iso_langs.json</autocomplete>
+                    <required/>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>subject</dc-element>
+                    <dc-qualifier/>
+                    <!-- An input-type of twobox MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <repeatable-parse>true</repeatable-parse>
+                    <label>input_forms.field.dc.subject.label</label>
+                    <input-type>twobox</input-type>
+                    <hint>input_forms.field.dc.subject.hint</hint>
+                    <autocomplete>solr-subject_ac</autocomplete>
+                    <required>input_forms.field.dc.subject.required</required>
+                </field>
+            </page>
+
+
         </form>
     </form-definitions>
 
