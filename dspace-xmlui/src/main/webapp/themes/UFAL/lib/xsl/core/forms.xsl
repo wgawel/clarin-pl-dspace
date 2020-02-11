@@ -1216,7 +1216,7 @@
 <!-- Special Handling for submissions -->
 
 	<xsl:template
-			match="dri:item[dri:field[@id='aspect.submission.StepTransformer.field.dc_type' and not(contains('no-thumbs', @rend))]]"
+			match="dri:item[dri:field[@id='aspect.submission.StepTransformer.field.dc_type' and not(contains(@rend, 'no-thumbs'))]]"
 				  priority="10">
                 <div>
                         <xsl:attribute name='class'>
