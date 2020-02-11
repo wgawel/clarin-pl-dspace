@@ -533,6 +533,7 @@
                     <input-type>onebox</input-type>
                     <hint>input_forms.field.dc.type.hint</hint>
                     <required>input_forms.field.dc.type.required</required>
+                    <class>no-thumbs</class>
                 </field>
                 <!-- describe the resource -->
                 <field>
