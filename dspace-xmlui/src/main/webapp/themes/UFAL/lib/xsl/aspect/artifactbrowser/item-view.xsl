@@ -1035,9 +1035,13 @@
                                     </xsl:variable>
                                     <xsl:choose>
                                         <xsl:when test="@MIMETYPE='text/plain'">
-                                            <xsl:value-of select="$files" disable-output-escaping="yes" /> . . .
+                                            <pre>
+                                                <xsl:value-of select="$files"/> . . .
+                                            </pre>
                                         </xsl:when>
                                         <xsl:otherwise>
+                                            <!-- output is not escaped as ft:parse returns html element that we
+                                                 need to render -->
                                             <xsl:value-of select="ft:parse($files)" disable-output-escaping="yes" />
                                         </xsl:otherwise>
                                     </xsl:choose>
