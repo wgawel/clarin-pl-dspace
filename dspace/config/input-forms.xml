@@ -14,7 +14,7 @@
     <form-map>
         <name-map collection-handle="default" form-name="traditional"/>
         <!-- TODO real handle -->
-        <name-map collection-handle="123456789/2888" form-name="clariah_submissions"/>
+        <name-map collection-handle="123456789/2" form-name="clariah_submissions"/>
     </form-map>
 
 
@@ -529,10 +529,10 @@
                     <dc-element>type</dc-element>
                     <dc-qualifier/>
                     <repeatable>false</repeatable>
-                    <label>input_forms.field.dc.type.label</label>
+                    <label>input_forms.field.dc.type.clariah.label</label>
                     <input-type>onebox</input-type>
-                    <hint>input_forms.field.dc.type.hint</hint>
-                    <required>input_forms.field.dc.type.required</required>
+                    <hint>input_forms.field.dc.type.clariah.hint</hint>
+                    <required>input_forms.field.dc.type.clariah.required</required>
                     <class>no-thumbs</class>
                 </field>
                 <!-- describe the resource -->
