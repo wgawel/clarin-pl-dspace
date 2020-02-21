@@ -555,7 +555,7 @@
                     <repeatable>true</repeatable>
                     <label>input_forms.field.dc.language.iso.label</label>
                     <!-- todo inspect the typebind -->
-                    <type-bind>TEXT</type-bind>
+                    <type-bind field="edm.type">TEXT</type-bind>
                     <input-type>onebox</input-type>
                     <hint>input_forms.field.dc.language.iso.hint</hint>
                     <autocomplete>json_static-iso_langs.json</autocomplete>
