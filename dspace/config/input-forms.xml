@@ -673,6 +673,72 @@
 
             </page>
         </form>
+
+        <form name="clariah_submissions">
+            <page number="1">
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>submission</dc-element>
+                    <dc-qualifier>note</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>input_forms.field.local.submission.note.label</label>
+                    <input-type>textarea</input-type>
+                    <hint>input_forms.field.local.submission.note.hint</hint>
+                    <required/>
+                </field>
+
+                <!-- DC.Relation.Replaces -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>replaces</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>input_forms.field.dc.relation.replaces.label</label>
+                    <input-type>onebox</input-type>
+                    <hint>input_forms.field.dc.relation.replaces.hint</hint>
+                    <autocomplete>solr-handle_title_ac</autocomplete>
+                    <required/>
+                    <component-label> </component-label>
+                    <collapsible>Special fields</collapsible>
+                </field>
+
+                <!-- DC.Relation.IsReplacedBy -->
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>relation</dc-element>
+                    <dc-qualifier>isreplacedby</dc-qualifier>
+                    <repeatable>true</repeatable>
+                    <label>input_forms.field.dc.relation.isreplacedby.label</label>
+                    <input-type>onebox</input-type>
+                    <hint>input_forms.field.dc.relation.isreplacedby.hint</hint>
+                    <autocomplete>solr-handle_title_ac</autocomplete>
+                    <required/>
+                    <component-label> </component-label>
+                    <acl>
+                        policy=deny,action=read,grantee-type=user,grantee-id=*
+                    </acl>
+                </field>
+
+                <!-- Local.Embargo.TermsLift -->
+                <field>
+                    <dc-schema>local</dc-schema>
+                    <dc-element>embargo</dc-element>
+                    <dc-qualifier>termslift</dc-qualifier>
+                    <repeatable>false</repeatable>
+                    <label>input_forms.field.local.embargo.termslift.label</label>
+                    <input-type>onebox</input-type>
+                    <hint>input_forms.field.local.embargo.termslift.hint</hint>
+                    <required/>
+                    <regexp>\d\d\d\d-\d\d-\d\d</regexp>
+                    <regexp-warning>input_forms.field.local.embargo.termslift.regexp-warning</regexp-warning>
+                    <component-label> </component-label>
+                    <acl>
+                        policy=deny,action=read,grantee-type=user,grantee-id=*
+                    </acl>
+                </field>
+
+            </page>
+        </form>
     </form-definitions-extra>
 
 
@@ -744,23 +810,23 @@
         </value-pairs>
         <value-pairs value-pairs-name="edm_types" dc-term="edm.type">
             <pair>
-            <displayed-value>TEXT</displayed-value>
+            <displayed-value>input_forms.value_pairs.edm_types.text</displayed-value>
             <stored-value>TEXT</stored-value>
             </pair>
             <pair>
-            <displayed-value>VIDEO</displayed-value>
+            <displayed-value>input_forms.value_pairs.edm_types.video</displayed-value>
             <stored-value>VIDEO</stored-value>
             </pair>
             <pair>
-            <displayed-value>SOUND</displayed-value>
+            <displayed-value>input_forms.value_pairs.edm_types.sound</displayed-value>
             <stored-value>SOUND</stored-value>
             </pair>
             <pair>
-            <displayed-value>IMAGE</displayed-value>
+            <displayed-value>input_forms.value_pairs.edm_types.image</displayed-value>
             <stored-value>IMAGE</stored-value>
             </pair>
             <pair>
-            <displayed-value>3D</displayed-value>
+            <displayed-value>input_forms.value_pairs.edm_types.3d</displayed-value>
             <stored-value>3D</stored-value>
             </pair>
         </value-pairs>

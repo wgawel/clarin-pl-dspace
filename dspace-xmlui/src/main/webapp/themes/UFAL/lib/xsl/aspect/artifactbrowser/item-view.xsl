@@ -388,10 +388,20 @@
 												<i18n:text>xmlui.dri2xhtml.METS-1.0.item-type</i18n:text>
 					</dt>
 					<dd>
-						<a>
-							<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:value-of select="dim:field[@element='type'][not(@qualifier)][1]/node()" />&amp;type=type</xsl:attribute>
-							<xsl:value-of select="dim:field[@element='type'][not(@qualifier)][1]/node()" />
-						</a>							
+						<xsl:for-each
+								select="dim:field[@element='type' and not(@qualifier)]">
+							<xsl:sort select="." />
+							<a>
+								<xsl:attribute name="href">
+									<xsl:value-of
+											select="concat($contextPath, '/discover?filtertype=type&amp;filter_relational_operator=equals&amp;filter=',encoder:encode(.))"/>
+								</xsl:attribute>
+								<xsl:value-of select="." />
+							</a>
+							<xsl:if test="position() != last()">
+								<xsl:text>, </xsl:text>
+							</xsl:if>
+						</xsl:for-each>
 					</dd>
 				</dl>
 				<xsl:call-template name="itemSummaryView-DIM-fields">

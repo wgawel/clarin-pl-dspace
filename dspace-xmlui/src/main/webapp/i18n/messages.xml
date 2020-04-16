@@ -3235,6 +3235,15 @@
 	<message key="input_forms.field.dc.relation.isreferencedby.hint">Link to original paper that references this dataset.</message>
 	<message key="input_forms.field.dc.relation.isreferencedby.regexp-warning">The supplied url must start with http/https</message>
 
+	<message key="input_forms.field.edm.type.label">Select type of your resource</message>
+	<message key="input_forms.field.edm.type.hint">Hint TBD</message>
+	<message key="input_forms.field.edm.type.required">Please select a resource type for your submission.</message>
+	<message key="input_forms.value_pairs.edm_types.text">TEXT</message>
+	<message key="input_forms.value_pairs.edm_types.video">VIDEO</message>
+	<message key="input_forms.value_pairs.edm_types.sound">SOUND</message>
+	<message key="input_forms.value_pairs.edm_types.image">IMAGE</message>
+	<message key="input_forms.value_pairs.edm_types.3d">3D</message>
+
 	<!-- cz.cuni.mff.ufal.ContractPage -->
 	<message key="xmlui.ContractPage.title">Distribution License Agreement</message>
 	<message key="xmlui.ContractPage.trail">Distribution License Agreement</message>

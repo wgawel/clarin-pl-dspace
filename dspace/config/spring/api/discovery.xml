@@ -516,6 +516,7 @@
         <property name="metadataFields">
             <list>
                 <value>dc.type</value>
+                <value>edm.type</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
@@ -602,6 +603,7 @@
         <property name="metadataFields">
             <list>
                 <value>dc.type</value>
+                <value>edm.type</value>
             </list>
         </property>
         <property name="facetLimit" value="20"/>
