@@ -3507,6 +3507,10 @@
 	<message key="input_forms.value_pairs.edm_types.image">IMAGE</message>
 	<message key="input_forms.value_pairs.edm_types.3d">3D</message>
 
+	<message key="input_forms.field.dc.type.clariah.label">DC type label TBD</message>
+	<message key="input_forms.field.dc.type.clariah.hint">DC type hint TBD</message>
+	<message key="input_forms.field.dc.type.clariah.required">DC type required</message>
+
 	<!-- cz.cuni.mff.ufal.ContractPage -->
 	<message key="xmlui.ContractPage.title">Smlouva o distribuci dat</message>
 	<message key="xmlui.ContractPage.trail">Smlouva o distribuci dat</message>

@@ -372,7 +372,6 @@
                         date
                         +admin only fields-->
 
-                <!-- TODO generic type TEXT/IMAGE/ETC -->
                 <field>
                     <dc-schema>edm</dc-schema>
                     <dc-element>type</dc-element>
@@ -532,6 +531,7 @@
                     <label>input_forms.field.dc.type.clariah.label</label>
                     <input-type>onebox</input-type>
                     <hint>input_forms.field.dc.type.clariah.hint</hint>
+                    <autocomplete>solr-dctype_ac</autocomplete>
                     <required>input_forms.field.dc.type.clariah.required</required>
                     <class>no-thumbs</class>
                 </field>
