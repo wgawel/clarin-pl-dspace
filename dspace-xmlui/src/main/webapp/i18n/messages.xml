@@ -3248,6 +3248,13 @@
 	<message key="input_forms.field.dc.type.clariah.hint">DC type hint TBD</message>
 	<message key="input_forms.field.dc.type.clariah.required">DC type required</message>
 
+	<message key="input_forms.field.dc.language.iso.clariah.label">Mandatory language for TEXT</message>
+	<message key="input_forms.field.dc.language.iso.clariah.hint">Mandatory language for TEXT</message>
+	<message key="input_forms.field.dc.language.iso.clariah.required">Mandatory language for TEXT</message>
+
+	<message key="input_forms.field.dc.language.iso1.clariah.label">Optional language for other types</message>
+	<message key="input_forms.field.dc.language.iso1.clariah.hint">Optional language for other types</message>
+
 	<!-- cz.cuni.mff.ufal.ContractPage -->
 	<message key="xmlui.ContractPage.title">Distribution License Agreement</message>
 	<message key="xmlui.ContractPage.trail">Distribution License Agreement</message>

@@ -553,13 +553,12 @@
                     <dc-element>language</dc-element>
                     <dc-qualifier>iso</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>input_forms.field.dc.language.iso.label</label>
-                    <!-- todo inspect the typebind -->
+                    <label>input_forms.field.dc.language.iso.clariah.label</label>
                     <type-bind field="edm.type">TEXT</type-bind>
                     <input-type>onebox</input-type>
-                    <hint>input_forms.field.dc.language.iso.hint</hint>
+                    <hint>input_forms.field.dc.language.iso.clariah.hint</hint>
                     <autocomplete>json_static-iso_langs.json</autocomplete>
-                    <required>input_forms.field.dc.language.iso.required</required>
+                    <required>input_forms.field.dc.language.iso.clariah.required</required>
                 </field>
 
                 <field>
@@ -567,11 +566,10 @@
                     <dc-element>language</dc-element>
                     <dc-qualifier>iso</dc-qualifier>
                     <repeatable>true</repeatable>
-                    <label>input_forms.field.dc.language.iso1.label</label>
-                    <!-- todo inspect the typebind -->
-                    <type-bind>toolService</type-bind>
+                    <label>input_forms.field.dc.language.iso1.clariah.label</label>
+                    <type-bind field="edm.type">VIDEO,IMAGE,SOUND,3D</type-bind>
                     <input-type>onebox</input-type>
-                    <hint>input_forms.field.dc.language.iso1.hint</hint>
+                    <hint>input_forms.field.dc.language.iso1.clariah.hint</hint>
                     <autocomplete>json_static-iso_langs.json</autocomplete>
                     <required/>
                 </field>
