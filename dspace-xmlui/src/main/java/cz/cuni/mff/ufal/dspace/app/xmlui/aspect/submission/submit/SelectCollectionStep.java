@@ -300,6 +300,8 @@ public class SelectCollectionStep extends AbstractSubmissionStep
 
         modelJo.put("communities", communitiesJa);
 
+        modelJo.put("GUI2", configurationService.getPropertyAsType("lr.SelectCollectionStep.TopLevelOnly", false));
+
         return modelJo;
     }
 
