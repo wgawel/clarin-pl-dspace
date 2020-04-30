@@ -381,7 +381,7 @@
 
 			<!-- type row -->
 			<xsl:when
-				test="$clause = 9 and (dim:field[@element='type' and not(@qualifier)])">
+				test="$clause = 9 and ((dim:field[@element='type' and not(@qualifier)]) or (dim:field[@qualifier='mediaType']))">
 					<dl id="item-type" class="dl-horizontal">
 					<dt style="text-align: left">
 						<i class="fa fa-tag">&#160;</i>
@@ -389,7 +389,7 @@
 					</dt>
 					<dd>
 						<xsl:for-each
-								select="dim:field[@element='type' and not(@qualifier)]">
+								select="dim:field[(@element='type' and not(@qualifier)) or @qualifier='mediaType']">
 							<xsl:sort select="." />
 							<a>
 								<xsl:attribute name="href">

@@ -518,6 +518,7 @@
             <list>
                 <value>dc.type</value>
                 <value>edm.type</value>
+                <value>metashare.ResourceInfo#ContentInfo.mediaType</value>
             </list>
         </property>
         <property name="facetLimit" value="5"/>
@@ -605,6 +606,7 @@
             <list>
                 <value>dc.type</value>
                 <value>edm.type</value>
+                <value>metashare.ResourceInfo#ContentInfo.mediaType</value>
             </list>
         </property>
         <property name="facetLimit" value="20"/>
