@@ -142,7 +142,12 @@ ufal.selectCollection = {
 	showCollectionsGUI2 : function(community, collectionSelect) {
 		ufal.selectCollection.createGUI(community, 'collections');
 		ufal.selectCollection.getCollectionsListDiv().find("a").on('click', function(){
-			var name = $(this).attr('id');
+			ufal.selectCollection.getCollectionsListDiv().find(".alert-info").each(function(){
+				$(this).removeClass('alert-info');
+			});
+			var $this = $(this);
+			$this.toggleClass('alert-info');
+			var name = $this.attr('id');
 			var collectionID = name.replace(/^.*_(\d+)/, '$1');
 			var handle;
 			for (var i in community.collections){
