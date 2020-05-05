@@ -589,6 +589,30 @@
                 </field>
 
                 <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>coverage</dc-element>
+                    <dc-qualifier>spatial</dc-qualifier>
+                    <!-- An input-type of twobox MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <repeatable-parse>true</repeatable-parse>
+                    <label>input_forms.field.dc.coverage.spatial.label</label>
+                    <input-type>twobox</input-type>
+                    <hint>input_forms.field.dc.coverage.spatial.hint</hint>
+                </field>
+
+                <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>covarage</dc-element>
+                    <dc-qualifier>temporal</dc-qualifier>
+                    <!-- An input-type of twobox MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <repeatable-parse>true</repeatable-parse>
+                    <label>input_forms.field.dc.coverage.temporal.label</label>
+                    <input-type>twobox</input-type>
+                    <hint>input_forms.field.dc.coverage.temporal.hint</hint>
+                </field>
+
+                <field>
                     <dc-schema>local</dc-schema>
                     <dc-element>size</dc-element>
                     <dc-qualifier>info</dc-qualifier>

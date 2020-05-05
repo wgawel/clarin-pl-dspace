@@ -3518,6 +3518,12 @@
 	<message key="input_forms.field.dc.language.iso1.clariah.label">Optional language for other types</message>
 	<message key="input_forms.field.dc.language.iso1.clariah.hint">Optional language for other types</message>
 
+	<message key="input_forms.field.dc.coverage.spatial.label">Spatial label TBD</message>
+	<message key="input_forms.field.dc.coverage.spatial.hint">Spatial hint TBD</message>
+
+	<message key="input_forms.field.dc.coverage.temporal.label">Temporal lable TBD</message>
+	<message key="input_forms.field.dc.coverage.temporal.hint">Temporal hint TBD</message>
+
 	<!-- cz.cuni.mff.ufal.ContractPage -->
 	<message key="xmlui.ContractPage.title">Smlouva o distribuci dat</message>
 	<message key="xmlui.ContractPage.trail">Smlouva o distribuci dat</message>
