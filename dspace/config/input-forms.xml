@@ -602,7 +602,7 @@
 
                 <field>
                     <dc-schema>dc</dc-schema>
-                    <dc-element>covarage</dc-element>
+                    <dc-element>coverage</dc-element>
                     <dc-qualifier>temporal</dc-qualifier>
                     <!-- An input-type of twobox MUST be marked as repeatable -->
                     <repeatable>true</repeatable>
