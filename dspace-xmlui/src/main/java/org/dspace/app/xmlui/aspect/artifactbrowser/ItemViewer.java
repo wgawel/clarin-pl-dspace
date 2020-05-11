@@ -62,6 +62,8 @@ import org.dspace.utils.DSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 /**
  * Display a single item.
  *
@@ -97,6 +99,8 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             + File.separator + "config" + File.separator + "sfx.xml";
 
     private static final Logger log = LoggerFactory.getLogger(ItemViewer.class);
+
+    private ConfigurationService cs = new DSpace().getConfigurationService();
 
     /**
      * Generate the unique caching key.
@@ -324,11 +328,42 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
     }
 
     private void addGoogleDatasetInfo(PageMeta pageMeta, Item item) throws WingException {
-        ConfigurationService cs = new DSpace().getConfigurationService();
-        boolean enabled = cs.getPropertyAsType("google-dataset.enable", false);
-        if(enabled) {
+        if(shouldAddGoogleDatasetMetadataForItem(item)){
             pageMeta.addMetadata("google_dataset").addContent(new GoogleDataset(item).toString());
         }
+    }
+
+    private boolean shouldAddGoogleDatasetMetadataForItem(Item item) {
+        boolean datasetEnabled = cs.getPropertyAsType("google-dataset.enable", false);
+        if(!datasetEnabled){
+            return false;
+        }
+
+        boolean withBitstreamOnly = cs.getPropertyAsType("google-dataset.onlyItemsWithBitstreams", true);
+        if(withBitstreamOnly){
+            try {
+                boolean hasBitstream = item.getNonInternalBitstreams().length > 0;
+                if(!hasBitstream){
+                    return false;
+                }
+            } catch (SQLException e) {
+                log.error("Error while looking for bitstreams.", e);
+            }
+        }
+
+        String blacklistedTypes = cs.getProperty("google-dataset.blacklistedTypes");
+        if(isNotBlank(blacklistedTypes)){
+            String[] types = blacklistedTypes.split(",");
+            String itemType = item.getMetadata("dc.type");
+            if(itemType != null){
+                for(String type : types){
+                    if(itemType.equals(type.trim())){
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
