@@ -23,6 +23,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import cz.cuni.mff.ufal.DSpaceApi;
+import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -45,6 +47,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Metadatum;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Bitstream;
 import org.dspace.content.Item;
 import org.dspace.app.util.GoogleMetadata;
 import org.dspace.content.crosswalk.CrosswalkException;
@@ -101,6 +104,8 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
     private static final Logger log = LoggerFactory.getLogger(ItemViewer.class);
 
     private ConfigurationService cs = new DSpace().getConfigurationService();
+
+    private final IFunctionalities functionalityManager = DSpaceApi.getFunctionalityManager();
 
     /**
      * Generate the unique caching key.
@@ -325,6 +330,24 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         }
 
         addGoogleDatasetInfo(pageMeta, item);
+
+        addCommandLineInfo(pageMeta, item);
+    }
+
+    private void addCommandLineInfo(PageMeta pageMeta, Item item) throws WingException {
+        final Bitstream[] bitstreams;
+        try {
+            bitstreams = item.getNonInternalBitstreams();
+            if(bitstreams.length > 0){
+                functionalityManager.openSession();
+                if(functionalityManager.isUserAllowedToAccessTheResource(-1, bitstreams[0].getID())) {
+                    pageMeta.addMetadata("include-library", "cmdline-info");
+                }
+                functionalityManager.closeSession();
+            }
+        } catch (SQLException e) {
+            log.error("Exception while fetching bitstream of item " + item.getID(), e);
+        }
     }
 
     private void addGoogleDatasetInfo(PageMeta pageMeta, Item item) throws WingException {

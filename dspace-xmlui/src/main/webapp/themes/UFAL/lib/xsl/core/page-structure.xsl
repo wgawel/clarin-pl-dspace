@@ -651,6 +651,10 @@
             <script type="text/javascript" src="{$theme-path}/lib/js/ufal-submission.js">&#160;</script>
         </xsl:if>
 
+        <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='cmdline-info']">
+            <script type="text/javascript" src="{$theme-path}/lib/js/ufal-cmdline.js">&#160;</script>
+        </xsl:if>
+
         <script type="text/javascript">
             runAfterJSImports.execute();
         </script>
