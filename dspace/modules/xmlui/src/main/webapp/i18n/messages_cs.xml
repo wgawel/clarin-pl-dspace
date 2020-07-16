@@ -907,6 +907,7 @@
         <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.error">Vyskytl se problém s načtením řízeného slovníku. Zkuste to, prosím, znovu později.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.missing_field">Vyplňte prosím všechna pole.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.regexp_error">Hodnota neodpovídá danému regulárnímu výrazu (formátu) "{0}"</message>
+	<message key="xmlui.Submission.submit.DescribeStep.english_only">Tam, kde je to možné, vyplňte metadatová pole v angličtině (zejména pole pro volný text, např. popis).</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.UFALLicenseStep -->
 	<message key="xmlui.Submission.submit.NA">N/A</message>

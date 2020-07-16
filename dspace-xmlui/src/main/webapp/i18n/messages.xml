@@ -894,6 +894,7 @@
 	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.error">There was an issue when loading the controlled vocabulary, please try again later.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.missing_field">Fill all the fields, please.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.regexp_error">The field doesn't match the required regular expression (format) "{0}"</message>
+	<message key="xmlui.Submission.submit.DescribeStep.english_only">Fill the metadata in English where possible (especially free text fields such as description).</message>
 
     <!-- org.dspace.app.xmlui.Submission.submit.UFALLicenseStep -->
     <message key="xmlui.Submission.submit.NA">N/A</message>
