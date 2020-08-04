@@ -105,7 +105,9 @@ public class DescribeStep extends AbstractSubmissionStep
         message("xmlui.Submission.submit.DescribeStep.report_no");
     protected static final Message T_missing_field =
             message("xmlui.Submission.submit.DescribeStep.missing_field");
-        
+    protected static final Message T_english_only =
+            message("xmlui.Submission.submit.DescribeStep.english_only");
+
         /**
      * A shared resource of the inputs reader. The 'inputs' are the
      * questions we ask the user to describe an item during the
@@ -243,6 +245,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 }else {
                 	form.setHead(message("xmlui.Submission.submit.DescribeStep.head"+this.getPage()));
                 }
+                form.addItem("english-only-info", "alert alert-info").addContent(T_english_only);
 
                 // Fetch the document type (dc.type)
                 String documentType = "";
