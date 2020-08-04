@@ -3409,6 +3409,8 @@
 	<message key="input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.other">other</message>
 	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.N/A">N/A</message>
 	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.grammar">grammar</message>
+	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.mlmodel">machine learning model</message>
+	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.ngrammodel">n-gram model</message>
 	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.other">other</message>
 	<message key="input_forms.value_pairs.metashare_funding.N/A">N/A</message>
 	<message key="input_forms.value_pairs.metashare_funding.euFunds">EU</message>
