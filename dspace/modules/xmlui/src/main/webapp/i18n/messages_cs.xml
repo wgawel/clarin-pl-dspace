@@ -710,7 +710,15 @@
 	<message key="xmlui.EPerson.StartRegistration.email_address_help">Tato adresa bude ověřena a použita jako vaše přihlašovací jméno.</message>
 	<message key="xmlui.EPerson.StartRegistration.error_bad_email">Nepodařilo se zaslat e-mail na tuto adresu.</message>
 	<message key="xmlui.EPerson.StartRegistration.submit_register">Zaregistrovat se</message>
-	
+
+
+	<message key="xmlui.EPerson.SetEmailStart.para2">Váš IDP (domovská organizace) nám neposkytl vaši emailovou
+		adresu. Pokud chcete přidávat záznamy do repozitáře, stahovat veřejně nedostupné záznamy, případně se
+		přihlásit k zásílání statistik a novinek, vyplňte a ověřte váš email.</message>
+	<message key="xmlui.EPerson.SetEmailStart.email_address_help">Tato adresa bude ověřena a zapamatována,
+		dokud při vašem přihlášení nedostaneme od IDP adresu jinou. I nadále se přihlašujete skrze vaši
+		domovskou organizaci.</message>
+
 	<!-- org.dspace.app.xmlui.eperson.VerifyEmail.java -->
 	<message key="xmlui.EPerson.VerifyEmail.title">Registrační e-mail zaslán</message>
 	<message key="xmlui.EPerson.VerifyEmail.head">Registrační e-mail zaslán</message>
