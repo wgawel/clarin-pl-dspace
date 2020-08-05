@@ -701,6 +701,13 @@
 	<message key="xmlui.EPerson.StartRegistration.error_bad_email">Unable to send email to this address.</message>
 	<message key="xmlui.EPerson.StartRegistration.submit_register">Register</message>
 
+
+	<message key="xmlui.EPerson.SetEmailStart.para2">Your IDP (home organization) has not provided your email
+		address. Please fill and verify your email in order to submit new items to the repository, to download
+		restricted items and optionally to subscribe to advanced statistics and/or collection updates.</message>
+	<message key="xmlui.EPerson.SetEmailStart.email_address_help">This address will be verified and remembered until
+		your IDP provides a different one. You will still sign in through your IDP.</message>
+
 	<!-- org.dspace.app.xmlui.eperson.VerifyEmail.java -->
 	<message key="xmlui.EPerson.VerifyEmail.title">Verification email sent</message>
 	<message key="xmlui.EPerson.VerifyEmail.head">Verification email sent</message>
