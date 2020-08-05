@@ -52,9 +52,6 @@
 						</div>					
 					</li>
 				</xsl:if>
-				<li class="always-open hidden-xs">
-					<xsl:call-template name="howto-panel" />
-				</li>
 				<xsl:apply-templates select="dri:list[count(child::*)!=0]" />
 				<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='feed']">
 					<li class="always-open">
@@ -318,27 +315,6 @@
 	</xsl:template>
 
     
-    <xsl:template name="howto-panel">
-                <a>
-                        <i class="fa fa-question-circle">&#160;</i>
-                        <span class="menu-text">
-							<i18n:text>xmlui.UFAL.navigation.menu_head</i18n:text>
-                        </span>
-                </a>
-                <ul class="submenu" style="padding-bottom: 8px;">
-                        <li>
-                        <a href="{$context-path}/page/deposit" style="border-top: none; padding: 7px 0px 8px 18px">
-                                <img src="{$context-path}/themes/UFALHome/lib/images/deposit.png" align="left" class="deposit" />
-                        </a>
-                        </li>
-                        <li>
-                                <a href="{$context-path}/page/cite" style="border-top: none; padding: 7px 0px 8px 18px;">
-                                <img src="{$context-path}/themes/UFALHome/lib/images/cite.png" align="right" class="cite" />
-                                </a>
-                        </li>
-                </ul>
-    </xsl:template>
-
 	<xsl:template name="navbar">
 		<nav class="navbar-fixed-top">
 			<div class="container-fluid">
