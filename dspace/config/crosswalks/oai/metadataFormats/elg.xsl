@@ -184,40 +184,42 @@
   <xsl:template name="fundingProject">
     <xsl:for-each select="doc:metadata/doc:element[@name='local']/doc:element[@name='sponsor']/doc:element/doc:field[@name='value']">
       <xsl:variable name="proj_arr" select="str:split(., '@@')"/>
-        <xsl:if
-                test="count($proj_arr) &gt;= 4 and $proj_arr[1] != '' and $proj_arr[2] != '' and $proj_arr[3] != '' and $proj_arr[4] != ''">
-          <ms:fundingProject>
-            <ms:projectName xml:lang="en">
-              <xsl:value-of select="$proj_arr[3]"/>
-            </ms:projectName>
-            <xsl:choose>
-              <xsl:when test="starts-with($proj_arr[5], 'info:')">
-                <ms:ProjectIdentifier>
-                  <xsl:attribute name="ms:ProjectIdentifierScheme">http://w3id.org/meta-share/meta-share/OpenAIRE</xsl:attribute>
-                  <xsl:value-of select="$proj_arr[5]"/>
-                </ms:ProjectIdentifier>
-              </xsl:when>
-              <xsl:otherwise>
-                  <ms:grantNumber>
-                    <xsl:value-of select="$proj_arr[2]"/>
-                  </ms:grantNumber>
-              </xsl:otherwise>
-            </xsl:choose>
-            <ms:fundingType>
-              <xsl:choose>
-                <xsl:when test="$proj_arr[4] = 'Other'">http://w3id.org/meta-share/meta-share/other</xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="concat('http://w3id.org/meta-share/meta-share/', $proj_arr[4])"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </ms:fundingType>
-            <ms:funder>
-              <ms:Organization>
-                <ms:actorType>Organization</ms:actorType>
-                <ms:organizationName xml:lang="en"><xsl:value-of select="$proj_arr[1]"/></ms:organizationName>
-              </ms:Organization>
-            </ms:funder>
-          </ms:fundingProject>
+        <xsl:if test="count($proj_arr) &gt;= 4">
+            <xsl:if
+                    test="$proj_arr[1] != '' and $proj_arr[2] != '' and $proj_arr[3] != '' and $proj_arr[4] != ''">
+              <ms:fundingProject>
+                <ms:projectName xml:lang="en">
+                  <xsl:value-of select="$proj_arr[3]"/>
+                </ms:projectName>
+                <xsl:choose>
+                  <xsl:when test="starts-with($proj_arr[5], 'info:')">
+                    <ms:ProjectIdentifier>
+                      <xsl:attribute name="ms:ProjectIdentifierScheme">http://w3id.org/meta-share/meta-share/OpenAIRE</xsl:attribute>
+                      <xsl:value-of select="$proj_arr[5]"/>
+                    </ms:ProjectIdentifier>
+                  </xsl:when>
+                  <xsl:otherwise>
+                      <ms:grantNumber>
+                        <xsl:value-of select="$proj_arr[2]"/>
+                      </ms:grantNumber>
+                  </xsl:otherwise>
+                </xsl:choose>
+                <ms:fundingType>
+                  <xsl:choose>
+                    <xsl:when test="$proj_arr[4] = 'Other'">http://w3id.org/meta-share/meta-share/other</xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="concat('http://w3id.org/meta-share/meta-share/', $proj_arr[4])"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </ms:fundingType>
+                <ms:funder>
+                  <ms:Organization>
+                    <ms:actorType>Organization</ms:actorType>
+                    <ms:organizationName xml:lang="en"><xsl:value-of select="$proj_arr[1]"/></ms:organizationName>
+                  </ms:Organization>
+                </ms:funder>
+              </ms:fundingProject>
+            </xsl:if>
         </xsl:if>
     </xsl:for-each>
   </xsl:template>
