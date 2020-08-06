@@ -363,10 +363,10 @@
                                  select="/doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ContentInfo']/doc:element[@name='detailedType']/doc:element/doc:field[@name='value']"/>
                    <xsl:choose>
                        <xsl:when test="$type='languageDescription' and not($val='grammar')">other</xsl:when>
+                       <xsl:otherwise>
+                           <xsl:value-of select="$val"/>
+                       </xsl:otherwise>
                    </xsl:choose>
-                   <xsl:otherwise>
-                       <xsl:value-of select="$val"/>
-                   </xsl:otherwise>
 	           </xsl:when>
 	           <xsl:otherwise>
                    <xsl:value-of select="logUtil:logMissing('detailedType',$handle)"/>
