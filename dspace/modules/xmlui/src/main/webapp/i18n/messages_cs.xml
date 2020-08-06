@@ -710,7 +710,15 @@
 	<message key="xmlui.EPerson.StartRegistration.email_address_help">Tato adresa bude ověřena a použita jako vaše přihlašovací jméno.</message>
 	<message key="xmlui.EPerson.StartRegistration.error_bad_email">Nepodařilo se zaslat e-mail na tuto adresu.</message>
 	<message key="xmlui.EPerson.StartRegistration.submit_register">Zaregistrovat se</message>
-	
+
+
+	<message key="xmlui.EPerson.SetEmailStart.para2">Váš IDP (domovská organizace) nám neposkytl vaši emailovou
+		adresu. Pokud chcete přidávat záznamy do repozitáře, stahovat veřejně nedostupné záznamy, případně se
+		přihlásit k zásílání statistik a novinek, vyplňte a ověřte váš email.</message>
+	<message key="xmlui.EPerson.SetEmailStart.email_address_help">Tato adresa bude ověřena a zapamatována,
+		dokud při vašem přihlášení nedostaneme od IDP adresu jinou. I nadále se přihlašujete skrze vaši
+		domovskou organizaci.</message>
+
 	<!-- org.dspace.app.xmlui.eperson.VerifyEmail.java -->
 	<message key="xmlui.EPerson.VerifyEmail.title">Registrační e-mail zaslán</message>
 	<message key="xmlui.EPerson.VerifyEmail.head">Registrační e-mail zaslán</message>
@@ -907,6 +915,7 @@
         <message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.error">Vyskytl se problém s načtením řízeného slovníku. Zkuste to, prosím, znovu později.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.missing_field">Vyplňte prosím všechna pole.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.regexp_error">Hodnota neodpovídá danému regulárnímu výrazu (formátu) "{0}"</message>
+	<message key="xmlui.Submission.submit.DescribeStep.english_only">Tam, kde je to možné, vyplňte metadatová pole v angličtině (zejména pole pro volný text, např. popis).</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.UFALLicenseStep -->
 	<message key="xmlui.Submission.submit.NA">N/A</message>
@@ -3232,7 +3241,6 @@
 	<message key="xmlui.UFAL.artifactbrowser.authors">Autoři</message>
 	<message key="xmlui.UFAL.artifactbrowser.project.code">Kód projektu: {0}</message>
 	<message key="xmlui.UFAL.artifactbrowser.project.name">Jméno projektu: {0}</message>
-	<message key="xmlui.UFAL.artifactbrowser.piwik.views">Zobrazení v čase (prozatím pouze v angličtině)</message>
 	<message key="xmlui.UFAL.artifactbrowser.item_view.replaced_one">Tento záznam byl nahrazen novější verzí:</message>
 	<message key="xmlui.UFAL.artifactbrowser.item_view.replaced_many">Tento záznam byl nahrazen novějšími verzemi:</message>
 	<message key="xmlui.UFAL.artifactbrowser.item_view.versions_dt">Ostatní verze</message>
@@ -3409,6 +3417,8 @@
 	<message key="input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.other">other</message>
 	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.N/A">N/A</message>
 	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.grammar">grammar</message>
+	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.mlmodel">machine learning model</message>
+	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.ngrammodel">n-gram model</message>
 	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.other">other</message>
 	<message key="input_forms.value_pairs.metashare_funding.N/A">N/A</message>
 	<message key="input_forms.value_pairs.metashare_funding.euFunds">EU</message>

@@ -701,6 +701,13 @@
 	<message key="xmlui.EPerson.StartRegistration.error_bad_email">Unable to send email to this address.</message>
 	<message key="xmlui.EPerson.StartRegistration.submit_register">Register</message>
 
+
+	<message key="xmlui.EPerson.SetEmailStart.para2">Your IDP (home organization) has not provided your email
+		address. Please fill and verify your email in order to submit new items to the repository, to download
+		restricted items and optionally to subscribe to advanced statistics and/or collection updates.</message>
+	<message key="xmlui.EPerson.SetEmailStart.email_address_help">This address will be verified and remembered until
+		your IDP provides a different one. You will still sign in through your IDP.</message>
+
 	<!-- org.dspace.app.xmlui.eperson.VerifyEmail.java -->
 	<message key="xmlui.EPerson.VerifyEmail.title">Verification email sent</message>
 	<message key="xmlui.EPerson.VerifyEmail.head">Verification email sent</message>
@@ -894,6 +901,7 @@
 	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.error">There was an issue when loading the controlled vocabulary, please try again later.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.missing_field">Fill all the fields, please.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.regexp_error">The field doesn't match the required regular expression (format) "{0}"</message>
+	<message key="xmlui.Submission.submit.DescribeStep.english_only">Fill the metadata in English where possible (especially free text fields such as description).</message>
 
     <!-- org.dspace.app.xmlui.Submission.submit.UFALLicenseStep -->
     <message key="xmlui.Submission.submit.NA">N/A</message>
@@ -2958,7 +2966,6 @@
   <message key="xmlui.UFAL.artifactbrowser.authors">Authors</message>
   <message key="xmlui.UFAL.artifactbrowser.project.code">Project code: {0}</message>
   <message key="xmlui.UFAL.artifactbrowser.project.name">Project name: {0}</message>
-  <message key="xmlui.UFAL.artifactbrowser.piwik.views">Views Over Time</message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.replaced_one">This item is replaced by a newer submission:</message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.replaced_many">This item is replaced by newer submissions:</message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.versions_dt">Other versions</message>
@@ -3148,6 +3155,8 @@
 	<message key="input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.other">other</message>
 	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.N/A">N/A</message>
 	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.grammar">grammar</message>
+	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.mlmodel">machine learning model</message>
+	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.ngrammodel">n-gram model</message>
 	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.other">other</message>
 	<message key="input_forms.value_pairs.metashare_funding.N/A">N/A</message>
 	<message key="input_forms.value_pairs.metashare_funding.euFunds">EU</message>

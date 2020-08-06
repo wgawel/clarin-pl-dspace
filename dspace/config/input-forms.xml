@@ -713,6 +713,14 @@
                 <stored-value>grammar</stored-value>
             </pair>
             <pair>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_languageDescription.mlmodel</displayed-value>
+                <stored-value>mlmodel</stored-value>
+            </pair>
+            <pair>
+                <displayed-value>input_forms.value_pairs.metashare_detailed_languageDescription.ngrammodel</displayed-value>
+                <stored-value>ngrammodel</stored-value>
+            </pair>
+            <pair>
                 <displayed-value>input_forms.value_pairs.metashare_detailed_languageDescription.other</displayed-value>
                 <stored-value>other</stored-value>
             </pair>

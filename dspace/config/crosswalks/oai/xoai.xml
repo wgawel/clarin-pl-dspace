@@ -27,6 +27,7 @@
 			<Format ref="cmdi" />
 			<Format ref="olac" />
 			<Format ref="html" />
+            <Format ref="elg" />
             <Description>
                 This is the default context of the DSpace OAI-PMH data provider.
             </Description>
@@ -157,6 +158,13 @@
 		    <Namespace>http://lindat.mff.cuni.cz/ns/experimental/html</Namespace>
 		    <SchemaLocation>http://lindat.mff.cuni.cz/schemas/experimental/html.xsd</SchemaLocation>
 		</Format>
+        <Format id="elg">
+            <Prefix>elg</Prefix>
+            <XSLT>metadataFormats/elg.xsl</XSLT>
+            <Namespace>http://w3id.org/meta-share/meta-share/</Namespace>
+            <SchemaLocation>http://w3id.org/meta-share/meta-share/ ../Schema/ELG-SHARE.xsd</SchemaLocation>
+            <Filter ref="elgFilter"/>
+        </Format>
     </Formats>
 
     <Transformers>
@@ -306,6 +314,19 @@
             </Definition>
         </Filter>
 
+        <Filter id="elgFilter">
+            <Definition>
+                <And>
+                    <LeftCondition>
+                        <Custom ref="hasFilesCondition"/>
+                    </LeftCondition>
+                    <RightCondition>
+                        <Custom ref="hasMediaTypeCondition"/>
+                    </RightCondition>
+                </And>
+            </Definition>
+        </Filter>
+
         <!-- This condition determines if an Item has a "dc.type" field
              which contains "Thesis". -->
         <CustomCondition id="thesisDocumentTypeCondition">
@@ -397,6 +418,22 @@
                 <string name="field">dc.relation</string>
                 <string name="operator">starts_with</string>
                 <string name="value">info:eu-repo/grantAgreement/</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="hasFilesCondition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">local.has.files</string>
+                <string name="operator">equal</string>
+                <string name="value">yes</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="hasMediaTypeCondition">
+            <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+            <Configuration>
+                <string name="field">metashare.ResourceInfo#ContentInfo.mediaType</string>
             </Configuration>
         </CustomCondition>
     </Filters>
