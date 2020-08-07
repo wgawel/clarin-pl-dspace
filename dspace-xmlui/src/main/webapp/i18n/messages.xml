@@ -3091,7 +3091,8 @@
 	<message key="input_forms.field.local.submission.note.hint">Leave a note for the editors/reviewers</message>
 	<message key="input_forms.field.dc.relation.replaces.label">Replaces</message>
 	<message key="input_forms.field.dc.relation.replaces.hint">URL to a related resource that is supplanted, displaced, or superseded by the described
-		resource.
+		resource. If the replaced resource is in this repository start typing its name or handle and select the
+		resource from the autocomplete popup.
 	</message>
 	<message key="input_forms.field.dc.relation.isreplacedby.label">Is replaced by</message>
 	<message key="input_forms.field.dc.relation.isreplacedby.hint">A related resource that supplants, displaces, or supersedes the described resource.</message>
