@@ -3354,7 +3354,9 @@
 	<message key="input_forms.field.local.submission.note.label">Vzkaz</message>
 	<message key="input_forms.field.local.submission.note.hint">Zde můžete zanechat vzkaz editorům.</message>
 	<message key="input_forms.field.dc.relation.replaces.label">Replaces</message>
-	<message key="input_forms.field.dc.relation.replaces.hint">URL příbuzného záznamu, který je tímto záznamem nahrazen.</message>
+	<message key="input_forms.field.dc.relation.replaces.hint">URL příbuzného záznamu, který je tímto záznamem
+		nahrazen. Pokud je příbuzný záznam v tomto repozitáři, začněte psát jeho název, nebo handle a vyberte záznam
+	z nabídky.</message>
 	<message key="input_forms.field.dc.relation.isreplacedby.label">Is replaced by</message>
 	<message key="input_forms.field.dc.relation.isreplacedby.hint">Příbuzný záznam, který nahrazuje tento.</message>
 	<message key="input_forms.field.local.embargo.termslift.label">Datum konce embarga</message>
