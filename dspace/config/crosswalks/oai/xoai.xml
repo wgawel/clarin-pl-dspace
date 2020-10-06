@@ -149,8 +149,8 @@
 		<Format id="oai_datacite">
 		       <Prefix>oai_datacite</Prefix>
 		       <XSLT>metadataFormats/datacite_openaire.xsl</XSLT>
-		       <Namespace>http://schema.datacite.org/oai/oai-1.0/</Namespace>
-		       <SchemaLocation>http://schema.datacite.org/oai/oai-1.0/oai.xsd</SchemaLocation>
+		       <Namespace>http://schema.datacite.org/oai/oai-1.1/</Namespace>
+		       <SchemaLocation>http://schema.datacite.org/oai/oai-1.1/oai.xsd</SchemaLocation>
 		</Format>
 		<Format id="html">
 		    <Prefix>html</Prefix>
