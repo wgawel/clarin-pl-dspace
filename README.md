@@ -21,7 +21,7 @@
 * SWE-CLARIN:
 * CLARIN-DK: https://repository.clarin.dk/repository/xmlui/
 * Árni Magnússon Institute for Icelandic Studies (CLARIN-IS): https://repository.clarin.is/repository/xmlui/
-* University of Oxford - Oxford Text Archive:
+* University of Oxford - Oxford Text Archive: https://ota.bodleian.ox.ac.uk/repository/xmlui/
 * RDA EU – ENVRI Summer School:
 * Centrum orální historie ÚSD AV ČR:
 * Národní filmový archiv:
