@@ -463,6 +463,7 @@
         <property name="facetLimit" value="5"/>
         <property name="sortOrder" value="COUNT"/>
         <property name="splitter" value="::"/>
+        <property name="skipFirstNodeLevel" value="false"/>
 		<property name="fullAutoComplete" value="true"/>
     </bean>
     <bean id="searchFilterRights" class="org.dspace.discovery.configuration.DiscoverySearchFilterFacet">	
