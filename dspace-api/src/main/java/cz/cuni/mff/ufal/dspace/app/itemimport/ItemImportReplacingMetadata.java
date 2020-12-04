@@ -3,6 +3,7 @@ package cz.cuni.mff.ufal.dspace.app.itemimport;
 import org.dspace.app.itemimport.ItemImport;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
+import org.dspace.content.Metadatum;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 
@@ -51,7 +52,18 @@ public class ItemImportReplacingMetadata extends ItemImport {
                 item = Item.find(c, Integer.parseInt(handle));
             }
 
+            final Metadatum[] provenance = item.getMetadataByMetadataString("dc.description.provenance");
+            final Metadatum[] accessioned = item.getMetadataByMetadataString("dc.date.accessioned");
+            final Metadatum[] available = item.getMetadataByMetadataString("dc.date.available");
+            final Metadatum[] branding = item.getMetadataByMetadataString("local.branding");
+
+            item.clearMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
             loadMetadata(c, item, java.nio.file.Paths.get(sourceDir, itemName).toString() + fs.getSeparator());
+            for (Metadatum[] mds : new Metadatum[][]{provenance, accessioned, available, branding}){
+                for(Metadatum md : mds){
+                    item.addMetadatum(md);
+                }
+            }
             processedItems.add(item);
         }
 
