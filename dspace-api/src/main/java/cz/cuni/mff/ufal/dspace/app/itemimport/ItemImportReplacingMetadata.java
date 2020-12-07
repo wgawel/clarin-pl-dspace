@@ -74,19 +74,26 @@ public class ItemImportReplacingMetadata extends ItemImport {
         c.commit();
         c.clearCache();
 
+        // attach license, license label requires an update
         functionalities.openSession();
         for(Item i : processedItems){
             final String licenseURI = i.getMetadata("dc.rights.uri");
             if(licenseURI != null) {
-                final int licenseId = functionalities.getLicenseByDefinition(licenseURI).getLicenseId();
+                final LicenseDefinition license = functionalities.getLicenseByDefinition(licenseURI);
+                final int licenseId = license.getLicenseId();
                 for(Bundle bundle : i.getBundles("ORIGINAL")){
                     for(Bitstream b : bundle.getBitstreams()){
                         functionalities.detachLicenses(b.getID());
                         functionalities.attachLicense(licenseId, b.getID());
                     }
                 }
+                i.clearMetadata("dc", "rights", "label", Item.ANY);
+                i.addMetadata("dc", "rights", "label", Item.ANY, license.getLicenseLabel().getLabel());
+                i.update();
             }
         }
+        c.commit();
+        c.clearCache();
         functionalities.closeSession();
     }
 }
