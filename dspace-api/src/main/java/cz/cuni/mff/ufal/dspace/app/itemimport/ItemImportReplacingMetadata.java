@@ -1,15 +1,14 @@
 package cz.cuni.mff.ufal.dspace.app.itemimport;
 
+import cz.cuni.mff.ufal.DSpaceApi;
+import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseDefinition;
+import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
 import org.dspace.app.itemimport.ItemImport;
-import org.dspace.content.Collection;
-import org.dspace.content.Item;
-import org.dspace.content.Metadatum;
+import org.dspace.content.*;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +16,7 @@ import java.util.Map;
 public class ItemImportReplacingMetadata extends ItemImport {
 
     private java.nio.file.FileSystem fs = java.nio.file.FileSystems.getDefault();
+    IFunctionalities functionalities = DSpaceApi.getFunctionalityManager();
 
     @Override
     protected void replaceItems(Context c, Collection[] mycollections, String sourceDir, String mapFile,
@@ -73,5 +73,20 @@ public class ItemImportReplacingMetadata extends ItemImport {
         }
         c.commit();
         c.clearCache();
+
+        functionalities.openSession();
+        for(Item i : processedItems){
+            final String licenseURI = i.getMetadata("dc.rights.uri");
+            if(licenseURI != null) {
+                final int licenseId = functionalities.getLicenseByDefinition(licenseURI).getLicenseId();
+                for(Bundle bundle : i.getBundles("ORIGINAL")){
+                    for(Bitstream b : bundle.getBitstreams()){
+                        functionalities.detachLicenses(b.getID());
+                        functionalities.attachLicense(licenseId, b.getID());
+                    }
+                }
+            }
+        }
+        functionalities.closeSession();
     }
 }
