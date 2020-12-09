@@ -3498,6 +3498,35 @@
 	<message key="input_forms.field.dc.relation.isreferencedby.hint">Odkaz na původní článek, který zmiňuje tento záznam.</message>
 	<message key="input_forms.field.dc.relation.isreferencedby.regexp-warning">URL musi začínat http/https</message>
 
+	<message key="input_forms.field.edm.type.label">Zvolte druh záznamu</message>
+	<message key="input_forms.field.edm.type.hint">Vyberte z TEXT, VIDEO, ZVUK, OBRAZ, 3D. Pokud zvolíte TEXT,
+		zvažte, jestli se nejedná o Language Resource (Jazykový zdroj).</message>
+	<message key="input_forms.field.edm.type.required">Zvolte prosím jednu z možností</message>
+	<message key="input_forms.value_pairs.edm_types.text">TEXT</message>
+	<message key="input_forms.value_pairs.edm_types.video">VIDEO</message>
+	<message key="input_forms.value_pairs.edm_types.sound">ZVUK</message>
+	<message key="input_forms.value_pairs.edm_types.image">OBRAZ</message>
+	<message key="input_forms.value_pairs.edm_types.3d">3D</message>
+
+	<message key="input_forms.field.dc.type.clariah.label">Typ záznamu</message>
+	<message key="input_forms.field.dc.type.clariah.hint">Typ by měl být odlišný od druhu, který jste zvolili v
+		prvním kroku. Například: fotografie nebo malba pro druh OBRAZ, kniha nebo dopis pro typ TEXT apod.</message>
+	<message key="input_forms.field.dc.type.clariah.required">Vyplňte typ</message>
+
+	<message key="input_forms.field.dc.language.iso.clariah.label">Vyberte jazyky TEXTu</message>
+	<message key="input_forms.field.dc.language.iso.clariah.hint">Vyberte jazyky, jichž se data tohoto záznamu týkají. Je možné zvolit více jazyků. Začnete-li psát, objeví se nápověda. Je lepší vyjmenovat všechny dotčené jazyky (pokud jich je větší množství, kontaktujte podporu), než používat iso kód 'mul'. </message>
+	<message key="input_forms.field.dc.language.iso.clariah.required">Pro TEXTy je jazyk povinný</message>
+
+	<message key="input_forms.field.dc.language.iso1.clariah.label">Jazyk</message>
+	<message key="input_forms.field.dc.language.iso1.clariah.hint">Volitelné. Vyberte jazyky, jichž se data tohoto záznamu týkají. Je možné zvolit více jazyků. Začnete-li psát, objeví se nápověda. Je lepší vyjmenovat všechny dotčené jazyky (pokud jich je větší množství, kontaktujte podporu), než používat iso kód 'mul'. </message>
+
+	<message key="input_forms.field.dc.coverage.spatial.label">Místa</message>
+	<message key="input_forms.field.dc.coverage.spatial.hint">Volitelné. Uveďte místa, o kterých zdroj je.</message>
+
+	<message key="input_forms.field.dc.coverage.temporal.label">Období</message>
+	<message key="input_forms.field.dc.coverage.temporal.hint">Volitelné. Uveďte data, období, epochy apod., o
+	kterých zdroj je.</message>
+
 	<!-- cz.cuni.mff.ufal.ContractPage -->
 	<message key="xmlui.ContractPage.title">Smlouva o distribuci dat</message>
 	<message key="xmlui.ContractPage.trail">Smlouva o distribuci dat</message>
