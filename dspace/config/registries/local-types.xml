@@ -117,6 +117,13 @@
         <qualifier>reason</qualifier>
         <scope_note>Store the withdrawal reason in addition to provenance</scope_note>
     </dc-type>
+    <dc-type>
+        <schema>local</schema>
+        <element>refbox</element>
+        <qualifier>format</qualifier>
+        <scope_note>If the default refbox citation is not enough, use this field to provide a format string
+            . Check/extend html.xsl for available variables.</scope_note>
+    </dc-type>
 </dspace-dc-types>
 
 
