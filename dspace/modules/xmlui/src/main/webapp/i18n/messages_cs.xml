@@ -3536,6 +3536,11 @@
 		Klíčová slova buď přidávejte po jednom, nebo je oddělte čárkou, nebo středníkem. Začnete-li psát, objeví se nápověda.
 	</message>
 
+	<message key="input_forms.field.dc.alternate.identifiers.label">Jiné identifikátory</message>
+	<message key="input_forms.field.dc.alternate.identifiers.hint">Pro tento záznam bude vytvořen handle. Pokud má
+		zdroj přidělený jiný identifikátor, nebo kód, uveďte jej i jeho typ.
+	</message>
+
 	<!-- cz.cuni.mff.ufal.ContractPage -->
 	<message key="xmlui.ContractPage.title">Smlouva o distribuci dat</message>
 	<message key="xmlui.ContractPage.trail">Smlouva o distribuci dat</message>

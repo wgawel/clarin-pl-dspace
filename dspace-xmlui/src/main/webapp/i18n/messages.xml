@@ -3281,6 +3281,11 @@
 		ESC if you don't want to use the preselected value.
 	</message>
 
+	<message key="input_forms.field.dc.alternate.identifiers.label">Alternate identifiers</message>
+	<message key="input_forms.field.dc.alternate.identifiers.hint">The item will get a handle. If the item has any
+		identification numbers	or codes associated with it, please enter the types and the actual numbers or codes.
+   </message>
+
 	<!-- cz.cuni.mff.ufal.ContractPage -->
 	<message key="xmlui.ContractPage.title">Distribution License Agreement</message>
 	<message key="xmlui.ContractPage.trail">Distribution License Agreement</message>

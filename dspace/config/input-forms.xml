@@ -602,6 +602,18 @@
                 </field>
 
                 <field>
+                    <dc-schema>dc</dc-schema>
+                    <dc-element>identifier</dc-element>
+                    <dc-qualifier/>
+                    <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
+                    <repeatable>true</repeatable>
+                    <label>input_forms.field.dc.alternate.identifiers.label</label>
+                    <input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
+                    <hint>input_forms.field.dc.alternate.identifiers.hint</hint>
+                    <required/>
+                </field>
+
+                <field>
                     <dc-schema>local</dc-schema>
                     <dc-element>size</dc-element>
                     <dc-qualifier>info</dc-qualifier>
@@ -793,10 +805,6 @@
             <pair>
                 <displayed-value>input_forms.value_pairs.common_identifiers.govdoc</displayed-value>
                 <stored-value>govdoc</stored-value>
-            </pair>
-            <pair>
-                <displayed-value>input_forms.value_pairs.common_identifiers.uri</displayed-value>
-                <stored-value>uri</stored-value>
             </pair>
             <pair>
                 <displayed-value>input_forms.value_pairs.common_identifiers.isbn</displayed-value>
