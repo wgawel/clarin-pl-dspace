@@ -605,9 +605,10 @@
                     <dc-schema>dc</dc-schema>
                     <dc-element>identifier</dc-element>
                     <dc-qualifier>other</dc-qualifier>
-                    <!-- An input-type of qualdrop_value MUST be marked as repeatable -->
                     <repeatable>true</repeatable>
                     <label>input_forms.field.dc.alternate.identifiers.label</label>
+                    <!-- qualdrop_value on dc.identifier messes with how we use dc.identifier.uri, even if uri is not
+                     in the pairs it's showed in submission and you can delete it.-->
                     <input-type>onebox</input-type>
                     <hint>input_forms.field.dc.alternate.identifiers.hint</hint>
                     <required/>
