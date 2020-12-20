@@ -3292,5 +3292,14 @@
 	<message key="xmlui.ContractPage.head">Distribution License Agreement</message>
 	<message key="xmlui.ContractPage.collection_name">{0}</message>
 
+	<!-- cz.cuni.mff.ufal.dspace.app.xmlui.aspect.submission.submit.ShowInfoStep -->
+	<message key="xmlui.Submission.submit.progressbar.showinfo">Notice</message>
+	<message key="xmlui.Submission.submit.ShowInfoStep.head">Notice</message>
+	<message key="xmlui.Submission.submit.ShowInfoStep.info1">The submission process for digital humanities
+		collections is still being fine tuned. If you find yourself not being able to continue the submission,
+	because you can't provide the required information, or because the required format for a field is too strict, or
+		because there's no appropriate field for your information or for any other reason,
+		<a class="helpdesk-tolink">let us know</a>.</message>
+
 </catalogue>
 

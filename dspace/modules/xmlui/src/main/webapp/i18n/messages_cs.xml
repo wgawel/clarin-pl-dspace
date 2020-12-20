@@ -3548,4 +3548,13 @@
 	<message key="xmlui.ContractPage.collection_name">{0}</message>
 	<message key="xmlui.ContractPage.explain_non_localized_license">Smlouva se uzavírá v angličtině a její plné znění naleznete níže. Následující český překlad je pouze orientační. V případě rozporů platí anglická verze. </message>
 
+	<!-- cz.cuni.mff.ufal.dspace.app.xmlui.aspect.submission.submit.ShowInfoStep -->
+	<message key="xmlui.Submission.submit.progressbar.showinfo">Upozornění</message>
+	<message key="xmlui.Submission.submit.ShowInfoStep.head">Upozornění</message>
+	<message key="xmlui.Submission.submit.ShowInfoStep.info1">Proces přidávání záznamů do kolekcí "digital
+		humanities" stále ladíme. Pokud se vám nedaří přidat záznam, protože nemáte požadované informace, nebo
+		protože některé z polí má příliš přísné požadavky na formát, nebo protože chybí pole, do kterého by se dala
+		vaše informace zachytit, nebo z jakéhokoliv jiného důvodu, <a class="helpdesk-tolink">kontaktujte nás</a>.
+		</message>
+
 </catalogue>
