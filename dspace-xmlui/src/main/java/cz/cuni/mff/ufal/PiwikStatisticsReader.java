@@ -108,10 +108,13 @@ public class PiwikStatisticsReader extends AbstractReader {
 	public void generate() throws ProcessingException {
 		try {
 			String mergedResult = "";
-			if(PIWIK_API_MODE==null || PIWIK_API_MODE.equals("direct")) {
-				mergedResult = getDataFromPiwikServer();
-			} else if(PIWIK_API_MODE.equals("cached")) {
+			if(PIWIK_API_MODE.equals("cached")) {
+				log.debug("========CACHED MODE");
 				mergedResult = getDataFromLindatPiwikCacheServer();
+			} else {
+				// direct mode as default
+				log.debug("========DIRECT MODE");
+				mergedResult = getDataFromPiwikServer();
 			}
 			out.write(mergedResult.getBytes());
 			out.flush();
