@@ -153,21 +153,15 @@ public class PiwikStatisticsReader extends AbstractReader {
 
 	private String buildViewsURL() throws UnsupportedEncodingException, ParseException {
 		String dspaceURL = ConfigurationManager.getProperty("dspace.url");
-		String params =
-				"&idSite=" + PIWIK_SITE_ID
-				+ "&segment=pageUrl=@" + dspaceURL + "/handle/" + item.getHandle();
-		return buildURL(params);
+		return buildURL(PIWIK_SITE_ID, dspaceURL + "/handle/" + item.getHandle());
 	}
 
 	private String buildDownloadsURL() throws UnsupportedEncodingException, ParseException {
 		String dspaceURL = ConfigurationManager.getProperty("dspace.url");
-		String params =
-				"&idSite=" + PIWIK_DOWNLOAD_SITE_ID
-				+ "&segment=pageUrl=@" + dspaceURL + "/bitstream/handle/" + item.getHandle();
-		return buildURL(params);
+		return buildURL(PIWIK_DOWNLOAD_SITE_ID, dspaceURL + "/bitstream/handle/" + item.getHandle());
 	}
 
-	private String buildURL(String params) throws UnsupportedEncodingException, ParseException {
+	private String buildURL(String siteID, String filterPattern) throws UnsupportedEncodingException, ParseException {
 		// should contain the period
 		String period = request.getParameter("period");
 		String dateRange = DateRange.fromDateString(request.getParameter("date")).toString();
@@ -189,12 +183,17 @@ public class PiwikStatisticsReader extends AbstractReader {
 		- this will remove the cummulative results; all rows will be of the same type (having url field)
 		 */
 		String piwikApiGetQuery = "method=Actions.getPageUrls&expanded=1&flat=1";
-		String commonParams =
+		String params =
 				"&date=" + dateRange
 				+ "&period=" + period
 				+ "&token_auth=" + PIWIK_AUTH_TOKEN
-				+ "&showColumns=label,url,nb_visits,nb_hits";
-		return URLEncoder.encode(piwikApiGetQuery + commonParams + params, "UTF-8");
+				+ "&showColumns=label,url,nb_visits,nb_hits"
+				// don't want to handle paging
+				+ "&filter_limit=-1"
+				+ "&filter_column=url"
+				+ "&filter_pattern=" + filterPattern
+				+ "&idSite=" + siteID;
+		return URLEncoder.encode(piwikApiGetQuery + params, "UTF-8");
 	}
 
 	private String getDataFromLindatPiwikCacheServer() throws IOException {
