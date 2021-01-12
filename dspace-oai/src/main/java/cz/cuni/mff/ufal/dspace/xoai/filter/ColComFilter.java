@@ -30,12 +30,18 @@ public class ColComFilter extends DSpaceFilter {
     @Override
     public SolrFilterResult buildSolrQuery() {
         if (getDSpaceObject() != null) {
+            /*
+                -foo is transformed by solr into (*:* -foo) only if the top level query is a pure negative query
+                bar OR (-foo) is not transformed; so we need bar OR (*:* -foo)
+                bar comes from org.dspace.xoai.services.impl.xoai.BaseDSpaceFilterResolver#buildSolrQuery
+             */
+            String q = "*:* AND ";
             String setSpec = getSetSpec();
             if (dso.getType() == Constants.COLLECTION) {
-                return new SolrFilterResult("-item.collections:"
+                return new SolrFilterResult(q + "-item.collections:"
                         + ClientUtils.escapeQueryChars(setSpec));
             } else if (dso.getType() == Constants.COMMUNITY) {
-                return new SolrFilterResult("-item.communities:"
+                return new SolrFilterResult(q + "-item.communities:"
                         + ClientUtils.escapeQueryChars(setSpec));
             }
         };
