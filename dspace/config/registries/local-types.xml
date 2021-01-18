@@ -93,6 +93,12 @@
         <qualifier>pmltq</qualifier>
         <scope_note>Links to data in PML-TQ</scope_note>
     </dc-type>
+    <dc-type>
+        <schema>local</schema>
+        <element>featuredService</element>
+        <qualifier>teitok</qualifier>
+        <scope_note>Links to data in TEITOK</scope_note>
+    </dc-type>
 	<dc-type>
         <schema>local</schema>
         <element>bitstream</element>
