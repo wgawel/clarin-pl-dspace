@@ -27,6 +27,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 public class PiwikHelper {
+	private static org.apache.log4j.Logger log = Logger.getLogger(PiwikHelper.class);
+
 	private static final String[] requiredStatsNames = {"nb_visits", "nb_uniq_visitors", "nb_pageviews",
 			"nb_uniq_pageviews", "nb_downloads", "nb_uniq_downloads"};
 
@@ -396,12 +398,20 @@ public class PiwikHelper {
             old_value = System.getProperty("jsse.enableSNIExtension");
             System.setProperty("jsse.enableSNIExtension", "false");
 
+            long fetchingStart = 0L;
+            if(log.isDebugEnabled()){
+                fetchingStart = System.currentTimeMillis();
+            }
             BufferedReader in = new BufferedReader(new InputStreamReader(widget.openStream()));
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
                 output.append(inputLine).append("\n");
             }
             in.close();
+            if(log.isDebugEnabled()) {
+                long fetchingEnd = System.currentTimeMillis();
+                log.debug(String.format("PiwikHelper fetching took %s", fetchingEnd - fetchingStart));
+            }
         }finally {
         	//true is the default http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html
         	old_value = (old_value == null) ? "true" : old_value;

@@ -45,16 +45,16 @@ public class PiwikStatisticsReader extends AbstractReader {
     private boolean isSpider = false;
     
     private String rest = "";
-    
-    
-    /** Piwik configurations */
+
+	private String dspaceURL = ConfigurationManager.getProperty("dspace.url");
+
+	/** Piwik configurations */
     private static final String PIWIK_API_MODE = ConfigurationManager.getProperty("lr", "lr.statistics.api.mode");
     private static final String PIWIK_API_URL = ConfigurationManager.getProperty("lr", "lr.statistics.api.url");
     private static final String PIWIK_API_URL_CACHED = ConfigurationManager.getProperty("lr", "lr.statistics.api.cached.url");
     private static final String PIWIK_AUTH_TOKEN = ConfigurationManager.getProperty("lr", "lr.statistics.api.auth.token");
     private static final String PIWIK_SITE_ID = ConfigurationManager.getProperty("lr", "lr.statistics.api.site_id");
 	private static final String PIWIK_DOWNLOAD_SITE_ID = ConfigurationManager.getProperty("lr", "lr.tracker.bitstream.site_id");	
-	//private static final int PIWIK_SHOW_LAST_N_DAYS = ConfigurationManager.getIntProperty("lr", "lr.statistics.show_last_n", 7);
 
     /**
      * Set up the PiwikStatisticsReader
@@ -92,10 +92,6 @@ public class PiwikStatisticsReader extends AbstractReader {
             if(eperson == null) {
             	throw new AuthorizeException();
             }
-            
-            /*if(!(AuthorizeManager.isAdmin(context) || item.getSubmitter().getID()==eperson.getID())) {
-            	throw new AuthorizeException();
-            }*/
             
         } catch (AuthorizeException | SQLException | IllegalStateException e) {
             throw new ProcessingException("Unable to read piwik statistics", e);
@@ -152,12 +148,10 @@ public class PiwikStatisticsReader extends AbstractReader {
 	}
 
 	private String buildViewsURL() throws UnsupportedEncodingException, ParseException {
-		String dspaceURL = ConfigurationManager.getProperty("dspace.url");
 		return buildURL(PIWIK_SITE_ID, dspaceURL + "/handle/" + item.getHandle());
 	}
 
 	private String buildDownloadsURL() throws UnsupportedEncodingException, ParseException {
-		String dspaceURL = ConfigurationManager.getProperty("dspace.url");
 		return buildURL(PIWIK_DOWNLOAD_SITE_ID, dspaceURL + "/bitstream/handle/" + item.getHandle());
 	}
 
