@@ -7,6 +7,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -111,37 +112,27 @@ public class PiwikHelper {
 		return reportJSON.toJSONString();
 	}
 	
-	public static String mergeJSONResults(String report) throws Exception {
+	/**
+	 *
+	 * @param keys - The order of keys should match the json object indexes
+	 * @param report - The downloaded json
+	 * @return
+	 * @throws Exception
+	 */
+	public static String transformJSONResults(Set<String> keys, String report) throws Exception {
 		JSONParser parser = new JSONParser();
 		JSONArray json = (JSONArray)parser.parse(report);
-		JSONObject views = (JSONObject)json.get(0);
-		JSONObject downloads = (JSONObject)json.get(1);
-		JSONObject result = new JSONObject();
-
-		for(Object key : views.keySet()) {
-			JSONObject view_data = new JSONObject();
-			// any valid view data?
-			try {
-				view_data = (JSONObject) views.get(key);
-			} catch (ClassCastException e) {
+		JSONObject views = null;
+		JSONObject downloads = null;
+		int i = 0;
+		for(String key: keys){
+			if(key.toLowerCase().contains("itemview")){
+				views = mergeJSONReports(views, (JSONObject)json.get(i));
+			}else if(key.toLowerCase().contains("downloads")){
+				downloads = mergeJSONReports(downloads, (JSONObject)json.get(i));
 			}
-			// any valid download data?
-			try {
-				JSONObject download_data = (JSONObject)downloads.get(key);
-				view_data.put("nb_downloads", download_data.get("nb_pageviews"));
-				view_data.put("nb_uniq_downloads", download_data.get("nb_uniq_pageviews"));
-			} catch (ClassCastException e) {
-			}
-			result.put(key, view_data);
+			i++;
 		}
-		return result.toJSONString();
-	}
-	
-	public static String transformJSONResults(String report) throws Exception {
-		JSONParser parser = new JSONParser();
-		JSONArray json = (JSONArray)parser.parse(report);
-		JSONObject views = (JSONObject)json.get(0);
-		JSONObject downloads = (JSONObject)json.get(1);
 		JSONObject response = new JSONObject();
 		JSONObject result = new JSONObject();		
 		response.put("response", result);		
@@ -150,6 +141,29 @@ public class PiwikHelper {
 		result.put("downloads", transformJSON(downloads));
 		
 		return response.toJSONString().replace("\\/", "/");
+	}
+
+	@SuppressWarnings("unchecked")
+	private static JSONObject mergeJSONReports(JSONObject o1, JSONObject o2) {
+		if (o1 == null) {
+			return o2;
+		} else {
+		    //just concatenate the dmy arrays, transformJSON should do the rest
+			Set<String> keys = o1.keySet();
+			for (String dmyKey : keys) {
+				if(o2.containsKey(dmyKey)){
+					JSONArray a = (JSONArray)o1.get(dmyKey);
+					a.addAll((JSONArray)o2.get(dmyKey));
+				}
+			}
+			keys = o2.keySet();
+			for (String dmyKey : keys) {
+			    if(!o1.containsKey(dmyKey)){
+			        o1.put(dmyKey, o2.get(dmyKey));
+				}
+			}
+			return o1;
+		}
 	}
 	
 	

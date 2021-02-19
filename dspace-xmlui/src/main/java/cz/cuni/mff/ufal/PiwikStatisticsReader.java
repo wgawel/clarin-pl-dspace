@@ -5,9 +5,7 @@ import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
@@ -120,17 +118,17 @@ public class PiwikStatisticsReader extends AbstractReader {
 	}
 
 	private String getDataFromPiwikServer() throws Exception {
-		String viewsURL = buildViewsURL();
-		String downloadURL = buildDownloadsURL();
-		String bulkApiGetRequestURL = buildBulkApiGetRequestURL(viewsURL, downloadURL);
+		SortedMap<String, String> urls = buildViewsURL();
+		urls.put("downloads", buildDownloadsURL());
+		String bulkApiGetRequestURL = buildBulkApiGetRequestURL(urls);
 
 		log.debug(String.format("Fetching data from piwik server; requesting \"%s\"", bulkApiGetRequestURL));
 
 		String report = PiwikHelper.readFromURL(bulkApiGetRequestURL);
-		return PiwikHelper.transformJSONResults(report);
+		return PiwikHelper.transformJSONResults(urls.keySet(), report);
 	}
 
-	private String buildBulkApiGetRequestURL(String... urls){
+	private String buildBulkApiGetRequestURL(SortedMap<String, String> urls){
 		String piwikBulkApiGetQuery = "module=API&method=API.getBulkRequest&format=JSON"
 				+ "&token_auth=" + PIWIK_AUTH_TOKEN;
 		StringBuilder sb = new StringBuilder();
@@ -138,24 +136,41 @@ public class PiwikStatisticsReader extends AbstractReader {
 				.append(rest)
 				.append("?")
 				.append(piwikBulkApiGetQuery);
-		for(int i=0; i<urls.length; i++){
+		int i = 0;
+		for(String url : urls.values()){
 			sb.append("&urls[")
-				.append(i)
+				.append(i++)
 				.append("]=")
-				.append(urls[i]);
+				.append(url);
 		}
 		return sb.toString();
 	}
 
-	private String buildViewsURL() throws UnsupportedEncodingException, ParseException {
-		return buildURL(PIWIK_SITE_ID, dspaceURL + "/handle/" + item.getHandle());
+	private SortedMap<String, String> buildViewsURL() throws UnsupportedEncodingException, ParseException {
+    	// use Actions.getPageUrl; call it twice; once with ?show=full
+		String paramsFmt = "method=Actions.getPageUrl&pageUrl=%s";
+		String summaryItemView = buildURL(PIWIK_SITE_ID,
+				String.format(paramsFmt, URLEncoder.encode(dspaceURL + "/handle/" + item.getHandle(), "UTF-8")));
+		String fullItemView = buildURL(PIWIK_SITE_ID,
+				String.format(paramsFmt, URLEncoder.encode(
+						dspaceURL + "/handle" + "/" + item.getHandle() + "?show=full", "UTF-8")));
+		SortedMap<String, String> ret = new TreeMap<>();
+		ret.put("summaryItemView", summaryItemView);
+		ret.put("fullItemView", fullItemView);
+		return ret;
 	}
 
 	private String buildDownloadsURL() throws UnsupportedEncodingException, ParseException {
-		return buildURL(PIWIK_DOWNLOAD_SITE_ID, dspaceURL + "/bitstream/handle/" + item.getHandle());
+        String filterPattern =  URLEncoder.encode(dspaceURL + "/bitstream/handle/" + item.getHandle(), "UTF-8");
+		String params =
+				"method=Actions.getPageUrls" +
+						"&expanded=1&flat=1" +
+						"&filter_column=url" +
+						"&filter_pattern=" + filterPattern;
+		return buildURL(PIWIK_DOWNLOAD_SITE_ID, params);
 	}
 
-	private String buildURL(String siteID, String filterPattern) throws UnsupportedEncodingException, ParseException {
+	private String buildURL(String siteID, String specificParams) throws UnsupportedEncodingException, ParseException {
 		// should contain the period
 		String period = request.getParameter("period");
 		String dateRange = DateRange.fromDateString(request.getParameter("date")).toString();
@@ -176,18 +191,16 @@ public class PiwikStatisticsReader extends AbstractReader {
 		- some API functions have a parameter 'expanded', which means that the data is hierarchical. For such API function, if 'flat' is set to 1, the returned data will contain the flattened view of the table data set. The children of all first level rows will be aggregated under one row. This is useful for example to see all Custom Variables names and values at once, for example, Matomo forum user status, or to see the full URLs not broken down by directory or structure.
 		- this will remove the cummulative results; all rows will be of the same type (having url field)
 		 */
-		String piwikApiGetQuery = "method=Actions.getPageUrls&expanded=1&flat=1";
 		String params =
-				"&date=" + dateRange
+                specificParams
+				+ "&date=" + dateRange
 				+ "&period=" + period
 				+ "&token_auth=" + PIWIK_AUTH_TOKEN
 				+ "&showColumns=label,url,nb_visits,nb_hits"
-				// don't want to handle paging
+				// don't want to handle "paging" (summary views)
 				+ "&filter_limit=-1"
-				+ "&filter_column=url"
-				+ "&filter_pattern=" + filterPattern
 				+ "&idSite=" + siteID;
-		return URLEncoder.encode(piwikApiGetQuery + params, "UTF-8");
+		return URLEncoder.encode(params, "UTF-8");
 	}
 
 	private String getDataFromLindatPiwikCacheServer() throws IOException {
