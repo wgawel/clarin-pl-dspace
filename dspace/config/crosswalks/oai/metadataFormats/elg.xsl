@@ -425,6 +425,7 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
       <ms:licenceTerms>
         <ms:licenceTermsName xml:lang="en"><xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value']" /></ms:licenceTermsName>
         <ms:licenceTermsURL><xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element[@name='uri']/doc:element/doc:field[@name='value']" /></ms:licenceTermsURL>
+        <ms:conditionOfUse>http://w3id.org/meta-share/meta-share/unspecified</ms:conditionOfUse>  
       </ms:licenceTerms>
     </xsl:element>
   </xsl:template>
