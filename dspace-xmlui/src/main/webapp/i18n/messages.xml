@@ -3037,7 +3037,16 @@
 		institution. Start typing the publisher and use autocomplete form that will appear if
 		applicable. End your input by pressing ESC if you don't want to use the preselected value.
 	</message>
+	<message key="input_forms.field.dc.publisher.clariah.hint">The name of the publisher of the original analog or born
+		digital object. Use your home institution if this is a born digital object being published now. Start typing the
+		publisher and use autocomplete form that will appear if applicable. End your input by pressing ESC if you
+		don't want to use the preselected value.
+	</message>
 	<message key="input_forms.field.dc.publisher.required">You must enter the name of the publisher.</message>
+	<message key="input_forms.field.local.dataProvider.label">Data provider</message>
+	<message key="input_forms.field.local.dataProvider.hint">This concerns the digital object (not the analog
+		original). An institution from which the data come. Used eg. to give proper attribution. Generally
+		different from publisher.</message>
 	<message key="input_forms.field.local.contact.person.label">Contact person</message>
 	<message key="input_forms.field.local.contact.person.hint">Person to contact in case of any issues with this submission.</message>
 	<message key="input_forms.field.local.contact.person.required">Please fill all the fields for the contact person.</message>
@@ -3237,7 +3246,8 @@
 
 	<message key="input_forms.field.edm.type.label">Select the kind of resource you are submitting</message>
 	<message key="input_forms.field.edm.type.hint">Choose one of TEXT, VIDEO, SOUND, IMAGE, 3D. If choosing
-		TEXT consider adding the resource among other Language Resources.</message>
+		TEXT consider adding the resource among other Language Resources. Images are visual resources for users to
+		look at. Text materials are meant to be read and not looked at.</message>
 	<message key="input_forms.field.edm.type.required">Please select one of the options.</message>
 	<message key="input_forms.value_pairs.edm_types.text">TEXT</message>
 	<message key="input_forms.value_pairs.edm_types.video">VIDEO</message>
@@ -3262,20 +3272,34 @@
 		typing the language and use autocomplete form that will appear if applicable. Better to list all the languages then to use the 'mul' iso code (if there are too many, contact support).
 	</message>
 
-	<message key="input_forms.field.dc.coverage.spatial.label">Spatial coverage</message>
-	<message key="input_forms.field.dc.coverage.spatial.hint">Optionally, describe places and locations the
-		resource is about.</message>
-
-	<message key="input_forms.field.dc.coverage.temporal.label">Temporal coverage</message>
-	<message key="input_forms.field.dc.coverage.temporal.hint">Optionally, describe dates or periods the resources is
-		about.
+	<message key="input_forms.field.dc.subject.clariah.hint">Enter appropriate subject keyword or phrase and press
+		the Add button. Use keywords to specify also people, places and times (period, era, date range etc) the resource
+		is about. You	can use hierarchical subjects, separate the hierarchy levels with two colons (::). Eg.
+		People::John Doe, Places::New York, Times::WWII.
+		You can repeat it	for multiple keywords or use separators i.e., comma and semicolon, which will split it accordingly.
+		Start typing the keyword and use autocomplete form that will appear. End your input by pressing
+		ESC if you don't want to use the preselected value.
 	</message>
+
+	<message key="input_forms.field.dc.alternate.identifiers.label">Alternate identifiers</message>
+	<message key="input_forms.field.dc.alternate.identifiers.hint">The item will get a handle. If the item has any
+		identification numbers	or codes associated with it, please enter the types and the actual numbers or codes.
+   </message>
 
 	<!-- cz.cuni.mff.ufal.ContractPage -->
 	<message key="xmlui.ContractPage.title">Distribution License Agreement</message>
 	<message key="xmlui.ContractPage.trail">Distribution License Agreement</message>
 	<message key="xmlui.ContractPage.head">Distribution License Agreement</message>
 	<message key="xmlui.ContractPage.collection_name">{0}</message>
+
+	<!-- cz.cuni.mff.ufal.dspace.app.xmlui.aspect.submission.submit.ShowInfoStep -->
+	<message key="xmlui.Submission.submit.progressbar.showinfo">Notice</message>
+	<message key="xmlui.Submission.submit.ShowInfoStep.head">Notice</message>
+	<message key="xmlui.Submission.submit.ShowInfoStep.info1">The submission process for digital humanities
+		collections is still being fine tuned. If you find yourself not being able to continue the submission,
+	because you can't provide the required information, or because the required format for a field is too strict, or
+		because there's no appropriate field for your information or for any other reason,
+		<a class="helpdesk-tolink">let us know</a>.</message>
 
 </catalogue>
 
