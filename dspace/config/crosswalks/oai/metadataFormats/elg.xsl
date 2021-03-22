@@ -115,7 +115,7 @@
       <ms:entityType>LanguageResource</ms:entityType>
       <xsl:call-template name="resourceName"/>
       <xsl:call-template name="description"/>
-      <ms:version>undefined</ms:version>
+      <ms:version>unspecified</ms:version>
       <ms:additionalInfo>
         <ms:landingPage><xsl:value-of select="$identifier_uri"/></ms:landingPage>
       </ms:additionalInfo>
