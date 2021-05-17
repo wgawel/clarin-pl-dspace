@@ -188,23 +188,9 @@
 					<dd style="padding-right: 40px;">
 					<xsl:choose>
 						<xsl:when test="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']">
-							<xsl:for-each
-								select="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']">
-								<span>
-									<xsl:if test="@authority">
-										<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
-									</xsl:if>
-									<a>
-								<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
-								<xsl:copy-of select="node()" />
-								</a>
-
-								</span>
-								<xsl:if
-									test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']) != 0">
-									<xsl:text>; </xsl:text>
-								</xsl:if>
-							</xsl:for-each>
+							<xsl:call-template name="authors_with_short_summary_view">
+								<xsl:with-param name="contextPath" select="$contextPath"/>
+							</xsl:call-template>
 						</xsl:when>
 						<xsl:when test="dim:field[@element='creator']">
 							<xsl:for-each select="dim:field[@element='creator']">
@@ -1230,6 +1216,63 @@
                </button>
            </div>
        </div>
+    </xsl:template>
+
+    <xsl:template name="authors_with_short_summary_view">
+	<xsl:param name="contextPath"/>
+	<xsl:choose>
+		<xsl:when test="count(dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']) &gt; 3">
+			<details>
+				<summary>
+
+					<xsl:for-each select="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other'][position() &lt;= 3]">
+						<xsl:call-template name="print_author">
+							<xsl:with-param name="contextPath" select="$contextPath"/>
+						</xsl:call-template>
+						<xsl:text>;</xsl:text>
+					</xsl:for-each>
+					<xsl:text> et al.</xsl:text>
+					<span style="display: list-item"><i18n:text>xmlui.UFAL.artifactbrowser.item_view.show_all_authors</i18n:text></span>
+				</summary>
+				<xsl:call-template name="print_all_authors">
+					<xsl:with-param name="contextPath" select="$contextPath"/>
+				</xsl:call-template>
+			</details>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:call-template name="print_all_authors">
+				<xsl:with-param name="contextPath" select="$contextPath"/>
+			</xsl:call-template>
+		</xsl:otherwise>
+	</xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="print_all_authors">
+	    <xsl:param name="contextPath"/>
+	<xsl:for-each
+		select="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']">
+		<xsl:call-template name="print_author">
+			<xsl:with-param name="contextPath" select="$contextPath"/>
+		</xsl:call-template>
+		<xsl:if
+			test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']) != 0">
+			<xsl:text>; </xsl:text>
+		</xsl:if>
+	</xsl:for-each>
+    </xsl:template>
+
+    <xsl:template name="print_author">
+    	<xsl:param name="contextPath" select="$context-path"/>
+	<span>
+		<xsl:if test="@authority">
+			<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
+		</xsl:if>
+		<a>
+	<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
+	<xsl:copy-of select="node()" />
+	</a>
+
+	</span>
     </xsl:template>
 </xsl:stylesheet>
 
