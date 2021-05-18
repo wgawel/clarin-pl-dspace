@@ -1218,14 +1218,17 @@
        </div>
     </xsl:template>
 
+    <xsl:variable name="etal_limit" select="5"/>
     <xsl:template name="authors_with_short_summary_view">
 	<xsl:param name="contextPath"/>
+	<xsl:variable name="authors_count" select="count(dim:field[@element='contributor'][@qualifier='author' or @qualifier='other'])"/>
 	<xsl:choose>
-		<xsl:when test="count(dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']) &gt; 3">
+		<xsl:when test="$authors_count &gt; $etal_limit">
 			<details>
 				<summary>
-
-					<xsl:for-each select="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other'][position() &lt;= 3]">
+					<!-- APA 6+: A; et al. -->
+					<!-- this selects just the first author; it's a for-each loop to set a context for the print_author template -->
+					<xsl:for-each select="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other'][position() = 1]">
 						<xsl:call-template name="print_author">
 							<xsl:with-param name="contextPath" select="$contextPath"/>
 						</xsl:call-template>
@@ -1240,11 +1243,28 @@
 			</details>
 		</xsl:when>
 		<xsl:otherwise>
-			<xsl:call-template name="print_all_authors">
+			<xsl:call-template name="few_authors_formatted">
 				<xsl:with-param name="contextPath" select="$contextPath"/>
 			</xsl:call-template>
 		</xsl:otherwise>
 	</xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="few_authors_formatted">
+    	<xsl:param name="contextPath"/>
+	<xsl:for-each select="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other'][position() &lt;= $etal_limit]">
+		<xsl:call-template name="print_author">
+			<xsl:with-param name="contextPath" select="$contextPath"/>
+		</xsl:call-template>
+		<xsl:choose>
+			<xsl:when test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']) = 1">
+				<xsl:text> and </xsl:text>
+			</xsl:when>
+			<xsl:when test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']) &gt; 1">
+				<xsl:text>;</xsl:text>
+			</xsl:when>
+		</xsl:choose>
+	</xsl:for-each>
     </xsl:template>
 
     <xsl:template name="print_all_authors">
