@@ -10,7 +10,7 @@
 
     <!-- repository name -->
     <xsl:variable name="dspace.name" select="confman:getProperty('dspace.name')"/>
-    <xsl:variable name="authorsLimitLT" select="4"/>
+    <xsl:variable name="authorsLimitLT" select="6"/>
 
     <xsl:output omit-xml-declaration="yes" method="xml" indent="yes" cdata-section-elements="h:html"/>
 
@@ -81,14 +81,17 @@
                    If you decide to change it test it well.
                 -->
                 <xsl:if test="position() &lt; $authorsLimitLT">
+                  <xsl:if test="position() = 1 or $authorsCount &lt; $authorsLimitLT">
                     <xsl:value-of select="."/>
                     <xsl:choose>
                         <!-- if `$authorsLimitLT - 1` or less authors use 'and' before the last name -->
-                        <xsl:when test="position() > 0 and position() = last()-1 and $authorsCount &lt; $authorsLimitLT"> and </xsl:when>
+
+                        <xsl:when test="position() = last()-1 and $authorsCount &lt; $authorsLimitLT"> and </xsl:when>
                         <xsl:when test="position() &lt; last() and position() &lt; $authorsLimitLT - 1">; </xsl:when>
                     </xsl:choose>
-                    <!-- last position and more authors than we display, add 'et al.', eg. 3rd author and the max displayed is 3 -->
-                    <xsl:if test="position() > 0 and position() = $authorsLimitLT - 1 and $authorsCount &gt; $authorsLimitLT - 1">; et al.</xsl:if>
+                  </xsl:if>
+                  <!-- last position and more authors than we display, add 'et al.', eg. 3rd author and the max displayed is 3 -->
+                  <xsl:if test="position() = $authorsLimitLT - 1 and $authorsCount &gt; $authorsLimitLT - 1">et al.</xsl:if>
                 </xsl:if>
             </xsl:for-each>
         </xsl:if>
