@@ -22,6 +22,7 @@
 	
 	<xsl:output indent="yes" />
 
+	<xsl:variable name="contextPath" select="concat('/', substring-after(substring-after(confman:getProperty('dspace.url'), '://'), '/'))"/>
 	<xsl:template name="itemSummaryView-DIM">
 		<!-- Generate the info about the item from the metadata section -->
 		<xsl:apply-templates
@@ -94,7 +95,6 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		<xsl:variable name="contextPath" select="concat('/', substring-after(substring-after(confman:getProperty('dspace.url'), '://'), '/'))"/>
 
 
 		<xsl:choose>
@@ -188,9 +188,7 @@
 					<dd style="padding-right: 40px;">
 					<xsl:choose>
 						<xsl:when test="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']">
-							<xsl:call-template name="authors_with_short_summary_view">
-								<xsl:with-param name="contextPath" select="$contextPath"/>
-							</xsl:call-template>
+							<xsl:call-template name="authors_with_short_summary_view" />
 						</xsl:when>
 						<xsl:when test="dim:field[@element='creator']">
 							<xsl:for-each select="dim:field[@element='creator']">
@@ -1220,7 +1218,6 @@
 
     <xsl:variable name="etal_limit" select="5"/>
     <xsl:template name="authors_with_short_summary_view">
-	<xsl:param name="contextPath"/>
 	<xsl:variable name="authors_count" select="count(dim:field[@element='contributor'][@qualifier='author' or @qualifier='other'])"/>
 	<xsl:choose>
 		<xsl:when test="$authors_count &gt; $etal_limit">
@@ -1229,33 +1226,24 @@
 					<!-- APA 6+: A; et al. -->
 					<!-- this selects just the first author; it's a for-each loop to set a context for the print_author template -->
 					<xsl:for-each select="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other'][position() = 1]">
-						<xsl:call-template name="print_author">
-							<xsl:with-param name="contextPath" select="$contextPath"/>
-						</xsl:call-template>
+						<xsl:call-template name="print_author" />
 						<xsl:text>;</xsl:text>
 					</xsl:for-each>
 					<xsl:text> et al.</xsl:text>
 					<span style="display: list-item"><i18n:text>xmlui.UFAL.artifactbrowser.item_view.show_all_authors</i18n:text></span>
 				</summary>
-				<xsl:call-template name="print_all_authors">
-					<xsl:with-param name="contextPath" select="$contextPath"/>
-				</xsl:call-template>
+				<xsl:call-template name="print_all_authors" />
 			</details>
 		</xsl:when>
 		<xsl:otherwise>
-			<xsl:call-template name="few_authors_formatted">
-				<xsl:with-param name="contextPath" select="$contextPath"/>
-			</xsl:call-template>
+			<xsl:call-template name="few_authors_formatted" />
 		</xsl:otherwise>
 	</xsl:choose>
     </xsl:template>
 
     <xsl:template name="few_authors_formatted">
-    	<xsl:param name="contextPath"/>
 	<xsl:for-each select="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other'][position() &lt;= $etal_limit]">
-		<xsl:call-template name="print_author">
-			<xsl:with-param name="contextPath" select="$contextPath"/>
-		</xsl:call-template>
+		<xsl:call-template name="print_author" />
 		<xsl:choose>
 			<xsl:when test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']) = 1">
 				<xsl:text> and </xsl:text>
@@ -1268,12 +1256,9 @@
     </xsl:template>
 
     <xsl:template name="print_all_authors">
-	    <xsl:param name="contextPath"/>
 	<xsl:for-each
 		select="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']">
-		<xsl:call-template name="print_author">
-			<xsl:with-param name="contextPath" select="$contextPath"/>
-		</xsl:call-template>
+		<xsl:call-template name="print_author" />
 		<xsl:if
 			test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']) != 0">
 			<xsl:text>; </xsl:text>
@@ -1282,7 +1267,6 @@
     </xsl:template>
 
     <xsl:template name="print_author">
-    	<xsl:param name="contextPath" select="$context-path"/>
 	<span>
 		<xsl:if test="@authority">
 			<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
