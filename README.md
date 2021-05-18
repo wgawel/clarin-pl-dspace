@@ -18,7 +18,7 @@
     * ERCC: https://clarin.eurac.edu/repository/xmlui/
 * CLARIN-ES:
 * CLARIN-LT: https://clarin.vdu.lt/xmlui/
-* SWE-CLARIN: 
+* SWE-CLARIN: https://repo.spraakbanken.gu.se/xmlui/
 * CLARIN-DK: https://repository.clarin.dk/repository/xmlui/
 * Árni Magnússon Institute for Icelandic Studies (CLARIN-IS): https://repository.clarin.is/repository/xmlui/
 * University of Oxford - Oxford Text Archive: https://ota.bodleian.ox.ac.uk/repository/xmlui/
