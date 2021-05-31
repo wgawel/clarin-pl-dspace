@@ -22,6 +22,7 @@
 	
 	<xsl:output indent="yes" />
 
+	<xsl:variable name="contextPath" select="concat('/', substring-after(substring-after(confman:getProperty('dspace.url'), '://'), '/'))"/>
 	<xsl:template name="itemSummaryView-DIM">
 		<!-- Generate the info about the item from the metadata section -->
 		<xsl:apply-templates
@@ -94,7 +95,6 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		<xsl:variable name="contextPath" select="concat('/', substring-after(substring-after(confman:getProperty('dspace.url'), '://'), '/'))"/>
 
 
 		<xsl:choose>
@@ -188,23 +188,7 @@
 					<dd style="padding-right: 40px;">
 					<xsl:choose>
 						<xsl:when test="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']">
-							<xsl:for-each
-								select="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']">
-								<span>
-									<xsl:if test="@authority">
-										<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
-									</xsl:if>
-									<a>
-								<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
-								<xsl:copy-of select="node()" />
-								</a>
-
-								</span>
-								<xsl:if
-									test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']) != 0">
-									<xsl:text>; </xsl:text>
-								</xsl:if>
-							</xsl:for-each>
+							<xsl:call-template name="authors_with_short_summary_view" />
 						</xsl:when>
 						<xsl:when test="dim:field[@element='creator']">
 							<xsl:for-each select="dim:field[@element='creator']">
@@ -381,17 +365,27 @@
 
 			<!-- type row -->
 			<xsl:when
-				test="$clause = 9 and (dim:field[@element='type' and not(@qualifier)])">
+				test="$clause = 9 and ((dim:field[@element='type' and not(@qualifier)]) or (dim:field[@qualifier='mediaType']))">
 					<dl id="item-type" class="dl-horizontal">
 					<dt style="text-align: left">
 						<i class="fa fa-tag">&#160;</i>
 												<i18n:text>xmlui.dri2xhtml.METS-1.0.item-type</i18n:text>
 					</dt>
 					<dd>
-						<a>
-							<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:value-of select="dim:field[@element='type'][not(@qualifier)][1]/node()" />&amp;type=type</xsl:attribute>
-							<xsl:value-of select="dim:field[@element='type'][not(@qualifier)][1]/node()" />
-						</a>							
+						<xsl:for-each
+								select="dim:field[(@element='type' and not(@qualifier)) or @qualifier='mediaType']">
+							<xsl:sort select="." />
+							<a>
+								<xsl:attribute name="href">
+									<xsl:value-of
+											select="concat($contextPath, '/discover?filtertype=type&amp;filter_relational_operator=equals&amp;filter=',encoder:encode(.))"/>
+								</xsl:attribute>
+								<xsl:value-of select="." />
+							</a>
+							<xsl:if test="position() != last()">
+								<xsl:text>, </xsl:text>
+							</xsl:if>
+						</xsl:for-each>
 					</dd>
 				</dl>
 				<xsl:call-template name="itemSummaryView-DIM-fields">
@@ -1220,6 +1214,69 @@
                </button>
            </div>
        </div>
+    </xsl:template>
+
+    <xsl:variable name="etal_limit" select="5"/>
+    <xsl:template name="authors_with_short_summary_view">
+	<xsl:variable name="authors_count" select="count(dim:field[@element='contributor'][@qualifier='author' or @qualifier='other'])"/>
+	<xsl:choose>
+		<xsl:when test="$authors_count &gt; $etal_limit">
+			<details>
+				<summary>
+					<!-- APA 6+: A; et al. -->
+					<!-- this selects just the first author; it's a for-each loop to set a context for the print_author template -->
+					<xsl:for-each select="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other'][position() = 1]">
+						<xsl:call-template name="print_author" />
+						<xsl:text>;</xsl:text>
+					</xsl:for-each>
+					<xsl:text> et al.</xsl:text>
+					<span style="display: list-item"><i18n:text>xmlui.UFAL.artifactbrowser.item_view.show_all_authors</i18n:text></span>
+				</summary>
+				<xsl:call-template name="print_all_authors" />
+			</details>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:call-template name="few_authors_formatted" />
+		</xsl:otherwise>
+	</xsl:choose>
+    </xsl:template>
+
+    <xsl:template name="few_authors_formatted">
+	<xsl:for-each select="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other'][position() &lt;= $etal_limit]">
+		<xsl:call-template name="print_author" />
+		<xsl:choose>
+			<xsl:when test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']) = 1">
+				<xsl:text> and </xsl:text>
+			</xsl:when>
+			<xsl:when test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']) &gt; 1">
+				<xsl:text>;</xsl:text>
+			</xsl:when>
+		</xsl:choose>
+	</xsl:for-each>
+    </xsl:template>
+
+    <xsl:template name="print_all_authors">
+	<xsl:for-each
+		select="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']">
+		<xsl:call-template name="print_author" />
+		<xsl:if
+			test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']) != 0">
+			<xsl:text>; </xsl:text>
+		</xsl:if>
+	</xsl:for-each>
+    </xsl:template>
+
+    <xsl:template name="print_author">
+	<span>
+		<xsl:if test="@authority">
+			<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
+		</xsl:if>
+		<a>
+	<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
+	<xsl:copy-of select="node()" />
+	</a>
+
+	</span>
     </xsl:template>
 </xsl:stylesheet>
 

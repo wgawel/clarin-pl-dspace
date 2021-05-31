@@ -73,6 +73,7 @@
   </xsl:variable>
 
   <xsl:variable name="lr.download.all.limit.max.file.size" select="confman:getLongProperty('lr', 'lr.download.all.limit.max.file.size', 1073741824)"/>
+  <xsl:variable name="lr.elg.downloadLocation.exposed" select="confman:getLongProperty('lr', 'lr.elg.downloadLocation.exposed', 0)"/>
   <!-- VARIABLES END -->
 
   <xsl:template match="/">
@@ -114,7 +115,7 @@
       <ms:entityType>LanguageResource</ms:entityType>
       <xsl:call-template name="resourceName"/>
       <xsl:call-template name="description"/>
-      <ms:version>undefined</ms:version>
+      <ms:version>unspecified</ms:version>
       <ms:additionalInfo>
         <ms:landingPage><xsl:value-of select="$identifier_uri"/></ms:landingPage>
       </ms:additionalInfo>
@@ -381,21 +382,23 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
         <xsl:value-of select="concat('http://w3id.org/meta-share/meta-share/', $form)"/>
       </xsl:element>
 
-      <!-- downloadLocation if there are files -->
-      <xsl:if test="xalan:nodeset($files)/doc:element[@name='bitstream']">
-        <xsl:choose>
-          <!-- one file -> direct link -->
-          <xsl:when test="count(xalan:nodeset($files)/doc:element[@name='bitstream']) = 1">
-            <ms:downloadLocation><xsl:value-of
-                      select="xalan:nodeset($files)[1]/doc:element[@name='bitstream']/doc:field[@name='url']/text()" /></ms:downloadLocation>
-          </xsl:when>
-          <!-- multiple files within allzip limit -->
-          <xsl:when
-                  test="sum(xalan:nodeset($files)/doc:element[@name='bitstream']/doc:field[@name='size']/text()) &lt; $lr.download.all.limit.max.file.size ">
-            <ms:downloadLocation><xsl:value-of
-                    select="concat(str:split(xalan:nodeset($files)[1]/doc:element[@name='bitstream']/doc:field[@name='url']/text(), 'bitstream/')[1], $handle, '/allzip')" /></ms:downloadLocation>
-          </xsl:when>
-        </xsl:choose>
+      <xsl:if test="$lr.elg.downloadLocation.exposed">
+          <!-- downloadLocation if there are files -->
+          <xsl:if test="xalan:nodeset($files)/doc:element[@name='bitstream']">
+            <xsl:choose>
+              <!-- one file -> direct link -->
+              <xsl:when test="count(xalan:nodeset($files)/doc:element[@name='bitstream']) = 1">
+                <ms:downloadLocation><xsl:value-of
+                          select="xalan:nodeset($files)[1]/doc:element[@name='bitstream']/doc:field[@name='url']/text()" /></ms:downloadLocation>
+              </xsl:when>
+              <!-- multiple files within allzip limit -->
+              <xsl:when
+                      test="sum(xalan:nodeset($files)/doc:element[@name='bitstream']/doc:field[@name='size']/text()) &lt; $lr.download.all.limit.max.file.size ">
+                <ms:downloadLocation><xsl:value-of
+                        select="concat(str:split(xalan:nodeset($files)[1]/doc:element[@name='bitstream']/doc:field[@name='url']/text(), 'bitstream/')[1], $handle, '/allzip')" /></ms:downloadLocation>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:if>
       </xsl:if>
       <ms:accessLocation><xsl:value-of select="$identifier_uri"/></ms:accessLocation>
       <xsl:if test="doc:metadata/doc:element[@name='local']/doc:element[@name='demo']/doc:element[@name='uri']/doc:element/doc:field[@name='value']">
@@ -422,6 +425,7 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
       <ms:licenceTerms>
         <ms:licenceTermsName xml:lang="en"><xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element/doc:field[@name='value']" /></ms:licenceTermsName>
         <ms:licenceTermsURL><xsl:value-of select="doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element[@name='uri']/doc:element/doc:field[@name='value']" /></ms:licenceTermsURL>
+        <ms:conditionOfUse>http://w3id.org/meta-share/meta-share/unspecified</ms:conditionOfUse>  
       </ms:licenceTerms>
     </xsl:element>
   </xsl:template>
@@ -605,6 +609,9 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
         <xsl:when test="$unit = 'semanticUnits'">
           <ms:sizeUnit>http://w3id.org/meta-share/meta-share/semanticUnit1</ms:sizeUnit>
         </xsl:when>
+        <xsl:when test="$unit = 'syntacticUnits'">
+          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/syntacticUnit1</ms:sizeUnit>
+        </xsl:when>  
         <xsl:when test="$unit = 'terms'">
           <ms:sizeUnit>http://w3id.org/meta-share/meta-share/term</ms:sizeUnit>
         </xsl:when>

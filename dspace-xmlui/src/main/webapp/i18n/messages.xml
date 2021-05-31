@@ -2973,6 +2973,8 @@
   <message key="xmlui.UFAL.artifactbrowser.item_view.licensed_under">This item is {0} and licensed under:<BR/></message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.preview">Preview</message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.file_preview">File Preview</message>
+  <message key="xmlui.UFAL.artifactbrowser.item_view.show_all_authors">show everyone</message>
+
 
 
 	<!-- UFAL/lib/xsl/core/navigation.xsl -->
@@ -3037,7 +3039,16 @@
 		institution. Start typing the publisher and use autocomplete form that will appear if
 		applicable. End your input by pressing ESC if you don't want to use the preselected value.
 	</message>
+	<message key="input_forms.field.dc.publisher.clariah.hint">The name of the publisher of the original analog or born
+		digital object. Use your home institution if this is a born digital object being published now. Start typing the
+		publisher and use autocomplete form that will appear if applicable. End your input by pressing ESC if you
+		don't want to use the preselected value.
+	</message>
 	<message key="input_forms.field.dc.publisher.required">You must enter the name of the publisher.</message>
+	<message key="input_forms.field.local.dataProvider.label">Data provider</message>
+	<message key="input_forms.field.local.dataProvider.hint">This concerns the digital object (not the analog
+		original). An institution from which the data come. Used eg. to give proper attribution. Generally
+		different from publisher.</message>
 	<message key="input_forms.field.local.contact.person.label">Contact person</message>
 	<message key="input_forms.field.local.contact.person.hint">Person to contact in case of any issues with this submission.</message>
 	<message key="input_forms.field.local.contact.person.required">Please fill all the fields for the contact person.</message>
@@ -3091,7 +3102,8 @@
 	<message key="input_forms.field.local.submission.note.hint">Leave a note for the editors/reviewers</message>
 	<message key="input_forms.field.dc.relation.replaces.label">Replaces</message>
 	<message key="input_forms.field.dc.relation.replaces.hint">URL to a related resource that is supplanted, displaced, or superseded by the described
-		resource.
+		resource. If the replaced resource is in this repository start typing its name or handle and select the
+		resource from the autocomplete popup.
 	</message>
 	<message key="input_forms.field.dc.relation.isreplacedby.label">Is replaced by</message>
 	<message key="input_forms.field.dc.relation.isreplacedby.hint">A related resource that supplants, displaces, or supersedes the described resource.</message>
@@ -3234,11 +3246,62 @@
 	<message key="input_forms.field.dc.relation.isreferencedby.hint">Link to original paper that references this dataset.</message>
 	<message key="input_forms.field.dc.relation.isreferencedby.regexp-warning">The supplied url must start with http/https</message>
 
+	<message key="input_forms.field.edm.type.label">Select the kind of resource you are submitting</message>
+	<message key="input_forms.field.edm.type.hint">Choose one of TEXT, VIDEO, SOUND, IMAGE, 3D. If choosing
+		TEXT consider adding the resource among other Language Resources. Images are visual resources for users to
+		look at. Text materials are meant to be read and not looked at.</message>
+	<message key="input_forms.field.edm.type.required">Please select one of the options.</message>
+	<message key="input_forms.value_pairs.edm_types.text">TEXT</message>
+	<message key="input_forms.value_pairs.edm_types.video">VIDEO</message>
+	<message key="input_forms.value_pairs.edm_types.sound">SOUND</message>
+	<message key="input_forms.value_pairs.edm_types.image">IMAGE</message>
+	<message key="input_forms.value_pairs.edm_types.3d">3D</message>
+
+	<message key="input_forms.field.dc.type.clariah.label">The type of the resource</message>
+	<message key="input_forms.field.dc.type.clariah.hint">The type should be different from what you have
+		entered in the first step. Examples: photo or painting for IMAGE, book or letter for TEXT, etc.</message>
+	<message key="input_forms.field.dc.type.clariah.required">Type is required</message>
+
+	<message key="input_forms.field.dc.language.iso.clariah.label">Pick the languages of the TEXT</message>
+	<message key="input_forms.field.dc.language.iso.clariah.hint">Select the language of the main content of the item. Multiple languages are possible. Start
+		typing the language and use autocomplete form that will appear if applicable. Better to list all the languages then to use the 'mul' iso code (if there are too many, contact support).
+		</message>
+	<message key="input_forms.field.dc.language.iso.clariah.required">The language is required for TEXT resources</message>
+
+	<message key="input_forms.field.dc.language.iso1.clariah.label">Language</message>
+	<message key="input_forms.field.dc.language.iso1.clariah.hint">Optionally, select the language of the main content
+		of the item. Multiple languages are possible. Start
+		typing the language and use autocomplete form that will appear if applicable. Better to list all the languages then to use the 'mul' iso code (if there are too many, contact support).
+	</message>
+
+	<message key="input_forms.field.dc.subject.clariah.hint">Enter appropriate subject keyword or phrase and press
+		the Add button. Use keywords to specify also people, places and times (period, era, date range etc) the resource
+		is about. You	can use hierarchical subjects, separate the hierarchy levels with two colons (::). Eg.
+		People::John Doe, Places::New York, Times::WWII.
+		You can repeat it	for multiple keywords or use separators i.e., comma and semicolon, which will split it accordingly.
+		Start typing the keyword and use autocomplete form that will appear. End your input by pressing
+		ESC if you don't want to use the preselected value.
+	</message>
+
+	<message key="input_forms.field.dc.alternate.identifiers.label">Alternate identifiers</message>
+	<message key="input_forms.field.dc.alternate.identifiers.hint">The item will get a handle. If the item has any
+		identification numbers	or codes associated with it, please enter the types and the actual numbers or codes.
+   </message>
+
 	<!-- cz.cuni.mff.ufal.ContractPage -->
 	<message key="xmlui.ContractPage.title">Distribution License Agreement</message>
 	<message key="xmlui.ContractPage.trail">Distribution License Agreement</message>
 	<message key="xmlui.ContractPage.head">Distribution License Agreement</message>
 	<message key="xmlui.ContractPage.collection_name">{0}</message>
+
+	<!-- cz.cuni.mff.ufal.dspace.app.xmlui.aspect.submission.submit.ShowInfoStep -->
+	<message key="xmlui.Submission.submit.progressbar.showinfo">Notice</message>
+	<message key="xmlui.Submission.submit.ShowInfoStep.head">Notice</message>
+	<message key="xmlui.Submission.submit.ShowInfoStep.info1">The submission process for digital humanities
+		collections is still being fine tuned. If you find yourself not being able to continue the submission,
+	because you can't provide the required information, or because the required format for a field is too strict, or
+		because there's no appropriate field for your information or for any other reason,
+		<a class="helpdesk-tolink">let us know</a>.</message>
 
 </catalogue>
 
