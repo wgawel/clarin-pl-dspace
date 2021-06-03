@@ -41,6 +41,8 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
     private static final Set<String> DCTYPE_VALUES_SET = new HashSet<String>(
         Arrays.asList(DCTYPE_VALUES));
 
+    private static final String[] rightsMdStrings = {"dc.rights.uri", "dc.rights.label", "dc.rights"};
+
     private Map<String, String> _item_titles;
     private String _handle_prefix;
 
@@ -140,6 +142,8 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
                         validate_branding_consistency(item, dcs, results);
                         //
                         validate_rights_labels(item, dcs, results);
+                        //
+                        item_with_files_has_license(item);
                         //
                         validate_highly_recommended_metadata(item, dcs, results);
                         //
@@ -468,6 +472,29 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
 			}
 		}
 	}
+
+	private void item_with_files_has_license(Item item) throws CurateException {
+        try {
+            boolean fail = false;
+            StringBuilder sb = new StringBuilder();
+            if (item.getNonInternalBitstreams().length > 0) {
+                for(String mdString : rightsMdStrings){
+                    final Metadatum[] vals = item.getMetadataByMetadataString(mdString);
+                    if(vals == null || vals.length == 0){
+                        fail = true;
+                        sb.append(mdString).append(", ");
+                    }
+                }
+            }
+            if(fail){
+                throw new CurateException("There are bitsreams but incomplete rights metadata. Missing: " + sb.toString(), Curator.CURATE_FAIL);
+            }
+        } catch (SQLException throwables) {
+            throw  new CurateException(throwables.getMessage(), Curator.CURATE_ERROR);
+        }
+
+
+    }
 
 } // class ItemMetadataQAChecker
 
