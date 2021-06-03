@@ -31,6 +31,7 @@ import org.dspace.handle.HandleManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.dspace.utils.DSpace;
 
 import static cz.cuni.mff.ufal.curation.RequiredMetadata.addMagicString;
 
@@ -43,8 +44,8 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
 
     public static final int CURATE_WARNING = -1000;
     /** Expected types. */
-    private static final String[] DCTYPE_VALUES = { 
-        "corpus", "lexicalConceptualResource", "languageDescription", "toolService" };
+    private static final String[] DCTYPE_VALUES = new DSpace().getConfigurationService().getPropertyAsType("lr.curation.metadata.expected.types" ,
+            new String[]{ "corpus", "lexicalConceptualResource", "languageDescription", "toolService" });
     private static final Set<String> DCTYPE_VALUES_SET = new HashSet<String>(
         Arrays.asList(DCTYPE_VALUES));
 
