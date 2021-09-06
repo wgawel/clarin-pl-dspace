@@ -1352,12 +1352,12 @@
         </definition>
 
         <definition name="sizeInfo">
-            <input name="1_size" type="text" regexp="\d+.?\d*" required="true"/>
+            <input name="1_size" type="text" regexp="\d+\.?\d*" required="true"/>
             <input name="2_unit" type="dropdown" pairs="metashare_sizeunit" label="input_forms.complex_definitions.sizeInfo.2_unit.label" required="true"/>
         </definition>
 
         <definition name="clariahSizeInfo">
-        <input name="1_size" type="text" regexp="\d+.?\d*" required="true"/>
+        <input name="1_size" type="text" regexp="\d+\.?\d*" required="true"/>
         <input name="2_unit" type="text" label="input_forms.complex_definitions.sizeInfo.2_unit.label"
                required="true" autocomplete="solr-local.size.info_comp"/>
         </definition>

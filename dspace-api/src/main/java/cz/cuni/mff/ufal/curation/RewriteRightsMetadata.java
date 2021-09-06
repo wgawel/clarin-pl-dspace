@@ -14,7 +14,7 @@ import cz.cuni.mff.ufal.DSpaceApi;
 import cz.cuni.mff.ufal.lindat.utilities.hibernate.LicenseDefinition;
 import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
 
-public class AddLabelMetadata extends AbstractCurationTask {
+public class RewriteRightsMetadata extends AbstractCurationTask {
 
     private int status = Curator.CURATE_UNSET;
 
@@ -48,6 +48,9 @@ public class AddLabelMetadata extends AbstractCurationTask {
 	            if(license!=null) {                        
 	            	item.clearMetadata("dc", "rights", "label", Item.ANY);
 	            	item.addMetadata("dc", "rights", "label", Item.ANY, license.getLicenseLabel().getLabel());
+	            	// null qualifier means unqualified
+	            	item.clearMetadata("dc", "rights", null, Item.ANY);
+	            	item.addMetadata("dc", "rights", null, Item.ANY, license.getName());
 	            	item.update();
 	            }
 	        	status = Curator.CURATE_SUCCESS;
