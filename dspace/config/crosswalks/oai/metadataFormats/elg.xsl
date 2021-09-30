@@ -96,7 +96,7 @@
       </ms:metadataLastDateUpdated>
       <ms:compliesWith>http://w3id.org/meta-share/meta-share/ELG-SHARE</ms:compliesWith>
       <ms:sourceOfMetadataRecord>
-        <ms:repositoryName xml:lang="en">LINDAT/CLARIAH-CZ</ms:repositoryName>
+        <ms:repositoryName xml:lang="en">CLARIN-PL</ms:repositoryName>
       </ms:sourceOfMetadataRecord>
       <ms:sourceMetadataRecord>
         <ms:MetadataRecordIdentifier>
