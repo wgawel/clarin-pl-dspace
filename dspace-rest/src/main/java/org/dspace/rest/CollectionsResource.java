@@ -29,29 +29,34 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseException;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
 import org.dspace.content.service.ItemService;
 import org.dspace.eperson.EPerson;
+import org.dspace.content.WorkspaceItem;
+import org.dspace.core.Constants;
+import org.dspace.identifier.IdentifierException;
+import org.dspace.identifier.IdentifierService;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.LogManager;
 import org.dspace.rest.common.Collection;
 import org.dspace.rest.common.Item;
-import org.dspace.rest.common.JsonReader;
 import org.dspace.rest.common.MetadataEntry;
 import org.dspace.rest.common.clarinpl.MetadataItem;
 import org.dspace.rest.common.clarinpl.NextCloudItem;
 import org.dspace.rest.exceptions.ContextException;
 import org.dspace.usage.UsageEvent;
+import org.dspace.utils.DSpace;
+import org.dspace.workflow.WorkflowManager;
+import org.dspace.xmlworkflow.XmlWorkflowManager;
 
 /**
  * This class provides all CRUD operation over collections.
  * 
  * @author Rostislav Novak (Computing and Information Centre, CTU in Prague)
+ * @author Adán Román Ruiz (arvo.es)
  */
 @Path("/collections")
 public class CollectionsResource extends Resource
@@ -104,7 +109,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
 
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId, org.dspace.core.Constants.READ);
             writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
@@ -173,7 +178,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
 
             if (!((limit != null) && (limit >= 0) && (offset != null) && (offset >= 0)))
             {
@@ -259,7 +264,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
 
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId, org.dspace.core.Constants.READ);
             writeStats(dspaceCollection, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor,
@@ -342,12 +347,11 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
-
+            context = createContext(headers);
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
-                    org.dspace.core.Constants.WRITE);
+                    org.dspace.core.Constants.ADD);
 
-            writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
+            writeStats(dspaceCollection, UsageEvent.Action.ADD, user_ip, user_agent, xforwardedfor,
                     headers, request, context);
 
             log.trace("Creating item in collection(id=" + collectionId + ").");
@@ -366,14 +370,24 @@ public class CollectionsResource extends Resource
             }
             workspaceItem.update();
 
-            // Index item to browse.
-            org.dspace.browse.IndexBrowse browse = new org.dspace.browse.IndexBrowse(context);
-            browse.indexItem(dspaceItem);
+            IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
+            context.turnOffAuthorisationSystem();
+            identifierService.reserve(context, dspaceItem);
+            dspaceItem.update();
+            context.restoreAuthSystemState();
 
-            log.trace("Installing item to collection(id=" + collectionId + ").");
-            dspaceItem = org.dspace.content.InstallItem.installItem(context, workspaceItem);
-
-            returnItem = new Item(dspaceItem, "", context);
+            // Must insert the item into workflow
+            if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
+                try{
+                    XmlWorkflowManager.start(context, workspaceItem);
+                }catch (Exception e){
+                    log.error(LogManager.getHeader(context, "Error while starting xml workflow", "Item id: " + dspaceItem.getID()), e);
+                    throw new ContextException("Error while starting xml workflow: Item id: " + dspaceItem.getID(),e);
+                }
+            }else{
+                WorkflowManager.start(context, (WorkspaceItem )workspaceItem);
+            }
+            returnItem=new Item(workspaceItem.getItem(),"",context);
 
             context.complete();
 
@@ -391,17 +405,14 @@ public class CollectionsResource extends Resource
         {
             processException("Could not add item into collection(id=" + collectionId + "), IOException. Message: " + e, context);
         }
-        catch (BrowseException e)
-        {
-            processException("Could not add item into browse index, BrowseException. Message: " + e, context);
-        }
         catch (ContextException e)
         {
             processException(
                     "Could not add item into collection(id=" + collectionId + "), ContextException. Message: " + e.getMessage(),
                     context);
-        }
-        finally
+        } catch (IdentifierException e) {
+            processException("Could not reserve handle, IdentifierException. Message: " + e.getMessage(), context);
+        } finally
         {
             processFinally(context);
         }
@@ -433,7 +444,7 @@ public class CollectionsResource extends Resource
                 throw new AuthorizeException();
             }
 
-            context = createContext(dspaceUser);
+            context = createContext(headers);
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
@@ -542,7 +553,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.WRITE);
 
@@ -614,7 +625,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
                     org.dspace.core.Constants.DELETE);
 
@@ -685,9 +696,9 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.Collection dspaceCollection = findCollection(context, collectionId,
-                    org.dspace.core.Constants.WRITE);
+                    Constants.REMOVE);
 
             org.dspace.content.Item item = null;
             org.dspace.content.ItemIterator dspaceItems = dspaceCollection.getItems();
@@ -705,19 +716,6 @@ public class CollectionsResource extends Resource
                 context.abort();
                 log.warn("Item(id=" + itemId + ") was not found!");
                 throw new WebApplicationException(Response.Status.NOT_FOUND);
-            }
-            else if (!AuthorizeManager.authorizeActionBoolean(context, item, org.dspace.core.Constants.REMOVE))
-            {
-                context.abort();
-                if (context.getCurrentUser() != null)
-                {
-                    log.error("User(" + context.getCurrentUser().getEmail() + ") has not permission to delete item!");
-                }
-                else
-                {
-                    log.error("User(anonymous) has not permission to delete item!");
-                }
-                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
 
             writeStats(dspaceCollection, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor,
@@ -782,7 +780,7 @@ public class CollectionsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.Collection[] dspaceCollections;
 
             dspaceCollections = org.dspace.content.Collection.findAll(context);

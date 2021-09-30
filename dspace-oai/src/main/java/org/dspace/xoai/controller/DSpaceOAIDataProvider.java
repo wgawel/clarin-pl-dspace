@@ -53,7 +53,6 @@ import com.lyncode.xoai.dataprovider.xml.XmlOutputContext;
 import com.lyncode.xoai.dataprovider.xml.oaipmh.OAIPMH;
 
 import cz.cuni.mff.ufal.tracker.TrackerFactory;
-import cz.cuni.mff.ufal.tracker.TrackingSite;
 
 
 /**
@@ -190,7 +189,7 @@ public class DSpaceOAIDataProvider
 
         if(configurationService.getBooleanProperty("lr", "lr.tracker.enabled", false)) {
             // Track the OAI request for analytics platform
-            TrackerFactory.createInstance(TrackingSite.OAI).trackPage(request, "CLARIN-PL OAI-PMH Data Provider Endpoint");
+            TrackerFactory.createOAITrackerInstance().trackPage(request, "CLARIN-PL Repository OAI-PMH Data Provider Endpoint");
         }
 
         Context context = null;

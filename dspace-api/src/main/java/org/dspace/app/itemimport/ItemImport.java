@@ -209,6 +209,8 @@ public class ItemImport
 
             options.addOption("h", "help", false, "help");
 
+            options.addOption("x", "extending-class", true, "Class name to use in main. Leave empty if you don't know what it is.");
+
             CommandLine line = parser.parse(options, argv);
 
             String command = null; // add replace remove, etc
@@ -318,7 +320,7 @@ public class ItemImport
             if (line.hasOption('z'))
             {
                 zip = true;
-                zipfilename = sourcedir + System.getProperty("file.separator") + line.getOptionValue('z');
+                zipfilename = line.getOptionValue('z');
             }
 
             //By default assume collections will be given on the command line
@@ -434,7 +436,13 @@ public class ItemImport
                 System.exit(1);
             }
 
-            ItemImport myloader = new ItemImport();
+            ItemImport myloader;
+            if(line.hasOption("x")){
+                String name = line.getOptionValue("x", "org.dspace.app.itemimport.ItemImport");
+                myloader = (ItemImport) Class.forName(name).newInstance();
+            }else{
+                myloader = new ItemImport();
+            }
 
             // create a context
             Context c = new Context();
@@ -767,7 +775,7 @@ public class ItemImport
                 {
                     clist = mycollections;
                 }
-                addItem(c, mycollections, sourceDir, dircontents[i], mapOut, template);
+                addItem(c, clist, sourceDir, dircontents[i], mapOut, template);
                 System.out.println(i + " " + dircontents[i]);
                 c.clearCache();
             }
@@ -781,7 +789,7 @@ public class ItemImport
         }
     }
 
-    private void replaceItems(Context c, Collection[] mycollections,
+    protected void replaceItems(Context c, Collection[] mycollections,
             String sourceDir, String mapFile, boolean template) throws Exception
     {
         // verify the source directory
@@ -883,7 +891,7 @@ public class ItemImport
      * @param itemname handle - non-null means we have a pre-defined handle already
      * @param mapOut - mapfile we're writing
      */
-    private Item addItem(Context c, Collection[] mycollections, String path,
+    protected Item addItem(Context c, Collection[] mycollections, String path,
             String itemname, PrintWriter mapOut, boolean template) throws Exception
     {
         String mapOutputString = null;
@@ -949,8 +957,8 @@ public class ItemImport
                 try {
                     InstallItem.installItem(c, wi, myhandle);
                 } catch (Exception e) {
-                    wi.deleteAll();
                     log.error("Exception after install item, try to revert...", e);
+                    wi.deleteAll();
                     throw e;
                 }
 
@@ -1040,7 +1048,7 @@ public class ItemImport
     // utility methods
     ////////////////////////////////////
     // read in the map file and generate a hashmap of (file,handle) pairs
-    private Map<String, String> readMapFile(String filename) throws Exception
+    protected Map<String, String> readMapFile(String filename) throws Exception
     {
         Map<String, String> myHash = new HashMap<String, String>();
 
@@ -1092,7 +1100,7 @@ public class ItemImport
     }
 
     // Load all metadata schemas into the item.
-    private void loadMetadata(Context c, Item myitem, String path)
+    protected void loadMetadata(Context c, Item myitem, String path)
             throws SQLException, IOException, ParserConfigurationException,
             SAXException, TransformerException, AuthorizeException
     {
@@ -1108,7 +1116,7 @@ public class ItemImport
         }
     }
 
-    private void loadDublinCore(Context c, Item myitem, String filename)
+    protected void loadDublinCore(Context c, DSpaceObject myitem, String filename)
             throws SQLException, IOException, ParserConfigurationException,
             SAXException, TransformerException, AuthorizeException
     {
@@ -1147,13 +1155,17 @@ public class ItemImport
         }
     }
 
-    private void addDCValue(Context c, Item i, String schema, Node n) throws TransformerException, SQLException, AuthorizeException
+    private void addDCValue(Context c, DSpaceObject i, String schema, Node n) throws TransformerException, SQLException, AuthorizeException
     {
         String value = getStringValue(n); //n.getNodeValue();
         // compensate for empty value getting read as "null", which won't display
         if (value == null)
         {
             value = "";
+        }
+        else
+        {
+        	value = value.trim();
         }
         // //getElementData(n, "element");
         String element = getAttributeValue(n, "element");
@@ -1176,8 +1188,8 @@ public class ItemImport
         {
             qualifier = null;
         }
-
-        if (!isTest)
+        // only add metadata if it is no test and there is an real value
+        if (!isTest && !value.equals(""))
         {
             i.addMetadata(schema, element, qualifier, language, value);
         }

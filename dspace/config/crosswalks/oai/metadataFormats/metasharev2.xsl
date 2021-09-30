@@ -287,8 +287,8 @@
                 </ms:resourceCreationInfo>
             </xsl:when>
             <xsl:when test="doc:metadata/doc:element[@name='local']/doc:element[@name='sponsor']/doc:element/doc:field[@name='value']">
+                <ms:resourceCreationInfo>
                                 <xsl:for-each select="doc:metadata/doc:element[@name='local']/doc:element[@name='sponsor']/doc:element/doc:field[@name='value']">
-                                    <ms:resourceCreationInfo>
                                                 <ms:fundingProject>
                                                     <ms:projectName>
                                                             <xsl:value-of select="str:split(., '@@')[3]"/>
@@ -297,8 +297,8 @@
                                                             <xsl:value-of select="str:split(., '@@')[4]"/>
                                                     </ms:fundingType>
                                                 </ms:fundingProject>
-                                    </ms:resourceCreationInfo>
                                 </xsl:for-each>
+                </ms:resourceCreationInfo>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:choose>
@@ -359,7 +359,14 @@
 	   <xsl:if test="not($type='corpus')">
 	       <xsl:choose>
 	           <xsl:when test="/doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ContentInfo']/doc:element[@name='detailedType']/doc:element/doc:field[@name='value']">
-	               <xsl:value-of select="/doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ContentInfo']/doc:element[@name='detailedType']/doc:element/doc:field[@name='value']"/>
+                   <xsl:variable name="val"
+                                 select="/doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ContentInfo']/doc:element[@name='detailedType']/doc:element/doc:field[@name='value']"/>
+                   <xsl:choose>
+                       <xsl:when test="$type='languageDescription' and not($val='grammar')">other</xsl:when>
+                       <xsl:otherwise>
+                           <xsl:value-of select="$val"/>
+                       </xsl:otherwise>
+                   </xsl:choose>
 	           </xsl:when>
 	           <xsl:otherwise>
                    <xsl:value-of select="logUtil:logMissing('detailedType',$handle)"/>
@@ -372,7 +379,15 @@
         <xsl:param name="ns"/>
 	   <ms:resourceComponentType>
 	       <xsl:element name="ms:{$type}Info" namespace="{$ns}">
-	           <ms:resourceType><xsl:value-of select="$type"/></ms:resourceType>
+               <!-- easier to hack it like this than fix a typo in cmdi profile with inlined components :facepalm: -->
+               <xsl:choose>
+                   <xsl:when test="$type='languageDescription' and $ns='http://www.clarin.eu/cmd/'">
+                       <ms:resoureType><xsl:value-of select="$type"/></ms:resoureType>
+                   </xsl:when>
+                   <xsl:otherwise>
+                       <ms:resourceType><xsl:value-of select="$type"/></ms:resourceType>
+                   </xsl:otherwise>
+               </xsl:choose>
 	           <!-- Everything but corpus should have detailedType -->
 	           <xsl:if test="not($type='corpus')">
 	               <xsl:element name="ms:{$type}Type" namespace="{$ns}"><xsl:value-of select="$detailedType"/></xsl:element>

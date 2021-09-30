@@ -9,19 +9,13 @@ package org.dspace.app.xmlui.aspect.general;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.Serializable;
 import java.sql.SQLException;
 
 import org.apache.cocoon.ProcessingException;
-import org.apache.cocoon.ResourceNotFoundException;
-import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.http.HttpEnvironment;
-import org.apache.cocoon.util.HashUtil;
 import org.apache.commons.lang.reflect.FieldUtils;
-import org.apache.excalibur.source.SourceValidity;
-import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -38,7 +32,6 @@ import org.xml.sax.SAXException;
 
 import org.dspace.core.ConfigurationManager;
 import org.apache.log4j.Logger;
-import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.List;
 
 import cz.cuni.mff.ufal.InvalidContinuationTransformer;
@@ -50,7 +43,7 @@ import cz.cuni.mff.ufal.InvalidContinuationTransformer;
  * based on class by Scott Phillips and Kim Shepherd
  * modified for LINDAT/CLARIN
  */
-public class PageNotFoundTransformer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
+public class PageNotFoundTransformer extends AbstractDSpaceTransformer
 {
     private static final org.apache.log4j.Logger log = Logger.getLogger(PageNotFoundTransformer.class);
     /** Language Strings */
@@ -68,6 +61,9 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
     
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
+
+    private static final Message T_help_desk =
+            message("xmlui.general.helpdesk");
     
     
     /** Where the body element is stored while we wait to see if it is empty */
@@ -75,27 +71,6 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
     
     /** Have we determined that the body is empty, and hence a we should generate a page not found. */
     private boolean bodyEmpty;
-    
-    /**
-     * Generate the unique caching key.
-     * This key must be unique inside the space of this component.
-     */
-    public Serializable getKey() 
-    {
-        Request request = ObjectModelHelper.getRequest(objectModel);
-        
-        return HashUtil.hash(request.getSitemapURI());
-    }
-
-    /**
-     * Generate the cache validity object.
-     * 
-     * The cache is always valid.
-     */
-    public SourceValidity getValidity() {
-        return NOPValidity.SHARED_INSTANCE;
-    }
-    
     
     /**
      * Receive notification of the beginning of a document.
@@ -203,9 +178,9 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
             Throwable t = new Throwable("Page cannot be found");
             List list = notFound.addList("not-found", List.TYPE_FORM);
             Item mess = list.addItem();
-            mess.addHighlight("").addContent("Sorry, we couldn't find the page you've requested ("+path+"), if you think it should exist please contact our ");
+            mess.addHighlight("").addContent(T_para1.parameterize(path));
             String support = ConfigurationManager.getProperty("lr.help.mail");
-            mess.addHighlight("").addXref("mailto:" + support, "Help Desk.", null, null);
+            mess.addHighlight("").addXref("mailto:" + support, T_help_desk, null, null);
             list.addItem(null, "fa fa-warning fa-5x hangright").addContent(" ");
 
             notFound.addPara().addXref(contextPath + "/",T_go_home);
@@ -218,19 +193,8 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
             	trace.addItem(ste.toString());
             }
 
-            //This is here to generate 404 but doesn't work.
-            //check ./sources/dspace-xmlui/dspace-xmlui-webapp/src/main/webapp/sitemap.xmap and the relevant dspace bug referenced in our #421
-            // special case
-
-/*
-            if ( this.eperson == null &&  this.sitemapURI.endsWith(".continue") ) {
-            	throw new InvalidContinuationException( "Page " + this.sitemapURI + " needs authenticated user." );
-            }
-*/            
-            //throw new ResourceNotFoundException("Page cannot be found");
-
-			HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-			httpResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            HttpServletResponse response = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 

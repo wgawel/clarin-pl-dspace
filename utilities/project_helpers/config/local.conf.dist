@@ -105,6 +105,7 @@ lr.dspace.version = lindat-dspace5
 dspace.install.dir = /opt/lindat-dspace/installation
 
 # A description of your dspace instance. It will be used as a description of your dspace instance for other services
+
 #lr.dspace.name = LINDAT/CLARIN digital library at Institute of Formal and Applied Linguistics, Charles University in Prague
 #lr.dspace.name = CLARIN-PL digital repository
 lr.dspace.name = 
@@ -112,7 +113,7 @@ lr.dspace.name =
 # Used in email templates
 #lr.dspace.name.short = LINDAT/CLARIN
 #lr.dspace.name.short = CLARIN-PL
-lr.dspace.name.short = 
+lr.dspace.name.short = CLARIN-PL
 
 supported.locales = en, cs
 
@@ -424,4 +425,35 @@ lr.spEntityId = http://example.com/sp/shibboleth
 ####
 lr.shortener.enabled = false
 lr.shortener.handle.prefix = 1234
+
+#####
+#
+# XSendFile header
+#
+####
+lr.XSendFileHeader =
+lr.XSendFilePathPrefix =
+
+####
+#
+# drive etc config
+#
+####
+#don't show anything in upload step
+social.enabled=false
+#id can't be null even when not configured
+social.google.clientId=fake_id
+#dto for secret
+social.google.clientSecret=fake_secret
+#neither password used to generate key to encrypt/decrypt user's tokens
+social.userconnection.encrypt.password=1234567890abcdef
+#salt must be hex encdoded string with length >= 8 bytes
+social.userconnection.encrypt.salt=1234abcd
+
+### TOS Page
+lr.description.institution = Wroclaw University of Science and Technology
+lr.description.location = wybrzeże Stanisława Wyspiańskiego 27, 50-370 Wrocław, Poland
+lr.description.country = Poland
+lr.description.city = Wrocław
+
 lr.compile.time=

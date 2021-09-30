@@ -2,7 +2,6 @@
 package cz.cuni.mff.ufal;
 
 import cz.cuni.mff.ufal.tracker.TrackerFactory;
-import cz.cuni.mff.ufal.tracker.TrackingSite;
 import org.apache.avalon.excalibur.pool.Recyclable;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
@@ -32,7 +31,6 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
-
 import javax.mail.internet.MimeUtility;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.Deflater;
+
 
 public class AllBitstreamZipArchiveReader extends AbstractReader implements Recyclable {
 
@@ -175,7 +174,8 @@ public class AllBitstreamZipArchiveReader extends AbstractReader implements Recy
 
             if(ConfigurationManager.getBooleanProperty("lr", "lr.tracker.enabled")) {
                 // Track the download for analytics platform
-                TrackerFactory.createInstance(TrackingSite.BITSTREAM).trackPage(request, "Bitstream Download / Zip Archive");
+                TrackerFactory.createBitstreamTrackerInstance(item.getOwningCollection()).trackPage(request,
+                        "Bitstream Download / Zip Archive");
             }
 
         }

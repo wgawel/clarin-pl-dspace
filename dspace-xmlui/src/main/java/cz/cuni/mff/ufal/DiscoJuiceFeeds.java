@@ -2,30 +2,36 @@
 package cz.cuni.mff.ufal;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.exception.GeoIp2Exception;
+import com.maxmind.geoip2.model.CityResponse;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.generation.AbstractGenerator;
 import org.apache.cocoon.xml.dom.DOMStreamer;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
+import org.dspace.utils.DSpace;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import com.maxmind.geoip.Location;
-import com.maxmind.geoip.LookupService;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -50,18 +56,14 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
     private static String feedsContent;
     private static ReadWriteLock lock = new ReentrantReadWriteLock();
     private static final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    private static ScheduledFuture<?> future;
+    private static boolean aggressiveDelay = true;
 
     static{
-        executor.scheduleWithFixedDelay(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                DiscoJuiceFeeds.update();
-                                            }
-                                        }, 0,
-                ConfigurationManager.getLongProperty("discojuice", "refresh"), TimeUnit.HOURS);
+        future = executor.scheduleWithFixedDelay(new Updater(), 30, 60, TimeUnit.SECONDS);
     }
 
-    private static final LookupService locationService;
+    private static final DatabaseReader locationService;
     /**
      * contains entityIDs of idps we wish to set the country to something different than discojuice feeds suggests
      **/
@@ -69,13 +71,10 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
 
     static {
         String dbfile = ConfigurationManager.getProperty("usage-statistics", "dbfile");
-        LookupService service = null;
+        DatabaseReader service = null;
         if (dbfile != null) {
             try {
-                service = new LookupService(dbfile,
-                        LookupService.GEOIP_STANDARD);
-            } catch (FileNotFoundException fe) {
-                log.error("The GeoLite Database file is missing (" + dbfile + ")! Solr Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
+                service = new DatabaseReader.Builder(new BufferedInputStream(Files.newInputStream(Paths.get(dbfile)))).build();
             } catch (IOException e) {
                 log.error("Unable to load GeoLite Database file (" + dbfile + ")! You may need to reinstall it. See the DSpace installation instructions for more details.", e);
             }
@@ -96,7 +95,19 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
         log.info("DiscoJuiceFeeds::update called");
         lock.writeLock().lock();
         try{
-           feedsContent = createFeedsContent();
+            String newFeedsContent = createFeedsContent();
+            if(isNotBlank(newFeedsContent)) {
+                feedsContent = newFeedsContent;
+            }
+            if(aggressiveDelay && isNotBlank(feedsContent)){
+                // apply the configured refresh rate, when we've successfully obtained feeds
+                future.cancel(true);
+                future = executor.scheduleWithFixedDelay(new Updater(), 0,
+                        ConfigurationManager.getLongProperty("discojuice", "refresh"),
+                        TimeUnit.HOURS);
+                aggressiveDelay = false;
+            }
+
         }finally {
             lock.writeLock().unlock();
         }
@@ -121,7 +132,7 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
             Element root = doc.createElement("ignore_root");
             lock.readLock().lock();
             try {
-                if (feedsContent == null || feedsContent.isEmpty()) {
+                if (isBlank(feedsContent)) {
                     response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to obtain feeds.");
                 } else {
                     boolean jsonp = isNotBlank(callback);
@@ -162,12 +173,62 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
         return map;
     }
 
+    private static JSONArray shrink(JSONArray jsonArray){
+        for(Object entityO : jsonArray){
+            JSONObject entity = (JSONObject) entityO;
+            // if there are DisplayNames only the first one will be used in title copy the rest
+            // to keywords
+            // copy any value in Keywords and Description to keywords
+            for(String key: new String[]{"DisplayNames", "Keywords", "Descriptions"}) {
+                if (entity.containsKey(key)) {
+                    JSONArray keyObjects = (JSONArray) entity.get(key);
+                    List<String> values = getValues(keyObjects);
+                    if (!values.isEmpty()) {
+                        if("DisplayNames".equals(key)){
+                            entity.put("title", values.remove(0));
+                            if(values.isEmpty()){
+                                continue;
+                            }
+                        }
+                        if (entity.containsKey("keywords")) {
+                            values.addAll((List<String>) entity.get("keywords"));
+                        }
+                        entity.put("keywords", values);
+                    }
+                }
+            }
+
+            // Logos (in contrast to icon) are currently unused by the fronted; they just eat bandwidth
+            // The same for InformationURLs, Descriptions, PrivacyStatementURLs
+            // Can be configured
+            String[] toRemove = new DSpace().getConfigurationService().getPropertyAsType("discojuice" +
+                    ".remove_from_shib_feed_object", new String[]{"Logos", "InformationURLs",
+                    "Descriptions", "PrivacyStatementURLs", "DisplayNames", "Keywords"});
+            for(String key : toRemove){
+                entity.remove(key);
+            }
+        }
+        return jsonArray;
+    }
+
+    private static List<String> getValues(JSONArray array){
+        ArrayList<String> res = new ArrayList<>(array.size());
+        for(Object obj : array){
+            JSONObject jObj = (JSONObject) obj;
+            if(jObj.containsKey("value")){
+                res.add((String)jObj.get("value"));
+            }
+
+        }
+        return res;
+    }
+
     public static String createFeedsContent(String feedsConfig, String shibbolethDiscoFeedUrl){
         String old_value = System.getProperty("jsse.enableSNIExtension");
         System.setProperty("jsse.enableSNIExtension", "false");
 
         //Obtain shibboleths discofeed
-        final Map<String,JSONObject> shibDiscoEntities = toMap(DiscoJuiceFeeds.downloadJSON(shibbolethDiscoFeedUrl));
+        final Map<String,JSONObject> shibDiscoEntities = toMap(shrink(DiscoJuiceFeeds.downloadJSON(shibbolethDiscoFeedUrl)));
 
         //true is the default http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html
         old_value = (old_value == null) ? "true" : old_value;
@@ -211,10 +272,14 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
                 log.info(String.format("For %s changed country from %s to %s", shibEntity.get("entityID"), old_country, new_country));
             }
         }
-        JSONArray ret = new JSONArray();
-        ret.addAll(shibDiscoEntities.values());
 
-        return ret.toJSONString();
+        if(shibDiscoEntities.isEmpty()){
+            return null;
+        }else {
+            JSONArray ret = new JSONArray();
+            ret.addAll(shibDiscoEntities.values());
+            return ret.toJSONString();
+        }
     }
 
     private static JSONArray downloadJSON(String url){
@@ -233,25 +298,26 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
     }
 
     private static String guessCountry(JSONObject entity){
-    	if(locationService != null && entity.containsKey("InformationURLs")){
-    		JSONArray informationURLs = (JSONArray)entity.get("InformationURLs");
-    		if(informationURLs.size() > 0){
-    			String informationURL = (String)((JSONObject)informationURLs.get(0)).get("value");
-    			try{
-    				Location location = locationService.getLocation(java.net.InetAddress.getByName(new URL(informationURL).getHost()));
-    				if(location != null && location.countryCode != null){
-    					return location.countryCode;
-    				}else{
-    					log.info("Country or location is null for " + informationURL);
-    				}
-    			}catch(MalformedURLException e){
-    				
-    			}catch(java.net.UnknownHostException e){
-    				
-    			}
-    		}
-    	}
-    	String entityID = (String)entity.get("entityID");
+        if(locationService != null && entity.containsKey("InformationURLs")){
+            JSONArray informationURLs = (JSONArray)entity.get("InformationURLs");
+            if(informationURLs.size() > 0){
+                String informationURL = (String)((JSONObject)informationURLs.get(0)).get("value");
+                try{
+                    CityResponse cityResponse = locationService.city(InetAddress.getByName(new URL(informationURL).getHost()));
+                    if(cityResponse != null && cityResponse.getCountry() != null && isNotBlank(cityResponse.getCountry().getIsoCode())){
+                        String code = cityResponse.getCountry().getIsoCode();
+                        log.debug("Found code " + code + " for " + informationURL);
+                        return code;
+                    }else{
+                        log.info("Country or location is null for " + informationURL);
+                    }
+                }catch(IOException | GeoIp2Exception e){
+                    log.debug(e);
+                }
+
+            }
+        }
+        String entityID = (String)entity.get("entityID");
         //entityID not necessarily an URL
         try{
             URL url = new URL(entityID);
@@ -276,4 +342,10 @@ public class DiscoJuiceFeeds extends AbstractGenerator {
         //System.out.println(feeds);
     }
 
+    private static class Updater implements Runnable {
+        @Override
+        public void run() {
+            DiscoJuiceFeeds.update();
+        }
+    }
 }

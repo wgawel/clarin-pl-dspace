@@ -2,16 +2,19 @@
 <!-- 
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-				xmlns:doc="http://www.lyncode.com/xoai"
-				xmlns:itemUtil="cz.cuni.mff.ufal.utils.ItemUtil"
-				xmlns:isocodes="cz.cuni.mff.ufal.IsoLangCodes"
-				xmlns:xalan="http://xml.apache.org/xslt"
-				xmlns:configuration="org.dspace.core.ConfigurationManager"
-				xmlns:ms="http://www.ilsp.gr/META-XMLSchema"
-				xmlns:olac="http://experimental.loc/olac"
-				xmlns:cmd="http://www.clarin.eu/cmd/" xmlns:xls="http://www.w3.org/1999/XSL/Transform"
-				exclude-result-prefixes="doc xalan itemUtil isocodes configuration ms"
-				version="1.0">
+    xmlns:doc="http://www.lyncode.com/xoai"
+    xmlns:itemUtil="cz.cuni.mff.ufal.utils.ItemUtil"
+    xmlns:isocodes="cz.cuni.mff.ufal.IsoLangCodes"
+    xmlns:xalan="http://xml.apache.org/xslt"
+    xmlns:configuration="org.dspace.core.ConfigurationManager"
+    xmlns:jstring="java.lang.String"
+    xmlns:ms="http://www.ilsp.gr/META-XMLSchema"
+    xmlns:olac="http://experimental.loc/olac"
+    xmlns:cmd="http://www.clarin.eu/cmd/"
+    xmlns:lindat="http://lindat.mff.cuni.cz/ns/experimental/cmdi"
+    exclude-result-prefixes="doc xalan itemUtil isocodes configuration ms jstring"
+    version="1.0">
+
     <xsl:import href="metadataFormats/metasharev2.xsl"/>
     <xsl:import href="metadataFormats/olac-dcmiterms.xsl"/>
     
@@ -22,8 +25,10 @@
 
 
     <xsl:variable name="handle" select="/doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text()"/>
-    <xsl:variable name="dc_identifier_uri" select="/doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='uri']/doc:element/doc:field[@name='value']"/>
+    <xsl:variable name="dc_identifier_uri"
+				  select="jstring:replaceFirst(jstring:new(/doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='uri']/doc:element/doc:field[@name='value']), 'http://', 'https://')"/>
     <xsl:variable name="modifyDate" select="/doc:metadata/doc:element[@name='others']/doc:field[@name='lastModifyDate']/text()"/>
+	<xsl:variable name="dc_rights_uri" select="/doc:metadata/doc:element[@name='dc']/doc:element[@name='rights']/doc:element[@name='uri']/doc:element/doc:field[@name='value']" />
     <xsl:variable name="dsURL" select="configuration:getProperty('dspace.url')"/>
     <xsl:variable name="newProfile" select="'clarin.eu:cr1:p_1403526079380'"/>
     <xsl:variable name="oldProfile" select="'clarin.eu:cr1:p_1349361150622'"/>
@@ -44,7 +49,7 @@
     	<xsl:variable name="contact" select="/doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value']"/>
     	<xsl:variable name="profile">
                     <xsl:choose>
-                            <xsl:when test="$contact != ''">
+                            <xsl:when test="$contact != '' and $dc_rights_uri != ''">
                             	<xsl:value-of select="$newProfile"/>
                             </xsl:when>
                             <xsl:otherwise>
@@ -101,7 +106,6 @@
 				</cmd:ResourceProxy>
 				<xsl:call-template name="ProcessSourceURI"/>
 				<xsl:call-template name="ProcessBitstreams"/>
-				<xsl:call-template name="ProcessBitstreamsMetadata"/>
 			</cmd:ResourceProxyList>
 			<cmd:JournalFileProxyList/>
 			<cmd:ResourceRelationList/>
@@ -114,16 +118,7 @@
 		   <cmd:ResourceProxy>
 	                   <xsl:attribute name="id">r_<xsl:value-of select="./doc:field[@name='id']/text()"/></xsl:attribute>
                        <cmd:ResourceType><xsl:attribute name="mimetype"><xsl:value-of select="./doc:field[@name='format']/text()"/></xsl:attribute>Resource</cmd:ResourceType>
-                       <cmd:ResourceRef>
-						   <xsl:choose>
-							   <xsl:when test="./doc:field[@name='external_url']/text() != ''">
-								   <xsl:value-of select="./doc:field[@name='external_url']/text()"/>
-							   </xsl:when>
-							   <xls:otherwise>
-								   <xsl:value-of select="concat($dsURL,'/bitstream/handle/',$handle,'/',./doc:field[@name='name']/text(),'?sequence=',./doc:field[@name='sid']/text())"/>
-							   </xls:otherwise>
-						   </xsl:choose>
-					   </cmd:ResourceRef>
+			   <cmd:ResourceRef><xsl:attribute name="lindat:md5_checksum"><xsl:value-of select="./doc:field[@name='checksum']/text()"/></xsl:attribute><xsl:value-of select="concat($dsURL,'/bitstream/handle/',$handle,'/',./doc:field[@name='name']/text(),'?sequence=',./doc:field[@name='sid']/text())"/></cmd:ResourceRef>
            </cmd:ResourceProxy>
 	   </xsl:for-each>
 	</xsl:template>
@@ -155,9 +150,11 @@
 		<cmd:Components>
 			<cmd:data>
 				<xsl:call-template name="OLAC_DCMI"/>
-				<xsl:call-template name="ResourceInfo">
-					<xsl:with-param name="ns" select='"http://www.clarin.eu/cmd/"'/>
-				</xsl:call-template>
+				<xsl:if test="doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#IdentificationInfo']/doc:element[@name='resourceName']/doc:element/doc:field[@name='value']">
+                    <xsl:call-template name="ResourceInfo">
+                        <xsl:with-param name="ns" select='"http://www.clarin.eu/cmd/"'/>
+                    </xsl:call-template>
+				</xsl:if>
 			</cmd:data>
 		</cmd:Components>
 	</xsl:template>
@@ -197,11 +194,13 @@
 			<cmd:identifiers>
 				<cmd:identifier type="Handle"><xsl:value-of select="$dc_identifier_uri"/></cmd:identifier>
 			</cmd:identifiers>
-			<cmd:funds>
-				<xsl:for-each select="doc:metadata/doc:element[@name='local']/doc:element[@name='sponsor']/doc:element/doc:field[@name='value']">
-					<xsl:copy-of select="itemUtil:getFunding(.)"/>
-				</xsl:for-each>
-			</cmd:funds>
+			<xsl:if test="doc:metadata/doc:element[@name='local']/doc:element[@name='sponsor']/doc:element/doc:field[@name='value']">
+                <cmd:funds>
+                    <xsl:for-each select="doc:metadata/doc:element[@name='local']/doc:element[@name='sponsor']/doc:element/doc:field[@name='value']">
+                        <xsl:copy-of select="itemUtil:getFunding(.)"/>
+                    </xsl:for-each>
+                </cmd:funds>
+            </xsl:if>
 			<xsl:copy-of select="itemUtil:getContact(doc:metadata/doc:element[@name='local']/doc:element[@name='contact']/doc:element[@name='person']/doc:element/doc:field[@name='value'])"/>
 			<cmd:publishers>
 				<cmd:publisher>

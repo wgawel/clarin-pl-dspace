@@ -64,7 +64,7 @@ public class CmdiProfilesResource extends Resource {
         org.dspace.core.Context context = null;
         FileInputStream fis = null;
         try {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             CmdiProfile profile = DSpaceApi.getCmdiProfileById(profileId);
             File file = new File(profile.getForm());
             fis = new FileInputStream(file);

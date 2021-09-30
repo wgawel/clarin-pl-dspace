@@ -73,7 +73,7 @@ public class ProcessItems extends ItemsResource {
         org.dspace.core.Context context = null;
 
         try {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
 
             if(dso.getType() == Constants.ITEM) {
@@ -125,7 +125,7 @@ public class ProcessItems extends ItemsResource {
         org.dspace.content.Item dspaceItem = null;
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
             if(dso.getType() == Constants.ITEM) {
                 dspaceItem = (Item) dso;
@@ -162,7 +162,7 @@ public class ProcessItems extends ItemsResource {
         org.dspace.core.Context context = null;
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
 
             if(dso.getType() == Constants.ITEM) {
@@ -200,7 +200,7 @@ public class ProcessItems extends ItemsResource {
         org.dspace.core.Context context = null;
 
         try {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
 
             if(dso.getType() == Constants.ITEM) {
@@ -237,7 +237,7 @@ public class ProcessItems extends ItemsResource {
         org.dspace.core.Context context = null;
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
 
             if(dso.getType() == Constants.ITEM) {
@@ -281,7 +281,7 @@ public class ProcessItems extends ItemsResource {
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
             if(dso.getType() == Constants.ITEM) {
                 org.dspace.content.Item item = (Item) dso;
@@ -341,7 +341,7 @@ public class ProcessItems extends ItemsResource {
         m.put("error", null);
 
         try {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
 
             if(dso.getType() == Constants.ITEM) {

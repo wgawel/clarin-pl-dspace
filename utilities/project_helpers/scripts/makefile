@@ -71,7 +71,10 @@ UTILITIES_DATABASE_NAME :=$(shell cd $(BASE) && python setup.lindat.py --get="lr
 DB_PORT			:=$(shell cd $(BASE) && python setup.lindat.py --get="lr.database.port" --from="$(LOCAL_CONF)")
 DIR_INSTALLATION        :=$(shell cd $(BASE) && python setup.lindat.py --get="lr.dspace.install.dir" --from="$(LOCAL_CONF)")
 
+DIR_LINDAT_THEME_IN_WEBAPPS :=$(DIR_INSTALLATION)/webapps/xmlui/themes/UFAL/lib/lindat
 DIR_DATABASE_BACKUP         :=$(DIR_INSTALLATION)/../database_backup
+
+SOCIAL_ENABLED          :=$(shell cd $(BASE) && python setup.lindat.py --get="social.enabled" --from="$(LOCAL_CONF)")
 
 
 # Dspace Configuration
@@ -172,11 +175,12 @@ clean_source: deploy_logs
 clean_installation:
 	@cd $(DIR_BUILD) && $(ANT_WITH_CONF) clean_backups 2>&1 | $(HIDE_PASSW) | tee  $(DIR_DEPLOY_LOGS)/$@.log
 	
-compile: deploy_logs
+compile: deploy_logs dspace-oai/src/main/resources/iso-639-3.tab
 	@if [[ -f $@.sh ]]; then echo "Running customised $@"; bash $@.sh; fi 
 	@echo "COMPILING SOURCE ..."
 	@echo "Updating lr.compile.time..."
 	@if grep -q "lr\.compile\.time" $(LOCAL_CONF);then sed --follow-symlinks -i'' "s/^lr\.compile\.time=.*/lr.compile.time=`date`/" $(LOCAL_CONF); else echo -e "$(RED)Compile time not updated$(NORMAL)";fi
+	@sed --follow-symlinks -i'' '/lr.description.currentAsOf/d' $(LOCAL_CONF) && echo "lr.description.currentAsOf=`date +%Y-%m-%d`" >> $(LOCAL_CONF)
 	@cd $(DIR_SOURCE) && mvn clean package $(MVN_OPTS) 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log
 	@echo ""
 	@if grep -q "BUILD FAILURE" $(DIR_DEPLOY_LOGS)/compile.log; then \
@@ -195,21 +199,29 @@ install_guru:   print_message \
                 install_dspace
 
 install_dspace: 
-# @if test -L $(DIR_LINDAT_THEME_IN_WEBAPPS); then unlink $(DIR_LINDAT_THEME_IN_WEBAPPS); fi
-	@echo "DEPLOYING CLARIN-PL DSpace ..."
-	@cd $(DIR_BUILD) &&  $(ANT_WITH_CONF) update 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log
+	@if test -L $(DIR_LINDAT_THEME_IN_WEBAPPS); then unlink $(DIR_LINDAT_THEME_IN_WEBAPPS); fi
+	@echo "DEPLOYING CLARIN-DSpace ..."
+	@cd $(DIR_BUILD) &&  $(ANT_WITH_CONF) update 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log 
 	@$(MAKE) clean_installation
 	@echo "INSTALLATION SUCCESSFUL ..."
 
-postinstall:
+postinstall: 
+	# spring-social gdrive is experimental and enabled with this hack only if configured
+	@if [ "$(SOCIAL_ENABLED)" = "true" ];then sed -ie 's#.*</web-app>.*#<context-param>\n<param-name>spring.profiles.active</param-name>\n<param-value>drive-beta</param-value>\n</context-param>\n</web-app>#' "$(DIR_INSTALLATION)/webapps/xmlui/WEB-INF/web.xml";fi
+
 	@$(MAKE) update_lindat_common
 	@$(MAKE) grant_rights
 	@if [[ -f $@.sh ]]; then echo "Running customised $@"; bash $@.sh; fi 
 	@echo "DEPLOYMENT (INSTALL + POSTINSTALL) SUCCESSFUL"
 
 fresh_install:
-	@echo "INSTALLING FRESH CLARIN-PL DSpace ..."
+	@echo "INSTALLING FRESH CLARIN-DSpace ..."
 	@cd $(DIR_BUILD) && $(ANT_WITH_CONF) fresh_install 2>&1 | $(HIDE_PASSW) | tee $(DIR_DEPLOY_LOGS)/$@.log
+
+
+dspace-oai/src/main/resources/iso-639-3.tab:
+	@if [[ ! -f $(DIR_SOURCE)/$@ ]]; then echo "Downloading iso-639-3.tab from sil.org"; wget -O $(DIR_SOURCE)/$@ https://iso639-3.sil.org/sites/iso639-3/files/downloads/iso-639-3.tab; fi
+
 
 # Grant rights to installation
 grant_rights:

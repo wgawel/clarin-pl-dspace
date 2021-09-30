@@ -15,6 +15,7 @@
 
     <Contexts>
         <Context baseurl="request" name="Default Context">
+            <Filter ref="defaultFilter"/>
             <Format ref="oaidc"/>
             <Format ref="mets"/>
             <Format ref="dim"/>
@@ -26,6 +27,7 @@
 			<Format ref="cmdi" />
 			<Format ref="olac" />
 			<Format ref="html" />
+            <Format ref="elg" />
             <Description>
                 This is the default context of the DSpace OAI-PMH data provider.
             </Description>
@@ -135,6 +137,7 @@
 		    <XSLT>metadataFormats/lindat_cmdi.xsl</XSLT>
 		    <Namespace>http://www.clarin.eu/cmd/</Namespace>
 		    <SchemaLocation>http://catalog.clarin.eu/ds/ComponentRegistry/rest/registry/profiles/clarin.eu:cr1:p_1349361150622/xsd</SchemaLocation>
+            <Filter ref="ExcludeItemsInComOrCol"/>
 		</Format>
         <Format id="olac">
                <Prefix>olac</Prefix>
@@ -146,8 +149,8 @@
 		<Format id="oai_datacite">
 		       <Prefix>oai_datacite</Prefix>
 		       <XSLT>metadataFormats/datacite_openaire.xsl</XSLT>
-		       <Namespace>http://schema.datacite.org/oai/oai-1.0/</Namespace>
-		       <SchemaLocation>http://schema.datacite.org/oai/oai-1.0/oai.xsd</SchemaLocation>
+		       <Namespace>http://schema.datacite.org/oai/oai-1.1/</Namespace>
+		       <SchemaLocation>http://schema.datacite.org/oai/oai-1.1/oai.xsd</SchemaLocation>
 		</Format>
 		<Format id="html">
 		    <Prefix>html</Prefix>
@@ -155,6 +158,13 @@
 		    <Namespace>http://clarin-pl.eu/ns/experimental/html</Namespace>
 		    <SchemaLocation>http://clarin-pl.eu/schemas/experimental/html.xsd</SchemaLocation>
 		</Format>
+        <Format id="elg">
+            <Prefix>elg</Prefix>
+            <XSLT>metadataFormats/elg.xsl</XSLT>
+            <Namespace>http://w3id.org/meta-share/meta-share/</Namespace>
+            <SchemaLocation>http://w3id.org/meta-share/meta-share/ ../Schema/ELG-SHARE.xsd</SchemaLocation>
+            <Filter ref="elgFilter"/>
+        </Format>
     </Formats>
 
     <Transformers>
@@ -171,6 +181,11 @@
         <Filter id="openaireFilter">
             <Definition>
                                 <Custom ref="openaireRelationCondition"/>
+            </Definition>
+        </Filter>
+        <Filter id="ExcludeItemsInComOrCol">
+            <Definition>
+                <Custom ref="cmdiExcludedComsOrCols"/>
             </Definition>
         </Filter>
 
@@ -304,6 +319,19 @@
             </Definition>
         </Filter>
 
+        <Filter id="elgFilter">
+            <Definition>
+                <And>
+                    <LeftCondition>
+                        <Custom ref="hasFilesCondition"/>
+                    </LeftCondition>
+                    <RightCondition>
+                        <Custom ref="hasMediaTypeCondition"/>
+                    </RightCondition>
+                </And>
+            </Definition>
+        </Filter>
+
         <!-- This condition determines if an Item has a "dc.type" field
              which contains "Thesis". -->
         <CustomCondition id="thesisDocumentTypeCondition">
@@ -395,6 +423,29 @@
                 <string name="field">dc.relation</string>
                 <string name="operator">starts_with</string>
                 <string name="value">info:eu-repo/grantAgreement/</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="hasFilesCondition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">local.has.files</string>
+                <string name="operator">equal</string>
+                <string name="value">yes</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="hasMediaTypeCondition">
+            <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
+            <Configuration>
+                <string name="field">metashare.ResourceInfo#ContentInfo.mediaType</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="cmdiExcludedComsOrCols">
+            <Class>cz.cuni.mff.ufal.dspace.xoai.filter.ColComFilter</Class>
+            <Configuration>
+                <string name="handle">XXX</string>
             </Configuration>
         </CustomCondition>
     </Filters>

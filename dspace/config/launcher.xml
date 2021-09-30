@@ -135,6 +135,14 @@
         </step>
     </command>
     <command>
+        <name>extendedimport</name>
+        <description>Import items with bitstream metadata into DSpace</description>
+        <step>
+            <class>cz.cuni.mff.ufal.dspace.app.itemimport.ItemImport</class>
+            <argument>-xcz.cuni.mff.ufal.dspace.app.itemimport.ItemImport</argument>
+        </step>
+    </command>
+    <command>
         <name>index-authority</name>
         <description>Indexes all metadata fields that use solr authority</description>
         <step>
@@ -276,8 +284,6 @@
             <class>org.dspace.util.SolrImportExport</class>
 	    <argument>-a</argument>
 	    <argument>export</argument>
-	    <argument>-i</argument>
-	    <argument>statistics</argument>
         </step>
     </command>
     <command>
@@ -287,8 +293,6 @@
             <class>org.dspace.util.SolrImportExport</class>
 	    <argument>-a</argument>
 	    <argument>import</argument>
-	    <argument>-i</argument>
-	    <argument>statistics</argument>
         </step>
     </command>
     <command>
@@ -298,8 +302,6 @@
             <class>org.dspace.util.SolrImportExport</class>
 	    <argument>-a</argument>
 	    <argument>reindex</argument>
-	    <argument>-i</argument>
-	    <argument>statistics</argument>
         </step>
     </command>
     <command>

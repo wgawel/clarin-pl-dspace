@@ -24,7 +24,7 @@
        particular java class. 
     -->
   <!-- General keys -->
-  <message key="xmlui.general.dspace_home">LINDAT/CLARIN Repository Home</message>
+  <message key="xmlui.general.dspace_home">LINDAT/CLARIAH-CZ Repository Home</message>
   <message key="xmlui.general.search">Search</message>
   <message key="xmlui.general.go">Go</message>
   <message key="xmlui.general.go_home">Back to repository homepage</message>
@@ -38,6 +38,7 @@
   <message key="xmlui.general.perform">Perform</message>
   <message key="xmlui.general.queue">Queue</message>
   <message key="xmlui.general.here">here</message>
+  <message key="xmlui.general.helpdesk">Help Desk</message>
   <!-- Keys which are used by exception2dri.xsl on error pages -->
   <message key="xmlui.error.contact_msg">Please contact the site administrator if you wish to report this error. If possible, please  provide details about what you were doing at the time this error occurred.</message>
   <message key="xmlui.error.contact">Contact site administrator</message>
@@ -51,7 +52,7 @@
     -->
   <message key="xmlui.PageNotFound.title">Page not found</message>
   <message key="xmlui.PageNotFound.head">Page not found</message>
-  <message key="xmlui.PageNotFound.para1">We can't find the page you asked for.</message>
+  <message key="xmlui.PageNotFound.para1">Sorry, we couldn't find the page you've requested ({0}), if you think it should exist please contact our </message>
   <!--  session expired  -->
   <message key="xmlui.SessionExpired.title">Your Session has Expired</message>
   <message key="xmlui.SessionExpired.head">To login and continue, click </message>
@@ -65,7 +66,7 @@
   <!--
     This section is for feed syndications (RSS, atom, etc)  
   -->
-  <message key="xmlui.feed.general_description">The LINDAT/CLARIN digital repository system captures, stores, indexes, preserves, and distributes digital research material.</message>
+  <message key="xmlui.feed.general_description">The LINDAT/CLARIAH-CZ digital repository system captures, stores, indexes, preserves, and distributes digital research material.</message>
   <message key="xmlui.feed.header">RSS Feeds</message>
   <message key="xmlui.feed.logo_title">The Channel Image</message>
   <message key="xmlui.feed.untitled">Untitled</message>
@@ -516,7 +517,7 @@
   <!-- org.dspace.app.xmlui.eperson.WelcomeLogin.java -->
   <message key="xmlui.EPerson.WelcomeLogin.title">Welcome message</message>
   <message key="xmlui.EPerson.WelcomeLogin.trail">Welcome message</message>
-  <message key="xmlui.EPerson.WelcomeLogin.head1">Welcome to LINDAT/CLARIN Repository</message>
+  <message key="xmlui.EPerson.WelcomeLogin.head1">Welcome to LINDAT/CLARIAH-CZ Repository</message>
   <message key="xmlui.EPerson.WelcomeLogin.head2">Privacy Statement</message>
   <message key="xmlui.EPerson.WelcomeLogin.para1">The information released by your IdP (home organisation) is shown below.</message>
   <message key="xmlui.EPerson.WelcomeLogin.warn1">
@@ -547,6 +548,8 @@
   <message key="xmlui.EPerson.FailedAuthentication.title">Authentication Failed</message>
   <message key="xmlui.EPerson.FailedAuthentication.trail">Failed Authentication</message>
   <message key="xmlui.EPerson.FailedAuthentication.h1">Authentication Failed</message>
+  <!-- cz.cuni.mff.ufal.dspace.authenticate.shibboleth.ShibEPerson -->
+  <message key="xmlui.ShibEPerson.locked_email">Your email ({0}) is already associated with a different user. It is also possible that you used a different identity provider to login before. For more information please contact our <a class="helpdesk-tolink">Help Desk</a>.</message>
   <!-- Login xml files -->
   <message key="xmlui.eperson.noAuthMethod.head">No Authentication Method Found</message>
   <message key="xmlui.eperson.noAuthMethod.p1">No authentication method was found. Please contact the <a class="helpdesk-tolink">Help Desk</a>.</message>
@@ -897,6 +900,7 @@
   <message key="xmlui.Submission.submit.UploadStep.checksum">File checksum:</message>
   <message key="xmlui.Submission.submit.UploadStep.submit_remove">Remove selected files</message>
   <message key="xmlui.Submission.submit.UploadStep.review.no_file">You didn't upload any file.</message>
+  <message key="xmlui.Submission.submit.UploadStep.social.drive.list_files">Add files from your Drive <span class="google-drive">&#160;</span></message>
   <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Upload File(s)</message>
   <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file">File</message>
   <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file_help">Please enter the full path of the file on your computer corresponding to your item. If you click "Browse...", a new window will allow you to select the file from your computer.</message>
@@ -2347,7 +2351,9 @@
   <message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">View/<wbr/>Open</message>
   <message key="xmlui.dri2xhtml.METS-1.0.item-files-access-rights">P&#x159;&#xED;stup na &#x10D;ten&#xED; dostupn&#xFD; pro</message>
   <message key="xmlui.dri2xhtml.METS-1.0.item-no-files">There are no files associated with this item.</message>
+  <message key="xmlui.dri2xhtml.METS-1.0.item-files-checksum">MD5</message>
   <message key="xmlui.ufal.METS-1.0.item-collections">Collection(s)</message>
+  <message key="xmlui.dri2xhtml.METS-1.0.item-relation-isreferencedby">Referenced by</message>
   <message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>
   <message key="xmlui.dri2xhtml.METS-1.0.size-kilobytes">KB</message>
   <message key="xmlui.dri2xhtml.METS-1.0.size-megabytes">MB</message>
@@ -2784,7 +2790,7 @@
   <message key="xmlui.UFAL.dragndrop.nodescription.label">Describing file named </message>
   <!-- ufal theme -->
   <message key="UFAL.firstpage.title">Repository</message>
-  <message key="UFAL.firstpage.title.text">Welcome to LINDAT/CLARIN - Centre for Language Research Infrastructure in the Czech Republic</message>
+  <message key="UFAL.firstpage.title.text">Welcome to LINDAT/CLARIAH-CZ - Centre for Language Research Infrastructure in the Czech Republic</message>
   <!-- UFAL/lib/xsl/aspect/artifactbrowser/item-list.xsl -->
   <message key="xmlui.UFAL.artifactbrowser.item-contains-one-file">This item contains {0} file ({1}).</message>
   <message key="xmlui.UFAL.artifactbrowser.item-contains-many-files">This item contains {0} files ({1}).</message>
@@ -2801,7 +2807,6 @@
   <message key="xmlui.UFAL.artifactbrowser.authors">Authors</message>
   <message key="xmlui.UFAL.artifactbrowser.project.code">Project code: {0}</message>
   <message key="xmlui.UFAL.artifactbrowser.project.name">Project name: {0}</message>
-  <message key="xmlui.UFAL.artifactbrowser.piwik.views">Views Over Time</message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.replaced_one">This item is replaced by a newer submission:</message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.replaced_many">This item is replaced by newer submissions:</message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.licensed_under">This item is {0} and licensed under:<BR/></message>
@@ -2891,13 +2896,12 @@
   <message key="input_forms.field.dc.description.required">Please give us a description</message>
   <message key="input_forms.field.dc.language.iso.label">Language</message>
   <message key="input_forms.field.dc.language.iso.hint">Select the language of the main content of the item. Multiple languages are possible. Start
-    typing the language and use autocomplete form that will appear if applicable.
+	typing the language and use autocomplete form that will appear if applicable. Better to list all the languages then to use the 'mul' iso code (if there are too many, contact support).
   </message>
   <message key="input_forms.field.dc.language.iso.required">Please choose a language for the resource.</message>
   <message key="input_forms.field.dc.language.iso1.label">Language</message>
-  <message key="input_forms.field.dc.language.iso1.hint">Select the spoken language (in ISO 639-3 format) of the main content of the item (use "N/A" if
-    not applicable). Multiple languages are possible. Start typing the language and use autocomplete
-    form that will appear.
+  <message key="input_forms.field.dc.language.iso1.hint">If the tool/service is language dependent, select the appropriate language(s). Otherwise leave the field empty. Multiple languages are possible. Start typing the language and use autocomplete
+	form that will appear.
   </message>
   <message key="input_forms.field.dc.subject.label">Subject Keywords</message>
   <message key="input_forms.field.dc.subject.hint">Enter appropriate subject keyword or phrase and press the Add button. You can repeat it for
@@ -3072,6 +3076,9 @@
   <message key="input_forms.complex_definitions.funding.3_projname.label">Funding project name</message>
   <message key="input_forms.complex_definitions.funding.5_openaire_id.label">EU Project Identifier (OpenAIRE)</message>
   <message key="input_forms.complex_definitions.sizeInfo.2_unit.label">Unit</message>
+  <message key="input_forms.field.dc.relation.isreferencedby.label">Referenced by</message>
+  <message key="input_forms.field.dc.relation.isreferencedby.hint">Link to original paper that references this dataset.</message>
+  <message key="input_forms.field.dc.relation.isreferencedby.regexp-warning">The supplied url must start with http/https</message>
   <!-- cz.cuni.mff.ufal.ContractPage -->
   <message key="xmlui.ContractPage.title">Distribution License Agreement</message>
   <message key="xmlui.ContractPage.trail">Distribution License Agreement</message>

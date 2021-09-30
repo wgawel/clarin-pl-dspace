@@ -79,6 +79,7 @@ public class ShibbolethAction extends AbstractAction
             {
                 Request request = ObjectModelHelper.getRequest(objectModel);
             	// The user has successfully logged in
+
                 String redirectTo = request.getParameter("login_redirect");
 
                 String redirectURL = request.getRequestURI();
@@ -99,6 +100,7 @@ public class ShibbolethAction extends AbstractAction
                 }
 
             	if (AuthenticationUtil.isInterupptedRequest(objectModel))
+
             	{
             		// Resume the request and set the redirect target URL to
             		// that of the originally interrupted request.
@@ -163,6 +165,7 @@ public class ShibbolethAction extends AbstractAction
                 }
 
                 log.error("Redirect to: "+redirectURL);
+
                 httpResponse.sendRedirect(redirectURL);
                 
                 // log the user out for the rest of this current request, however they will be reauthenticated

@@ -38,6 +38,7 @@
         <message key="xmlui.general.perform">Perform</message>
         <message key="xmlui.general.queue">Queue</message>
 	<message key="xmlui.general.here">here</message>
+    <message key="xmlui.general.helpdesk">Help Desk</message>
 
         <!-- Keys which are used by exception2dri.xsl on error pages -->
         <message key="xmlui.error.contact_msg">Please contact the site administrator if you wish to report this error. If possible, please  provide details about what you were doing at the time this error occurred.</message>
@@ -53,7 +54,7 @@
 		-->
 	<message key="xmlui.PageNotFound.title">Page not found</message>
 	<message key="xmlui.PageNotFound.head">Page not found</message>
-	<message key="xmlui.PageNotFound.para1">We can't find the page you asked for.</message>
+	<message key="xmlui.PageNotFound.para1">Sorry, we couldn't find the page you've requested ({0}), if you think it should exist please contact our </message>
 
     <!--  session expired  -->
     <message key="xmlui.SessionExpired.title">Your Session has Expired</message>
@@ -352,7 +353,9 @@
     <message key="xmlui.ArtifactBrowser.RestrictedItem.head_item_claimed"><h4>This item is managed by another repository</h4></message>
     <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_claimed">You will find this item at the following location(s):</message>
     <message key="xmlui.ArtifactBrowser.RestrictedItem.para2_item_claimed">The author(s) asked us to hide this submission. <strong>We still keep all the data and metadata of the original submission</strong> but the submission is now located at the above url(s). If you need the contents of the original submission, contact us at our <a class="helpdesk-tolink">Help Desk</a>.</message>
-    
+
+    <message key="xmlui.ArtifactBrowser.RestrictedItem.para_reason">The reason for withdrawal:</message>
+
     <message key="xmlui.administrative.item.ConfirmItemForm.withdraw_para_extraInfo">You may wish to provide some extra information; a handle in case the item was moved someplace else and/or reason for the removal.</message>
     <message key="xmlui.administrative.item.ConfirmItemForm.withdraw_help_extra_handle">If you fill this, users wanting to view the item will get special message. With a link created from the new PID.</message>
     <message key="xmlui.administrative.item.ConfirmItemForm.withdraw_label_extra_handle">The new PID:</message>
@@ -368,7 +371,7 @@
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.unknown">unknown</message>
         <message key="xmlui.ArtifactBrowser.RestrictedItem.login">Proceed to login screen</message>
 
-        <message key="xmlui.ArtifactBrowser.RestrictedItem.head_item_withdrawn">This item is withdrawn</message>
+        <message key="xmlui.ArtifactBrowser.RestrictedItem.head_item_withdrawn"><h4>This item is withdrawn</h4></message>
         <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_withdrawn">The selected item is withdrawn and is no longer available.</message>
         <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted_auth">The selected item is access restricted and requires credentials to view. Please login to access the item.</message>
         <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted">Your user account does not have the credentials to view this item. Please contact the <a class="helpdesk-tolink">Help Desk</a> if you have any questions.</message>
@@ -645,6 +648,9 @@
     <message key="xmlui.EPerson.FailedAuthentication.trail">Failed Authentication</message>
     <message key="xmlui.EPerson.FailedAuthentication.h1">Authentication Failed</message>
 
+	<!-- cz.cuni.mff.ufal.dspace.authenticate.shibboleth.ShibEPerson -->
+	<message key="xmlui.ShibEPerson.locked_email">Your email ({0}) is already associated with a different user. It is also possible that you used a different identity provider to login before. For more information please contact our <a class="helpdesk-tolink">Help Desk</a>.</message>
+
 	<!-- Login xml files -->
 	<message key="xmlui.eperson.noAuthMethod.head">No Authentication Method Found</message>
     <message key="xmlui.eperson.noAuthMethod.p1">No authentication method was found. Please contact the <a class="helpdesk-tolink">Help Desk</a>.</message>
@@ -694,6 +700,13 @@
 	<message key="xmlui.EPerson.StartRegistration.email_address_help">This address will be verified and used as your login name.</message>
 	<message key="xmlui.EPerson.StartRegistration.error_bad_email">Unable to send email to this address.</message>
 	<message key="xmlui.EPerson.StartRegistration.submit_register">Register</message>
+
+
+	<message key="xmlui.EPerson.SetEmailStart.para2">Your IDP (home organization) has not provided your email
+		address. Please fill and verify your email in order to submit new items to the repository, to download
+		restricted items and optionally to subscribe to advanced statistics and/or collection updates.</message>
+	<message key="xmlui.EPerson.SetEmailStart.email_address_help">This address will be verified and remembered until
+		your IDP provides a different one. You will still sign in through your IDP.</message>
 
 	<!-- org.dspace.app.xmlui.eperson.VerifyEmail.java -->
 	<message key="xmlui.EPerson.VerifyEmail.title">Verification email sent</message>
@@ -895,6 +908,7 @@
 	<message key="xmlui.Submission.submit.DescribeStep.controlledvocabulary.error">There was an issue when loading the controlled vocabulary, please try again later.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.missing_field">Fill all the fields, please.</message>
 	<message key="xmlui.Submission.submit.DescribeStep.regexp_error">The field doesn't match the required regular expression (format) "{0}"</message>
+	<message key="xmlui.Submission.submit.DescribeStep.english_only">Fill the metadata in English where possible (especially free text fields such as description).</message>
 
     <!-- org.dspace.app.xmlui.Submission.submit.UFALLicenseStep -->
     <message key="xmlui.Submission.submit.NA">N/A</message>
@@ -1050,6 +1064,7 @@
 	<message key="xmlui.Submission.submit.UploadStep.column_checksum">Checksum</message>
 	<message key="xmlui.Submission.submit.UploadStep.column_order">Order</message>
 	<message key="xmlui.Submission.submit.UploadStep.review.no_file">You didn't upload any file.</message>
+	<message key="xmlui.Submission.submit.UploadStep.social.drive.list_files">Add files from your Drive <span class="google-drive">&#160;</span></message>
 
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.head">Upload File(s)</message>
     <message key="xmlui.Submission.submit.UploadWithEmbargoStep.file">File</message>
@@ -2646,8 +2661,11 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-description">Description</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">View/<wbr/>Open</message>
 	<message key="xmlui.dri2xhtml.METS-1.0.item-no-files">There are no files associated with this item.</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-files-checksum">MD5</message>
 
     <message key="xmlui.ufal.METS-1.0.item-collections">Collection(s)</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-relation-isreferencedby">Referenced by</message>
+	<message key="xmlui.dri2xhtml.METS-1.0.item-pid">Item identifier</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>
     <message key="xmlui.dri2xhtml.METS-1.0.size-kilobytes">KB</message>
@@ -2940,7 +2958,6 @@
     <!-- ufal theme -->
   <message key="UFAL.firstpage.title">Repository</message>
   <message key="UFAL.firstpage.title.text">Welcome to CLARIN-PL Repository</message>
-
   <!-- UFAL/lib/xsl/aspect/artifactbrowser/item-list.xsl -->
   <message key="xmlui.UFAL.artifactbrowser.item-contains-one-file">This item contains {0} file ({1}).</message>
   <message key="xmlui.UFAL.artifactbrowser.item-contains-many-files">This item contains {0} files ({1}).</message>
@@ -2967,12 +2984,15 @@
   <message key="xmlui.UFAL.artifactbrowser.authors">Authors</message>
   <message key="xmlui.UFAL.artifactbrowser.project.code">Project code: {0}</message>
   <message key="xmlui.UFAL.artifactbrowser.project.name">Project name: {0}</message>
-  <message key="xmlui.UFAL.artifactbrowser.piwik.views">Views Over Time</message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.replaced_one">This item is replaced by a newer submission:</message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.replaced_many">This item is replaced by newer submissions:</message>
+  <message key="xmlui.UFAL.artifactbrowser.item_view.versions_dt">Other versions</message>
+  <message key="xmlui.UFAL.artifactbrowser.item_view.versions_dropdown">List all versions</message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.licensed_under">This item is {0} and licensed under:<BR/></message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.preview">Preview</message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.file_preview">File Preview</message>
+  <message key="xmlui.UFAL.artifactbrowser.item_view.show_all_authors">show everyone</message>
+
 
 
 	<!-- UFAL/lib/xsl/core/navigation.xsl -->
@@ -3037,7 +3057,16 @@
 		institution. Start typing the publisher and use autocomplete form that will appear if
 		applicable. End your input by pressing ESC if you don't want to use the preselected value.
 	</message>
+	<message key="input_forms.field.dc.publisher.clariah.hint">The name of the publisher of the original analog or born
+		digital object. Use your home institution if this is a born digital object being published now. Start typing the
+		publisher and use autocomplete form that will appear if applicable. End your input by pressing ESC if you
+		don't want to use the preselected value.
+	</message>
 	<message key="input_forms.field.dc.publisher.required">You must enter the name of the publisher.</message>
+	<message key="input_forms.field.local.dataProvider.label">Data provider</message>
+	<message key="input_forms.field.local.dataProvider.hint">This concerns the digital object (not the analog
+		original). An institution from which the data come. Used eg. to give proper attribution. Generally
+		different from publisher.</message>
 	<message key="input_forms.field.local.contact.person.label">Contact person</message>
 	<message key="input_forms.field.local.contact.person.hint">Person to contact in case of any issues with this submission.</message>
 	<message key="input_forms.field.local.contact.person.required">Please fill all the fields for the contact person.</message>
@@ -3048,12 +3077,11 @@
 	<message key="input_forms.field.dc.description.required">Please give us a description</message>
 	<message key="input_forms.field.dc.language.iso.label">Language</message>
 	<message key="input_forms.field.dc.language.iso.hint">Select the language of the main content of the item. Multiple languages are possible. Start
-		typing the language and use autocomplete form that will appear if applicable.
+		typing the language and use autocomplete form that will appear if applicable. Better to list all the languages then to use the 'mul' iso code (if there are too many, contact support).
 	</message>
 	<message key="input_forms.field.dc.language.iso.required">Please choose a language for the resource.</message>
 	<message key="input_forms.field.dc.language.iso1.label">Language</message>
-	<message key="input_forms.field.dc.language.iso1.hint">Select the spoken language (in ISO 639-3 format) of the main content of the item (use "N/A" if
-		not applicable). Multiple languages are possible. Start typing the language and use autocomplete
+	<message key="input_forms.field.dc.language.iso1.hint">If the tool/service is language dependent, select the appropriate language(s). Otherwise leave the field empty. Multiple languages are possible. Start typing the language and use autocomplete
 		form that will appear.
 	</message>
 	<message key="input_forms.field.dc.subject.label">Subject Keywords</message>
@@ -3092,7 +3120,8 @@
 	<message key="input_forms.field.local.submission.note.hint">Leave a note for the editors/reviewers</message>
 	<message key="input_forms.field.dc.relation.replaces.label">Replaces</message>
 	<message key="input_forms.field.dc.relation.replaces.hint">URL to a related resource that is supplanted, displaced, or superseded by the described
-		resource.
+		resource. If the replaced resource is in this repository start typing its name or handle and select the
+		resource from the autocomplete popup.
 	</message>
 	<message key="input_forms.field.dc.relation.isreplacedby.label">Is replaced by</message>
 	<message key="input_forms.field.dc.relation.isreplacedby.hint">A related resource that supplants, displaces, or supersedes the described resource.</message>
@@ -3156,6 +3185,8 @@
 	<message key="input_forms.value_pairs.metashare_detailed_lexicalConceptualResource.other">other</message>
 	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.N/A">N/A</message>
 	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.grammar">grammar</message>
+	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.mlmodel">machine learning model</message>
+	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.ngrammodel">n-gram model</message>
 	<message key="input_forms.value_pairs.metashare_detailed_languageDescription.other">other</message>
 	<message key="input_forms.value_pairs.metashare_funding.N/A">N/A</message>
 	<message key="input_forms.value_pairs.metashare_funding.euFunds">EU</message>
@@ -3229,12 +3260,66 @@
 	<message key="input_forms.complex_definitions.funding.3_projname.label">Funding project name</message>
 	<message key="input_forms.complex_definitions.funding.5_openaire_id.label">EU Project Identifier (OpenAIRE)</message>
 	<message key="input_forms.complex_definitions.sizeInfo.2_unit.label">Unit</message>
+	<message key="input_forms.field.dc.relation.isreferencedby.label">Referenced by</message>
+	<message key="input_forms.field.dc.relation.isreferencedby.hint">Link to original paper that references this dataset.</message>
+	<message key="input_forms.field.dc.relation.isreferencedby.regexp-warning">The supplied url must start with http/https</message>
+
+	<message key="input_forms.field.edm.type.label">Select the kind of resource you are submitting</message>
+	<message key="input_forms.field.edm.type.hint">Choose one of TEXT, VIDEO, SOUND, IMAGE, 3D. If choosing
+		TEXT consider adding the resource among other Language Resources. Images are visual resources for users to
+		look at. Text materials are meant to be read and not looked at.</message>
+	<message key="input_forms.field.edm.type.required">Please select one of the options.</message>
+	<message key="input_forms.value_pairs.edm_types.text">TEXT</message>
+	<message key="input_forms.value_pairs.edm_types.video">VIDEO</message>
+	<message key="input_forms.value_pairs.edm_types.sound">SOUND</message>
+	<message key="input_forms.value_pairs.edm_types.image">IMAGE</message>
+	<message key="input_forms.value_pairs.edm_types.3d">3D</message>
+
+	<message key="input_forms.field.dc.type.clariah.label">The type of the resource</message>
+	<message key="input_forms.field.dc.type.clariah.hint">The type should be different from what you have
+		entered in the first step. Examples: photo or painting for IMAGE, book or letter for TEXT, etc.</message>
+	<message key="input_forms.field.dc.type.clariah.required">Type is required</message>
+
+	<message key="input_forms.field.dc.language.iso.clariah.label">Pick the languages of the TEXT</message>
+	<message key="input_forms.field.dc.language.iso.clariah.hint">Select the language of the main content of the item. Multiple languages are possible. Start
+		typing the language and use autocomplete form that will appear if applicable. Better to list all the languages then to use the 'mul' iso code (if there are too many, contact support).
+		</message>
+	<message key="input_forms.field.dc.language.iso.clariah.required">The language is required for TEXT resources</message>
+
+	<message key="input_forms.field.dc.language.iso1.clariah.label">Language</message>
+	<message key="input_forms.field.dc.language.iso1.clariah.hint">Optionally, select the language of the main content
+		of the item. Multiple languages are possible. Start
+		typing the language and use autocomplete form that will appear if applicable. Better to list all the languages then to use the 'mul' iso code (if there are too many, contact support).
+	</message>
+
+	<message key="input_forms.field.dc.subject.clariah.hint">Enter appropriate subject keyword or phrase and press
+		the Add button. Use keywords to specify also people, places and times (period, era, date range etc) the resource
+		is about. You	can use hierarchical subjects, separate the hierarchy levels with two colons (::). Eg.
+		People::John Doe, Places::New York, Times::WWII.
+		You can repeat it	for multiple keywords or use separators i.e., comma and semicolon, which will split it accordingly.
+		Start typing the keyword and use autocomplete form that will appear. End your input by pressing
+		ESC if you don't want to use the preselected value.
+	</message>
+
+	<message key="input_forms.field.dc.alternate.identifiers.label">Alternate identifiers</message>
+	<message key="input_forms.field.dc.alternate.identifiers.hint">The item will get a handle. If the item has any
+		identification numbers	or codes associated with it, please enter the types and the actual numbers or codes.
+   </message>
 
 	<!-- cz.cuni.mff.ufal.ContractPage -->
 	<message key="xmlui.ContractPage.title">Distribution License Agreement</message>
 	<message key="xmlui.ContractPage.trail">Distribution License Agreement</message>
 	<message key="xmlui.ContractPage.head">Distribution License Agreement</message>
 	<message key="xmlui.ContractPage.collection_name">{0}</message>
+
+	<!-- cz.cuni.mff.ufal.dspace.app.xmlui.aspect.submission.submit.ShowInfoStep -->
+	<message key="xmlui.Submission.submit.progressbar.showinfo">Notice</message>
+	<message key="xmlui.Submission.submit.ShowInfoStep.head">Notice</message>
+	<message key="xmlui.Submission.submit.ShowInfoStep.info1">The submission process for digital humanities
+		collections is still being fine tuned. If you find yourself not being able to continue the submission,
+	because you can't provide the required information, or because the required format for a field is too strict, or
+		because there's no appropriate field for your information or for any other reason,
+		<a class="helpdesk-tolink">let us know</a>.</message>
 
 </catalogue>
 

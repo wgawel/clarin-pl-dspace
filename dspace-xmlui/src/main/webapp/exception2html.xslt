@@ -258,6 +258,11 @@
 	        <script type="text/javascript" src="{$contextPath}/themes/ClarinPlTheme/lib/js/jquery-ui.js">&#160;</script>
             <script type="text/javascript" src="{concat($aaiURL, '/discojuice/discojuice-3.0.pl_PL.min.js')}">&#160;</script>
 			<script type="text/javascript" src="{$contextPath}/themes/ClarinPlTheme/lib/js/jquery.i18n.js">&#160;</script>
+		<script type="text/javascript">
+                    <xsl:attribute name="src">
+                        <xsl:value-of select="concat($contextPath,$theme-path,'/lib/js/messages/messages.js')" />
+                    </xsl:attribute>&#160;</script>
+            <script type="text/javascript" src="{concat($aaiURL, '/discojuice/discojuice-2.1.en.min.js')}">&#160;</script>
             <script type="text/javascript" src="{concat($aaiURL, '/aai.js')}">&#160;</script>
 	
 	        <xsl:variable name="localJQuerySrc">
@@ -284,9 +289,9 @@
 			<link rel="stylesheet" type="text/css"
 				href="{$contextPath}/themes/ClarinPlTheme/lib/clarinpl/public/css/clarinpl.css" />
 
-
 			<script type="text/javascript" src="{$contextPath}/themes/ClarinPlTheme/lib/bootstrap/js/bootstrap.min.js">&#160;</script>
 			<script type="text/javascript" src="{$contextPath}/themes/ClarinPlTheme/lib/bootstrap/js/clarinpl.min.js">&#160;</script>
+			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js">&#160;</script>
 
 			<!-- Add the title in -->
 			<title>

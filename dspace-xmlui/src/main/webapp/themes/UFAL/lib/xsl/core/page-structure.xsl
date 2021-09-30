@@ -23,9 +23,10 @@
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:mods="http://www.loc.gov/mods/v3"
     xmlns:confman="org.dspace.core.ConfigurationManager"
+    xmlns:psu="cz.cuni.mff.ufal.utils.PageStructureUtil"
     xmlns:file="java.io.File"
     xmlns="http://www.w3.org/1999/xhtml"
-    exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods confman file">
+    exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods confman file psu">
 
     <xsl:output indent="yes" />
 
@@ -155,10 +156,9 @@
             
             
 			<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='jqplot']">
-				<link rel="stylesheet" href="{$theme-path}/lib/js/jqplot/jquery.jqplot.css"> </link>
-				<link rel="stylesheet" href="{$theme-path}/lib/css/jqplot.css"> </link>
-				<link rel="stylesheet" href="{$theme-path}/lib/css/daterangepicker.css"> </link>
-	        	</xsl:if>            
+				<link rel="stylesheet" href="{$theme-path}/lib/js/piwik-charts/lib/jqplot/jquery.jqplot.css"> </link>
+				<link rel="stylesheet" href="{$theme-path}/lib/js/piwik-charts/lib/css/jqplot.css"> </link>
+	        	</xsl:if>
             
             <!-- select2 -->
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='select2']">
@@ -285,6 +285,10 @@
 
             <link href="{concat($aaiURL, '/discojuice/discojuice.css')}" type="text/css" rel="stylesheet" />
 
+            <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google_dataset']">
+                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google_dataset']"
+                              disable-output-escaping="yes" />
+            </xsl:if>
         </head>
     </xsl:template>
 
@@ -404,7 +408,7 @@
             
                             <xsl:when test="normalize-space($static-page-name) != ''">
                                 <div>
-                                    <xsl:copy-of select="document(concat('../../html/', $static-page-name, '.html'))" />
+                                    <xsl:copy-of select="psu:documentReadAndInterpolate(concat($theme-path-on-disk, '/lib/html/', $static-page-name, '.html'))" />
                                 </div>
                             </xsl:when>
             
@@ -443,6 +447,23 @@
         <script type="text/javascript" src="{concat($protocol, 'ajax.googleapis.com/ajax/libs/jquery/', $jqueryVersion ,'/jquery.min.js')}">&#160;</script>
         <script type="text/javascript" src="{$theme-path}/lib/js/jquery-ui.js">&#160;</script>
         <script type="text/javascript" src="{$theme-path}/lib/js/jquery.i18n.js">&#160;</script>
+        <script type="text/javascript">
+            <xsl:variable name="currentLocale">
+                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
+            </xsl:variable>
+            <xsl:attribute name="src">
+                <xsl:variable name="localizedContextPath" select="concat($theme-path,'/lib/js/messages/messages_',$currentLocale,'.js')" />
+                <xsl:variable name="localizedDiskPath" select="concat($theme-path-on-disk,'/lib/js/messages/messages_',$currentLocale,'.js')" />
+                <xsl:variable name="path" select="file:new($localizedDiskPath)"/>
+                <xsl:choose>
+                    <xsl:when test="file:isFile($path)">
+                        <xsl:value-of select="$localizedContextPath" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="concat($theme-path,'/lib/js/messages/messages.js')" />
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:attribute>&#160;</script>
 
         <script type="text/javascript" src="{concat($aaiURL, '/discojuice/discojuice-2.1.en.min.js')}">&#160;</script>
         <script type="text/javascript" src="{concat($aaiURL, '/aai.js')}">&#160;</script>
@@ -540,6 +561,11 @@
             </xsl:attribute>&#160;</script>
 
         <script type="text/javascript">
+            <xsl:attribute name="src">
+                <xsl:text>https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js</xsl:text>
+            </xsl:attribute>&#160;</script>
+
+        <script type="text/javascript">
             <xsl:variable name="currentLocale">
                 <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
             </xsl:variable>
@@ -563,17 +589,18 @@
         -->
         
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='jqplot']">
-        	<script type="text/javascript" src="{$theme-path}/lib/js/jqplot/jquery.jqplot.min.js">&#160;</script>
-            <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.canvasTextRenderer.min.js">&#160;</script>
-            <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js">&#160;</script>
-            <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.highlighter.min.js">&#160;</script>
-            <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.cursor.min.js">&#160;</script>
-            <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.dateAxisRenderer.min.js">&#160;</script>
-            <script type="text/javascript" src="{$theme-path}/lib/js/jqplot/plugins/jqplot.enhancedLegendRenderer.js">&#160;</script>
-            <script type="text/javascript" src="{$theme-path}/lib/js/piwik_charts.js">&#160;</script>
-            <script type="text/javascript" src="{$theme-path}/lib/js/moment.min.js">&#160;</script>
-            <script type="text/javascript" src="{$theme-path}/lib/js/daterangepicker.js">&#160;</script>
-        </xsl:if>        
+        	<script type="text/javascript" src="{$theme-path}/lib/js/piwik-charts/lib/jqplot/jquery.jqplot.min.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/piwik-charts/lib/jqplot/plugins/jqplot.canvasTextRenderer.min.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/piwik-charts/lib/jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/piwik-charts/lib/jqplot/plugins/jqplot.highlighter.min.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/piwik-charts/lib/jqplot/plugins/jqplot.cursor.min.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/piwik-charts/lib/jqplot/plugins/jqplot.dateAxisRenderer.min.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/piwik-charts/lib/jqplot/plugins/jqplot.enhancedLegendRenderer.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/piwik-charts/lib/jqplot/plugins/jqplot.barRenderer.min.js">&#160;</script>
+	    <script type="text/javascript" src="{$theme-path}/lib/js/piwik-charts/js/piwik_charts.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/piwik-charts/lib/moment/moment.min.js">&#160;
+            </script>
+        </xsl:if>
         
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='datepicker']">
             <script type="text/javascript" src="{$theme-path}/lib/bootstrap/js/bootstrap-datepicker.js">&#160;</script>
@@ -582,6 +609,7 @@
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='dragNdrop']">
             <script type="text/javascript" src="{$theme-path}/lib/js/dragndrop.js">&#160;</script>
             <script type="text/javascript" src="{$theme-path}/lib/js/fileupload.js">&#160;</script>
+            <script type="text/javascript" src="{$theme-path}/lib/js/socialproviders.js">&#160;</script>
         </xsl:if>
 
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='extrametadata']">
@@ -620,6 +648,10 @@
         
         <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='submission']">
             <script type="text/javascript" src="{$theme-path}/lib/js/ufal-submission.js">&#160;</script>
+        </xsl:if>
+
+        <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='include-library'][@qualifier='cmdline-info']">
+            <script type="text/javascript" src="{$theme-path}/lib/js/ufal-cmdline.js">&#160;</script>
         </xsl:if>
 
         <script type="text/javascript">

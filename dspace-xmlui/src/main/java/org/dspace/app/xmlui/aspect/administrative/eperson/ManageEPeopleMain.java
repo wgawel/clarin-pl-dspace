@@ -218,7 +218,7 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
         		line1.addHighlight("label label-important").addContent("Cannot login");
         	}
         	
-        	if(person.getPasswordHash()==null) {
+        	if(person.getPasswordHash().getHash() == null) {
         		line1.addHighlight("label label-warning").addContent("Password not set");
         	} else {
         		line1.addHighlight("label label-success").addContent("Password set");

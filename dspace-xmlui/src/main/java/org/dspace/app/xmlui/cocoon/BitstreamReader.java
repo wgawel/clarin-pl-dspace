@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import cz.cuni.mff.ufal.UFALLicenceAgreement;
 
+import cz.cuni.mff.ufal.dspace.IOUtils;
 import org.apache.avalon.excalibur.pool.Recyclable;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
@@ -46,6 +47,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.disseminate.CitationDocument;
 import org.dspace.handle.HandleManager;
+import org.dspace.storage.bitstore.BitstreamStorageManager;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
@@ -54,7 +56,6 @@ import cz.cuni.mff.ufal.DSpaceApi;
 import cz.cuni.mff.ufal.DownloadTokenExpiredException;
 import cz.cuni.mff.ufal.MissingLicenseAgreementException;
 import cz.cuni.mff.ufal.tracker.TrackerFactory;
-import cz.cuni.mff.ufal.tracker.TrackingSite;
 
 /**
  * The BitstreamReader will query DSpace for a particular bitstream and transmit
@@ -178,6 +179,10 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     private File tempFile;
 
     private String redirectToURL;
+
+    private String XSendFileHeader;
+    private String XSendFilePathPrefix;
+    private String bitstreamPathRelativeToAssetstore;
 
     /**
      * Set up the bitstream reader.
@@ -416,9 +421,10 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 }
             }
             
-            if(is_item_bitstream && ConfigurationManager.getBooleanProperty("lr", "lr.tracker.enabled")) {
+            if(is_item_bitstream && ConfigurationManager.getBooleanProperty("lr", "lr.tracker.enabled") && IOUtils.requestRangeContainsStart(request)) {
                 // Track the download for analytics platform
-                TrackerFactory.createInstance(TrackingSite.BITSTREAM).trackPage(request,"Bitstream Download / Single File");
+                TrackerFactory.createBitstreamTrackerInstance(item.getOwningCollection()).trackPage(request,
+                        "Bitstream Download / Single File");
             }
             
             
@@ -443,6 +449,13 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             } else {
             	this.redirectToURL = "";
             }
+
+            XSendFileHeader = new DSpace().getConfigurationService().getProperty("lr.XSendFileHeader");
+            XSendFilePathPrefix = new DSpace().getConfigurationService().getProperty("lr.XSendFilePathPrefix");
+            XSendFilePathPrefix = XSendFilePathPrefix == null ? "" : XSendFilePathPrefix;
+            //assume only one assetstore
+            bitstreamPathRelativeToAssetstore = XSendFilePathPrefix + BitstreamStorageManager.getIntermediatePath(bitstream.get_internal_id()) +
+                    bitstream.get_internal_id();
         }
         catch (SQLException sqle)
         {
@@ -709,7 +722,8 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             }
         }
 
-        if(item!=null) { // item = null means special bitstream possibly a community logo
+        if(item!=null && IOUtils.requestRangeContainsStart(request)) { // item = null means special bitstream possibly a
+            // community logo
         	// Log download statistics
         	DSpaceApi.updateFileDownloadStatistics(userID, bitstreamID);
         }
@@ -797,7 +811,16 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
         try
         {
-            if(org.apache.commons.lang3.StringUtils.isNotBlank(this.redirectToURL)){
+            if(org.apache.commons.lang3.StringUtils.isNotBlank(this.XSendFileHeader)){
+                //path should take into the account the nginx inner location (eg. alias for .../assetstore)
+                //or what you allow in apache with XSendFilePath
+                //this is a header only response, could do even without opening in/out streams
+                //any authorization is handled during setup
+                //other headers (mime-type, content-dipsosition, ...) not changed
+                response.setHeader(this.XSendFileHeader, this.bitstreamPathRelativeToAssetstore);
+
+            }
+            else if(org.apache.commons.lang3.StringUtils.isNotBlank(this.redirectToURL)){
                 response.sendRedirect(this.redirectToURL);
             }else {
                 if (byteRange != null) {
@@ -882,6 +905,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         this.tempFile = null;
         this.item = null;
         this.redirectToURL = null;
+        this.XSendFileHeader = null;
+        this.XSendFilePathPrefix = null;
+        this.bitstreamPathRelativeToAssetstore = null;
         super.recycle();
     }
 

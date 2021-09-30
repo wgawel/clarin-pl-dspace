@@ -409,6 +409,12 @@ public class FlowItemUtils
 		}
 		if(!StringUtils.isEmpty(reason)){
 			item.store_provenance_info(String.format("The item was withdrawn with the following reason: \"%s\"", reason), context.getCurrentUser());
+			Metadatum md = new Metadatum();
+			md.schema = "local";
+			md.element = "withdrawn";
+			md.qualifier = "reason";
+			md.value = reason;
+			item.addMetadatum(md);
 		}
 		item.withdraw();
 		context.commit();
@@ -674,6 +680,7 @@ public class FlowItemUtils
 				}
 	        	upload_name = filePath;
 			} catch (URISyntaxException | FileNotFoundException e) {
+				log.warn("Error while adding file. Check the path/url.", e);
 			}
 		}
 		

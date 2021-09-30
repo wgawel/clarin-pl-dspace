@@ -9,13 +9,11 @@ package org.dspace.rest;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
+import java.util.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -38,13 +36,13 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.ItemIterator;
-import org.dspace.content.Metadatum;
+import org.dspace.content.*;
 import org.dspace.content.service.ItemService;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.Group;
+import org.dspace.identifier.IdentifierNotFoundException;
+import org.dspace.identifier.IdentifierNotResolvableException;
+import org.dspace.identifier.IdentifierService;
 import org.dspace.rest.common.Bitstream;
 import org.dspace.rest.common.Item;
 import org.dspace.rest.common.MetadataEntry;
@@ -52,6 +50,7 @@ import org.dspace.rest.exceptions.ContextException;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.usage.UsageEvent;
+import org.dspace.utils.DSpace;
 
 /**
  * Class which provide all CRUD methods over items.
@@ -106,7 +105,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -166,7 +165,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
 
             ItemIterator dspaceItems = org.dspace.content.Item.findAllUnfiltered(context);
             items = new ArrayList<Item>();
@@ -242,7 +241,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -301,7 +300,7 @@ public class ItemsResource extends Resource
         List<Bitstream> bitstreams = null;
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
 
             writeStats(dspaceItem, UsageEvent.Action.VIEW, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -348,7 +347,7 @@ public class ItemsResource extends Resource
         org.dspace.core.Context  context = null;
         URI uri = null;
         try {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.READ);
             String OAI_BASE_URL = ConfigurationManager.getProperty("oai.context");
             uri = new URI(OAI_BASE_URL + "cite?metadataPrefix=cmdi&handle=" + dspaceItem.getHandle());
@@ -396,7 +395,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -466,6 +465,9 @@ public class ItemsResource extends Resource
             @QueryParam("name") String name, @QueryParam("description") String description,
             @QueryParam("groupId") Integer groupId, @QueryParam("year") Integer year, @QueryParam("month") Integer month,
             @QueryParam("day") Integer day, @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+            @QueryParam("file_mime_type") String fileMimeType,
+            @QueryParam("primary") boolean primary,
+            @QueryParam("bundle_name") @DefaultValue("ORIGINAL") String bundle_name,
             @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
             throws WebApplicationException
     {
@@ -476,7 +478,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -485,7 +487,7 @@ public class ItemsResource extends Resource
             log.trace("Creating bitstream in item.");
             org.dspace.content.Bundle bundle = null;
             org.dspace.content.Bitstream dspaceBitstream = null;
-            Bundle[] bundles = dspaceItem.getBundles("ORIGINAL");
+            Bundle[] bundles = dspaceItem.getBundles(bundle_name);
 			if(bundles != null && bundles.length != 0)
 			{
 				bundle = bundles[0]; // There should be only one bundle ORIGINAL.
@@ -493,7 +495,8 @@ public class ItemsResource extends Resource
             if (bundle == null)
             {
                 log.trace("Creating bundle in item.");
-                dspaceBitstream = dspaceItem.createSingleBitstream(inputStream);
+                dspaceBitstream = dspaceItem.createSingleBitstream(inputStream, bundle_name);
+                bundle = dspaceItem.getBundles(bundle_name)[0];
             }
             else
             {
@@ -506,22 +509,30 @@ public class ItemsResource extends Resource
             // Set bitstream name and description
             if (name != null)
             {
-                if (BitstreamResource.getMimeType(name) == null)
-                {
-                    dspaceBitstream.setFormat(BitstreamFormat.findUnknown(context));
-                }
-                else
-                {
-                    dspaceBitstream.setFormat(BitstreamFormat.findByMIMEType(context, BitstreamResource.getMimeType(name)));
-                }
                 dspaceBitstream.setName(name);
+                BitstreamFormat bitstreamFormat = null;
+                if(fileMimeType != null){
+                    bitstreamFormat = BitstreamFormat.findByMIMEType(context, fileMimeType);
+                }
+                if(bitstreamFormat == null){
+                    bitstreamFormat = FormatIdentifier.guessFormat(context, dspaceBitstream);
+                }
+                //null bitstreamFormat results in unknown
+                dspaceBitstream.setFormat(bitstreamFormat);
             }
             if (description != null)
             {
                 dspaceBitstream.setDescription(description);
             }
 
+            //or we would need to add/remove ResourcePolicy (as in WorkspaceItem...AuthorizeManager.addPolicy(c, i, Constants.WRITE, e, ResourcePolicy.TYPE_SUBMISSION);)
+            context.turnOffAuthorisationSystem();
             dspaceBitstream.update();
+            if(primary){
+                bundle.setPrimaryBitstreamID(dspaceBitstream.getID());
+                bundle.update();
+            }
+            context.restoreAuthSystemState();
 
             // Create policy for bitstream
             if (groupId != null)
@@ -579,6 +590,8 @@ public class ItemsResource extends Resource
 
             dspaceBitstream = org.dspace.content.Bitstream.find(context, dspaceBitstream.getID());
             bitstream = new Bitstream(dspaceBitstream, "");
+            //trigger auto generated metadata on item
+            dspaceItem.update();
 
             context.complete();
 
@@ -644,7 +657,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -726,7 +739,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.DELETE);
 
             writeStats(dspaceItem, UsageEvent.Action.REMOVE, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -795,7 +808,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.Item dspaceItem = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
             writeStats(dspaceItem, UsageEvent.Action.UPDATE, user_ip, user_agent, xforwardedfor, headers, request, context);
@@ -876,7 +889,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
             org.dspace.content.Item item = findItem(context, itemId, org.dspace.core.Constants.WRITE);
 
             org.dspace.content.Bitstream bitstream = org.dspace.content.Bitstream.find(context, bitstreamId);
@@ -888,8 +901,8 @@ public class ItemsResource extends Resource
             }
             else if (!AuthorizeManager.authorizeActionBoolean(context, bitstream, org.dspace.core.Constants.DELETE))
             {
+                log.error("User(" + context.getCurrentUser().getEmail() + ") is not allowed to delete bitstream(id=" + bitstreamId + ").");
                 context.abort();
-                log.error("User(" + getUser(headers).getEmail() + ") is not allowed to delete bitstream(id=" + bitstreamId + ").");
                 return Response.status(Status.UNAUTHORIZED).build();
             }
 
@@ -977,7 +990,7 @@ public class ItemsResource extends Resource
 
         try
         {
-            context = createContext(getUser(headers));
+            context = createContext(headers);
 
             // TODO Repair, it ends by error:
             // "java.sql.SQLSyntaxErrorException: ORA-00932: inconsistent datatypes: expected - got CLOB"
@@ -1018,29 +1031,32 @@ public class ItemsResource extends Resource
                     "ELEMENT= ? AND ";
                     parameterList.add(metadata[0]);
                     parameterList.add(metadata[1]);
-            if (metadata.length > 3)
+            if (metadata.length == 3)
             {
                 sql += "QUALIFIER= ? AND ";
                 parameterList.add(metadata[2]);
             }
             if (org.dspace.storage.rdbms.DatabaseManager.isOracle())
             {
-                sql += "dbms_lob.compare(TEXT_VALUE, ?) = 0 AND ";
+                sql += "dbms_lob.compare(TEXT_VALUE, ?) = 0";
                 parameterList.add(metadataEntry.getValue());
             }
             else
             {
-                sql += "TEXT_VALUE=? AND ";
+                sql += "TEXT_VALUE=?";
                 parameterList.add(metadataEntry.getValue());
             }
             if (metadataEntry.getLanguage() != null)
             {
-                sql += "TEXT_LANG=?";
-                parameterList.add(metadataEntry.getLanguage());
+                // omit text_lang from where clause if we have *
+                if(!metadataEntry.getLanguage().equals(org.dspace.content.Item.ANY)){
+                    sql += " AND TEXT_LANG=?";
+                    parameterList.add(metadataEntry.getLanguage());
+                }
             }
             else
             {
-                sql += "TEXT_LANG is null";
+                sql += " AND TEXT_LANG is null";
             }
 
             Object[] parameters = parameterList.toArray();
@@ -1082,6 +1098,98 @@ public class ItemsResource extends Resource
         }
 
         return items.toArray(new Item[0]);
+    }
+
+    /**
+     * Returns the "versions" of this item. It's obtained by following the "isreplacedby" and "replaces" relations.
+     * If you have the following graph (where numbers are individual versions),
+     *
+     *   2-5
+     *  /
+     * 1-3-6-7-8
+     *  \  /
+     *   4
+     *
+     * versions of 1 are all the nodes, versions of 4 are just 1; 4 and 7, versions of 8 are all the nodes except 2
+     * and 5.
+     *
+     * @param itemId
+     * @param expand
+     * @param user_ip
+     * @param user_agent
+     * @param xforwardedfor
+     * @param headers
+     * @param request
+     * @return
+     * @throws WebApplicationException
+     */
+    @GET
+    @Path("/{item_id}/versions")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Item[] versions(@PathParam("item_id") Integer itemId, @QueryParam("expand") String expand,
+            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+            @QueryParam("xforwardedfor") String xforwardedfor, @Context HttpHeaders headers, @Context HttpServletRequest request)
+            throws WebApplicationException{
+
+        org.dspace.core.Context context = null;
+        Item[] items = new Item[]{};
+        Map<Item,Date> item2date = new HashMap<>();
+
+        try {
+            context = createContext(headers);
+            org.dspace.content.Item item = findItem(context, itemId, org.dspace.core.Constants
+                    .READ);
+            java.util.Collection<String> relations = item.getRelationChain("isreplacedby");
+            relations.add(item.getHandle());
+            relations.addAll(item.getRelationChain ("replaces"));
+
+
+            IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
+            for(String handleRelation : relations){
+                org.dspace.content.Item resolvedItem;
+                try {
+                    resolvedItem = (org.dspace.content.Item)identifierService.resolve(context, handleRelation);
+                }catch (IdentifierNotFoundException | IdentifierNotResolvableException e){
+                    resolvedItem = null;
+                }
+                if(resolvedItem == null) {
+                    Item fakeItem = new Item();
+                    fakeItem.setHandle(handleRelation);
+                    fakeItem.setName(handleRelation);
+                    item2date.put(fakeItem, DCDate.getCurrent().toDate());
+                }else {
+                    Date submitDate;
+                    Metadatum[] mds = resolvedItem.getMetadata("dc","date", "available",
+                            org.dspace.content.Item.ANY);
+                    if(mds != null && mds.length > 0){
+                        submitDate = new DCDate(mds[0].value).toDate();
+                    }else{
+                        submitDate = DCDate.getCurrent().toDate();
+                    }
+
+                    item2date.put(new Item(resolvedItem, expand, context), submitDate);
+                }
+            }
+            context.complete();
+            List<Map.Entry<Item,Date>> entries = new LinkedList<>(item2date.entrySet());
+            Collections.sort(entries, new Comparator<Map.Entry<Item, Date>>() {
+                @Override
+                public int compare(Map.Entry<Item, Date> o1, Map.Entry<Item, Date> o2) {
+                    return o2.getValue().compareTo(o1.getValue());
+                }
+            });
+            items = new Item[entries.size()];
+            int i = 0;
+            for(Map.Entry<Item, Date> entry : entries){
+               items[i++] = entry.getKey();
+            }
+        }catch (SQLException | ContextException e){
+            processException("Could not fetch versions(id=" + itemId + "), " + e.getClass().getName() +"." +
+                    " Message:" + e.getMessage(), context);
+        }finally {
+            processFinally(context);
+        }
+        return items;
     }
 
     /**

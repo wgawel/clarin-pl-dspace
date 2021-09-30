@@ -22,10 +22,11 @@
 	xmlns:mods="http://www.loc.gov/mods/v3"
 	xmlns:confman="org.dspace.core.ConfigurationManager"
 	xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
+        xmlns:file="java.io.File"
 	xmlns:encoder="xalan://java.net.URLEncoder"
 	xmlns:solrClientUtils="org.apache.solr.client.solrj.util.ClientUtils"
 	xmlns="http://www.w3.org/1999/xhtml"
-	exclude-result-prefixes="i18n encoder solrClientUtils dri mets xlink xsl dim xhtml mods confman util">
+	exclude-result-prefixes="i18n encoder solrClientUtils dri mets xlink xsl dim xhtml mods confman util file">
 
 	<xsl:output indent="yes" />
 
@@ -297,8 +298,11 @@
 
 				<!-- Rest of the Body -->
 				<div class="row contents">
-				
-					<div id="main-contents" class="col-sm-9">																								
+
+					<!-- sidebar -->
+					<xsl:apply-templates select="/dri:document/dri:options" />
+
+					<div id="main-contents" class="col-sm-9">
 						<xsl:choose>
 							<xsl:when test="dri:div[@n='site-home']/dri:div[@n='site-recent-submission']/dri:referenceSet/dri:reference">
 								<xsl:call-template name="recent-submission" />
@@ -314,9 +318,6 @@
 							</xsl:when>
 						</xsl:choose>
 					</div>
-					<!-- sidebar -->
-					<xsl:apply-templates select="/dri:document/dri:options" />
-										
 				</div>
 			</div>
 		</div>
@@ -483,7 +484,7 @@
         	</div>
         </xsl:if>
 		
-		<img class="artifact-icon pull-right" alt="{dim:field[@element='type'][1]/node()}">
+		<img class="artifact-icon pull-right" alt="{dim:field[@element='type'][1]/node()}" onerror="this.src='{$theme-path}/images/mime/application-x-zerosize.png'">
 			<xsl:attribute name="src">
                                 <xsl:text>themes/UFALHome/lib/images/</xsl:text>
                                 <xsl:value-of
@@ -513,22 +514,7 @@
 			<div class="author">
 				<xsl:choose>
 					<xsl:when test="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']">
-						<xsl:for-each
-							select="dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']">
-							<span>
-								<xsl:if test="@authority">
-									<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
-								</xsl:if>
-                                <a>
-									<xsl:attribute name="href"><xsl:copy-of select="$context-path"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
-									<xsl:copy-of select="node()" />
-								</a>                                
-							</span>
-							<xsl:if
-								test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author' or @qualifier='other']) != 0">
-								<xsl:text>; </xsl:text>
-							</xsl:if>
-						</xsl:for-each>
+			    			<xsl:call-template name="authors_with_short_summary_view"/>
 					</xsl:when>
 					<xsl:when test="dim:field[@element='creator']">
 						<xsl:for-each select="dim:field[@element='creator']">
@@ -681,6 +667,23 @@
 			src="{concat($protocol, 'ajax.googleapis.com/ajax/libs/jquery/', $jqueryVersion ,'/jquery.min.js')}">&#160;</script>
 		<script type="text/javascript" src="{$theme-path}/lib/js/jquery-ui.js">&#160;</script>
 		<script type="text/javascript" src="{$theme-path}/lib/js/jquery.i18n.js">&#160;</script>
+		<script type="text/javascript">
+		    <xsl:variable name="currentLocale">
+		        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='page'][@qualifier='currentLocale']"/>
+		    </xsl:variable>
+		    <xsl:attribute name="src">
+		        <xsl:variable name="localizedContextPath" select="concat($theme-path,'/lib/js/messages/messages_',$currentLocale,'.js')" />
+		        <xsl:variable name="localizedDiskPath" select="concat($theme-path-on-disk,'/lib/js/messages/messages_',$currentLocale,'.js')" />
+		        <xsl:variable name="path" select="file:new($localizedDiskPath)"/>
+		        <xsl:choose>
+		            <xsl:when test="file:isFile($path)">
+                                <xsl:value-of select="$localizedContextPath" />
+		            </xsl:when>
+		            <xsl:otherwise>
+                                <xsl:value-of select="concat($theme-path,'/lib/js/messages/messages.js')" />
+		            </xsl:otherwise>
+		        </xsl:choose>
+                    </xsl:attribute>&#160;</script>
 
         <script type="text/javascript" src="{concat($aaiURL, '/discojuice/discojuice-2.1.en.min.js')}">&#160;</script>
         <script type="text/javascript" src="{concat($aaiURL, '/aai.js')}">&#160;</script>
@@ -726,6 +729,11 @@
 				&#160;
 			</script>
 		</xsl:for-each>
+
+		<script type="text/javascript">
+			<xsl:attribute name="src">
+				<xsl:text>https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js</xsl:text>
+			</xsl:attribute>&#160;</script>
 
 		<!-- add "shared" javascript from static, path is relative to webapp root -->
 		<xsl:for-each
@@ -866,11 +874,11 @@
 			<div class="row">
 				<div style="height: 160px; position: relative;" class="col-md-7 col-lg-7">
 				  <a href="/lindat">
-			            <img src="{$context-path}/themes/UFAL/images/lindat/lindat-logo.png" style="position: absolute; height: 60%; top: 0px; bottom: 0px; margin: auto;" class="logo" alt="LINDAT/CLARIN logo" /></a>
+			            <img src="{$context-path}/themes/UFAL/images/lindat/lindat-logo-new-sm.png" style="position: absolute; height: 60%; top: 0px; bottom: 0px; margin: auto;" class="logo" alt="LINDAT/CLARIAH-CZ logo" /></a>
 				</div>
 		                <div style="height: 160px; position: relative;" class="col-md-5 col-lg-5">
 				    <a href="http://www.clarin.eu/">
-		                    <img src="{$context-path}/themes/UFAL/images/lindat/clarin-logo.png" style="position: absolute; height: 70%; top: 0px; bottom: 0px; margin: auto;" class="logo" alt="LINDAT/CLARIN logo" /></a>
+		                    <img src="{$context-path}/themes/UFAL/images/lindat/clarin-logo.png" style="position: absolute; height: 70%; top: 0px; bottom: 0px; margin: auto;" class="logo" alt="CLARIN logo" /></a>
 		                </div>
 			</div>
         </div>		
