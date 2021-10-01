@@ -133,6 +133,8 @@ public class RestIndex {
                         "<li>GET /process/items/handle/{prefix}/{sufix}/restart - Resets item status </li>" +
                         "<li>GET /process/items/handle/{prefix}/{sufix}/export/mewex - Exports processed item files to mewex service </li>" +
                         "<li>GET /process/items/handle/{prefix}/{sufix}/export/inforex - Exports processed item files to inforex service </li>" +
+                        "<li>GET /process/items/handle/{prefix}/{sufix}/ccl - return ccl file if exists </li>" +
+                        "<li>POST /process/items/handle/{prefix}/{sufix}/ccl - add ccl file </li>" +
                         "</ul>" +
                 "</body></html> ";
     }

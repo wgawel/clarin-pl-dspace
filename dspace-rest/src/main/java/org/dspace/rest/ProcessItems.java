@@ -8,6 +8,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Item;
@@ -16,6 +17,7 @@ import org.dspace.core.Constants;
 import org.dspace.handle.HandleManager;
 import org.dspace.rest.common.clarinpl.*;
 import org.dspace.rest.exceptions.ContextException;
+import org.dspace.usage.UsageEvent;
 import org.json.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -31,6 +33,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -38,6 +41,7 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -324,6 +328,7 @@ public class ProcessItems extends ItemsResource {
         return m;
     }
 
+
     @GET
     @Path("/{prefix}/{suffix}/export/inforex")
     @Produces(MediaType.APPLICATION_JSON)
@@ -377,6 +382,110 @@ public class ProcessItems extends ItemsResource {
 
         return m;
     }
+
+    @GET
+    @Path("/{prefix}/{suffix}/ccl")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCCL(
+            @PathParam("prefix") Integer prefix, @PathParam("suffix") Integer suffix, @QueryParam("expand") String expand,
+            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+            @QueryParam("userEmail") String user_email, @QueryParam("xforwardedfor") String xforwardedfor,
+            @Context HttpHeaders headers, @Context HttpServletRequest request) {
+
+        log.info("Reading item(handle=" + prefix + "/" + suffix + "/ccl).");
+
+        org.dspace.core.Context context = null;
+        InputStream inputStream = null;
+
+        try {
+            context = createContext(headers);
+            org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
+
+            if(dso.getType() == Constants.ITEM) {
+                org.dspace.content.Item item = (Item) dso;
+
+                String handle = item.getHandle();
+                String nfs_path = String.format("%s%s/", nfs, handle);
+
+                File file = new File(nfs_path + zip_name);
+                if (file.exists()) {
+                    inputStream = new FileInputStream(file);
+                } else {
+                    context.abort();
+                    return Response.status(Response.Status.NOT_FOUND).build();
+                }
+                context.complete();
+                log.trace("Item(handle=" + prefix + "/" + suffix + ") was successfully read.");
+            }
+        } catch (Exception e) {
+            log.error("Could not read item. Item may not exist (handle=" + prefix + "/" + suffix +"/ccl" +"), ContextException. Message: ");
+            return Response.status(Response.Status.NOT_FOUND).type("application/json").build();
+        } finally {
+            try {
+                context.complete();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return Response.ok(inputStream).type("application/zip").build();
+    }
+
+
+    @POST
+    @Path("/{prefix}/{suffix}/ccl")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loadCCL(
+            @PathParam("prefix") Integer prefix, @PathParam("suffix") Integer suffix,
+            InputStream is,
+            @QueryParam("userIP") String user_ip, @QueryParam("userAgent") String user_agent,
+            @QueryParam("userEmail") String user_email, @QueryParam("xforwardedfor") String xforwardedfor,
+            @Context HttpHeaders headers, @Context HttpServletRequest request) {
+
+        log.info("Reading item(handle=" + prefix + "/" + suffix + "/ccl).");
+        log.info("IP: " + user_ip);
+        org.dspace.core.Context context = null;
+
+        try {
+            context = createContext(headers);
+            org.dspace.content.DSpaceObject dso = HandleManager.resolveToObject(context, prefix + "/" + suffix);
+
+            if(dso.getType() == Constants.ITEM) {
+                org.dspace.content.Item item = (Item) dso;
+                String handle = item.getHandle();
+
+                String nfs_path = String.format("%s%s/", nfs, handle);
+
+
+                File path = new File(nfs_path);
+                path.getAbsoluteFile().mkdirs();
+
+                File targetFile = new File(nfs_path + zip_name);
+                if (!targetFile.exists()) {
+                    targetFile.createNewFile();
+                }
+
+                java.nio.file.Files.copy(
+                        is,
+                        targetFile.toPath(),
+                        StandardCopyOption.REPLACE_EXISTING);
+                context.complete();
+                log.trace("Item(handle=" + prefix + "/" + suffix + ") was successfully read.");
+            }
+        } catch (Exception e) {
+            log.error("Could not load file item not exist (handle=" + prefix + "/" + suffix +"/ccl" +"), ContextException. Message: ");
+            return Response.status(Response.Status.NOT_FOUND).type("application/json").build();
+        } finally {
+            try {
+                context.complete();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return Response.ok().build();
+    }
+
 
     private ProcessStatusResponse checkStatus( org.dspace.content.Item item) {
         ProcessStatusResponse status = new ProcessStatusResponse();
