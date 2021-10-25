@@ -9,7 +9,6 @@ Abu'Arapesh:aah
 Arifama-Miniafia:aai
 Ankave:aak
 Afade:aal
-Aramanik:aam
 Anambé:aan
 AlgerianSaharan Arabic:aao
 ParáArára:aap
@@ -81,7 +80,6 @@ Adioukrou:adj
 Galo:adl
 Adang:adn
 Abu:ado
-Adap:adp
 Adangbe:adq
 Adonara:adr
 AdamorobeSign Language:ads
@@ -179,7 +177,6 @@ Aiton:aio
 Burumakok:aip
 Aimaq:aiq
 Airoran:air
-Nataoran Amis:ais
 Arikem:ait
 Aari:aiw
 Aighon:aix
@@ -298,7 +295,6 @@ Andarum:aod
 AngalEnen:aoe
 Bragat:aof
 Angoram:aog
-Arma:aoh
 Anindilyakwa:aoi
 Mufian:aoj
 Arhö:aok
@@ -368,7 +364,6 @@ Egyptian Arabic:arz
 Asu(Tanzania):asa
 Assiniboine:asb
 Casuarina Coast Asmat:asc
-Asas:asd
 AmericanSign Language:ase
 Australian Sign Language:asf
 Cishingini:asg
@@ -419,7 +414,6 @@ Asumboa:aua
 Alugu:aub
 Waorani:auc
 Anuta:aud
-=/Kx'au//'ein:aue
 Aguna:aug
 Aushi:auh
 Anuki:aui
@@ -493,8 +487,6 @@ Central Aymara:ayr
 SorsogonAyta:ays
 Magbukun Ayta:ayt
 Ayu:ayu
-Ayi(China):ayx
-Tayabas Ayta:ayy
 MaiBrat:ayz
 Azha:aza
 SouthAzerbaijani:azb
@@ -526,7 +518,6 @@ Vengo:bav
 Bambili-Bambui:baw
 Bamun:bax
 Batuley:bay
-Tunen:baz
 Baatonum:bba
 Barai:bbb
 Batak Toba:bbc
@@ -552,7 +543,6 @@ Karnai:bbv
 Baba:bbw
 Bubia:bbx
 Befang:bby
-Babalia Creole Arabic:bbz
 CentralBai:bca
 Bainouk-Samik:bcb
 SouthernBalochi:bcc
@@ -665,7 +655,6 @@ Giangan:bgi
 Bangolan:bgj
 Bit:bgk
 Bo(Laos):bgl
-BagaMboteni:bgm
 Western Balochi:bgn
 Baga Koga:bgo
 Eastern Balochi:bgp
@@ -706,12 +695,10 @@ Bhele:bhy
 Bada(Indonesia):bhz
 Badimaya:bia
 Bissa:bib
-Bikaru:bic
 Bidiyo:bid
 Bepour:bie
 Biafada:bif
 Biangai:big
-Vaghat-Ya-Bijim-Legeri:bij
 Bikol:bik
 Bile:bil
 Bimoba:bim
@@ -731,7 +718,6 @@ Baloi:biz
 Budza:bja
 Banggarla:bjb
 Bariji:bjc
-Bandjigali:bjd
 Biao-JiaoMien:bje
 Barzani Jewish Neo-Aramaic:bjf
 Bidyogo:bjg
@@ -743,7 +729,6 @@ Bulu(Papua New Guinea):bjl
 Bajelani:bjm
 Banjar:bjn
 Mid-Southern Banda:bjo
-Southern Betsimisaraka Malagasy:bjq
 Binumarien:bjr
 Bajan:bjs
 Balanta-Ganja:bjt
@@ -783,7 +768,6 @@ BellaCoola:blc
 Bolango:bld
 Balanta-Kentohe:ble
 Buol:blf
-Balau:blg
 Kuwaa:blh
 Bolia:bli
 Bolongan:blj
@@ -826,7 +810,6 @@ Burum-Mindik:bmu
 Bum:bmv
 Bomwali:bmw
 Baimak:bmx
-Bemba (Democratic Republic of Congo):bmy
 Baramu:bmz
 Bonerate:bna
 Bookan:bnb
@@ -878,7 +861,6 @@ Buamu:box
 Bodo(Central African Republic):boy
 Tiéyaxo Bozo:boz
 Dakaka:bpa
-Barbacoas:bpb
 Banda-Banda:bpd
 Bonggo:bpg
 Botlikh:bph
@@ -984,7 +966,6 @@ GagnoaBété:btg
 Biatah Bidayuh:bth
 Burate:bti
 Bacanese Malay:btj
-Bhatola:btl
 BatakMandailing:btm
 Ratagnon:btn
 Rinconada Bikol:bto
@@ -1095,7 +1076,6 @@ Busam:bxs
 China Buriat:bxu
 Berakou:bxv
 Bankagooma:bxw
-Borna (Democratic Republic of Congo):bxx
 Binahari:bxz
 Batak:bya
 Bikya:byb
@@ -1120,7 +1100,6 @@ Berti:byt
 Medumba:byv
 Belhariya:byw
 Qaqet:byx
-Buya:byy
 Banaro:byz
 Bandi:bza
 Andio:bzb
@@ -1174,9 +1153,7 @@ Canichana:caz
 Cabiyarí:cbb
 Carapana:cbc
 Carijona:cbd
-Chipiajes:cbe
 Chimila:cbg
-Cagua:cbh
 Chachi:cbi
 EdeCabe:cbj
 Chavacano:cbk
@@ -1190,7 +1167,6 @@ Candoshi-Shapra:cbu
 Cacua:cbv
 Kinabalian:cbw
 Carabayo:cby
-Cauca:cca
 Chamicuro:ccc
 Cafundo Creole:ccd
 Chopi:cce
@@ -1201,12 +1177,10 @@ Cutchi-Swahili:ccl
 Malaccan Creole Malay:ccm
 ComaltepecChinantec:cco
 Chakma:ccp
-Chaungtha:ccq
 Cacaopera:ccr
 Choni:cda
 Chenchu:cde
 Chiru:cdf
-Chamari:cdg
 Chambeali:cdh
 Chodri:cdi
 Churahi:cdj
@@ -1280,7 +1254,6 @@ Cabécar:cjp
 Shor:cjs
 Chuave:cjv
 Jinyu Chinese:cjy
-Khumi Awa Chin:cka
 CentralKurdish:ckb
 Chak:ckh
 Cibak:ckl
@@ -1355,7 +1328,6 @@ Wamey:cou
 CaoMiao:cov
 Cowlitz:cow
 Nanti:cox
-Coyaima:coy
 Chochotec:coz
 Palantla Chinantec:cpa
 Ucayali-YurúaAshéninka:cpb
@@ -1368,7 +1340,6 @@ PichisAshéninka:cpu
 Pu-XianChinese:cpx
 South Ucayali Ashéninka:cpy
 Chuanqiandian Cluster Miao:cqd
-ChileanQuechua:cqu
 Chara:cra
 IslandCarib:crb
 Lonwolwol:crc
@@ -1437,7 +1408,6 @@ Cuiba:cui
 MashcoPiro:cuj
 SanBlas Kuna:cuk
 Culina:cul
-Cumeral:cum
 Cumanagoto:cuo
 Cupeño:cup
 Cun:cuq
@@ -1468,7 +1438,6 @@ Dangaléat:daa
 Dambi:dac
 Marik:dad
 Duupa:dae
-Dan:daf
 Dagbani:dag
 Gwahatike:dah
 Day:dai
@@ -1478,7 +1447,6 @@ Dahalo:dal
 Damakawa:dam
 Danish:dan
 DaaiChin:dao
-Nisi (India):dap
 Dandami Maria:daq
 Dargwa:dar
 Daho-Doo:das
@@ -1547,10 +1515,8 @@ Dagoman:dgn
 Dogri(individual language):dgo
 Dogrib:dgr
 Dogoso:dgs
-Degaru:dgu
 Doghoro:dgx
 Daga:dgz
-Dhanwar(India):dha
 Dhundari:dhd
 Dhangu:dhg
 Dhimal:dhi
@@ -1581,7 +1547,6 @@ NortheasternDinka:dip
 Dimli (individual language):diq
 Dirim:dir
 Dimasa:dis
-Dirari:dit
 Diriku:diu
 Dhivehi:div
 NorthwesternDinka:diw
@@ -1596,7 +1561,6 @@ Djangun:djf
 Djinang:dji
 Djeebbana:djj
 Eastern Maroon Creole:djk
-Djiwarli:djl
 Jamsay Dogon:djm
 Djauan:djn
 Jangkang:djo
@@ -1605,7 +1569,6 @@ Kapriman:dju
 Djawi:djw
 Dakpakha:dka
 Dakka:dkk
-KolumSo Dogon:dkl
 Kuijau:dkr
 SoutheasternDinka:dks
 Mazagway:dkx
@@ -1669,7 +1632,6 @@ Darling:drl
 WestDamar:drn
 Daro-MatuMelanau:dro
 Dura:drq
-Dororo:drr
 Gedeo:drs
 Drents:drt
 Rukai:dru
@@ -1695,13 +1657,11 @@ Tebul Ure Dogon:dtu
 Duala:dua
 Dubli:dub
 Duna:duc
-Hun-Saare:dud
 UmirayDumaget Agta:due
 Dumbea:duf
 Duruma:dug
 DungraBhil:duh
 Dumun:dui
-Dhuwal:duj
 Duduela:duk
 AlabatIsland Agta:dul
 Middle Dutch (ca. 1050-1350):dum
@@ -1719,7 +1679,6 @@ DicamayAgta:duy
 Duli:duz
 Duau:dva
 Diri:dwa
-Walo Kumbe Dogon:dwl
 Dawro:dwr
 Dutton World Speedwords:dws
 Dawawa:dww
@@ -1734,7 +1693,6 @@ Jola-Fonyi:dyo
 Dyula:dyu
 Dyaabugay:dyy
 Tunzu:dza
-Daza:dzd
 Dazaga:dzg
 Dzalakha:dzl
 Dzando:dzn
@@ -1778,7 +1736,6 @@ Elkei:elk
 Modern Greek (1453-):ell
 Eleme:elm
 El Molo:elo
-Elpaputih:elp
 Elu:elu
 Elamite:elx
 Emai-Iuleha-Ora:ema
@@ -1789,7 +1746,6 @@ Mussau-Emira:emi
 EasternManinkakan:emk
 Mamulique:emm
 Eman:emn
-Emok:emo
 Northern Emberá:emp
 PacificGulf Yupik:ems
 EasternMuria:emu
@@ -1975,7 +1931,6 @@ Gayo:gay
 West Central Oromo:gaz
 Gbaya(Central African Republic):gba
 Kaytetye:gbb
-Garawa:gbc
 Karadjeri:gbd
 Niksek:gbe
 Gaikundi:gbf
@@ -2049,9 +2004,6 @@ Guragone:gge
 Gurgula:ggg
 Kungarakany:ggk
 Ganglau:ggl
-EasternGurung:ggn
-SouthernGondi:ggo
-AghuTharnggalu:ggr
 Gitua:ggt
 Gagu:ggu
 Gogodala:ggw
@@ -2074,7 +2026,6 @@ Goaria:gig
 Gilbertese:gil
 Gimi (Eastern Highlands):gim
 Hinukh:gin
-Gelao:gio
 Gimi(West New Britain):gip
 GreenGelao:giq
 RedGelao:gir
@@ -2084,7 +2035,6 @@ WhiteGelao:giw
 Gilima:gix
 Giyug:giy
 South Giziga:giz
-Geji:gji
 Kachi Koli:gjk
 Gonja:gjn
 Gujari:gju
@@ -2098,7 +2048,6 @@ Nanai:gld
 Irish:gle
 Galician:glg
 Northwest Pashayi:glh
-Guliguli:gli
 GulaIro:glj
 Gilaki:glk
 Galambu:glo
@@ -2199,7 +2148,6 @@ Wasembo:gsp
 Greek Sign Language:gss
 SwissGerman:gsw
 Guató:gta
-Gbati-ri:gti
 Shiki:gua
 Guajajára:gub
 Wayuu:guc
@@ -2221,7 +2169,6 @@ Farefare:gur
 GuineanSign Language:gus
 Maléku Jaíka:gut
 Yanomamö:guu
-Gey:guv
 Gun:guw
 Gourmanchéma:gux
 Gusii:guz
@@ -2407,7 +2354,6 @@ Hre:hre
 Haruku:hrk
 HornedMiao:hrm
 Haroi:hro
-Horuru:hrr
 Hértevin:hrt
 Hruso:hru
 Croatian:hrv
@@ -2460,14 +2406,12 @@ Hya:hya
 Armenian:hye
 Iaai:iai
 Iatmul:ian
-Iapama:iap
 Purari:iar
 Iban:iba
 Ibibio:ibb
 Iwaidja:ibd
 Akpes:ibe
 Ibanag:ibg
-Ibilo:ibi
 Ibaloi:ibl
 Agoi:ibm
 Ibino:ibn
@@ -2534,14 +2478,11 @@ Interlingue:ile
 Garig-Ilgar:ilg
 IliTurki:ili
 Ilongot:ilk
-Iranun:ill
 Iloko:ilo
 International Sign:ils
 Ili'uun:ilu
 Ilue:ilv
-Talur:ilw
 MalaMalasar:ima
-Imeraguen:ime
 Anamgura:imi
 Miluk:iml
 Imonda:imn
@@ -2623,7 +2564,6 @@ Iyayu:iya
 Mesaka:iyo
 Yaka (Congo):iyx
 Ingrian:izh
-Izi-Ezaa-Ikwo-Mgbo:izi
 Izere:izr
 Jamamadí:jaa
 Hyam:jab
@@ -2638,7 +2578,6 @@ Yalahatan:jal
 Jamaican Creole English:jam
 Yanyuwa:jao
 Yaqay:jaq
-Jarawa(Nigeria):jar
 NewCaledonian Javanese:jas
 Jakati:jat
 Yaur:jau
@@ -2660,7 +2599,6 @@ Jadgali:jdg
 Judeo-Tat:jdt
 Jebero:jeb
 Jerung:jee
-Jeng:jeg
 Jeh:jeh
 Yei:jei
 JeriKuo:jek
@@ -2779,7 +2717,6 @@ Kaxuiâna:kbb
 Kadiwéu:kbc
 Kabardian:kbd
 Kanju:kbe
-Kakauhua:kbf
 Khamba:kbg
 Camsá:kbh
 Kaptiau:kbi
@@ -2844,7 +2781,6 @@ Koch:kdq
 Karaim:kdr
 Kuy:kdt
 Kadaru:kdu
-Kado:kdv
 Koneraw:kdw
 Kam:kdx
 Keder:kdy
@@ -2903,12 +2839,9 @@ Kumaoni:kfy
 Koromfé:kfz
 Koyaga:kga
 Kawe:kgb
-Kasseng:kgc
-Kataang:kgd
 Komering:kge
 Kube:kgf
 Kusunda:kgg
-UpperTanudan Kalinga:kgh
 SelangorSign Language:kgi
 Gamale Kham:kgj
 Kaiwá:kgk
@@ -2982,7 +2915,6 @@ Q'anjob'al:kjb
 CoastalKonjo:kjc
 SouthernKiwai:kjd
 Kisar:kje
-Khalaj:kjf
 Khmu:kjg
 Khakas:kjh
 Zabana:kji
@@ -3112,7 +3044,6 @@ Kubi:kof
 Cogui:kog
 Koyo:koh
 Komi-Permyak:koi
-SaraDunjo:koj
 Konkani (macrolanguage):kok
 Kol(Papua New Guinea):kol
 Komi:kom
@@ -3126,7 +3057,6 @@ Lagwan:kot
 Koke:kou
 Kudu-Camo:kov
 Kugama:kow
-Coxima:kox
 Koyukon:koy
 Korak:koz
 Kutto:kpa
@@ -3144,7 +3074,6 @@ Kpala:kpl
 Koho:kpm
 Kepkiriwát:kpn
 Ikposo:kpo
-PakuKaren:kpp
 Korupun-Sela:kpq
 Korafe-Yegha:kpr
 Tehit:kps
@@ -3192,7 +3121,6 @@ Krio:kri
 Kinaray-A:krj
 Kerek:krk
 Karelian:krl
-Krim:krm
 Sapo:krn
 Korop:krp
 Kru'ng 2:krr
@@ -3247,7 +3175,6 @@ Karitiâna:ktn
 Kuot:kto
 Kaduo:ktp
 Katabaga:ktq
-Kota Marudu Tinagas:ktr
 South Muyu:kts
 Ketum:ktt
 Kituba(Democratic Republic of Congo):ktu
@@ -3300,7 +3227,6 @@ Dobel:kvo
 Kompane:kvp
 GebaKaren:kvq
 Kerinci:kvr
-Kunggara:kvs
 Lahta Karen:kvt
 Yinbaw Karen:kvu
 Kola:kvv
@@ -3324,7 +3250,6 @@ Kwambi:kwm
 Kwangali:kwn
 Kwomtari:kwo
 Kodia:kwp
-Kwak:kwq
 Kwer:kwr
 Kwese:kws
 Kwesten:kwt
@@ -3338,13 +3263,11 @@ Kairiru:kxa
 Krobu:kxb
 Konso:kxc
 Brunei:kxd
-Kakihum:kxe
 ManumanawKaren:kxf
 Karo (Ethiopia):kxh
 Keningau Murut:kxi
 Kulfa:kxj
 ZayeinKaren:kxk
-Nepali Kurux:kxl
 Northern Khmer:kxm
 Kanowit-Tanjong Melanau:kxn
 Kanoé:kxo
@@ -3353,7 +3276,6 @@ SmärkyKanum:kxq
 Koro (Papua New Guinea):kxr
 Kangjia:kxs
 Koiwat:kxt
-Kui(India):kxu
 Kuvi:kxv
 Konai:kxw
 Likuba:kxx
@@ -3392,9 +3314,7 @@ Kadai:kzd
 Kosena:kze
 Da'aKaili:kzf
 Kikai:kzg
-Kenuzi-Dongola:kzh
 Kelabit:kzi
-Coastal Kadazan:kzj
 Kazukuru:kzk
 Kayeli:kzl
 Kais:kzm
@@ -3404,7 +3324,6 @@ Kaidipang:kzp
 Kaike:kzq
 Karang:kzr
 SugutDusun:kzs
-TambunanDusun:kzt
 Kayupulau:kzu
 Komyandaret:kzv
 Karirí-Xocó:kzw
@@ -3437,7 +3356,6 @@ Lauje:law
 Tiwa:lax
 Lama(Myanmar):lay
 Aribwatsa:laz
-Lui:lba
 Label:lbb
 Lakkia:lbc
 Lak:lbe
@@ -3489,7 +3407,6 @@ Leco:lec
 Lendu:led
 Lyélé:lee
 Lelemi:lef
-Lengua:leg
 Lenje:leh
 Lemio:lei
 Lengola:lej
@@ -3543,7 +3460,6 @@ Likila:lie
 Limbu:lif
 Ligbi:lig
 Lihir:lih
-Lingkhim:lii
 Ligurian:lij
 Lika:lik
 Lillooet:lil
@@ -3593,7 +3509,6 @@ Lelak:llk
 Lilau:lll
 Lasalimu:llm
 Lele (Chad):lln
-Khlor:llo
 NorthEfate:llp
 Lolak:llq
 LithuanianSign Language:lls
@@ -3611,7 +3526,6 @@ Lombi:lmi
 WestLembata:lmj
 Lamkang:lmk
 Hano:lml
-Lamam:lmm
 Lambadi:lmn
 Lombard:lmo
 Limbum:lmp
@@ -3622,7 +3536,6 @@ Lomaiviti:lmv
 LakeMiwok:lmw
 Laimbue:lmx
 Lamboya:lmy
-Lumbee:lmz
 Langbashe:lna
 Mbalanhu:lnb
 Lundayeh:lnd
@@ -3684,7 +3597,6 @@ Lemerig:lrz
 Lasgerdi:lsa
 Lishana Deni:lsd
 Lusengo:lse
-Lyons Sign Language:lsg
 Lish:lsh
 Lashi:lsi
 Latvian Sign Language:lsl
@@ -3851,7 +3763,6 @@ Mara:mec
 Melpa:med
 Mengen:mee
 Megam:mef
-Mea:meg
 Southwestern Tlaxiaco Mixtec:meh
 Midob:mei
 Meyah:mej
@@ -3919,7 +3830,6 @@ Mongol:mgt
 Mailu:mgu
 Matengo:mgv
 Matumbi:mgw
-Omati:mgx
 Mbunga:mgy
 Mbugwe:mgz
 Manda(India):mha
@@ -3929,7 +3839,6 @@ Mbugu:mhd
 Besisi:mhe
 Mamaa:mhf
 Margu:mhg
-MaskoyPidgin:mhh
 Ma'di:mhi
 Mogholi:mhj
 Mungaka:mhk
@@ -3972,7 +3881,6 @@ Akoye:miw
 MixtepecMixtec:mix
 AyutlaMixtec:miy
 CoatzospanMixtec:miz
-Mahei:mja
 SanJuan Colorado Mixtec:mjc
 Northwest Maidu:mjd
 Muskum:mje
@@ -4024,7 +3932,6 @@ Makasae:mkz
 Malo:mla
 Mbule:mlb
 CaoLan:mlc
-Malakhel:mld
 Manambu:mle
 Mal:mlf
 Malagasy:mlg
@@ -4089,7 +3996,6 @@ MinBei Chinese:mnp
 Minriq:mnq
 Mono(USA):mnr
 Mansi:mns
-Maykulan:mnt
 Mer:mnu
 Rennell-Bellona:mnv
 Mon:mnw
@@ -4278,7 +4184,6 @@ Mire:mvh
 Miyako:mvi
 Mekmek:mvk
 Mbara (Australia):mvl
-Muya:mvm
 Minaveha:mvn
 Marovo:mvo
 Duri:mvp
@@ -4295,13 +4200,11 @@ Mesqan:mvz
 Mwatebu:mwa
 Juwal:mwb
 Are:mwc
-Mudbura:mwd
 Mwera(Chimwera):mwe
 Murrinh-Patha:mwf
 Aiklep:mwg
 Mouk-Aria:mwh
 Labo:mwi
-Maligo:mwj
 Kita Maninkakan:mwk
 Mirandese:mwl
 Sar:mwm
@@ -4315,8 +4218,6 @@ Moken:mwt
 Mittu:mwu
 Mentawai:mwv
 Hmong Daw:mww
-Mediak:mwx
-Mosiro:mwy
 Moingi:mwz
 NorthwestOaxaca Mixtec:mxa
 TezoatlánMixtec:mxb
@@ -4347,19 +4248,16 @@ CentralMasela:mxz
 Burmese:mya
 Mbay:myb
 Mayeka:myc
-Maramba:myd
 Myene:mye
 Bambassi:myf
 Manta:myg
 Makah:myh
-Mina(India):myi
 Mangayat:myj
 MamaraSenoufo:myk
 Moma:myl
 Me'en:mym
 Anfillo:myo
 Pirahã:myp
-Forest Maninka:myq
 Muniche:myr
 Mesmes:mys
 Mundurukú:myu
@@ -4396,7 +4294,6 @@ Maiadomu:mzz
 Namla:naa
 Southern Nambikuára:nab
 Narak:nac
-Nijadali:nad
 Naka'ela:nae
 Nabak:naf
 NagaPidgin:nag
@@ -4422,7 +4319,6 @@ Ndoe:nbb
 ChangNaga:nbc
 Ngbinda:nbd
 KonyakNaga:nbe
-Naxi:nbf
 Nagarchal:nbg
 Ngamo:nbh
 MaoNaga:nbi
@@ -4440,7 +4336,6 @@ Na:nbt
 RongmeiNaga:nbu
 Ngamambo:nbv
 SouthernNgbandi:nbw
-Ngura:nbx
 Ningera:nby
 Iyo:nca
 Central Nicobarese:ncb
@@ -4457,7 +4352,6 @@ Michoacán Nahuatl:ncl
 Nambo:ncm
 Nauna:ncn
 Sibe:nco
-Ndaktup:ncp
 Ncane:ncr
 NicaraguanSign Language:ncs
 ChotheNaga:nct
@@ -4532,7 +4426,6 @@ Ngalkbun:ngk
 Lomwe:ngl
 Ngatik Men's Creole:ngm
 Ngwo:ngn
-Ngoni:ngo
 Ngulu:ngp
 Ngurimi:ngq
 Nanggu:ngr
@@ -4640,9 +4533,7 @@ Grangali:nli
 Nyali:nlj
 Ninia Yali:nlk
 Nihali:nll
-DurangoNahuatl:nln
 Ngul:nlo
-Ngarla:nlr
 Nchumbulu:nlu
 Orizaba Nahuatl:nlv
 Nahali:nlx
@@ -4692,12 +4583,10 @@ Norwegian Nynorsk:nno
 WanchoNaga:nnp
 Ngindo:nnq
 Narungga:nnr
-Ningye:nns
 Nanticoke:nnt
 Dwang:nnu
 Nugunu (Australia):nnv
 Southern Nuni:nnw
-Ngong:nnx
 Nyangga:nny
 Nda'nda':nnz
 Woun Meu:noa
@@ -4713,7 +4602,6 @@ Nonuya:noj
 Nooksack:nok
 Nocamán:nom
 Old Norse:non
-Nootka:noo
 Numanggang:nop
 Ngongo:noq
 Norwegian:nor
@@ -4783,7 +4671,6 @@ Nateni:ntm
 Ntomba:nto
 Northern Tepehuan:ntp
 Delo:ntr
-Natagaimas:nts
 Natügu:ntu
 Nottoway:ntw
 Mantsi:nty
@@ -4832,7 +4719,6 @@ SouthNuaulu:nxl
 Numidian:nxm
 Ngawun:nxn
 Ninggerum:nxr
-Narau:nxu
 Nafri:nxx
 Nyanja:nya
 Nyangbo:nyb
@@ -4936,7 +4822,6 @@ Olrat:olr
 Omaha-Ponca:oma
 EastAmbae:omb
 Mochica:omc
-Omejes:ome
 Omagua:omg
 Omi:omi
 Omok:omk
@@ -5025,7 +4910,6 @@ Glio-Oubi:oub
 Ounge:oue
 OldUighur:oui
 Ouma:oum
-!O!ung:oun
 Owiniga:owi
 OldWelsh:owl
 Oy:oyb
@@ -5050,7 +4934,6 @@ Papiamento:pap
 Parya:paq
 Panamint:par
 Papasena:pas
-Papitalai:pat
 Palauan:pau
 Pakaásnovos:pav
 Pawnee:paw
@@ -5074,7 +4957,6 @@ SouthernPashto:pbt
 NorthernPashto:pbu
 Pnar:pbv
 Pyu:pby
-Palu:pbz
 Santa Inés Ahuatempan Popoloca:pca
 Pear:pcb
 Bouyei:pcc
@@ -5090,7 +4972,6 @@ Pardhi:pcl
 Nigerian Pidgin:pcm
 Piti:pcn
 Pacahuara:pcp
-Panang:pcr
 Pyapun:pcw
 Anam:pda
 PennsylvaniaGerman:pdc
@@ -5129,7 +5010,6 @@ Rerep:pgk
 Paelignian:pgn
 Pangseng:pgs
 Pagu:pgu
-Pongyong:pgy
 Pa-Hng:pha
 Phudagi:phd
 Phuong:phg
@@ -5195,7 +5075,6 @@ KohistaniShina:plk
 ShwePalaung:pll
 Palenquero:pln
 OlutaPopoluca:plo
-Palpa:plp
 Palaic:plq
 PalakaSenoufo:plr
 San Marcos Tlalcoyalco Popoloca:pls
@@ -5207,7 +5086,6 @@ Bolyu:ply
 Paluan:plz
 Paama:pma
 Pambia:pmb
-Palumata:pmc
 Pwaamei:pme
 Pamona:pmf
 Māhārāṣṭri Prākrit:pmh
@@ -5222,7 +5100,6 @@ Northern Pame:pmq
 Paynamar:pmr
 Piemontese:pms
 Tuamotuan:pmt
-Mirpur Panjabi:pmu
 PlainsMiwok:pmw
 PoumeiNaga:pmx
 PapuanMalay:pmy
@@ -5249,7 +5126,6 @@ Phong-Kniang:pnx
 Pinyin:pny
 Pana (Central African Republic):pnz
 Poqomam:poc
-Ponares:pod
 San Juan Atzingo Popoloca:poe
 Poke:pof
 Potiguára:pog
@@ -5269,7 +5145,6 @@ Upper Guinea Crioulo:pov
 San Felipe Otlaltepec Popoloca:pow
 Polabian:pox
 Pogolo:poy
-Pao:ppa
 Papi:ppe
 Paipai:ppi
 Uma:ppk
@@ -5279,13 +5154,11 @@ Papapana:ppn
 Folopa:ppo
 Pelende:ppp
 Pei:ppq
-Piru:ppr
 San Luís Temalacayuca Popoloca:pps
 Pare:ppt
 Papora:ppu
 Pa'a:pqa
 Malecite-Passamaquoddy:pqm
-Lua':prb
 Parachi:prc
 Parsi-Dari:prd
 Principense:pre
@@ -5306,7 +5179,6 @@ Phai:prt
 Puragi:pru
 Parawen:prw
 Purik:prx
-Pray 3:pry
 ProvidenciaSign Language:prz
 Asue Awyu:psa
 Persian Sign Language:psc
@@ -5348,7 +5220,6 @@ Punan Merah:puf
 Phuie:pug
 Puinave:pui
 PunanTubu:puj
-PuKo:puk
 Puma:pum
 Puoc:puo
 Pulabu:pup
@@ -5360,7 +5231,6 @@ Punu:puu
 Puluwatese:puw
 Puare:pux
 Purisimeño:puy
-PurumNaga:puz
 Pawaia:pwa
 Panawa:pwb
 Gapapaiwa:pwg
@@ -5489,7 +5359,6 @@ Ringgou:rgu
 Rohingya:rhg
 Yahang:rhp
 Riang(India):ria
-Rien:rie
 Tarifit:rif
 Riang(Myanmar):ril
 Nyaturu:rim
@@ -5530,7 +5399,6 @@ WelshRomani:rmw
 Romam:rmx
 Vlax Romani:rmy
 Marma:rmz
-Runa:rna
 Ruund:rnd
 Ronga:rng
 Ranglong:rnl
@@ -5557,7 +5425,6 @@ Rapting:rpt
 Ririo:rri
 Waima:rro
 Romano-Serbian:rsb
-Rennellese Sign Language:rsi
 RussianSign Language:rsl
 Ratahan:rth
 Rotuman:rtm
@@ -5600,7 +5467,6 @@ Sake:sak
 SamaritanAramaic:sam
 Sanskrit:san
 Sause:sao
-Sanapaná:sap
 Samburu:saq
 Saraveca:sar
 Sasak:sas
@@ -5637,7 +5503,6 @@ Simba:sbw
 Seberuang:sbx
 Soli:sby
 Sara Kaba:sbz
-Sansu:sca
 Chut:scb
 Dongxiang:sce
 SanMiguel Creole French:scf
@@ -5665,7 +5530,6 @@ Southern Kurdish:sdh
 Suundi:sdj
 SosKundi:sdk
 Saudi Arabian Sign Language:sdl
-Semandang:sdm
 Gallurese Sardinian:sdn
 Bukar-SadungBidayuh:sdo
 Sherdukpen:sdp
@@ -5713,7 +5577,6 @@ Shughni:sgh
 Suga:sgi
 Sangkong:sgk
 Singa:sgm
-Songa:sgo
 Singpho:sgp
 Sangisari:sgr
 Samogitian:sgs
@@ -5797,7 +5660,6 @@ SakalavaMalagasy:skg
 Sikule:skh
 Sika:ski
 Seke(Nepal):skj
-Sok:skk
 Sakam:skm
 KolibuganSubanon:skn
 Seko Tengah:sko
@@ -5867,7 +5729,6 @@ Sindhi:snd
 Bau Bidayuh:sne
 Noon:snf
 Sanga (Democratic Republic of Congo):sng
-Shinabo:snh
 Sensi:sni
 RiverainSango:snj
 Soninke:snk
@@ -6034,7 +5895,6 @@ Ulau-Suain:svb
 Vincentian Creole English:svc
 Serili:sve
 SlovakianSign Language:svk
-Savara:svr
 Savosavo:svs
 Skalvian:svx
 Swahili(macrolanguage):swa
@@ -6124,7 +5984,6 @@ Tamki:tax
 Atayal:tay
 Tocho:taz
 Aikanã:tba
-Tapeba:tbb
 Takia:tbc
 KakiAe:tbd
 Tanimbili:tbe
@@ -6189,7 +6048,6 @@ Tita:tdq
 Todrah:tdr
 Doutai:tds
 TetunDili:tdt
-TempasukDusun:tdu
 Toro:tdv
 Tandroy-Mahafaly Malagasy:tdx
 Tadyawan:tdy
@@ -6228,7 +6086,6 @@ Tigak:tgc
 Ciwogai:tgd
 Eastern Gorkha Tamang:tge
 Chalikha:tgf
-Tangga:tgg
 TobagonianCreole English:tgh
 Lawunuia:tgi
 Tajik:tgk
@@ -6246,7 +6103,6 @@ TagwanaSenoufo:tgw
 Tagish:tgx
 Togoyo:tgy
 Thai:tha
-TaiHang Tong:thc
 Thayore:thd
 Chitwania Tharu:the
 Thangmi:thf
@@ -6263,14 +6119,10 @@ Thakali:ths
 Tahltan:tht
 Thuri:thu
 Tahaggart Tamahaq:thv
-Thudam:thw
-The:thx
 Tha:thy
 TayartTamajeq:thz
 Tidikelt Tamazight:tia
 Tira:tic
-Tidong:tid
-Tingal:tie
 Tifal:tif
 Tigre:tig
 TimugonMurut:tih
@@ -6305,7 +6157,6 @@ Buksa:tkb
 Tukudede:tkd
 Takwane:tke
 Tukumanféd:tkf
-Takpa:tkk
 Tokelau:tkl
 Takelma:tkm
 Toku-No-Shima:tkn
@@ -6339,7 +6190,6 @@ Tambotalo:tls
 Teluti:tlt
 Tulehu:tlu
 Taliabu:tlv
-South Wemale:tlw
 Khehek:tlx
 Talysh:tly
 Tama(Chad):tma
@@ -6357,7 +6207,6 @@ Tamnim Citak:tml
 TaiThanh:tmm
 Taman(Indonesia):tmn
 Temoq:tmo
-TaiMène:tmp
 Tumleo:tmq
 Jewish Babylonian Aramaic (ca. 200-1200 CE):tmr
 Tima:tms
@@ -6371,7 +6220,6 @@ Tacana:tna
 Western Tunebo:tnb
 Tanimuca-Retuarã:tnc
 AngosturasTunebo:tnd
-TinocKallahan:tne
 Tobanga:tng
 Maiani:tnh
 Tandia:tni
@@ -6394,7 +6242,6 @@ Tonga(Thailand):tnz
 Toba:tob
 CoyutlaTotonac:toc
 Toma:tod
-Tomedes:toe
 Gizrra:tof
 Tonga(Nyasa):tog
 Gitonga:toh
@@ -6477,7 +6324,6 @@ Tsamai:tsb
 Tswa:tsc
 Tsakonian:tsd
 TunisianSign Language:tse
-SouthwesternTamang:tsf
 Tausug:tsg
 Tsuvan:tsh
 Tsimshian:tsi
@@ -6688,11 +6534,9 @@ Uneme:une
 Ngarinyin:ung
 Enawené-Nawé:unk
 Unami:unm
-Worora:unp
 Mundari:unr
 Munda:unx
 UndeKaili:unz
-Uokha:uok
 Umeda:upi
 Uripiv-Wala-Rano-Atchin:upv
 Urarina:ura
@@ -6781,7 +6625,6 @@ Vishavan:vis
 Viti:vit
 Iduna:viv
 Kariyarra:vka
-Ija-Zuba:vki
 Kujarge:vkj
 Kaur:vkk
 Kulisusu:vkl
@@ -6917,10 +6760,8 @@ Wilawila:wil
 Wik-Mungkan:wim
 Ho-Chunk:win
 Wiraféd:wir
-Wintu:wit
 Wiru:wiu
 Muduapa:wiv
-Wirangu:wiw
 Wiyot:wiy
 Waja:wja
 Warji:wji
@@ -6990,7 +6831,6 @@ Hanga Hundi:wos
 Wawonii:wow
 Weyto:woy
 Maco:wpc
-Warapu:wra
 Warluwara:wrb
 Warduji:wrd
 Warungu:wrg
@@ -7063,7 +6903,6 @@ Kauwera:xau
 Xavánte:xav
 Kawaiisu:xaw
 Kayan Mahakam:xay
-Kamba(Brazil):xba
 LowerBurdekin:xbb
 Bactrian:xbc
 Kombio:xbi
@@ -7072,7 +6911,6 @@ Kenaboi:xbn
 Bolgarian:xbo
 Kambera:xbr
 Kambiwá:xbw
-Kabixí:xbx
 Cumbric:xcb
 Camunic:xcc
 Celtiberian:xce
@@ -7115,12 +6953,10 @@ Hernican:xhr
 Hattic:xht
 Hurrian:xhu
 Khua:xhv
-Xiandao:xia
 Iberian:xib
 Xiri:xii
 Illyrian:xil
 Xinca:xin
-Xipináwa:xip
 Xiriâna:xir
 IndusValley Language:xiv
 Xipaya:xiy
@@ -7131,7 +6967,6 @@ Mendalam Kayan:xkd
 Kereho:xke
 Khengkha:xkf
 Kagoro:xkg
-Karahawyana:xkh
 Kenyan Sign Language:xki
 Kajali:xkj
 Kaco':xkk
@@ -7272,7 +7107,6 @@ TacahuaMixtec:xtt
 CuyamecalcoMixtec:xtu
 Tawandê:xtw
 YoloxochitlMixtec:xty
-Tasmanian:xtz
 AluKurumba:xua
 BettaKurumba:xub
 Kunigami:xug
@@ -7331,7 +7165,6 @@ Agwagwune:yay
 Lokaa:yaz
 Yala:yba
 Yemba:ybb
-Yangbye:ybd
 WestYugur:ybe
 Yakha:ybh
 Yamphu:ybi
@@ -7351,14 +7184,12 @@ Eastern Yiddish:ydd
 YangumDey:yde
 Yidgha:ydg
 Yoidik:ydk
-YiddishSign Language:yds
 Ravula:yea
 Yeniche:yec
 Yimas:yee
 Yeni:yei
 Yevanic:yej
 Yela:yel
-Yendang:yen
 Tarok:yer
 Yeskwa:yes
 Yetfa:yet
@@ -7392,7 +7223,6 @@ EasternLalu:yit
 Awu:yiu
 NorthernNisu:yiv
 AxiYi:yix
-YirYoront:yiy
 Azhe:yiz
 Yakan:yka
 NorthernYukaghir:ykg
@@ -7416,7 +7246,6 @@ NaluoYi:ylo
 Yalarnnga:ylr
 Aribwaung:ylu
 Nyâlayu:yly
-Yamphe:yma
 Yambes:ymb
 Southern Muji:ymc
 Muda:ymd
@@ -7433,14 +7262,12 @@ Yamap:ymp
 QilaMuji:ymq
 Malasar:ymr
 Mysian:yms
-Mator-Taygi-Karagas:ymt
 NorthernMuji:ymx
 Muzi:ymz
 Aluo:yna
 Yandruwandha:ynd
 Lang'e:yne
 Yango:yng
-Yangho:ynh
 NaukanYupik:ynk
 Yangulam:ynl
 Yana:ynn
@@ -7455,7 +7282,6 @@ Yola:yol
 Yombe:yom
 Yonggom:yon
 Yoruba:yor
-Yos:yos
 Yoron:yox
 Yoy:yoy
 Phala:ypa
@@ -7470,7 +7296,6 @@ Phuza:ypz
 Yerakai:yra
 Yareba:yrb
 Yaouré:yre
-Yarí:yri
 Nenets:yrk
 Nhengatu:yrl
 Yerong:yrn
@@ -7506,7 +7331,6 @@ Yukpa:yup
 Yuqui:yuq
 Yurok:yur
 Yopno:yut
-Yugh:yuu
 Yau(Morobe Province):yuw
 Southern Yukaghir:yux
 East Yugur:yuy
@@ -7579,7 +7403,6 @@ Zimbabwe Sign Language:zib
 Zimakani:zik
 Mesme:zim
 Zinza:zin
-Ziriya:zir
 Zigula:ziw
 Zizilivakan:ziz
 Kaimbulawa:zka
