@@ -31,7 +31,7 @@ public class IsoLangCodes {
 
 	private static Map<String, String> buildMap(){
 		Map<String, String> map = new HashMap<String, String>();
-		final InputStream langCodesInputStream = IsoLangCodes.class.getClassLoader().getResourceAsStream("lang_codes.txt");
+		final InputStream langCodesInputStream = IsoLangCodes.class.getResourceAsStream("lang_codes.txt");
 		if(langCodesInputStream != null) {
 			try (BufferedReader reader = new BufferedReader(new InputStreamReader(langCodesInputStream, StandardCharsets.UTF_8))) {
 				String line;
