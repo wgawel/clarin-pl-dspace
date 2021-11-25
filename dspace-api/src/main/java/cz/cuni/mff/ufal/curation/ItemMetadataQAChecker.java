@@ -477,7 +477,7 @@ public class ItemMetadataQAChecker extends AbstractCurationTask {
         try {
             boolean fail = false;
             StringBuilder sb = new StringBuilder();
-            if (item.getNonInternalBitstreams().length > 0) {
+            if (item.hasUploadedFiles()) {
                 for(String mdString : rightsMdStrings){
                     final Metadatum[] vals = item.getMetadataByMetadataString(mdString);
                     if(vals == null || vals.length == 0){
