@@ -930,7 +930,7 @@
 								<!-- preload="metadata" would appear in access.log -->
 								<video controls="controls" preload="none">
 									<xsl:attribute name="height"><xsl:value-of select="240"/></xsl:attribute>
-									<xsl:if test="$thumbnail">
+									<xsl:if test="string($thumbnail)">
 										<xsl:attribute name="poster"><xsl:value-of select="$thumbnail" /></xsl:attribute>
 									</xsl:if>
 									<source>
@@ -941,7 +941,7 @@
 								</video>
 							</div>
 						</xsl:when>
-						<xsl:when test="$thumbnail">
+						<xsl:when test="string($thumbnail)">
 							<img alt="Thumbnail" class="pull-right">
 								<xsl:attribute name="src">
 									<xsl:value-of select="$thumbnail" />
