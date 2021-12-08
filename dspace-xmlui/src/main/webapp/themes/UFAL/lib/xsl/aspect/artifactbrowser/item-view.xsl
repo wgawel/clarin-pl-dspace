@@ -925,6 +925,7 @@
 								<xsl:attribute name="src">
 									<xsl:value-of select="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
 								</xsl:attribute>
+								<xsl:attribute name="style">height: <xsl:value-of select="$thumbnail.maxheight"/>px;</xsl:attribute>
 							</img>
 						</xsl:when>
 						<xsl:otherwise>
