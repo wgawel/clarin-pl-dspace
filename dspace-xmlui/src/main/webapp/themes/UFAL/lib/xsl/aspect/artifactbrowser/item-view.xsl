@@ -914,17 +914,39 @@
             </xsl:call-template>
         </xsl:variable>
         <xsl:variable name="md5_checksum" select="@CHECKSUM"/>
+	<xsl:variable name="thumbnail">
+		<xsl:if test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]">
+			<xsl:value-of select="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
+		</xsl:if>
+	</xsl:variable>
 			<div class="thumbnail" style="margin-bottom: 10px;">
 				<a>
 					<xsl:attribute name="href">
                         <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
                     </xsl:attribute>
 					<xsl:choose>
-						<xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]">
+						<xsl:when test="@MIMETYPE='video/mp4'">
+							<div style="text-align: left;">
+								<!-- preload="metadata" would appear in access.log -->
+								<video controls="controls" preload="none">
+									<xsl:attribute name="height"><xsl:value-of select="240"/></xsl:attribute>
+									<xsl:if test="$thumbnail">
+										<xsl:attribute name="poster"><xsl:value-of select="$thumbnail" /></xsl:attribute>
+									</xsl:if>
+									<source>
+										<xsl:attribute name="src"><xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/></xsl:attribute>
+										<xsl:attribute name="type"><xsl:value-of select="@MIMETYPE"/></xsl:attribute>
+									</source>
+									Your browser does not support the video tag.
+								</video>
+							</div>
+						</xsl:when>
+						<xsl:when test="$thumbnail">
 							<img alt="Thumbnail" class="pull-right">
 								<xsl:attribute name="src">
-									<xsl:value-of select="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
+									<xsl:value-of select="$thumbnail" />
 								</xsl:attribute>
+								<xsl:attribute name="style">height: <xsl:value-of select="$thumbnail.maxheight"/>px;</xsl:attribute>
 							</img>
 						</xsl:when>
 						<xsl:otherwise>
