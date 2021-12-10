@@ -261,8 +261,8 @@
 	             </xsl:for-each>
 	             <xsl:text> / </xsl:text>
              </xsl:if>
-             <span class="date">	             				
-				<xsl:value-of select="substring(dim:field[@element='date' and @qualifier='issued']/node(),1,10)"/>						            
+             <span class="date">
+                 <xsl:call-template name="date_issued_formatted_value"/>
 			</span>
              <xsl:text>)</xsl:text>
          </div>

@@ -348,13 +348,7 @@
 						<i18n:text>xmlui.dri2xhtml.METS-1.0.item-date</i18n:text>
 					</dt>
 					<dd>
-						<xsl:for-each select="dim:field[@element='date' and @qualifier='issued']">							
-							<xsl:copy-of select="substring(./node(),1,10)" />
-							<xsl:if
-								test="count(following-sibling::dim:field[@element='date' and @qualifier='issued']) != 0">
-								<br />
-							</xsl:if>
-						</xsl:for-each>
+						<xsl:call-template name="date_issued_formatted_value"/>
 					</dd>
 				</dl>
 				<xsl:call-template name="itemSummaryView-DIM-fields">
@@ -1300,5 +1294,26 @@
 
 	</span>
     </xsl:template>
+
+	<xsl:template name="date_issued_formatted_value">
+		<xsl:variable name="date" select="substring(./dim:field[@element='date' and @qualifier='issued'],1,10)"/>
+		<xsl:choose>
+			<xsl:when test="contains(dim:field[@mdschema='local' and @element='approximateDate' and @qualifier='issued'], ',')">
+				<i18n:translate>
+					<i18n:text>xmlui.UFAL.artifactbrowser.item_view.date_list</i18n:text>
+					<i18n:param><xsl:value-of select="dim:field[@mdschema='local' and @element='approximateDate' and @qualifier='issued']"/></i18n:param>
+				</i18n:translate>
+			</xsl:when>
+			<xsl:when test="dim:field[@mdschema='local' and @element='approximateDate' and @qualifier='issued']">
+				<i18n:translate>
+					<i18n:text>xmlui.UFAL.artifactbrowser.item_view.date_unknown</i18n:text>
+					<i18n:param><xsl:value-of select="dim:field[@mdschema='local' and @element='approximateDate' and @qualifier='issued']"/></i18n:param>
+				</i18n:translate>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$date" />
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 </xsl:stylesheet>
 

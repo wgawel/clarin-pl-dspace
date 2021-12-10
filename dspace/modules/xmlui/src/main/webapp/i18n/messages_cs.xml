@@ -3249,6 +3249,8 @@
 	<message key="xmlui.UFAL.artifactbrowser.item_view.preview">Náhled</message>
 	<message key="xmlui.UFAL.artifactbrowser.item_view.file_preview">Náhled souboru</message>
         <message key="xmlui.UFAL.artifactbrowser.item_view.show_all_authors">zobraz všechny autory</message>
+	<message key="xmlui.UFAL.artifactbrowser.item_view.date_unknown">Přesné datum není známo ({0})</message>
+	<message key="xmlui.UFAL.artifactbrowser.item_view.date_list">Tato položka je složena z částí vydaných v letech {0}</message>
 
 	<!-- DisplayShareLink -->
 	<message key="xmlui.aspect.submission.submit.DisplayShareLink.title">Sdílet odkaz</message>
