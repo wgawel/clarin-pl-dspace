@@ -251,7 +251,10 @@
              <xsl:if test="dim:field[@element='publisher']">
              	<xsl:for-each select="dim:field[@element='publisher']">
                     <a class="publisher">
-                        <xsl:attribute name="href"><xsl:copy-of select="$context-path"/>/browse?value=<xsl:copy-of select="./node()"/>&amp;type=publisher</xsl:attribute>
+			<xsl:attribute name="href">
+				<xsl:copy-of select="$contextPath"/>
+				<xsl:value-of select="concat('/discover?filtertype=publisher&amp;filter_relational_operator=equals&amp;filter=',encoder:encode(node()))"/>
+			</xsl:attribute>
                         <xsl:copy-of select="./node()"/>
                     </a>
 					<xsl:if
@@ -285,7 +288,10 @@
                     <xsl:when test="dim:field[@element='creator']">
                         <xsl:for-each select="dim:field[@element='creator']">
                         	<a>
-								<xsl:attribute name="href"><xsl:copy-of select="$context-path"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
+								<xsl:attribute name="href">
+									<xsl:copy-of select="$contextPath"/>
+									<xsl:value-of select="concat('/discover?filtertype=author&amp;filter_relational_operator=equals&amp;filter=',encoder:encode(node()))"/>
+								</xsl:attribute>
 								<xsl:copy-of select="node()" />
 							</a>                            
                             <xsl:if
