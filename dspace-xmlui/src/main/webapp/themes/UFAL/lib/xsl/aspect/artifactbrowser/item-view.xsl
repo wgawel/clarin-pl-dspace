@@ -193,7 +193,10 @@
 						<xsl:when test="dim:field[@element='creator']">
 							<xsl:for-each select="dim:field[@element='creator']">
 								<a>
-								<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
+								<xsl:attribute name="href">
+									<xsl:copy-of select="$contextPath"/>
+									<xsl:value-of select="concat('/discover?filtertype=author&amp;filter_relational_operator=equals&amp;filter=',encoder:encode(node()))"/>
+								</xsl:attribute>
 
 								<xsl:copy-of select="node()" />
 								</a>
@@ -446,7 +449,10 @@
 								select="dim:field[@element='language'][@qualifier='iso']">
 								<xsl:sort select="isocodes:getLangForCode(node())" />
 								<a>
-									<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="isocodes:getLangForCode(node())" />&amp;type=language</xsl:attribute>
+									<xsl:attribute name="href">
+										<xsl:copy-of select="$contextPath"/>
+										<xsl:value-of select="concat('/discover?filtertype=language&amp;filter_relational_operator=equals&amp;filter=',isocodes:getLangForCode(node()))"/>
+									</xsl:attribute>
 									<span class="language-iso-code"><xsl:copy-of select="isocodes:getLangForCode(node())" /></span>
 								</a>
 								<xsl:if
@@ -558,7 +564,11 @@
 						<xsl:for-each
 							select="dim:field[@element='publisher' and not(@qualifier)]">
 							<a>
-								<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="./node()" />&amp;type=publisher</xsl:attribute>
+
+								<xsl:attribute name="href">
+									<xsl:copy-of select="$contextPath"/>
+									<xsl:value-of select="concat('/discover?filtertype=publisher&amp;filter_relational_operator=equals&amp;filter=',encoder:encode(node()))"/>
+								</xsl:attribute>
 								<xsl:copy-of select="./node()" />									
 							</a>													
 							<xsl:if
@@ -658,7 +668,10 @@
 							select="dim:field[@element='subject' and not(@qualifier)]">
 							<span class="tag">
 								<a class="label label-primary">
-									<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=subject</xsl:attribute>
+									<xsl:attribute name="href">
+										<xsl:copy-of select="$contextPath"/>
+										<xsl:value-of select="concat('/discover?filtertype=subject&amp;filter_relational_operator=equals&amp;filter=',encoder:encode(node()))"/>
+									</xsl:attribute>
 									<xsl:copy-of select="node()" />
 								</a>
 							</span>														
@@ -1288,7 +1301,11 @@
 			<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
 		</xsl:if>
 		<a>
-	<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
+
+			<xsl:attribute name="href">
+				<xsl:copy-of select="$contextPath"/>
+				<xsl:value-of select="concat('/discover?filtertype=author&amp;filter_relational_operator=equals&amp;filter=',encoder:encode(node()))"/>
+			</xsl:attribute>
 	<xsl:copy-of select="node()" />
 	</a>
 
