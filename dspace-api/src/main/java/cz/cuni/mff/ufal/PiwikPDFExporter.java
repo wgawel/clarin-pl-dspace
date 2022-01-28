@@ -251,7 +251,7 @@ public class PiwikPDFExporter  {
 		Map<String, Integer> viewsTotals = extractStats(views, viewsSeries, "nb_hits", new String[]{"nb_hits",
 				"nb_uniq_pageviews", "nb_visits"});
 		Map<String, Integer> downloadsTotals = extractStats(downloads, downloadsSeries, "nb_hits", new String[]{ "nb_hits", "nb_uniq_pageviews"});
-		extractStats(views, downloadsSeries, "nb_uniq_visitors", new String[]{ });
+		extractStats(views, visitorsSeries, "nb_uniq_visitors", new String[]{ });
 
 		int maxPageViews = viewsTotals.get("max");
 
