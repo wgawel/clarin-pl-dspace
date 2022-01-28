@@ -242,29 +242,29 @@ public class PiwikPDFExporter  {
 		
 		TimeSeries viewsSeries = new TimeSeries("Views");
 		TimeSeries downloadsSeries = new TimeSeries("Downloads");
+		TimeSeries visitorsSeries = new TimeSeries("Unique visitors");
 		
 		JSONObject response = (JSONObject)report.get("response");
 		JSONObject views = (JSONObject) ((JSONObject) response.get("views")).get("total");
 		JSONObject downloads = (JSONObject) ((JSONObject) response.get("downloads")).get("total");
 
 		Map<String, Integer> viewsTotals = extractStats(views, viewsSeries, "nb_hits", new String[]{"nb_hits",
-				"nb_uniq_pageviews", "nb_visits", "nb_uniq_visitors"});
+				"nb_uniq_pageviews", "nb_visits"});
 		Map<String, Integer> downloadsTotals = extractStats(downloads, downloadsSeries, "nb_hits", new String[]{ "nb_hits", "nb_uniq_pageviews"});
+		extractStats(views, downloadsSeries, "nb_uniq_visitors", new String[]{ });
 
 		int maxPageViews = viewsTotals.get("max");
 
 		summary.put("pageviews", viewsTotals.get("nb_hits"));
 		summary.put("unique pageviews", viewsTotals.get("nb_uniq_pageviews"));
 		summary.put("visits", viewsTotals.get("nb_visits"));
-		// XXX IMO this number makes no sense (if there are 10 uniq visitors on 1st and 10 on 2nd, the actual number
-		// of uniq visitors is any number between 10 and 20, inclusive).
-		summary.put("unique visitors", viewsTotals.get("nb_uniq_visitors"));
 		summary.put("downloads", downloadsTotals.get("nb_hits"));
 		summary.put("unique downloads", downloadsTotals.get("nb_uniq_pageviews"));
 		
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
 		dataset.addSeries(viewsSeries);
-		dataset.addSeries(downloadsSeries);		
+		dataset.addSeries(downloadsSeries);
+		dataset.addSeries(visitorsSeries);
 		
 		lineChart = ChartFactory.createTimeSeriesChart("Views Over Time", "", "", dataset);
 		lineChart.setBackgroundPaint(Color.WHITE);
@@ -289,10 +289,13 @@ public class PiwikPDFExporter  {
         	Shape circle = new Ellipse2D.Double(-1f, -1f, 2, 2);
         	renderer.setSeriesShape(0, circle);
         	renderer.setSeriesShape(1, circle);
+			renderer.setSeriesShape(2, circle);
         	renderer.setSeriesPaint(0, new Color(212, 40, 30));
         	renderer.setSeriesPaint(1, new Color(30, 120, 180));
+			renderer.setSeriesPaint(2, new Color(30, 180, 65));
         	renderer.setSeriesStroke(0, new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
         	renderer.setSeriesStroke(1, new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
+			renderer.setSeriesStroke(2, new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
         }
         DateAxis xAxis = (DateAxis) plot.getDomainAxis();
         xAxis.setDateFormatOverride(outputDateFormat);
@@ -441,11 +444,7 @@ public class PiwikPDFExporter  {
 	    text.add("" + summary.get("visits"));
 	    text.setFont(FONT[6]);
 	    text.add(" visits, ");
-	    text.setFont(FONT[7]);
-	    text.add("" + summary.get("unique visitors"));
-	    text.setFont(FONT[6]);
-	    text.add(" unique visitors");
-	    
+
 	    srow = new PdfPCell();
 	    srow.setBorder(0);
 	    srow.addElement(text);
