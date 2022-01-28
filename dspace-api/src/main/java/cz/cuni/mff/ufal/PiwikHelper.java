@@ -410,7 +410,7 @@ public class PiwikHelper {
 					if(country instanceof JSONObject){
 						JSONObject c = (JSONObject) country;
 						String label = (String) c.get("label");
-						String count = ((Integer) c.get("nb_visits")).toString();
+						String count = ((Long) c.get("nb_visits")).toString();
 						result.add(new String[]{label, count});
 					}
 				}

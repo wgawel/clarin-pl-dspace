@@ -212,13 +212,13 @@ public class PiwikPDFExporter  {
 							if(dayo instanceof String){
 								String day = (String) dayo;
 								JSONObject stats = (JSONObject) days.get(day);
-								int valueForSeries = (Integer)stats.get(keyForSeries);
+								int valueForSeries = ((Long)stats.get(keyForSeries)).intValue();
 								if(max < valueForSeries){
 									max = valueForSeries;
 								}
 								series.add(Day.parseDay(String.format("%s-%s-%s", year, month, day)), valueForSeries);
 								for(String key : keysForTotals){
-									int valueForTotal = (Integer)stats.get(key);
+									int valueForTotal = ((Long)stats.get(key)).intValue();
 									int number = totals.get(key);
 									totals.put(key, number + valueForTotal);
 								}
