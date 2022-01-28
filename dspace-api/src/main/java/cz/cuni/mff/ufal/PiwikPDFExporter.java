@@ -7,6 +7,7 @@ import java.awt.BasicStroke;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -125,6 +126,9 @@ public class PiwikPDFExporter  {
 							log.info("Processing Item : " + item.getHandle());
 							generateItemReport(item);
 							done.add(item);
+						} catch(FileNotFoundException e){
+							log.info(String.format("404 '%s' probably nothing logged for that date", e.getMessage()));
+							continue;
 						} catch(Exception e) {
 							log.error("Unable to generate report.", e);
 							continue;

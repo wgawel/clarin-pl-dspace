@@ -381,13 +381,18 @@ public class PiwikHelper {
 	}
 
 	public List<String[]> getCountryData() throws Exception{
-		if(PIWIK_API_MODE.equals("cached")) {
-			log.debug("========CACHED MODE");
-			return getCountryDataFromLindatPiwikCacheServer();
-		} else {
-			// direct mode as default
-			log.debug("========DIRECT MODE");
-			return getCountryDataFromPiwik();
+		try {
+			if (PIWIK_API_MODE.equals("cached")) {
+				log.debug("========CACHED MODE");
+				return getCountryDataFromLindatPiwikCacheServer();
+			} else {
+				// direct mode as default
+				log.debug("========DIRECT MODE");
+				return getCountryDataFromPiwik();
+			}
+		} catch (FileNotFoundException e){
+			log.info(String.format("No country data for '%s'", e.getMessage()));
+			return new ArrayList<>();
 		}
 	}
 
