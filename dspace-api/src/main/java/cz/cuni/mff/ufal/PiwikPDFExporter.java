@@ -300,8 +300,8 @@ public class PiwikPDFExporter  {
         	renderer.setBaseShapesFilled(true);
         	Shape circle = new Ellipse2D.Double(-1f, -1f, 2, 2);
         	renderer.setSeriesShape(0, circle);
-        	renderer.setSeriesShape(1, ShapeUtilities.createDiagonalCross(2f, 1f));
-			renderer.setSeriesShape(2, ShapeUtilities.createRegularCross(2f, 1f));
+        	renderer.setSeriesShape(1, ShapeUtilities.createDiagonalCross(2f, 0.5f));
+			renderer.setSeriesShape(2, ShapeUtilities.createRegularCross(2f, 0.5f));
         	renderer.setSeriesPaint(0, new Color(212, 40, 30));
         	renderer.setSeriesPaint(1, new Color(30, 120, 180));
 			renderer.setSeriesPaint(2, new Color(30, 180, 65));
