@@ -453,18 +453,6 @@ public class PiwikPDFExporter  {
 	    
 	    text = new Paragraph();
 	    text.setFont(FONT[7]);
-	    text.add("" + summary.get("visits"));
-	    text.setFont(FONT[6]);
-	    text.add(" visits, ");
-
-	    srow = new PdfPCell();
-	    srow.setBorder(0);
-	    srow.addElement(text);
-	    
-	    summaryStats.addCell(srow);
-	    
-	    text = new Paragraph();
-	    text.setFont(FONT[7]);
 	    text.add("" + summary.get("downloads"));
 	    text.setFont(FONT[6]);
 	    text.add(" downloads, ");
@@ -473,6 +461,18 @@ public class PiwikPDFExporter  {
 	    text.setFont(FONT[6]);
 	    text.add(" unique downloads");
 	    
+	    srow = new PdfPCell();
+	    srow.setBorder(0);
+	    srow.addElement(text);
+	    
+	    summaryStats.addCell(srow);
+	    
+	    text = new Paragraph();
+	    text.setFont(FONT[7]);
+	    text.add("" + summary.get("visits"));
+	    text.setFont(FONT[6]);
+	    text.add(" visits ");
+
 	    srow = new PdfPCell();
 	    srow.setBorder(0);
 	    srow.addElement(text);
