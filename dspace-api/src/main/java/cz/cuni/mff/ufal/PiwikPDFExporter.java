@@ -207,20 +207,31 @@ public class PiwikPDFExporter  {
 		for(Object yo : statsObject.keySet()){
 			if(yo instanceof String){
 				String year = (String)yo;
+				int y = Integer.parseInt(year);
 				JSONObject months = (JSONObject) statsObject.get(year);
 				for(Object mo : months.keySet()){
 					if(mo instanceof String){
 						String month = (String)mo;
+						int m  = Integer.parseInt(month);
+						Calendar c = Calendar.getInstance();
+						// months are zero based, 0 january
+						c.set(y, m-1, 1);
+						// get the valid days in month and fill the series with zeros
+						for(int d = 1; d <= c.getActualMaximum(Calendar.DATE); d++){
+							// here month is 1-12
+							series.add(new Day(d, m ,y), 0);
+						}
 						JSONObject days = (JSONObject) months.get(month);
 						for(Object dayo: days.keySet()){
 							if(dayo instanceof String){
 								String day = (String) dayo;
+								int d = Integer.parseInt(day);
 								JSONObject stats = (JSONObject) days.get(day);
 								int valueForSeries = ((Long)stats.get(keyForSeries)).intValue();
 								if(max < valueForSeries){
 									max = valueForSeries;
 								}
-								series.add(Day.parseDay(String.format("%s-%s-%s", year, month, day)), valueForSeries);
+								series.addOrUpdate( new Day(d, m, y), valueForSeries);
 								for(String key : keysForTotals){
 									int valueForTotal = ((Long)stats.get(key)).intValue();
 									int number = totals.get(key);
