@@ -45,6 +45,7 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
+import org.jfree.util.ShapeUtilities;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -79,7 +80,7 @@ public class PiwikPDFExporter  {
     
 	private static SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	private static SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMM-dd");
-	
+
 	
 	private static Logger log = cz.cuni.mff.ufal.Logger.getLogger(PiwikPDFExporter.class);
 	
@@ -299,8 +300,8 @@ public class PiwikPDFExporter  {
         	renderer.setBaseShapesFilled(true);
         	Shape circle = new Ellipse2D.Double(-1f, -1f, 2, 2);
         	renderer.setSeriesShape(0, circle);
-        	renderer.setSeriesShape(1, circle);
-			renderer.setSeriesShape(2, circle);
+        	renderer.setSeriesShape(1, ShapeUtilities.createDiagonalCross(2f, 1f));
+			renderer.setSeriesShape(2, ShapeUtilities.createRegularCross(2f, 1f));
         	renderer.setSeriesPaint(0, new Color(212, 40, 30));
         	renderer.setSeriesPaint(1, new Color(30, 120, 180));
 			renderer.setSeriesPaint(2, new Color(30, 180, 65));
