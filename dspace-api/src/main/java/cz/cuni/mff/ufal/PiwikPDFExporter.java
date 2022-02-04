@@ -77,6 +77,8 @@ public class PiwikPDFExporter  {
     private static boolean PIWIK_KEEP_REPORTS;
 
     private static String LINDAT_LOGO;
+
+    private static String PIWIK_API_MODE;
     
 	private static SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	private static SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMM-dd");
@@ -87,6 +89,9 @@ public class PiwikPDFExporter  {
 	public static void main(String args[]) throws Exception {
 		log.info("Generating PIWIK pdf reports ....");
 		initialize();
+		if (!PIWIK_API_MODE.equals("cached")) {
+			log.warn("Not using the cached mode: the reports will be missing uniq stats for pageviews, downloads and visitors as this is not implemented in transformJSON.");
+		}
 		generateReports();
 		log.info("PIWIK pdf reports generation finished.");
 	}
@@ -95,6 +100,7 @@ public class PiwikPDFExporter  {
         PIWIK_REPORTS_OUTPUT_PATH = ConfigurationManager.getProperty("lr", "lr.statistics.report.path");
         PIWIK_KEEP_REPORTS = ConfigurationManager.getBooleanProperty("lr", "lr.statistics.keep.reports", true);
         LINDAT_LOGO = ConfigurationManager.getProperty("lr", "lr.lindat.logo.mono");
+	PIWIK_API_MODE = ConfigurationManager.getProperty("lr", "lr.statistics.api.mode");
 	}
 	
 	public static void generateReports() throws SQLException {
