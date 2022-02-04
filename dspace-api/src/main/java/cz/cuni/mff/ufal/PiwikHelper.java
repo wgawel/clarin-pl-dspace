@@ -438,7 +438,7 @@ public class PiwikHelper {
 				+ "&token_auth=" + PIWIK_AUTH_TOKEN
 				+ "&filter_limit=10"
 				+ "&format=xml"
-				+ "&segment=pageUrl=@" + item.getHandle();
+				+ "&segment=pageUrl=@" + URLEncoder.encode(dspaceURL + "/handle/" + item.getHandle(), "UTF-8");
 
 
 		String xml = PiwikHelper.readFromURL(countryReportURL);
