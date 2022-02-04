@@ -122,8 +122,8 @@ public class PiwikHelper {
 					v = new JSONObject();	
 					nb_visits = nb_visits + Integer.parseInt(row.get("nb_visits").toString());
 					nb_hits = nb_hits + Integer.parseInt(row.get("nb_hits").toString());
-					v.put("nb_hits", "" +  nb_hits);
-					v.put("nb_visits", "" + nb_visits);					
+					v.put("nb_hits", nb_hits);
+					v.put("nb_visits", nb_visits);
 					year.put(url, v);
 					
 					int total_nb_visits = 0;
@@ -137,8 +137,8 @@ public class PiwikHelper {
 					v = new JSONObject();	
 					total_nb_visits = total_nb_visits + Integer.parseInt(row.get("nb_visits").toString());
 					total_nb_hits = total_nb_hits + Integer.parseInt(row.get("nb_hits").toString());
-					v.put("nb_hits", "" +  total_nb_hits);
-					v.put("nb_visits", "" + total_nb_visits);					
+					v.put("nb_hits", total_nb_hits);
+					v.put("nb_visits", total_nb_visits);
 					total.put(y, v);
 					
 					total_nb_visits = 0;
@@ -190,8 +190,8 @@ public class PiwikHelper {
 					v = new JSONObject();	
 					nb_visits = nb_visits + Integer.parseInt(row.get("nb_visits").toString());
 					nb_hits = nb_hits + Integer.parseInt(row.get("nb_hits").toString());
-					v.put("nb_hits", "" +  nb_hits);
-					v.put("nb_visits", "" + nb_visits);					
+					v.put("nb_hits", nb_hits);
+					v.put("nb_visits", nb_visits);
 					month.put(url, v);
 					
 					JSONObject tyear = null;
@@ -225,8 +225,8 @@ public class PiwikHelper {
 					v = new JSONObject();	
 					total_nb_visits = total_nb_visits + Integer.parseInt(row.get("nb_visits").toString());
 					total_nb_hits = total_nb_hits + Integer.parseInt(row.get("nb_hits").toString());
-					v.put("nb_hits", "" +  total_nb_hits);
-					v.put("nb_visits", "" + total_nb_visits);					
+					v.put("nb_hits", total_nb_hits);
+					v.put("nb_visits", total_nb_visits);
 					tyear.put(m, v);					
 					
 				}				
@@ -271,8 +271,8 @@ public class PiwikHelper {
 					v = new JSONObject();	
 					nb_visits = nb_visits + Integer.parseInt(row.get("nb_visits").toString());
 					nb_hits = nb_hits + Integer.parseInt(row.get("nb_hits").toString());
-					v.put("nb_hits", "" +  nb_hits);
-					v.put("nb_visits", "" + nb_visits);					
+					v.put("nb_hits", nb_hits);
+					v.put("nb_visits", nb_visits);
 					day.put(url, v);
 					JSONObject tyear = null;
 					
@@ -314,8 +314,8 @@ public class PiwikHelper {
 					v = new JSONObject();	
 					total_nb_visits = total_nb_visits + Integer.parseInt(row.get("nb_visits").toString());
 					total_nb_hits = total_nb_hits + Integer.parseInt(row.get("nb_hits").toString());
-					v.put("nb_hits", "" +  total_nb_hits);
-					v.put("nb_visits", "" + total_nb_visits);					
+					v.put("nb_hits", total_nb_hits);
+					v.put("nb_visits", total_nb_visits);
 					tmonth.put(d, v);					
 				}
 
