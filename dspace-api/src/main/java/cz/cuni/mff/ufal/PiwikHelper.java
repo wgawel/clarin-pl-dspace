@@ -579,6 +579,7 @@ public class PiwikHelper {
 
 	private static class DateRange {
 		private static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		private static final SimpleDateFormat odf = new SimpleDateFormat("yyyy-MM");
 
 		private final Date startDate;
 		private final Date endDate;
@@ -597,12 +598,12 @@ public class PiwikHelper {
 				if(sdate.length()==4) {
 					sdate += "-01-01";
 					edate += "-12-31";
-				} else if(sdate.length()==7) {
+				} else if(sdate.length()==6 || sdate.length()==7) {
 					Calendar cal = Calendar.getInstance();
 					cal.set(Calendar.YEAR, Integer.parseInt(sdate.substring(0,4)));
-					cal.set(Calendar.MONTH, Integer.parseInt(sdate.substring(5,7))-1);
+					cal.set(Calendar.MONTH, Integer.parseInt(sdate.substring(5))-1);
 					cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
-					sdate += "-01";
+					sdate = odf.format(cal.getTime()) + "-01";
 					edate = df.format(cal.getTime());
 				}
 				startDate = df.parse(sdate);
