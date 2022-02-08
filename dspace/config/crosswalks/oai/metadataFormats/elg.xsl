@@ -528,7 +528,7 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
       <xsl:otherwise>
         <xsl:call-template name="size">
           <xsl:with-param name="amount" select="sum(xalan:nodeset($files)/doc:element[@name='bitstream']/doc:field[@name='size']/text())"/>
-          <xsl:with-param name="unit" select="'byte'"/>
+          <xsl:with-param name="unit" select="'bytes'"/>
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
@@ -537,113 +537,255 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
   <xsl:template name="size">
     <xsl:param name="amount"/>
     <xsl:param name="unit"/>
+
+    <xsl:variable name="unit_lc" select="translate($unit,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>
     <ms:size>
       <ms:amount><xsl:value-of select="$amount"/></ms:amount>
       <!-- sizeUnit -->
       <!-- adapted from https://gitlab.com/european-language-grid/platform/ELG-SHARE-schema/-/blob/master/Support%20tools/META-SHARE_3.1_into_ELG/elg-conversion-tools-master/rules/elra-to-elg-body.xsl -->
       <!-- DO NOT CHANGER ORDER DECLARATION -->
       <xsl:choose>
-        <xsl:when test="$unit = '4-grams'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/four-gram</ms:sizeUnit>
+        <xsl:when test="$unit_lc = '4-grams'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/four-gram</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = '5-grams'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/five-gram</ms:sizeUnit>
+        <xsl:when test="$unit_lc = '5-grams'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/five-gram</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'articles'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/article</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 't-hpairs'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/T-HPair</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'bigrams'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/bigram</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'articles'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/article</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'bytes'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/byte</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'bigrams'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/bigram</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'classes'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/class</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'bytes'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/byte</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'concepts'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/concept</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'classes'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/class</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'entries'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/entry</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'concepts'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/concept</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'expressions'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/expression</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'diphones'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/diphone1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'files'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/file</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'elements'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/element</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'frames'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/frame1</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'entries'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/entry</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'hours'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/hour1</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'expressions'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/expression</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'hpairs'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/T-HPair</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'files'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/file</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'images'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/image2</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'frames'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/frame1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'items'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/item</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'gb'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/gb</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'keywords'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/keyword1</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'hours'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/hour1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'lexicalTypes'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/lexicalType</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'idiomaticExpressions'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/idiomaticExpression</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'minutes'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/minute</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'images'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/image2</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'multiWordUnits'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/multiWordUnit</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'items'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/item</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'pages'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/other</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'kb'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/kb</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'segments'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/entry</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'keywords'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/keyword1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'sentences'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/sentence1</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'lexicalTypes'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/lexicalType</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'semanticUnits'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/semanticUnit1</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'mb'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/mb</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'syntacticUnits'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/syntacticUnit1</ms:sizeUnit>
-        </xsl:when>  
-        <xsl:when test="$unit = 'terms'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/term</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'minutes'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/minute</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'texts'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/text1</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'multiWordUnits'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/multiWordUnit</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'tokens'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/token</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'neologisms'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/neologism</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'trigrams'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/trigram</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'other'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/other</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'turns'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/turn</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'phonemes'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/phoneme2</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'units'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/unit</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'phoneticUnits'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/phoneticUnit</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'unigrams'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/unigram</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'predicates'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/predicate</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'utterances'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/utterance1</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'rules'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/rule</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'words'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/word3</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'seconds'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/second</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'semanticUnits'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/semanticUnit1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'sentences'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/sentence1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'shots'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/shot1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'syllables'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/syllable2</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'synsets'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/synset</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'syntacticUnits'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/syntacticUnit1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'terms'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/term</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'texts'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/text1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'tokens'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/token</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'trigrams'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/trigram</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'turns'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/turn</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'unigrams'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/unigram</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'units'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/unit</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'utterances'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/utterance1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'words'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/word3</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
         <xsl:otherwise>
-          <ms:sizeUnit><xsl:value-of select="concat('http://w3id.org/meta-share/meta-share/', $unit)"/></ms:sizeUnit>
+          <ms:sizeUnit>
+            <ms:sizeUnitOther>
+              <xsl:value-of select="$unit_lc"/>
+            </ms:sizeUnitOther>
+          </ms:sizeUnit>
         </xsl:otherwise>
       </xsl:choose>
     </ms:size>
