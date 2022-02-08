@@ -255,8 +255,8 @@
   </xsl:template>
 
   <xsl:template name="personalSensitiveAnon">
-    <ms:personalDataIncluded>false</ms:personalDataIncluded>
-    <ms:sensitiveDataIncluded>false</ms:sensitiveDataIncluded>
+    <ms:personalDataIncluded>http://w3id.org/meta-share/meta-share/noP</ms:personalDataIncluded>
+    <ms:sensitiveDataIncluded>http://w3id.org/meta-share/meta-share/noS</ms:sensitiveDataIncluded>
   </xsl:template>
 
   <xsl:template name="CommonMediaPart">
