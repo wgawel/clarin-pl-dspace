@@ -17,6 +17,8 @@
     <xsl:output omit-xml-declaration="yes" method="xml" indent="yes" xalan:indent-amount="4"/>
 
     <!-- VARIABLES BEGIN -->
+    <xsl:variable name="UPPER_CHARS" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
+    <xsl:variable name="LOWER_CHARS" select="'abcdefghijklmnopqrstuvwxyz'"/>
     <xsl:variable name="identifier_uri" select="doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='uri']/doc:element/doc:field[@name='value']"/>
     
     <xsl:variable name="handle" select="/doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text()"/>
@@ -25,7 +27,7 @@
                   select="/doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:field[@name='value']/text()"/>
 
     <xsl:variable name="upperType">
-      <xsl:value-of select="translate(substring($type,1,1),'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
+      <xsl:value-of select="translate(substring($type,1,1), $LOWER_CHARS, $UPPER_CHARS)"/>
       <xsl:value-of select="substring($type,2)"/>
     </xsl:variable>
 
@@ -44,7 +46,7 @@
     </xsl:variable>
 
     <xsl:variable name="upperMediaType">
-      <xsl:value-of select="translate(substring($mediaType,1,1),'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
+      <xsl:value-of select="translate(substring($mediaType,1,1), $LOWER_CHARS, $UPPER_CHARS)"/>
       <xsl:value-of select="substring($mediaType,2)"/>
     </xsl:variable>
 
@@ -538,7 +540,7 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
     <xsl:param name="amount"/>
     <xsl:param name="unit"/>
 
-    <xsl:variable name="unit_lc" select="translate($unit,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>
+    <xsl:variable name="unit_lc" select="translate($unit, $UPPER_CHARS, $LOWER_CHARS)"/>
     <ms:size>
       <ms:amount><xsl:value-of select="$amount"/></ms:amount>
       <!-- sizeUnit -->
