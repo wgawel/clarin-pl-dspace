@@ -793,10 +793,12 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
 
   <xsl:template name="dataFormat">
     <ms:dataFormat>
-      <xsl:choose>
-        <xsl:when test="false()"></xsl:when>
-        <xsl:otherwise><xsl:value-of select="'http://w3id.org/meta-share/omtd-share/BinaryFormat'"/></xsl:otherwise>
-      </xsl:choose>
+      <ms:dataFormatRecommended>
+        <xsl:choose>
+          <xsl:when test="false()"></xsl:when>
+          <xsl:otherwise><xsl:value-of select="'http://w3id.org/meta-share/omtd-share/BinaryFormat'"/></xsl:otherwise>
+        </xsl:choose>
+      </ms:dataFormatRecommended>
     </ms:dataFormat>
   </xsl:template>
 
