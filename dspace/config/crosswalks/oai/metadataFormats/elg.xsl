@@ -480,16 +480,12 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
             </xsl:when>
             <xsl:when test="$detailedType='mlmodel'">
               <ms:Model>
-                <ms:ldSubclassType>Model</ms:ldSubclassType>
-                <ms:modelType>http://w3id.org/meta-share/meta-share/unspecified</ms:modelType>
-                <ms:modelFunction>http://w3id.org/meta-share/meta-share/unspecified</ms:modelFunction>
+                <xsl:call-template name="languageDescriptionMsModel"/>
               </ms:Model>
             </xsl:when>
             <xsl:when test="$detailedType='ngrammodel'">
               <ms:Model>
-                <ms:ldSubclassType>Model</ms:ldSubclassType>
-                <ms:modelType>http://w3id.org/meta-share/meta-share/unspecified</ms:modelType>
-                <ms:modelFunction>http://w3id.org/meta-share/meta-share/unspecified</ms:modelFunction>
+                <xsl:call-template name="languageDescriptionMsModel"/>
                 <ms:NGramModel>
                   <ms:baseItem>http://w3id.org/meta-share/meta-share/unspecified</ms:baseItem>
                   <!-- XXX this is supposed to mean unspecified -->
@@ -817,6 +813,16 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
         </xsl:choose>
       </ms:dataFormatRecommended>
     </ms:dataFormat>
+  </xsl:template>
+
+  <xsl:template name="languageDescriptionMsModel">
+    <ms:ldSubclassType>Model</ms:ldSubclassType>
+    <ms:modelType>
+      <ms:modelTypeRecommended>http://w3id.org/meta-share/meta-share/unspecified</ms:modelTypeRecommended>
+    </ms:modelType>
+    <ms:modelFunction>
+      <ms:modelFunctionRecommended>http://w3id.org/meta-share/meta-share/unspecified</ms:modelFunctionRecommended>
+    </ms:modelFunction>
   </xsl:template>
 
 
