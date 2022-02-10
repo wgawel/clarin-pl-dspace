@@ -465,38 +465,41 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
       <ms:ldSubclass>
         <xsl:choose>
           <xsl:when test="$detailedType='grammar'">http://w3id.org/meta-share/meta-share/grammar</xsl:when>
-          <xsl:otherwise>http://w3id.org/meta-share/meta-share/model</xsl:otherwise>
+          <xsl:when test="contains($detailedType, 'model')">http://w3id.org/meta-share/meta-share/model</xsl:when>
+          <xsl:otherwise>http://w3id.org/meta-share/meta-share/other</xsl:otherwise>
         </xsl:choose>
       </ms:ldSubclass>
-      <ms:LanguageDescriptionSubclass>
-        <xsl:choose>
-          <xsl:when test="$detailedType='grammar'">
-            <ms:Grammar>
-              <ms:ldSubclassType>Grammar</ms:ldSubclassType>
-              <ms:encodingLevel>http://w3id.org/meta-share/meta-share/unspecified</ms:encodingLevel>
-            </ms:Grammar>
-          </xsl:when>
-          <xsl:when test="$detailedType='mlmodel'">
-            <ms:Model>
-              <ms:ldSubclassType>Model</ms:ldSubclassType>
-              <ms:modelType>http://w3id.org/meta-share/meta-share/unspecified</ms:modelType>
-              <ms:modelFunction>http://w3id.org/meta-share/meta-share/unspecified</ms:modelFunction>
-            </ms:Model>
-          </xsl:when>
-          <xsl:when test="$detailedType='ngrammodel'">
-            <ms:Model>
-              <ms:ldSubclassType>Model</ms:ldSubclassType>
-              <ms:modelType>http://w3id.org/meta-share/meta-share/unspecified</ms:modelType>
-              <ms:modelFunction>http://w3id.org/meta-share/meta-share/unspecified</ms:modelFunction>
-              <ms:NGramModel>
-                <ms:baseItem>http://w3id.org/meta-share/meta-share/unspecified</ms:baseItem>
-                <!-- XXX this is supposed to mean unspecified -->
-                <ms:order>-1</ms:order>
-              </ms:NGramModel>
-            </ms:Model>
-          </xsl:when>
-        </xsl:choose>
-      </ms:LanguageDescriptionSubclass>
+      <xsl:if test="$detailedType='grammar' or contains($detailedType, 'model')">
+        <ms:LanguageDescriptionSubclass>
+          <xsl:choose>
+            <xsl:when test="$detailedType='grammar'">
+              <ms:Grammar>
+                <ms:ldSubclassType>Grammar</ms:ldSubclassType>
+                <ms:encodingLevel>http://w3id.org/meta-share/meta-share/unspecified</ms:encodingLevel>
+              </ms:Grammar>
+            </xsl:when>
+            <xsl:when test="$detailedType='mlmodel'">
+              <ms:Model>
+                <ms:ldSubclassType>Model</ms:ldSubclassType>
+                <ms:modelType>http://w3id.org/meta-share/meta-share/unspecified</ms:modelType>
+                <ms:modelFunction>http://w3id.org/meta-share/meta-share/unspecified</ms:modelFunction>
+              </ms:Model>
+            </xsl:when>
+            <xsl:when test="$detailedType='ngrammodel'">
+              <ms:Model>
+                <ms:ldSubclassType>Model</ms:ldSubclassType>
+                <ms:modelType>http://w3id.org/meta-share/meta-share/unspecified</ms:modelType>
+                <ms:modelFunction>http://w3id.org/meta-share/meta-share/unspecified</ms:modelFunction>
+                <ms:NGramModel>
+                  <ms:baseItem>http://w3id.org/meta-share/meta-share/unspecified</ms:baseItem>
+                  <!-- XXX this is supposed to mean unspecified -->
+                  <ms:order>-1</ms:order>
+                </ms:NGramModel>
+              </ms:Model>
+            </xsl:when>
+          </xsl:choose>
+        </ms:LanguageDescriptionSubclass>
+      </xsl:if>
       <xsl:call-template name="CommonMediaPart"/>
       <xsl:call-template name="Distribution"/>
       <xsl:call-template name="personalSensitiveAnon"/>
