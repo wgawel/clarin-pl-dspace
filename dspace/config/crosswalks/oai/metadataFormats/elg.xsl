@@ -387,6 +387,7 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
 
   <xsl:template name="Distribution">
     <xsl:param name="distributionType" select="'Dataset'"/>
+    <xsl:param name="mediaFeature" select="$upperMediaType"/>
     <xsl:variable name="form">
       <xsl:choose>
         <xsl:when test="$distributionType = 'Dataset'">downloadable</xsl:when>
@@ -431,7 +432,7 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
 
       <!-- distributionXfeature -->
       <xsl:if test="$distributionType = 'Dataset'">
-        <xsl:element name="ms:distribution{$upperMediaType}Feature">
+        <xsl:element name="ms:distribution{$mediaFeature}Feature">
           <xsl:call-template name="Sizes"/>
           <xsl:call-template name="dataFormat"/>
         </xsl:element>
@@ -514,7 +515,14 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
       <xsl:call-template name="CommonMediaPart">
         <xsl:with-param name="noMediaPart" select="true()"/>
       </xsl:call-template>
-      <xsl:call-template name="Distribution"/>
+      <xsl:call-template name="Distribution">
+        <xsl:with-param name="mediaFeature">
+          <xsl:choose>
+            <xsl:when test="$isModel">Unspecified</xsl:when>
+            <xsl:otherwise><xsl:value-of select="$upperMediaType"/></xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+      </xsl:call-template>
       <xsl:call-template name="personalSensitiveAnon"/>
     </ms:LanguageDescription>
   </xsl:template>
