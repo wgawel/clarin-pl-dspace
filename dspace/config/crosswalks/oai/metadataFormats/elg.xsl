@@ -262,10 +262,20 @@
   </xsl:template>
 
   <xsl:template name="CommonMediaPart">
-    <xsl:variable name="name" select="concat($upperType, 'MediaPart')"/>
-    <xsl:element name="ms:{$name}">
-      <xsl:call-template name="commonMediaElements"/>
-    </xsl:element>
+    <xsl:param name="noMediaPart" select="false()"/>
+    <xsl:choose>
+      <xsl:when test="$noMediaPart">
+        <ms:unspecifiedPart>
+          <xsl:call-template name="lingualityAndLanguges"/>
+        </ms:unspecifiedPart>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="name" select="concat($upperType, 'MediaPart')"/>
+        <xsl:element name="ms:{$name}">
+          <xsl:call-template name="commonMediaElements"/>
+        </xsl:element>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="commonMediaElements">
@@ -283,22 +293,7 @@
     <xsl:element name="ms:{$name}">
       <xsl:element name="ms:{$name2}"><xsl:value-of select="$name"/></xsl:element>
       <ms:mediaType><xsl:value-of select="concat('http://w3id.org/meta-share/meta-share/', $mediaType)"/></ms:mediaType>
-      <ms:lingualityType>
-        <xsl:variable name="langCount" select="count(/doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']/doc:element/doc:field[@name='value'])"/>
-        <xsl:text>http://w3id.org/meta-share/meta-share/</xsl:text>
-        <xsl:choose>
-          <xsl:when test="$langCount=1">monolingual</xsl:when>
-          <xsl:when test="$langCount=2">bilingual</xsl:when>
-          <xsl:otherwise>multilingual</xsl:otherwise>
-        </xsl:choose>
-      </ms:lingualityType>
-      <ms:multilingualityType>http://w3id.org/meta-share/meta-share/unspecified</ms:multilingualityType>
-      <xsl:for-each
-              select="/doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']/doc:element/doc:field[@name='value']">
-        <xsl:call-template name="Language">
-          <xsl:with-param name="isoCode" select="langUtil:getShortestId(.)"/>
-        </xsl:call-template>
-      </xsl:for-each>
+      <xsl:call-template name="lingualityAndLanguges"/>
       <xsl:choose>
         <xsl:when test="$mediaType = 'audio'">
           <xsl:call-template name="audio"/>
@@ -314,6 +309,25 @@
         </xsl:when>
       </xsl:choose>
     </xsl:element>
+  </xsl:template>
+
+  <xsl:template name="lingualityAndLanguges">
+    <ms:lingualityType>
+      <xsl:variable name="langCount" select="count(/doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']/doc:element/doc:field[@name='value'])"/>
+      <xsl:text>http://w3id.org/meta-share/meta-share/</xsl:text>
+      <xsl:choose>
+        <xsl:when test="$langCount=1">monolingual</xsl:when>
+        <xsl:when test="$langCount=2">bilingual</xsl:when>
+        <xsl:otherwise>multilingual</xsl:otherwise>
+      </xsl:choose>
+    </ms:lingualityType>
+    <ms:multilingualityType>http://w3id.org/meta-share/meta-share/unspecified</ms:multilingualityType>
+    <xsl:for-each
+            select="/doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']/doc:element/doc:field[@name='value']">
+      <xsl:call-template name="Language">
+        <xsl:with-param name="isoCode" select="langUtil:getShortestId(.)"/>
+      </xsl:call-template>
+    </xsl:for-each>
   </xsl:template>
 
   <xsl:template name="commonCorpusMediaElements">
@@ -460,16 +474,17 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
   </xsl:template>
 
   <xsl:template name="languageDescription">
+    <xsl:variable name="isModel" select="contains($detailedType, 'model')"/>
     <ms:LanguageDescription>
       <ms:lrType>LanguageDescription</ms:lrType>
       <ms:ldSubclass>
         <xsl:choose>
           <xsl:when test="$detailedType='grammar'">http://w3id.org/meta-share/meta-share/grammar</xsl:when>
-          <xsl:when test="contains($detailedType, 'model')">http://w3id.org/meta-share/meta-share/model</xsl:when>
+          <xsl:when test="$isModel">http://w3id.org/meta-share/meta-share/model</xsl:when>
           <xsl:otherwise>http://w3id.org/meta-share/meta-share/other</xsl:otherwise>
         </xsl:choose>
       </ms:ldSubclass>
-      <xsl:if test="$detailedType='grammar' or contains($detailedType, 'model')">
+      <xsl:if test="$detailedType='grammar' or $isModel">
         <ms:LanguageDescriptionSubclass>
           <xsl:choose>
             <xsl:when test="$detailedType='grammar'">
@@ -496,7 +511,9 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
           </xsl:choose>
         </ms:LanguageDescriptionSubclass>
       </xsl:if>
-      <xsl:call-template name="CommonMediaPart"/>
+      <xsl:call-template name="CommonMediaPart">
+        <xsl:with-param name="noMediaPart" select="true()"/>
+      </xsl:call-template>
       <xsl:call-template name="Distribution"/>
       <xsl:call-template name="personalSensitiveAnon"/>
     </ms:LanguageDescription>
