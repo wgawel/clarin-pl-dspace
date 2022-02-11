@@ -451,16 +451,22 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
       <ms:ToolService>
         <ms:lrType>ToolService</ms:lrType>
         <ms:function>
-          <ms:LTClassRecommended>undefined</ms:LTClassRecommended>
-            <!-- XXX if undefined not working
-          <ms:LTClassRecommended>http://w3id.org/meta-share/omtd-share/Tokenization</ms:LTClassRecommended>
-            -->
+          <ms:LTClassOther>undefined</ms:LTClassOther>
         </ms:function>
         <xsl:call-template name="Distribution">
           <xsl:with-param name="distributionType" select="'Software'"/>
         </xsl:call-template>
+        <xsl:variable name="languageDependent">
+          <xsl:choose>
+            <xsl:when test="/doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ResourceComponentType#ToolServiceInfo']/doc:element[@name='languageDependent']/doc:element/doc:field[@name='value']">
+              <xsl:value-of select="/doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ResourceComponentType#ToolServiceInfo']/doc:element[@name='languageDependent']/doc:element/doc:field[@name='value']"/>
+            </xsl:when>
+            <!-- XXX taking a default of non language dependent -->
+            <xsl:otherwise>false</xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
         <ms:languageDependent>
-          <xsl:value-of select="/doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ResourceComponentType#ToolServiceInfo']/doc:element[@name='languageDependent']/doc:element/doc:field[@name='value']"/>
+          <xsl:value-of select="$languageDependent"/>
         </ms:languageDependent>
         <ms:inputContentResource>
           <ms:processingResourceType>http://w3id.org/meta-share/meta-share/unspecified</ms:processingResourceType>
