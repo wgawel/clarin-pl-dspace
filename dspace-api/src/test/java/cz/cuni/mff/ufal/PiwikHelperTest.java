@@ -15,6 +15,8 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.net.URL;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Created by okosarko on 3.8.15.
@@ -22,187 +24,32 @@ import java.net.URL;
 public class PiwikHelperTest {
 
     @Test
-    public void testJSONmerge() throws Exception{
-        URL url = this.getClass().getResource("/piwik/view_report.json");
-        File vrJson = new File(url.getFile());
-        url = this.getClass().getResource("/piwik/download_report.json");
-        File drJson = new File(url.getFile());
-        String jsonResult = PiwikHelper.mergeJSON(FileUtils.readFileToString(vrJson), FileUtils.readFileToString(drJson));
-        int mergedPVS = 0;
-        int mergedUPVS = 0;
-        int mergedDS = 0;
-        int mergedUDS = 0;
-        JSONParser parser = new JSONParser();
-        JSONObject merged = (JSONObject)parser.parse(jsonResult);
-        for(Object key : merged.keySet()) {
-            if(merged.get(key) instanceof JSONObject) {
-                JSONObject result = (JSONObject) merged.get(key);
-                for (Object resultKey : result.keySet()) {
-                    if ("nb_pageviews".equals(resultKey)) {
-                        mergedPVS += ((Long) result.get(resultKey)).intValue();
-                    } else if ("nb_uniq_pageviews".equals(resultKey)) {
-                        mergedUPVS += ((Long) result.get(resultKey)).intValue();
-                    } else if ("nb_downloads".equals(resultKey)) {
-                        mergedDS += ((Long) result.get(resultKey)).intValue();
-                    } else if ("nb_uniq_downloads".equals(resultKey)) {
-                        mergedUDS += ((Long) result.get(resultKey)).intValue();
-                    }
-                }
-            }else if(merged.get(key) instanceof JSONArray){
-                JSONArray arr = (JSONArray) merged.get(key);
-                assertEquals("Expecting empty array", 0, arr.size());
-            }
-        }
-
-        int ds = 0;
-        int uds = 0;
-        int pvs = 0;
-        int upvs = 0;
-        JSONObject download = (JSONObject)parser.parse(FileUtils.readFileToString(drJson));
-        for(Object key : download.keySet()) {
-            if(download.get(key) instanceof JSONObject) {
-                JSONObject result = (JSONObject) download.get(key);
-                for (Object resultKey : result.keySet()) {
-                    if ("nb_pageviews".equals(resultKey)) {
-                        ds += ((Long) result.get(resultKey)).intValue();
-                    } else if ("nb_uniq_pageviews".equals(resultKey)) {
-                        uds += ((Long) result.get(resultKey)).intValue();
-                    }
-                }
-            }else if(download.get(key) instanceof JSONArray){
-                JSONArray arr = (JSONArray) download.get(key);
-                assertEquals("Expecting empty array", 0, arr.size());
-            }
-        }
-
-        JSONObject views = (JSONObject)parser.parse(FileUtils.readFileToString(vrJson));
-        for(Object key : views.keySet()) {
-            if(views.get(key) instanceof JSONObject) {
-                JSONObject result = (JSONObject) views.get(key);
-                for (Object resultKey : result.keySet()) {
-                    if ("nb_pageviews".equals(resultKey)) {
-                        pvs += ((Long) result.get(resultKey)).intValue();
-                    } else if ("nb_uniq_pageviews".equals(resultKey)) {
-                        upvs += ((Long) result.get(resultKey)).intValue();
-                    }
-                }
-            }else if(views.get(key) instanceof JSONArray){
-                JSONArray arr = (JSONArray) views.get(key);
-                assertEquals("Expecting empty array", 0, arr.size());
-            }
-        }
-        assertEquals("Downloads not merged properly", ds, mergedDS);
-        assertEquals("Uniq downloads not merged properly", uds, mergedUDS);
-        assertEquals("Page views not merged properly", pvs, mergedPVS);
-        assertEquals("Uniq page views not merged properly", upvs, mergedUPVS);
+    public void testTransformJSONResults() throws Exception {
+        SortedSet set = new TreeSet();
+        set.add("1simpleItemView");
+        set.add("2fullItemView");
+        set.add("3downloads");
+        String simple = "{\"2021-01-01\":[],\"2021-01-02\":[],\"2021-01-03\":[{\"label\":\"/1-1827\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-04\":[{\"label\":\"/1-1827\",\"nb_visits\":2,\"nb_hits\":2,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-05\":[{\"label\":\"/1-1827\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-06\":[{\"label\":\"/1-1827\",\"nb_visits\":2,\"nb_hits\":2,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-07\":[{\"label\":\"/1-1827\",\"nb_visits\":1,\"nb_hits\":2,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-08\":[{\"label\":\"/1-1827\",\"nb_visits\":2,\"nb_hits\":2,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-09\":[],\"2021-01-10\":[],\"2021-01-11\":[{\"label\":\"/1-1827\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-12\":[{\"label\":\"/1-1827\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-13\":[{\"label\":\"/1-1827\",\"nb_visits\":3,\"nb_hits\":3,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-14\":[],\"2021-01-15\":[{\"label\":\"/1-1827\",\"nb_visits\":2,\"nb_hits\":3,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-16\":[{\"label\":\"/1-1827\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-17\":[{\"label\":\"/1-1827\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-18\":[{\"label\":\"/1-1827\",\"nb_visits\":3,\"nb_hits\":3,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-19\":[],\"2021-01-20\":[{\"label\":\"/1-1827\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-21\":[{\"label\":\"/1-1827\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-22\":[{\"label\":\"/1-1827\",\"nb_visits\":2,\"nb_hits\":3,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-23\":[],\"2021-01-24\":[{\"label\":\"/1-1827\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-25\":[{\"label\":\"/1-1827\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-26\":[{\"label\":\"/1-1827\",\"nb_visits\":3,\"nb_hits\":3,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-27\":[],\"2021-01-28\":[{\"label\":\"/1-1827\",\"nb_visits\":2,\"nb_hits\":2,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-29\":[{\"label\":\"/1-1827\",\"nb_visits\":2,\"nb_hits\":2,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-30\":[{\"label\":\"/1-1827\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827\"}],\"2021-01-31\":[]}";
+        String showFull = "{\"2021-01-01\":[],\"2021-01-02\":[],\"2021-01-03\":[],\"2021-01-04\":[]," +
+                "\"2021-01-05\":[],\"2021-01-06\":[{\"label\":\"/1-1827?show=full\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827?show=full\"}],\"2021-01-07\":[{\"label\":\"/1-1827?show=full\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827?show=full\"}],\"2021-01-08\":[],\"2021-01-09\":[],\"2021-01-10\":[],\"2021-01-11\":[],\"2021-01-12\":[],\"2021-01-13\":[],\"2021-01-14\":[],\"2021-01-15\":[],\"2021-01-16\":[],\"2021-01-17\":[],\"2021-01-18\":[],\"2021-01-19\":[],\"2021-01-20\":[],\"2021-01-21\":[],\"2021-01-22\":[{\"label\":\"/1-1827?show=full\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827?show=full\"}],\"2021-01-23\":[],\"2021-01-24\":[{\"label\":\"/1-1827?show=full\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827?show=full\"}],\"2021-01-25\":[],\"2021-01-26\":[],\"2021-01-27\":[],\"2021-01-28\":[{\"label\":\"/1-1827?show=full\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827?show=full\"}],\"2021-01-29\":[{\"label\":\"/1-1827?show=full\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827?show=full\"}],\"2021-01-30\":[{\"label\":\"/1-1827?show=full\",\"nb_visits\":1,\"nb_hits\":1,\"url\":\"https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-1827?show=full\"}],\"2021-01-31\":[]}\n";
+        String json = String.format("[%s, %s, {}]", simple, showFull);
+        String result = PiwikHelper.transformJSONResults(set, json);
+        System.out.println(result);
+        final JSONParser parser = new JSONParser();
+        final JSONObject jsonResult = (JSONObject)parser.parse(result);
+        JSONObject response = (JSONObject) jsonResult.get("response");
+        JSONObject downloads = (JSONObject) response.get("downloads");
+        assertTrue(downloads.isEmpty());
+        JSONObject views = (JSONObject) response.get("views");
+        final long totalHits =
+                Long.parseLong(
+                        ((JSONObject)
+                            ((JSONObject)
+                                    ((JSONObject)
+                                            ((JSONObject)
+                                                    views.get("total")).get("2021")).get("1")).get("29")).get("nb_hits").toString());
+        assertEquals(2+1, totalHits);
 
     }
 
-    @Test
-    public void testXMLMerge() throws Exception{
-        URL url = this.getClass().getResource("/piwik/download_report.xml");
-        File drXml = new File(url.getFile());
-        url = this.getClass().getResource("/piwik/view_report.xml");
-        File vrXml = new File(url.getFile());
-        String xmlResult = PiwikHelper.mergeXML(FileUtils.readFileToString(vrXml), FileUtils.readFileToString(drXml));
-
-        XPathFactory xpathFactory = XPathFactory.newInstance();
-        XPath xpath = xpathFactory.newXPath();
-        XPathExpression resCountX = xpath.compile("count(//result)");
-        XPathExpression pageViewsSumX = xpath.compile("sum(//nb_pageviews/text())");
-        XPathExpression uniqPageViewsSumX = xpath.compile("sum(//nb_uniq_pageviews/text())");
-        XPathExpression downSumX = xpath.compile("sum(//nb_downloads/text())");
-        XPathExpression uniqDownSumX = xpath.compile("sum(//nb_uniq_downloads/text())");
-
-        Document merged = PiwikHelper.loadXMLFromString(xmlResult);
-        int mergedResCount = ((Double)resCountX.evaluate(merged, XPathConstants.NUMBER)).intValue();
-        int mergedPageViewsSum = ((Double)pageViewsSumX.evaluate(merged, XPathConstants.NUMBER)).intValue();
-        int mergedUniqPageViewsSum = ((Double)uniqPageViewsSumX.evaluate(merged, XPathConstants.NUMBER)).intValue();
-        int mergedDownSum = ((Double)downSumX.evaluate(merged, XPathConstants.NUMBER)).intValue();
-        int mergedUniqDownSum = ((Double)uniqDownSumX.evaluate(merged, XPathConstants.NUMBER)).intValue();
-
-        Document downloads = PiwikHelper.loadXMLFromString(FileUtils.readFileToString(drXml));
-        int downSum = ((Double)pageViewsSumX.evaluate(downloads, XPathConstants.NUMBER)).intValue();
-        int uniqDownSum = ((Double)uniqPageViewsSumX.evaluate(downloads, XPathConstants.NUMBER)).intValue();
-
-        Document views = PiwikHelper.loadXMLFromString(FileUtils.readFileToString(vrXml));
-        int pageViewsSum = ((Double)pageViewsSumX.evaluate(views, XPathConstants.NUMBER)).intValue();
-        int uniqPageViewsSum = ((Double)uniqPageViewsSumX.evaluate(views, XPathConstants.NUMBER)).intValue();
-
-        assertEquals("Downloads not merged properly", downSum, mergedDownSum);
-        assertEquals("Uniq downloads not merged properly", uniqDownSum, mergedUniqDownSum);
-        assertEquals("Page views not merged properly", pageViewsSum, mergedPageViewsSum);
-        assertEquals("Uniq page views not merged properly", uniqPageViewsSum, mergedUniqPageViewsSum);
-    }
-
-    @Test
-    public void testMergeSanity() throws Exception{
-        URL url = this.getClass().getResource("/piwik/download_report.xml");
-        File drXml = new File(url.getFile());
-        url = this.getClass().getResource("/piwik/view_report.xml");
-        File vrXml = new File(url.getFile());
-        url = this.getClass().getResource("/piwik/view_report.json");
-        File vrJson = new File(url.getFile());
-        url = this.getClass().getResource("/piwik/download_report.json");
-        File drJson = new File(url.getFile());
-
-        String xmlResult = PiwikHelper.mergeXML(FileUtils.readFileToString(vrXml), FileUtils.readFileToString(drXml));
-        String jsonResult = PiwikHelper.mergeJSON(FileUtils.readFileToString(vrJson), FileUtils.readFileToString(drJson));
-
-        XPathFactory xpathFactory = XPathFactory.newInstance();
-        XPath xpath = xpathFactory.newXPath();
-        XPathExpression resCountX = xpath.compile("count(//result)");
-        XPathExpression pageViewsSumX = xpath.compile("sum(//nb_pageviews/text())");
-        XPathExpression uniqPageViewsSumX = xpath.compile("sum(//nb_uniq_pageviews/text())");
-        XPathExpression downSumX = xpath.compile("sum(//nb_downloads/text())");
-        XPathExpression uniqDownSumX = xpath.compile("sum(//nb_uniq_downloads/text())");
-
-        Document doc = PiwikHelper.loadXMLFromString(xmlResult);
-        int xmlResCount = ((Double)resCountX.evaluate(doc, XPathConstants.NUMBER)).intValue();
-        int xmlPageViewsSum = ((Double)pageViewsSumX.evaluate(doc, XPathConstants.NUMBER)).intValue();
-        int xmlUniqPageViewsSum = ((Double)uniqPageViewsSumX.evaluate(doc, XPathConstants.NUMBER)).intValue();
-        int xmlDownSum = ((Double)downSumX.evaluate(doc, XPathConstants.NUMBER)).intValue();
-        int xmlUniqDownSum = ((Double)uniqDownSumX.evaluate(doc, XPathConstants.NUMBER)).intValue();
-
-        JSONParser parser = new JSONParser();
-        JSONObject reportJSON = (JSONObject)parser.parse(jsonResult);
-        int jsonResCount = reportJSON.size();
-        int jsonPageViewsSum = 0;
-        int jsonUniqPageViewsSum = 0;
-        int jsonDownSum = 0;
-        int jsonUniqDownSum = 0;
-        for(Object key : reportJSON.keySet()) {
-            if(reportJSON.get(key) instanceof JSONObject) {
-                JSONObject result = (JSONObject) reportJSON.get(key);
-                for (Object resultKey : result.keySet()) {
-                    if ("nb_pageviews".equals(resultKey)) {
-                        jsonPageViewsSum += ((Long) result.get(resultKey)).intValue();
-                    } else if ("nb_uniq_pageviews".equals(resultKey)) {
-                        jsonUniqPageViewsSum += ((Long) result.get(resultKey)).intValue();
-                    } else if ("nb_downloads".equals(resultKey)) {
-                        jsonDownSum += ((Long) result.get(resultKey)).intValue();
-                    } else if ("nb_uniq_downloads".equals(resultKey)) {
-                        jsonUniqDownSum += ((Long) result.get(resultKey)).intValue();
-                    }
-                }
-            }else if(reportJSON.get(key) instanceof JSONArray){
-                JSONArray arr = (JSONArray) reportJSON.get(key);
-                assertEquals("Expecting empty array", 0, arr.size());
-            }
-        }
-        assertEquals("Result count differs", jsonResCount, xmlResCount);
-        assertEquals("Page views sum differs", jsonPageViewsSum, xmlPageViewsSum);
-        assertEquals("Uniq page views sum differs", jsonUniqPageViewsSum, xmlUniqPageViewsSum);
-        assertEquals("Download sum differs", jsonDownSum, xmlDownSum);
-        assertEquals("Uniq download sum differs", jsonUniqDownSum, xmlUniqDownSum);
-    }
-
-    @Test
-    public void issue_917() throws Exception {
-        URL url = this.getClass().getResource("/piwik/issue_917_download_report.xml");
-        File drXml = new File(url.getFile());
-        url = this.getClass().getResource("/piwik/issue_917_view_report.xml");
-        File vrXml = new File(url.getFile());
-        PiwikHelper.mergeXML(FileUtils.readFileToString(vrXml), FileUtils.readFileToString(drXml));
-    }
 }
