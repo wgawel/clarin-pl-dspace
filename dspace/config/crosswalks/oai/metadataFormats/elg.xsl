@@ -322,12 +322,7 @@
       </xsl:choose>
     </ms:lingualityType>
     <ms:multilingualityType>http://w3id.org/meta-share/meta-share/unspecified</ms:multilingualityType>
-    <xsl:for-each
-            select="/doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']/doc:element/doc:field[@name='value']">
-      <xsl:call-template name="Language">
-        <xsl:with-param name="isoCode" select="langUtil:getShortestId(.)"/>
-      </xsl:call-template>
-    </xsl:for-each>
+    <xsl:call-template name="Languages"/>
   </xsl:template>
 
   <xsl:template name="commonCorpusMediaElements">
@@ -344,12 +339,7 @@
             <xsl:otherwise>multilingual</xsl:otherwise>
           </xsl:choose>
         </ms:lingualityType>
-        <xsl:for-each
-                select="/doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']/doc:element/doc:field[@name='value']">
-          <xsl:call-template name="Language">
-            <xsl:with-param name="isoCode" select="langUtil:getShortestId(.)"/>
-          </xsl:call-template>
-        </xsl:for-each>
+        <xsl:call-template name="Languages"/>
       </xsl:element>
   </xsl:template>
 
@@ -470,7 +460,16 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
         </ms:languageDependent>
         <ms:inputContentResource>
           <ms:processingResourceType>http://w3id.org/meta-share/meta-share/unspecified</ms:processingResourceType>
+          <xsl:if test="$languageDependent='true'">
+            <xsl:call-template name="Languages"/>
+          </xsl:if>
         </ms:inputContentResource>
+        <xsl:if test="$languageDependent='true'">
+          <ms:outputResource>
+            <ms:processingResourceType>http://w3id.org/meta-share/meta-share/unspecified</ms:processingResourceType>
+            <xsl:call-template name="Languages"/>
+          </ms:outputResource>
+        </xsl:if>
         <!--
          The element can be used for adding evaluation/quality-related information,
          e.g. BLEU scores for machine translation tools,
@@ -856,5 +855,12 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
     </ms:modelFunction>
   </xsl:template>
 
-
+  <xsl:template name="Languages">
+    <xsl:for-each
+            select="/doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']/doc:element/doc:field[@name='value']">
+      <xsl:call-template name="Language">
+        <xsl:with-param name="isoCode" select="langUtil:getShortestId(.)"/>
+      </xsl:call-template>
+    </xsl:for-each>
+  </xsl:template>
 </xsl:stylesheet>
