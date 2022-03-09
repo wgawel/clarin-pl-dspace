@@ -518,7 +518,7 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
         </ms:LanguageDescriptionSubclass>
       </xsl:if>
       <xsl:call-template name="CommonMediaPart">
-        <xsl:with-param name="noMediaPart" select="true()"/>
+        <xsl:with-param name="noMediaPart" select="boolean($isModel)"/>
       </xsl:call-template>
       <xsl:call-template name="Distribution">
         <xsl:with-param name="mediaFeature">
