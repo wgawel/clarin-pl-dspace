@@ -324,10 +324,24 @@
             <Definition>
                 <And>
                     <LeftCondition>
-                        <Custom ref="hasFilesCondition"/>
+                        <Custom ref="isLanguageResourceCondition"/>
                     </LeftCondition>
                     <RightCondition>
-                        <Custom ref="hasMediaTypeCondition"/>
+                        <And>
+                            <LeftCondition>
+                                <Custom ref="hasFilesCondition"/>
+                            </LeftCondition>
+                            <RightCondition>
+                                <Or>
+                                    <LeftCondition>
+                                        <Custom ref="hasMediaTypeCondition"/>
+                                    </LeftCondition>
+                                    <RightCondition>
+                                        <Custom ref="isToolCondition"/>
+                                    </RightCondition>
+                                </Or>
+                            </RightCondition>
+                        </And>
                     </RightCondition>
                 </And>
             </Definition>
@@ -440,6 +454,29 @@
             <Class>org.dspace.xoai.filter.DSpaceMetadataExistsFilter</Class>
             <Configuration>
                 <string name="field">metashare.ResourceInfo#ContentInfo.mediaType</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="isToolCondition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.type</string>
+                <string name="operator">equal</string>
+                <string name="value">toolService</string>
+            </Configuration>
+        </CustomCondition>
+
+        <CustomCondition id="isLanguageResourceCondition">
+            <Class>org.dspace.xoai.filter.DSpaceAtLeastOneMetadataFilter</Class>
+            <Configuration>
+                <string name="field">dc.type</string>
+                <string name="operator">equal</string>
+                <list name="values">
+                    <string>corpus</string>
+                    <string>lexicalConceptualResource</string>
+                    <string>languageDescription</string>
+                    <string>toolService</string>
+                </list>
             </Configuration>
         </CustomCondition>
 
