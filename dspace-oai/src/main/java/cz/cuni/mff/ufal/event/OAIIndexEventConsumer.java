@@ -118,6 +118,7 @@ public class OAIIndexEventConsumer implements Consumer {
      */
 	public void end(Context ctx) throws Exception {
 
+		Context anonymousContext = null;
 		try {
 			if (itemsToUpdate != null) {
 
@@ -133,7 +134,8 @@ public class OAIIndexEventConsumer implements Consumer {
 				// "free" the resources
 				itemsToUpdate = null;
 
-				XOAI indexer = new XOAI(ctx, false, false, false);
+				anonymousContext = new Context(Context.READ_ONLY);
+				XOAI indexer = new XOAI(anonymousContext, false, false, false);
 				AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(
 						new Class[] { BasicConfiguration.class });
 				applicationContext.getAutowireCapableBeanFactory()
@@ -144,6 +146,11 @@ public class OAIIndexEventConsumer implements Consumer {
 		} catch (Exception e) {
 			itemsToUpdate = null;
 			throw e;
+		}
+		finally {
+			if(anonymousContext!=null){
+				anonymousContext.complete();
+			}
 		}
 	}
 

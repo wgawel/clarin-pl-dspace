@@ -1491,3 +1491,14 @@ div.modal-scrollbar {
     background-color: azure;
     display: block;
 }
+
+@media ( max-width : 768px) {
+	video {
+		margin-left: 0px;
+	}
+}
+@media ( min-width : 769px){
+	video {
+		margin-left: 100px;
+	}
+}

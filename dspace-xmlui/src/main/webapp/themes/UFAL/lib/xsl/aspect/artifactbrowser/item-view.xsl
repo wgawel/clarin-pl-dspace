@@ -193,7 +193,10 @@
 						<xsl:when test="dim:field[@element='creator']">
 							<xsl:for-each select="dim:field[@element='creator']">
 								<a>
-								<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
+								<xsl:attribute name="href">
+									<xsl:copy-of select="$contextPath"/>
+									<xsl:value-of select="concat('/discover?filtertype=author&amp;filter_relational_operator=equals&amp;filter=',encoder:encode(node()))"/>
+								</xsl:attribute>
 
 								<xsl:copy-of select="node()" />
 								</a>
@@ -348,13 +351,7 @@
 						<i18n:text>xmlui.dri2xhtml.METS-1.0.item-date</i18n:text>
 					</dt>
 					<dd>
-						<xsl:for-each select="dim:field[@element='date' and @qualifier='issued']">							
-							<xsl:copy-of select="substring(./node(),1,10)" />
-							<xsl:if
-								test="count(following-sibling::dim:field[@element='date' and @qualifier='issued']) != 0">
-								<br />
-							</xsl:if>
-						</xsl:for-each>
+						<xsl:call-template name="date_issued_formatted_value"/>
 					</dd>
 				</dl>
 				<xsl:call-template name="itemSummaryView-DIM-fields">
@@ -452,7 +449,10 @@
 								select="dim:field[@element='language'][@qualifier='iso']">
 								<xsl:sort select="isocodes:getLangForCode(node())" />
 								<a>
-									<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="isocodes:getLangForCode(node())" />&amp;type=language</xsl:attribute>
+									<xsl:attribute name="href">
+										<xsl:copy-of select="$contextPath"/>
+										<xsl:value-of select="concat('/discover?filtertype=language&amp;filter_relational_operator=equals&amp;filter=',isocodes:getLangForCode(node()))"/>
+									</xsl:attribute>
 									<span class="language-iso-code"><xsl:copy-of select="isocodes:getLangForCode(node())" /></span>
 								</a>
 								<xsl:if
@@ -564,7 +564,11 @@
 						<xsl:for-each
 							select="dim:field[@element='publisher' and not(@qualifier)]">
 							<a>
-								<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="./node()" />&amp;type=publisher</xsl:attribute>
+
+								<xsl:attribute name="href">
+									<xsl:copy-of select="$contextPath"/>
+									<xsl:value-of select="concat('/discover?filtertype=publisher&amp;filter_relational_operator=equals&amp;filter=',encoder:encode(node()))"/>
+								</xsl:attribute>
 								<xsl:copy-of select="./node()" />									
 							</a>													
 							<xsl:if
@@ -664,7 +668,10 @@
 							select="dim:field[@element='subject' and not(@qualifier)]">
 							<span class="tag">
 								<a class="label label-primary">
-									<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=subject</xsl:attribute>
+									<xsl:attribute name="href">
+										<xsl:copy-of select="$contextPath"/>
+										<xsl:value-of select="concat('/discover?filtertype=subject&amp;filter_relational_operator=equals&amp;filter=',encoder:encode(node()))"/>
+									</xsl:attribute>
 									<xsl:copy-of select="node()" />
 								</a>
 							</span>														
@@ -914,17 +921,39 @@
             </xsl:call-template>
         </xsl:variable>
         <xsl:variable name="md5_checksum" select="@CHECKSUM"/>
+	<xsl:variable name="thumbnail">
+		<xsl:if test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]">
+			<xsl:value-of select="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
+		</xsl:if>
+	</xsl:variable>
 			<div class="thumbnail" style="margin-bottom: 10px;">
 				<a>
 					<xsl:attribute name="href">
                         <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
                     </xsl:attribute>
 					<xsl:choose>
-						<xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]">
+						<xsl:when test="@MIMETYPE='video/mp4'">
+							<div style="text-align: left;">
+								<!-- preload="metadata" would appear in access.log -->
+								<video controls="controls" preload="none">
+									<xsl:attribute name="height"><xsl:value-of select="240"/></xsl:attribute>
+									<xsl:if test="string($thumbnail)">
+										<xsl:attribute name="poster"><xsl:value-of select="$thumbnail" /></xsl:attribute>
+									</xsl:if>
+									<source>
+										<xsl:attribute name="src"><xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/></xsl:attribute>
+										<xsl:attribute name="type"><xsl:value-of select="@MIMETYPE"/></xsl:attribute>
+									</source>
+									Your browser does not support the video tag.
+								</video>
+							</div>
+						</xsl:when>
+						<xsl:when test="string($thumbnail)">
 							<img alt="Thumbnail" class="pull-right">
 								<xsl:attribute name="src">
-									<xsl:value-of select="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
+									<xsl:value-of select="$thumbnail" />
 								</xsl:attribute>
+								<xsl:attribute name="style">height: <xsl:value-of select="$thumbnail.maxheight"/>px;</xsl:attribute>
 							</img>
 						</xsl:when>
 						<xsl:otherwise>
@@ -1272,11 +1301,36 @@
 			<xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
 		</xsl:if>
 		<a>
-	<xsl:attribute name="href"><xsl:copy-of select="$contextPath"/>/browse?value=<xsl:copy-of select="node()" />&amp;type=author</xsl:attribute>
+
+			<xsl:attribute name="href">
+				<xsl:copy-of select="$contextPath"/>
+				<xsl:value-of select="concat('/discover?filtertype=author&amp;filter_relational_operator=equals&amp;filter=',encoder:encode(node()))"/>
+			</xsl:attribute>
 	<xsl:copy-of select="node()" />
 	</a>
 
 	</span>
     </xsl:template>
+
+	<xsl:template name="date_issued_formatted_value">
+		<xsl:variable name="date" select="substring(./dim:field[@element='date' and @qualifier='issued'],1,10)"/>
+		<xsl:choose>
+			<xsl:when test="contains(dim:field[@mdschema='local' and @element='approximateDate' and @qualifier='issued'], ',')">
+				<i18n:translate>
+					<i18n:text>xmlui.UFAL.artifactbrowser.item_view.date_list</i18n:text>
+					<i18n:param><xsl:value-of select="dim:field[@mdschema='local' and @element='approximateDate' and @qualifier='issued']"/></i18n:param>
+				</i18n:translate>
+			</xsl:when>
+			<xsl:when test="dim:field[@mdschema='local' and @element='approximateDate' and @qualifier='issued']">
+				<i18n:translate>
+					<i18n:text>xmlui.UFAL.artifactbrowser.item_view.date_unknown</i18n:text>
+					<i18n:param><xsl:value-of select="dim:field[@mdschema='local' and @element='approximateDate' and @qualifier='issued']"/></i18n:param>
+				</i18n:translate>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$date" />
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 </xsl:stylesheet>
 
