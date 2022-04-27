@@ -2992,6 +2992,9 @@
   <message key="xmlui.UFAL.artifactbrowser.item_view.preview">Preview</message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.file_preview">File Preview</message>
   <message key="xmlui.UFAL.artifactbrowser.item_view.show_all_authors">show everyone</message>
+  <message key="xmlui.UFAL.artifactbrowser.item_view.date_unknown">The exact date is unknown ({0})</message>
+  <message key="xmlui.UFAL.artifactbrowser.item_view.date_list">This item is composed of parts issued in {0}</message>
+
 
 
 

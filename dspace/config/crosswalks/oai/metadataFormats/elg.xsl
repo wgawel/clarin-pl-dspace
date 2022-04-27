@@ -17,6 +17,8 @@
     <xsl:output omit-xml-declaration="yes" method="xml" indent="yes" xalan:indent-amount="4"/>
 
     <!-- VARIABLES BEGIN -->
+    <xsl:variable name="UPPER_CHARS" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
+    <xsl:variable name="LOWER_CHARS" select="'abcdefghijklmnopqrstuvwxyz'"/>
     <xsl:variable name="identifier_uri" select="doc:metadata/doc:element[@name='dc']/doc:element[@name='identifier']/doc:element[@name='uri']/doc:element/doc:field[@name='value']"/>
     
     <xsl:variable name="handle" select="/doc:metadata/doc:element[@name='others']/doc:field[@name='handle']/text()"/>
@@ -25,7 +27,7 @@
                   select="/doc:metadata/doc:element[@name='dc']/doc:element[@name='type']/doc:element/doc:field[@name='value']/text()"/>
 
     <xsl:variable name="upperType">
-      <xsl:value-of select="translate(substring($type,1,1),'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
+      <xsl:value-of select="translate(substring($type,1,1), $LOWER_CHARS, $UPPER_CHARS)"/>
       <xsl:value-of select="substring($type,2)"/>
     </xsl:variable>
 
@@ -44,7 +46,7 @@
     </xsl:variable>
 
     <xsl:variable name="upperMediaType">
-      <xsl:value-of select="translate(substring($mediaType,1,1),'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/>
+      <xsl:value-of select="translate(substring($mediaType,1,1), $LOWER_CHARS, $UPPER_CHARS)"/>
       <xsl:value-of select="substring($mediaType,2)"/>
     </xsl:variable>
 
@@ -255,15 +257,25 @@
   </xsl:template>
 
   <xsl:template name="personalSensitiveAnon">
-    <ms:personalDataIncluded>false</ms:personalDataIncluded>
-    <ms:sensitiveDataIncluded>false</ms:sensitiveDataIncluded>
+    <ms:personalDataIncluded>http://w3id.org/meta-share/meta-share/noP</ms:personalDataIncluded>
+    <ms:sensitiveDataIncluded>http://w3id.org/meta-share/meta-share/noS</ms:sensitiveDataIncluded>
   </xsl:template>
 
   <xsl:template name="CommonMediaPart">
-    <xsl:variable name="name" select="concat($upperType, 'MediaPart')"/>
-    <xsl:element name="ms:{$name}">
-      <xsl:call-template name="commonMediaElements"/>
-    </xsl:element>
+    <xsl:param name="noMediaPart" select="false()"/>
+    <xsl:choose>
+      <xsl:when test="$noMediaPart">
+        <ms:unspecifiedPart>
+          <xsl:call-template name="lingualityAndLanguges"/>
+        </ms:unspecifiedPart>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="name" select="concat($upperType, 'MediaPart')"/>
+        <xsl:element name="ms:{$name}">
+          <xsl:call-template name="commonMediaElements"/>
+        </xsl:element>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="commonMediaElements">
@@ -281,22 +293,7 @@
     <xsl:element name="ms:{$name}">
       <xsl:element name="ms:{$name2}"><xsl:value-of select="$name"/></xsl:element>
       <ms:mediaType><xsl:value-of select="concat('http://w3id.org/meta-share/meta-share/', $mediaType)"/></ms:mediaType>
-      <ms:lingualityType>
-        <xsl:variable name="langCount" select="count(/doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']/doc:element/doc:field[@name='value'])"/>
-        <xsl:text>http://w3id.org/meta-share/meta-share/</xsl:text>
-        <xsl:choose>
-          <xsl:when test="$langCount=1">monolingual</xsl:when>
-          <xsl:when test="$langCount=2">bilingual</xsl:when>
-          <xsl:otherwise>multilingual</xsl:otherwise>
-        </xsl:choose>
-      </ms:lingualityType>
-      <ms:multilingualityType>http://w3id.org/meta-share/meta-share/unspecified</ms:multilingualityType>
-      <xsl:for-each
-              select="/doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']/doc:element/doc:field[@name='value']">
-        <xsl:call-template name="Language">
-          <xsl:with-param name="isoCode" select="langUtil:getShortestId(.)"/>
-        </xsl:call-template>
-      </xsl:for-each>
+      <xsl:call-template name="lingualityAndLanguges"/>
       <xsl:choose>
         <xsl:when test="$mediaType = 'audio'">
           <xsl:call-template name="audio"/>
@@ -314,6 +311,20 @@
     </xsl:element>
   </xsl:template>
 
+  <xsl:template name="lingualityAndLanguges">
+    <ms:lingualityType>
+      <xsl:variable name="langCount" select="count(/doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']/doc:element/doc:field[@name='value'])"/>
+      <xsl:text>http://w3id.org/meta-share/meta-share/</xsl:text>
+      <xsl:choose>
+        <xsl:when test="$langCount=1">monolingual</xsl:when>
+        <xsl:when test="$langCount=2">bilingual</xsl:when>
+        <xsl:otherwise>multilingual</xsl:otherwise>
+      </xsl:choose>
+    </ms:lingualityType>
+    <ms:multilingualityType>http://w3id.org/meta-share/meta-share/unspecified</ms:multilingualityType>
+    <xsl:call-template name="Languages"/>
+  </xsl:template>
+
   <xsl:template name="commonCorpusMediaElements">
       <xsl:variable name="name" select="concat('Corpus', $upperMediaType, 'Part')"/>
       <xsl:element name="ms:{$name}">
@@ -328,12 +339,7 @@
             <xsl:otherwise>multilingual</xsl:otherwise>
           </xsl:choose>
         </ms:lingualityType>
-        <xsl:for-each
-                select="/doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']/doc:element/doc:field[@name='value']">
-          <xsl:call-template name="Language">
-            <xsl:with-param name="isoCode" select="langUtil:getShortestId(.)"/>
-          </xsl:call-template>
-        </xsl:for-each>
+        <xsl:call-template name="Languages"/>
       </xsl:element>
   </xsl:template>
 
@@ -371,6 +377,7 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
 
   <xsl:template name="Distribution">
     <xsl:param name="distributionType" select="'Dataset'"/>
+    <xsl:param name="mediaFeature" select="$upperMediaType"/>
     <xsl:variable name="form">
       <xsl:choose>
         <xsl:when test="$distributionType = 'Dataset'">downloadable</xsl:when>
@@ -415,7 +422,7 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
 
       <!-- distributionXfeature -->
       <xsl:if test="$distributionType = 'Dataset'">
-        <xsl:element name="ms:distribution{$upperMediaType}Feature">
+        <xsl:element name="ms:distribution{$mediaFeature}Feature">
           <xsl:call-template name="Sizes"/>
           <xsl:call-template name="dataFormat"/>
         </xsl:element>
@@ -434,20 +441,35 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
       <ms:ToolService>
         <ms:lrType>ToolService</ms:lrType>
         <ms:function>
-          <ms:LTClassRecommended>undefined</ms:LTClassRecommended>
-            <!-- XXX if undefined not working
-          <ms:LTClassRecommended>http://w3id.org/meta-share/omtd-share/Tokenization</ms:LTClassRecommended>
-            -->
+          <ms:LTClassOther>undefined</ms:LTClassOther>
         </ms:function>
         <xsl:call-template name="Distribution">
           <xsl:with-param name="distributionType" select="'Software'"/>
         </xsl:call-template>
+        <xsl:variable name="languageDependent">
+          <xsl:choose>
+            <xsl:when test="/doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ResourceComponentType#ToolServiceInfo']/doc:element[@name='languageDependent']/doc:element/doc:field[@name='value']">
+              <xsl:value-of select="/doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ResourceComponentType#ToolServiceInfo']/doc:element[@name='languageDependent']/doc:element/doc:field[@name='value']"/>
+            </xsl:when>
+            <!-- XXX taking a default of non language dependent -->
+            <xsl:otherwise>false</xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
         <ms:languageDependent>
-          <xsl:value-of select="/doc:metadata/doc:element[@name='metashare']/doc:element[@name='ResourceInfo#ResourceComponentType#ToolServiceInfo']/doc:element[@name='languageDependent']/doc:element/doc:field[@name='value']"/>
+          <xsl:value-of select="$languageDependent"/>
         </ms:languageDependent>
         <ms:inputContentResource>
           <ms:processingResourceType>http://w3id.org/meta-share/meta-share/unspecified</ms:processingResourceType>
+          <xsl:if test="$languageDependent='true'">
+            <xsl:call-template name="Languages"/>
+          </xsl:if>
         </ms:inputContentResource>
+        <xsl:if test="$languageDependent='true'">
+          <ms:outputResource>
+            <ms:processingResourceType>http://w3id.org/meta-share/meta-share/unspecified</ms:processingResourceType>
+            <xsl:call-template name="Languages"/>
+          </ms:outputResource>
+        </xsl:if>
         <!--
          The element can be used for adding evaluation/quality-related information,
          e.g. BLEU scores for machine translation tools,
@@ -458,33 +480,54 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
   </xsl:template>
 
   <xsl:template name="languageDescription">
+    <xsl:variable name="isModel" select="contains($detailedType, 'model')"/>
     <ms:LanguageDescription>
       <ms:lrType>LanguageDescription</ms:lrType>
-      <ms:LanguageDescriptionSubclass>
+      <ms:ldSubclass>
         <xsl:choose>
-          <xsl:when test="$detailedType='grammar'">
-            <ms:Grammar>
-              <ms:ldSubclassType>Grammar</ms:ldSubclassType>
-              <ms:encodingLevel>http://w3id.org/meta-share/meta-share/unspecified</ms:encodingLevel>
-            </ms:Grammar>
-          </xsl:when>
-          <xsl:when test="$detailedType='mlmodel'">
-            <ms:MLModel>
-              <ms:ldSubclassType>MlModel</ms:ldSubclassType>
-            </ms:MLModel>
-          </xsl:when>
-          <xsl:when test="$detailedType='ngrammodel'">
-            <ms:NGramModel>
-              <ms:ldSubclassType>NGramModel</ms:ldSubclassType>
-              <ms:baseItem>http://w3id.org/meta-share/meta-share/unspecified</ms:baseItem>
-              <!-- XXX this is supposed to mean unspecified -->
-              <ms:order>-1</ms:order>
-            </ms:NGramModel>
-          </xsl:when>
+          <xsl:when test="$detailedType='grammar'">http://w3id.org/meta-share/meta-share/grammar</xsl:when>
+          <xsl:when test="$isModel">http://w3id.org/meta-share/meta-share/model</xsl:when>
+          <xsl:otherwise>http://w3id.org/meta-share/meta-share/other</xsl:otherwise>
         </xsl:choose>
-      </ms:LanguageDescriptionSubclass>
-      <xsl:call-template name="CommonMediaPart"/>
-      <xsl:call-template name="Distribution"/>
+      </ms:ldSubclass>
+      <xsl:if test="$detailedType='grammar' or $isModel">
+        <ms:LanguageDescriptionSubclass>
+          <xsl:choose>
+            <xsl:when test="$detailedType='grammar'">
+              <ms:Grammar>
+                <ms:ldSubclassType>Grammar</ms:ldSubclassType>
+                <ms:encodingLevel>http://w3id.org/meta-share/meta-share/unspecified</ms:encodingLevel>
+              </ms:Grammar>
+            </xsl:when>
+            <xsl:when test="$detailedType='mlmodel'">
+              <ms:Model>
+                <xsl:call-template name="languageDescriptionMsModel"/>
+              </ms:Model>
+            </xsl:when>
+            <xsl:when test="$detailedType='ngrammodel'">
+              <ms:Model>
+                <xsl:call-template name="languageDescriptionMsModel"/>
+                <ms:NGramModel>
+                  <ms:baseItem>http://w3id.org/meta-share/meta-share/unspecified</ms:baseItem>
+                  <!-- XXX this is supposed to mean unspecified -->
+                  <ms:order>-1</ms:order>
+                </ms:NGramModel>
+              </ms:Model>
+            </xsl:when>
+          </xsl:choose>
+        </ms:LanguageDescriptionSubclass>
+      </xsl:if>
+      <xsl:call-template name="CommonMediaPart">
+        <xsl:with-param name="noMediaPart" select="boolean($isModel)"/>
+      </xsl:call-template>
+      <xsl:call-template name="Distribution">
+        <xsl:with-param name="mediaFeature">
+          <xsl:choose>
+            <xsl:when test="$isModel">Unspecified</xsl:when>
+            <xsl:otherwise><xsl:value-of select="$upperMediaType"/></xsl:otherwise>
+          </xsl:choose>
+        </xsl:with-param>
+      </xsl:call-template>
       <xsl:call-template name="personalSensitiveAnon"/>
     </ms:LanguageDescription>
   </xsl:template>
@@ -528,7 +571,7 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
       <xsl:otherwise>
         <xsl:call-template name="size">
           <xsl:with-param name="amount" select="sum(xalan:nodeset($files)/doc:element[@name='bitstream']/doc:field[@name='size']/text())"/>
-          <xsl:with-param name="unit" select="'byte'"/>
+          <xsl:with-param name="unit" select="'bytes'"/>
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
@@ -537,113 +580,255 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
   <xsl:template name="size">
     <xsl:param name="amount"/>
     <xsl:param name="unit"/>
+
+    <xsl:variable name="unit_lc" select="translate($unit, $UPPER_CHARS, $LOWER_CHARS)"/>
     <ms:size>
       <ms:amount><xsl:value-of select="$amount"/></ms:amount>
       <!-- sizeUnit -->
       <!-- adapted from https://gitlab.com/european-language-grid/platform/ELG-SHARE-schema/-/blob/master/Support%20tools/META-SHARE_3.1_into_ELG/elg-conversion-tools-master/rules/elra-to-elg-body.xsl -->
       <!-- DO NOT CHANGER ORDER DECLARATION -->
       <xsl:choose>
-        <xsl:when test="$unit = '4-grams'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/four-gram</ms:sizeUnit>
+        <xsl:when test="$unit_lc = '4-grams'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/four-gram</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = '5-grams'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/five-gram</ms:sizeUnit>
+        <xsl:when test="$unit_lc = '5-grams'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/five-gram</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'articles'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/article</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 't-hpairs'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/T-HPair</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'bigrams'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/bigram</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'articles'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/article</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'bytes'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/byte</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'bigrams'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/bigram</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'classes'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/class</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'bytes'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/byte</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'concepts'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/concept</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'classes'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/class</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'entries'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/entry</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'concepts'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/concept</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'expressions'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/expression</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'diphones'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/diphone1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'files'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/file</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'elements'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/element</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'frames'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/frame1</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'entries'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/entry</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'hours'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/hour1</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'expressions'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/expression</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'hpairs'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/T-HPair</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'files'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/file</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'images'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/image2</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'frames'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/frame1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'items'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/item</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'gb'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/gb</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'keywords'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/keyword1</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'hours'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/hour1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'lexicalTypes'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/lexicalType</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'idiomaticExpressions'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/idiomaticExpression</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'minutes'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/minute</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'images'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/image2</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'multiWordUnits'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/multiWordUnit</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'items'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/item</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'pages'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/other</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'kb'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/kb</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'segments'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/entry</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'keywords'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/keyword1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'sentences'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/sentence1</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'lexicalTypes'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/lexicalType</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'semanticUnits'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/semanticUnit1</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'mb'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/mb</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'syntacticUnits'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/syntacticUnit1</ms:sizeUnit>
-        </xsl:when>  
-        <xsl:when test="$unit = 'terms'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/term</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'minutes'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/minute</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'texts'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/text1</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'multiWordUnits'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/multiWordUnit</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'tokens'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/token</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'neologisms'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/neologism</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'trigrams'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/trigram</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'other'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/other</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'turns'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/turn</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'phonemes'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/phoneme2</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'units'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/unit</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'phoneticUnits'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/phoneticUnit</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'unigrams'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/unigram</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'predicates'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/predicate</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'utterances'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/utterance1</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'rules'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/rule</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
-        <xsl:when test="$unit = 'words'">
-          <ms:sizeUnit>http://w3id.org/meta-share/meta-share/word3</ms:sizeUnit>
+        <xsl:when test="$unit_lc = 'seconds'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/second</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'semanticUnits'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/semanticUnit1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'sentences'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/sentence1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'shots'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/shot1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'syllables'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/syllable2</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'synsets'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/synset</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'syntacticUnits'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/syntacticUnit1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'terms'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/term</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'texts'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/text1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'tokens'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/token</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'trigrams'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/trigram</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'turns'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/turn</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'unigrams'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/unigram</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'units'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/unit</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'utterances'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/utterance1</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
+        </xsl:when>
+        <xsl:when test="$unit_lc = 'words'">
+          <ms:sizeUnit>
+            <ms:sizeUnitRecommended>http://w3id.org/meta-share/meta-share/word3</ms:sizeUnitRecommended>
+          </ms:sizeUnit>
         </xsl:when>
         <xsl:otherwise>
-          <ms:sizeUnit><xsl:value-of select="concat('http://w3id.org/meta-share/meta-share/', $unit)"/></ms:sizeUnit>
+          <ms:sizeUnit>
+            <ms:sizeUnitOther>
+              <xsl:value-of select="$unit_lc"/>
+            </ms:sizeUnitOther>
+          </ms:sizeUnit>
         </xsl:otherwise>
       </xsl:choose>
     </ms:size>
@@ -651,12 +836,31 @@ elg.xml:62: element typeOfVideoContent: Schemas validity error : Element '{http:
 
   <xsl:template name="dataFormat">
     <ms:dataFormat>
-      <xsl:choose>
-        <xsl:when test="false()"></xsl:when>
-        <xsl:otherwise><xsl:value-of select="'http://w3id.org/meta-share/omtd-share/BinaryFormat'"/></xsl:otherwise>
-      </xsl:choose>
+      <ms:dataFormatRecommended>
+        <xsl:choose>
+          <xsl:when test="false()"></xsl:when>
+          <xsl:otherwise><xsl:value-of select="'http://w3id.org/meta-share/omtd-share/BinaryFormat'"/></xsl:otherwise>
+        </xsl:choose>
+      </ms:dataFormatRecommended>
     </ms:dataFormat>
   </xsl:template>
 
+  <xsl:template name="languageDescriptionMsModel">
+    <ms:ldSubclassType>Model</ms:ldSubclassType>
+    <ms:modelType>
+      <ms:modelTypeRecommended>http://w3id.org/meta-share/meta-share/unspecified</ms:modelTypeRecommended>
+    </ms:modelType>
+    <ms:modelFunction>
+      <ms:modelFunctionRecommended>http://w3id.org/meta-share/meta-share/unspecified</ms:modelFunctionRecommended>
+    </ms:modelFunction>
+  </xsl:template>
 
+  <xsl:template name="Languages">
+    <xsl:for-each
+            select="/doc:metadata/doc:element[@name='dc']/doc:element[@name='language']/doc:element[@name='iso']/doc:element/doc:field[@name='value']">
+      <xsl:call-template name="Language">
+        <xsl:with-param name="isoCode" select="langUtil:getShortestId(.)"/>
+      </xsl:call-template>
+    </xsl:for-each>
+  </xsl:template>
 </xsl:stylesheet>

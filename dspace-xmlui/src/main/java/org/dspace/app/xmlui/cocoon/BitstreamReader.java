@@ -811,6 +811,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
         try
         {
+           // this.XSendFileHeader = "";
             if(org.apache.commons.lang3.StringUtils.isNotBlank(this.XSendFileHeader)){
                 //path should take into the account the nginx inner location (eg. alias for .../assetstore)
                 //or what you allow in apache with XSendFilePath
@@ -823,6 +824,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             else if(org.apache.commons.lang3.StringUtils.isNotBlank(this.redirectToURL)){
                 response.sendRedirect(this.redirectToURL);
             }else {
+                log.error("SEND_FILE_HEADER: is BLANK");
                 if (byteRange != null) {
                     String entityLength;
                     String entityRange;
@@ -846,6 +848,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                     while ((length = this.bitstreamInputStream.read(buffer)) > -1) {
                         posEnd = pos + length - 1;
                         ByteRange intersection = byteRange.intersection(new ByteRange(pos, posEnd));
+                        log.error("IP WR : " + this.bitstreamInputStream);
                         if (intersection != null) {
                             out.write(buffer, (int) intersection.getStart() - pos, (int) intersection.length());
                         }
@@ -854,6 +857,7 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 } else {
                     response.setHeader("Content-Length", String.valueOf(this.bitstreamSize));
 
+                    log.error("last INPUT : " + this.bitstreamInputStream);
                     while ((length = this.bitstreamInputStream.read(buffer)) > -1) {
                         out.write(buffer, 0, length);
                     }

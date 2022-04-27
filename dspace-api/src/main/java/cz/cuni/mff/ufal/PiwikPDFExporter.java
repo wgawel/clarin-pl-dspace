@@ -11,7 +11,6 @@ import cz.cuni.mff.ufal.lindat.utilities.hibernate.PiwikReport;
 import cz.cuni.mff.ufal.lindat.utilities.interfaces.IFunctionalities;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.apache.tools.ant.filters.StringInputStream;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -32,18 +31,12 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+
+import org.jfree.util.ShapeUtilities;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import javax.mail.MessagingException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
@@ -60,23 +53,24 @@ public class PiwikPDFExporter  {
     private static String PIWIK_REPORTS_OUTPUT_PATH;
 
     /** Piwik configurations */
-    private static String PIWIK_API_URL;
-    private static String PIWIK_AUTH_TOKEN;
-    private static String PIWIK_SITE_ID;
-    private static String PIWIK_DOWNLOAD_SITE_ID;
     private static boolean PIWIK_KEEP_REPORTS;
 
     private static String LINDAT_LOGO;
+
+    private static String PIWIK_API_MODE;
     
 	private static SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	private static SimpleDateFormat outputDateFormat = new SimpleDateFormat("MMM-dd");
-	
+
 	
 	private static Logger log = cz.cuni.mff.ufal.Logger.getLogger(PiwikPDFExporter.class);
 	
 	public static void main(String args[]) throws Exception {
 		log.info("Generating PIWIK pdf reports ....");
 		initialize();
+		if (!PIWIK_API_MODE.equals("cached")) {
+			log.warn("Not using the cached mode: the reports will be missing uniq stats for pageviews, downloads and visitors as this is not implemented in transformJSON.");
+		}
 		generateReports();
 		log.info("PIWIK pdf reports generation finished.");
 	}
@@ -84,11 +78,8 @@ public class PiwikPDFExporter  {
 	public static void initialize() {
         PIWIK_REPORTS_OUTPUT_PATH = ConfigurationManager.getProperty("lr", "lr.statistics.report.path");
         PIWIK_KEEP_REPORTS = ConfigurationManager.getBooleanProperty("lr", "lr.statistics.keep.reports", true);
-        PIWIK_API_URL = ConfigurationManager.getProperty("lr", "lr.statistics.api.url");
-        PIWIK_AUTH_TOKEN = ConfigurationManager.getProperty("lr", "lr.statistics.api.auth.token");
-        PIWIK_SITE_ID = ConfigurationManager.getProperty("lr", "lr.statistics.api.site_id");
-        PIWIK_DOWNLOAD_SITE_ID = ConfigurationManager.getProperty("lr", "lr.tracker.bitstream.site_id");
         LINDAT_LOGO = ConfigurationManager.getProperty("lr", "lr.lindat.logo.mono");
+	PIWIK_API_MODE = ConfigurationManager.getProperty("lr", "lr.statistics.api.mode");
 	}
 	
 	public static void generateReports() throws SQLException {
@@ -121,6 +112,9 @@ public class PiwikPDFExporter  {
 							log.info("Processing Item : " + item.getHandle());
 							generateItemReport(item);
 							done.add(item);
+						} catch(FileNotFoundException e){
+							log.info(String.format("404 '%s' probably nothing logged for that date", e.getMessage()));
+							continue;
 						} catch(Exception e) {
 							log.error("Unable to generate report.", e);
 							continue;
@@ -153,8 +147,7 @@ public class PiwikPDFExporter  {
         Locale supportedLocale = I18nUtil.getEPersonLocale(to);
         
 	    String itemTitle = item.getMetadata("dc", "title", null, Item.ANY)[0].value;
-	    String hdlURL = item.getMetadata("dc", "identifier", "uri", Item.ANY)[0].value;
-        
+
 		Email email = Email.getEmail(I18nUtil.getEmailFilename(supportedLocale, "piwik_report"));
 		email.addArgument(itemTitle);
 		email.addArgument(to.getName());
@@ -169,143 +162,112 @@ public class PiwikPDFExporter  {
 		cal.add(Calendar.MONTH, -1);
 		cal.set(Calendar.DATE, 1);
 		Date firstDay = cal.getTime();
-		cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-		Date lastDay = cal.getTime();
-		
-		
-		String viewsReportURL = PIWIK_API_URL + "index.php"
-				+ "?module=API"
-				+ "&method=API.get"
-				+ "&idSite=" + PIWIK_SITE_ID
-				+ "&period=day"
-				+ "&date=" + inputDateFormat.format(firstDay) + "," + inputDateFormat.format(lastDay)
-				+ "&token_auth=" + PIWIK_AUTH_TOKEN
-				+ "&format=xml"
-				+ "&segment=pageUrl=@" + item.getHandle();
 
-		String downloadReportURL = PIWIK_API_URL + "index.php"
-				+ "?module=API"
-				+ "&method=API.get"
-				+ "&idSite=" + PIWIK_DOWNLOAD_SITE_ID
-				+ "&period=day"
-				+ "&date=" + inputDateFormat.format(firstDay) + "," + inputDateFormat.format(lastDay)
-				+ "&token_auth=" + PIWIK_AUTH_TOKEN
-				+ "&format=xml"
-				+ "&segment=pageUrl=@" + item.getHandle();
-				
-		String countryReportURL = PIWIK_API_URL + "index.php"
-					+ "?module=API"
-					+ "&method=UserCountry.getCountry"
-					+ "&idSite=" + PIWIK_SITE_ID
-					+ "&period=month"
-					+ "&date=" + inputDateFormat.format(firstDay)												
-					+ "&expanded=1"
-					+ "&token_auth=" + PIWIK_AUTH_TOKEN
-					+ "&filter_limit=10"
-					+ "&format=xml"
-					+ "&segment=pageUrl=@" + item.getHandle();
-							
-		
-		String viewsXML = PiwikHelper.readFromURL(viewsReportURL);
-		String downloadXML = PiwikHelper.readFromURL(downloadReportURL);
-		
-		viewsXML = PiwikHelper.mergeXML(viewsXML, downloadXML);
-		String countriesXML = PiwikHelper.readFromURL(countryReportURL);
-		
+		// use just the yyyy-MM part for the date param
+		PiwikHelper piwikHelper = new PiwikHelper("day", inputDateFormat.format(firstDay).substring(0,7), item, "");
+
+		String json = piwikHelper.getDataAsJsonString();
+		JSONParser parser = new JSONParser();
+		JSONObject report = (JSONObject) parser.parse(json);
+
+
+
 		Map<String, Integer> summary = new HashMap<String, Integer>();
 		
-		JFreeChart viewsChart = createViewsChart(viewsXML, summary);
-		List<String[]> countryData = getCountryData(countriesXML);
+		JFreeChart viewsChart = createViewsChart(report, summary);
+		List<String[]> countryData = piwikHelper.getCountryData();
 		
 		geneartePDF(item, firstDay, viewsChart, summary, countryData);
 	}
 	
-	public static List<String[]> getCountryData(String xml) throws Exception {
-		
-		Document doc = parseXML(xml);
-		
-		if(doc==null) throw new Exception("Unable to parse XML");
-		
-		List<String[]> data = new ArrayList<String[]>();
-		
-		XPath xPath =  XPathFactory.newInstance().newXPath();
-		XPathExpression eachResultNode = xPath.compile("//result/row");
-		
-		NodeList results = (NodeList)eachResultNode.evaluate(doc, XPathConstants.NODESET);
-		
-		for(int i=0;i<results.getLength();i++) {
-			Element row = (Element)results.item(i);
-			String country = row.getElementsByTagName("label").item(0).getTextContent();
-			String count = row.getElementsByTagName("nb_visits").item(0).getTextContent();
-			data.add(new String[]{country, count});
+
+	private static Map<String, Integer> extractStats(JSONObject statsObject, TimeSeries series,
+									 String keyForSeries, String[] keysForTotals){
+		HashMap<String, Integer> totals = new HashMap<>();
+		for(String key: keysForTotals){
+			totals.put(key, 0);
 		}
-		
-		return data;
-		
+
+		int max = 0;
+
+		if(statsObject != null) {
+			for (Object yo : statsObject.keySet()) {
+				if (yo instanceof String) {
+					String year = (String) yo;
+					int y = Integer.parseInt(year);
+					JSONObject months = (JSONObject) statsObject.get(year);
+					for (Object mo : months.keySet()) {
+						if (mo instanceof String) {
+							String month = (String) mo;
+							int m = Integer.parseInt(month);
+							Calendar c = Calendar.getInstance();
+							// months are zero based, 0 january
+							c.set(y, m - 1, 1);
+							// get the valid days in month and fill the series with zeros
+							for (int d = 1; d <= c.getActualMaximum(Calendar.DATE); d++) {
+								// here month is 1-12
+								series.add(new Day(d, m, y), 0);
+							}
+							JSONObject days = (JSONObject) months.get(month);
+							for (Object dayo : days.keySet()) {
+								if (dayo instanceof String) {
+									String day = (String) dayo;
+									int d = Integer.parseInt(day);
+									JSONObject stats = (JSONObject) days.get(day);
+									if(stats.containsKey(keyForSeries)) {
+										int valueForSeries = ((Long) stats.get(keyForSeries)).intValue();
+										if (max < valueForSeries) {
+											max = valueForSeries;
+										}
+										series.addOrUpdate(new Day(d, m, y), valueForSeries);
+									}
+									for (String key : keysForTotals) {
+										if(stats.containsKey(key)) {
+											int valueForTotal = ((Long) stats.get(key)).intValue();
+											int number = totals.get(key);
+											totals.put(key, number + valueForTotal);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		totals.put("max", max);
+		return totals;
 	}
 
-	public static JFreeChart createViewsChart(String xml, Map<String, Integer> summary) throws Exception {
+	public static JFreeChart createViewsChart(JSONObject report, Map<String, Integer> summary) throws Exception {
 
-		Document doc = parseXML(xml);
-		
-		if(doc==null) throw new Exception("Unable to parse XML");
-		
 		JFreeChart lineChart = null;
-		
-		XPath xPath =  XPathFactory.newInstance().newXPath();
-		XPathExpression eachResultNode = xPath.compile("//result");
-		
-		NodeList results = (NodeList)eachResultNode.evaluate(doc, XPathConstants.NODESET);
-		
-		int maxPageViews = Integer.MIN_VALUE;		
 		
 		TimeSeries viewsSeries = new TimeSeries("Views");
 		TimeSeries downloadsSeries = new TimeSeries("Downloads");
+		TimeSeries visitorsSeries = new TimeSeries("Unique visitors");
 		
-		int totalViews = 0;
-		int totalUniqueViews = 0;
-		int totalVisitors = 0;
-		int totalUniqueVisitors = 0;
-		int totalDownloads = 0;
-		int totalUniqueDownloads = 0;
-		
-		for(int i=0;i<results.getLength();i++) {
-			Element result = (Element)results.item(i);
-			String date = result.getAttribute("date");
-			Date dateObj = inputDateFormat.parse(date);
-			int iPageViews = 0;
-			int iDownloads = 0;
-			try{							
-				String pageViews = result.getElementsByTagName("nb_pageviews").item(0).getTextContent();
-				String downloads = result.getElementsByTagName("nb_downloads").item(0).getTextContent();
-				iPageViews = Integer.parseInt(pageViews);
-				iDownloads = Integer.parseInt(downloads);
-				
-				totalViews += iPageViews;
-				totalDownloads += iDownloads;				
-				totalUniqueViews += Integer.parseInt(result.getElementsByTagName("nb_uniq_pageviews").item(0).getTextContent());
-				totalUniqueDownloads += Integer.parseInt(result.getElementsByTagName("nb_uniq_downloads").item(0).getTextContent());
-				totalVisitors += Integer.parseInt(result.getElementsByTagName("nb_visits").item(0).getTextContent());
-				totalUniqueVisitors += Integer.parseInt(result.getElementsByTagName("nb_uniq_visitors").item(0).getTextContent());				
-				
-			}catch(Exception e) {
-			}
-						
-			if(maxPageViews < iPageViews) maxPageViews = iPageViews;
-			viewsSeries.add(new Day(dateObj), iPageViews);
-			downloadsSeries.add(new Day(dateObj), iDownloads);			
-		}
-		
-		summary.put("pageviews", totalViews);
-		summary.put("unique pageviews", totalUniqueViews);
-		summary.put("visits", totalVisitors);
-		summary.put("unique visitors", totalUniqueVisitors);
-		summary.put("downloads", totalDownloads);
-		summary.put("unique downloads", totalUniqueDownloads);
+		JSONObject response = (JSONObject)report.get("response");
+		JSONObject views = (JSONObject) ((JSONObject) response.get("views")).get("total");
+		JSONObject downloads = (JSONObject) ((JSONObject) response.get("downloads")).get("total");
+
+		Map<String, Integer> viewsTotals = extractStats(views, viewsSeries, "nb_hits", new String[]{"nb_hits",
+				"nb_uniq_pageviews", "nb_visits"});
+		Map<String, Integer> downloadsTotals = extractStats(downloads, downloadsSeries, "nb_hits", new String[]{ "nb_hits", "nb_uniq_pageviews"});
+		extractStats(views, visitorsSeries, "nb_uniq_visitors", new String[]{ });
+
+		int maxPageViews = viewsTotals.get("max");
+
+		summary.put("pageviews", viewsTotals.get("nb_hits"));
+		summary.put("unique pageviews", viewsTotals.get("nb_uniq_pageviews"));
+		summary.put("visits", viewsTotals.get("nb_visits"));
+		summary.put("downloads", downloadsTotals.get("nb_hits"));
+		summary.put("unique downloads", downloadsTotals.get("nb_uniq_pageviews"));
 		
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
 		dataset.addSeries(viewsSeries);
-		dataset.addSeries(downloadsSeries);		
+		dataset.addSeries(downloadsSeries);
+		dataset.addSeries(visitorsSeries);
 		
 		lineChart = ChartFactory.createTimeSeriesChart("Views Over Time", "", "", dataset);
 		lineChart.setBackgroundPaint(Color.WHITE);
@@ -329,11 +291,14 @@ public class PiwikPDFExporter  {
         	renderer.setBaseShapesFilled(true);
         	Shape circle = new Ellipse2D.Double(-1f, -1f, 2, 2);
         	renderer.setSeriesShape(0, circle);
-        	renderer.setSeriesShape(1, circle);
+        	renderer.setSeriesShape(1, ShapeUtilities.createDiagonalCross(2f, 0.5f));
+			renderer.setSeriesShape(2, ShapeUtilities.createRegularCross(2f, 0.5f));
         	renderer.setSeriesPaint(0, new Color(212, 40, 30));
         	renderer.setSeriesPaint(1, new Color(30, 120, 180));
+			renderer.setSeriesPaint(2, new Color(30, 180, 65));
         	renderer.setSeriesStroke(0, new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
         	renderer.setSeriesStroke(1, new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
+			renderer.setSeriesStroke(2, new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
         }
         DateAxis xAxis = (DateAxis) plot.getDomainAxis();
         xAxis.setDateFormatOverride(outputDateFormat);
@@ -444,7 +409,7 @@ public class PiwikPDFExporter  {
 	    
 	    Paragraph byCountry = new Paragraph();
 	    byCountry.setFont(FONT[5]);
-	    byCountry.add("Visitors By Country");
+	    byCountry.add("Visits By Country");
 	    
 	    PdfPCell statsC1 = new PdfPCell();
 	    statsC1.setBorder(0);
@@ -481,13 +446,13 @@ public class PiwikPDFExporter  {
 	    
 	    text = new Paragraph();
 	    text.setFont(FONT[7]);
-	    text.add("" + summary.get("visits"));
+	    text.add("" + summary.get("downloads"));
 	    text.setFont(FONT[6]);
-	    text.add(" visits, ");
+	    text.add(" downloads, ");
 	    text.setFont(FONT[7]);
-	    text.add("" + summary.get("unique visitors"));
+	    text.add("" + summary.get("unique downloads"));
 	    text.setFont(FONT[6]);
-	    text.add(" unique visitors");
+	    text.add(" unique downloads");
 	    
 	    srow = new PdfPCell();
 	    srow.setBorder(0);
@@ -497,14 +462,10 @@ public class PiwikPDFExporter  {
 	    
 	    text = new Paragraph();
 	    text.setFont(FONT[7]);
-	    text.add("" + summary.get("downloads"));
+	    text.add("" + summary.get("visits"));
 	    text.setFont(FONT[6]);
-	    text.add(" downloads, ");
-	    text.setFont(FONT[7]);
-	    text.add("" + summary.get("unique downloads"));
-	    text.setFont(FONT[6]);
-	    text.add(" unique downloads");
-	    
+	    text.add(" visits ");
+
 	    srow = new PdfPCell();
 	    srow.setBorder(0);
 	    srow.addElement(text);
@@ -568,35 +529,6 @@ public class PiwikPDFExporter  {
 		
 		pdf.close();			
 		writer.close();
-	}
-	
-	public static Document parseXML(String xml) {
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = null;
-		Document doc = null;
-		try {
-		    builder = builderFactory.newDocumentBuilder();
-		} catch (ParserConfigurationException e) {
-		    e.printStackTrace();  
-		}
-		try {
-			doc = builder.parse(new StringInputStream(xml));
-		} catch (Exception e) {
-			log.error(e);
-		}
-		return doc;
-	}
-
-	private static String readFromURL(String url) throws IOException {
-		StringBuilder output = new StringBuilder();		
-		URL widget = new URL(url);
-		BufferedReader in = new BufferedReader(new InputStreamReader(widget.openStream()));
-		String inputLine;
-		while ((inputLine = in.readLine()) != null) {
-			output.append(inputLine).append("\n");
-		}
-		in.close();
-		return output.toString();
 	}
 }
 

@@ -1203,7 +1203,7 @@ public class EPerson extends DSpaceObject
         DatabaseManager.update(ourContext, myRow);
 
         //Executing script to replicate user to other applications
-        runExternalScript();
+        //runExternalScript();
 
         log.info(LogManager.getHeader(ourContext, "update_eperson",
                 "eperson_id=" + getID()));
